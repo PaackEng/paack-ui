@@ -173,4 +173,10 @@ farIcon icon hintText =
 
 faIcon : String -> String -> String -> Element msg
 faIcon prefix icon hintText =
-    html (Html.i [ HtmlAttr.class (prefix ++ " fa-" ++ icon), HtmlAttr.title hintText ] [])
+    html
+        (Html.i
+            [ HtmlAttr.class (prefix ++ " fa-" ++ icon)
+            , HtmlAttr.title hintText
+            ]
+            []
+        )

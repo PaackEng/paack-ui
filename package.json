@@ -8,15 +8,16 @@
   },
   "scripts": {
     "watch-docs-old": "chokidar \"**/*.elm\" -c \"elm make docs/src/Main.elm\"",
-    "watch-docs" : "parcel docs/public/index.html",
-    "build-docs" : "parcel build docs/public/index.html",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "watch-docs": "parcel docs/public/index.html",
+    "build-docs": "parcel build docs/public/index.html",
+    "test": "elm-test"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "chokidar": "^3.3.1",
     "elm-hot": "^1.1.4",
+    "elm-test": "^0.19.1-revision2",
     "node-elm-compiler": "^5.0.4",
     "parcel-bundler": "^1.12.4"
   },
