@@ -1,0 +1,24 @@
+{
+  "name": "paack-ui",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "watch-docs-old": "chokidar \"**/*.elm\" -c \"elm make docs/src/Main.elm\"",
+    "watch-docs" : "parcel docs/public/index.html",
+    "build-docs" : "parcel build docs/public/index.html",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "chokidar": "^3.3.1",
+    "elm-hot": "^1.1.4",
+    "node-elm-compiler": "^5.0.4",
+    "parcel-bundler": "^1.12.4"
+  },
+  "dependencies": {}
+}

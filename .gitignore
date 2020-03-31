@@ -1,0 +1,10 @@
+# Desktop Services Store on macOS
+.DS_Store
+
+.cache/
+node_modules/
+yarn-error.log
+docs/elm-stuff/
+elm-stuff/
+
+dist/
