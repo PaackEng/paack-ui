@@ -1,15 +1,7 @@
-module UI.Utils.Element exposing (disabled, letterSpacing)
+module UI.Utils.Element exposing (colorTransition, disabled)
 
 import Element exposing (Attribute)
 import Html.Attributes as HtmlAttrs
-
-
-letterSpacing : Float -> Attribute msg
-letterSpacing px =
-    -- TODO: Allow other units
-    (String.fromFloat px ++ "px")
-        |> HtmlAttrs.style "letter-spacing"
-        |> Element.htmlAttribute
 
 
 disabled : List (Attribute msg)
@@ -20,22 +12,22 @@ disabled =
     , ( "pointer-events", "none" )
     , ( "cursor", "default" )
     ]
-        |> List.map pairToAttribute
+        |> List.map stylePair
+
+
+colorTransition : Int -> List (Attribute msg)
+colorTransition time =
+    [ ( "transition-property", "color, background-color, border-color" )
+    , ( "transition-duration", String.fromInt time ++ "s" )
+    , ( "transition-timing-function", "linear" )
+    ]
+        |> List.map stylePair
 
 
 
 -- Helpers
 
 
-pairToAttribute : ( String, String ) -> Attribute msg
-pairToAttribute ( k, v ) =
+stylePair : ( String, String ) -> Attribute msg
+stylePair ( k, v ) =
     Element.htmlAttribute <| HtmlAttrs.style k v
-
-
-boolToHTML : Bool -> String
-boolToHTML val =
-    if val then
-        "true"
-
-    else
-        "false"

@@ -1,13 +1,26 @@
 module UI.Internal.Palette exposing
-    ( ToneColors
+    ( Color
+    , ToneColors
     , danger
     , gray
     , primary
     , success
+    , textDisbledWithGrayLightest
+    , textWithBg
+    , textWithGrayLighter
+    , textWithGrayLightest
     , warning
     )
 
-import Element exposing (Color, rgb255)
+import Element exposing (rgb255)
+
+
+type alias Color =
+    Element.Color
+
+
+
+-- Tones
 
 
 type alias ToneColors =
@@ -21,11 +34,11 @@ type alias ToneColors =
 
 gray : ToneColors
 gray =
-    { darkest = rgb255 14 20 32
-    , middle = rgb255 74 74 74
-    , light = rgb255 165 165 165
-    , lighter = rgb255 228 228 228
-    , lightest = rgb255 246 246 246
+    { darkest = rgb255 14 20 32 -- #0E1420
+    , middle = rgb255 74 74 74 -- #4A4A4A
+    , light = rgb255 165 165 165 -- #A5A5A5
+    , lighter = rgb255 228 228 228 -- #E4E4E4
+    , lightest = rgb255 246 246 246 -- #F6F6F6
     }
 
 
@@ -67,3 +80,31 @@ warning =
     , lighter = rgb255 255 245 157
     , lightest = rgb255 255 249 201
     }
+
+
+
+-- Text
+
+
+textWithBg : Color
+textWithBg =
+    -- #FFF
+    rgb255 255 255 255
+
+
+textWithGrayLightest : Color
+textWithGrayLightest =
+    -- #1B60D8
+    rgb255 27 96 216
+
+
+textWithGrayLighter : Color
+textWithGrayLighter =
+    -- #0C429C
+    rgb255 12 66 156
+
+
+textDisbledWithGrayLightest : Color
+textDisbledWithGrayLightest =
+    -- #A5A5A5
+    rgb255 165 165 165
