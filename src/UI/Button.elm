@@ -1,342 +1,322 @@
 module UI.Button exposing
     ( Button
+    , ButtonClick
+    , ButtonMode
+    , ButtonStyle
+    , ButtonTone
+    , ButtonWidth
+    , bodyEl
+    , bodyIcon
+    , bodyText
     , button
     , link
+    , modeDisabled
+    , modeEnabled
+    , styleFilled
+    , styleOutlined
     , toEl
     , toggle
-    , withDangerColor
-    , withDisabledMode
-    , withFullWidth
-    , withIcon
-    , withPrimaryColor
-    , withSuccessColor
-    , withText
-    , withWarningColor
+    , toneDanger
+    , toneLight
+    , tonePrimary
+    , toneSuccess
+    , widthFull
+    , widthRelative
+    , withMode
+    , withStyle
+    , withTone
+    , withWidth
     )
 
-import Element exposing (..)
-import Element.Background as Background
+import Element exposing (Attribute, Element)
 import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
-import Helpers exposing (ifThenElse)
-import UI.Attributes as Attributes
-import UI.Theme as Theme
+import UI.Icons exposing (Icon)
+import UI.Internal.Palette as Palette
+import UI.Internal.Primitives as Primitives
+import UI.Utils.Element as Element
 
 
-type Content msg
-    = Text String
-    | Custom (Element msg)
+type alias Options =
+    { mode : ButtonMode
+    , style : ButtonStyle
+    , tone : ButtonTone
+    , width : ButtonWidth
+    }
 
 
-type ButtonType msg
-    = Normal msg
-    | Link String
-    | Toggle (Bool -> msg) Bool
-
-
-type alias Options msg =
-    { colorScheme : ColorScheme
-    , content : Content msg
-    , buttonType : ButtonType msg
-    , isDisabled : Bool
-    , isFullWidth : Bool
+type alias Properties msg =
+    { body : ButtonBody msg
+    , click : ButtonClick msg
     }
 
 
 type Button msg
-    = Button (Options msg)
+    = Button (Properties msg) Options
 
 
-type alias ColorScheme =
-    { normal : ColorConfig
-    , hover : ColorConfig
-    }
+type ButtonBody msg
+    = BodyText String
+    | BodyIcon Icon
+    | BodyEl (Element msg)
 
 
-type alias ColorConfig =
-    { bg : Color
-    , text : Color
-    , border : Color
-    }
+type ButtonClick msg
+    = ClickMsg msg
+    | ClickHref String
+    | ClickToggle (Bool -> msg) Bool
 
 
-defaultOptions : Options msg
+type ButtonMode
+    = ModeEnabled
+    | ModeDisabled
+
+
+type ButtonStyle
+    = StyleFilled
+    | StyleOutlined
+
+
+type ButtonTone
+    = ToneDanger
+    | ToneLight
+    | TonePrimary
+    | ToneSuccess
+
+
+type ButtonWidth
+    = WidthFull
+    | WidthRelative
+
+
+
+-- Create
+
+
+defaultOptions : Options
 defaultOptions =
-    { content = Text ""
-    , colorScheme = disabledColorScheme
-    , buttonType = Link ""
-    , isDisabled = False
-    , isFullWidth = False
+    { mode = ModeEnabled
+    , style = StyleFilled
+    , tone = TonePrimary
+    , width = WidthRelative
     }
 
 
-button : msg -> Button msg
+buttonAny : ButtonClick msg -> ButtonBody msg -> Button msg
+buttonAny click body =
+    Button (Properties body click) defaultOptions
+
+
+button : msg -> ButtonBody msg -> Button msg
 button msg =
-    Button
-        { defaultOptions
-            | buttonType = Normal msg
-        }
+    buttonAny (ClickMsg msg)
 
 
-toggle : (Bool -> msg) -> Bool -> Button msg
+toggle : (Bool -> msg) -> Bool -> ButtonBody msg -> Button msg
 toggle msg isEnabled =
-    Button
-        { defaultOptions
-            | buttonType = Toggle msg isEnabled
-        }
+    buttonAny (ClickToggle msg isEnabled)
 
 
-link : String -> Button msg
+link : String -> ButtonBody msg -> Button msg
 link url =
-    Button
-        { defaultOptions
-            | buttonType = Link url
-        }
+    buttonAny (ClickHref url)
 
 
-withDisabledMode : Bool -> Button msg -> Button msg
-withDisabledMode isDisabled (Button options) =
-    Button
-        { options
-            | isDisabled = isDisabled
-        }
+
+-- Options
 
 
-disabledColorScheme : ColorScheme
-disabledColorScheme =
-    let
-        default =
-            { bg = Theme.gray4
-            , text = Theme.gray2
-            , border = Theme.gray2
-            }
-    in
-    { normal = default
-    , hover = default
-    }
+withMode : ButtonMode -> Button msg -> Button msg
+withMode mode (Button prop opt) =
+    Button prop { opt | mode = mode }
 
 
-withIcon : Element msg -> Button msg -> Button msg
-withIcon content (Button options) =
-    Button
-        { options
-            | content = Custom content
-        }
+withStyle : ButtonStyle -> Button msg -> Button msg
+withStyle style (Button prop opt) =
+    Button prop { opt | style = style }
 
 
-withPrimaryColor : Button msg -> Button msg
-withPrimaryColor (Button options) =
-    Button
-        { options
-            | colorScheme =
-                { normal =
-                    { bg = Theme.primary
-                    , text = Theme.white
-                    , border = Theme.primary
-                    }
-                , hover =
-                    { bg = Theme.white
-                    , text = Theme.primary
-                    , border = Theme.primary
-                    }
-                }
-        }
+withTone : ButtonTone -> Button msg -> Button msg
+withTone tone (Button prop opt) =
+    Button prop { opt | tone = tone }
 
 
-withSuccessColor : Button msg -> Button msg
-withSuccessColor (Button options) =
-    Button
-        { options
-            | colorScheme =
-                { normal =
-                    { bg = Theme.success
-                    , text = Theme.black
-                    , border = Theme.success
-                    }
-                , hover =
-                    { bg = Theme.white
-                    , text = Theme.black
-                    , border = Theme.success
-                    }
-                }
-        }
+withWidth : ButtonWidth -> Button msg -> Button msg
+withWidth width (Button prop opt) =
+    Button prop { opt | width = width }
 
 
-withDangerColor : Button msg -> Button msg
-withDangerColor (Button options) =
-    Button
-        { options
-            | colorScheme =
-                { normal =
-                    { bg = Theme.error
-                    , text = Theme.white
-                    , border = Theme.error
-                    }
-                , hover =
-                    { bg = Theme.white
-                    , text = Theme.error
-                    , border = Theme.error
-                    }
-                }
-        }
+
+-- Expose all properties
 
 
-withWarningColor : Button msg -> Button msg
-withWarningColor (Button options) =
-    Button
-        { options
-            | colorScheme =
-                { normal =
-                    { bg = Theme.warning
-                    , text = Theme.black
-                    , border = Theme.warning
-                    }
-                , hover =
-                    { bg = Theme.white
-                    , text = Theme.black
-                    , border = Theme.warning
-                    }
-                }
-        }
+bodyEl : Element msg -> ButtonBody msg
+bodyEl elem =
+    BodyEl elem
 
 
-withFullWidth : Button msg -> Button msg
-withFullWidth (Button options) =
-    Button
-        { options | isFullWidth = True }
+bodyIcon : Icon -> ButtonBody msg
+bodyIcon ico =
+    BodyIcon ico
 
 
-withText : String -> Button msg -> Button msg
-withText val (Button options) =
-    Button
-        { options
-            | content = Text val
-        }
+bodyText : String -> ButtonBody msg
+bodyText text =
+    BodyText text
+
+
+modeDisabled : ButtonMode
+modeDisabled =
+    ModeDisabled
+
+
+modeEnabled : ButtonMode
+modeEnabled =
+    ModeEnabled
+
+
+styleFilled : ButtonStyle
+styleFilled =
+    StyleFilled
+
+
+styleOutlined : ButtonStyle
+styleOutlined =
+    StyleOutlined
+
+
+toneDanger : ButtonTone
+toneDanger =
+    ToneDanger
+
+
+toneLight : ButtonTone
+toneLight =
+    ToneLight
+
+
+tonePrimary : ButtonTone
+tonePrimary =
+    TonePrimary
+
+
+toneSuccess : ButtonTone
+toneSuccess =
+    ToneSuccess
+
+
+widthFull : ButtonWidth
+widthFull =
+    WidthFull
+
+
+widthRelative : ButtonWidth
+widthRelative =
+    WidthRelative
+
+
+
+-- Render
 
 
 toEl : Button msg -> Element msg
-toEl (Button options) =
+toEl ((Button { click, body } _) as btn) =
     let
-        baseAttrs =
-            case options.buttonType of
-                Link _ ->
-                    []
-
-                _ ->
-                    [ Font.size 16
-                    , Theme.roundedBorder
-                    , Border.width 1
-                    , Font.center
-                    , buttonWidth
-                    , buttonPadding
-                    , Attributes.ariaRole "button"
-                    ]
-
-        buttonPadding =
-            case options.content of
-                Custom _ ->
-                    paddingXY 12 8
-
-                Text _ ->
-                    paddingXY 30 10
-
-        buttonWidth =
-            width <| ifThenElse options.isFullWidth fill shrink
-
-        disabledAttrs =
-            if options.isDisabled then
-                [ Attributes.custom "disabled" "true"
-                , Attributes.custom "aria-disabled" "true"
-                , Attributes.custom "tabindex" "-1"
-                , Attributes.custom "pointer-events" "none"
-                , Attributes.custom "cursor" "default"
-                ]
-
-            else
-                [ pointer ]
-
-        clickAttrs =
-            case options.buttonType of
-                Normal msg ->
-                    [ Events.onClick msg ]
-
-                Toggle msg isEnabled ->
-                    [ Events.onClick (msg (not isEnabled)) ]
-
-                Link _ ->
-                    []
-
         attrs =
-            baseAttrs
-                ++ colorAttrs options
-                ++ disabledAttrs
-                ++ ifThenElse options.isDisabled [] clickAttrs
+            baseAttrs btn
+                ++ colorAttrs btn
+                ++ disabledAttrs btn
+                ++ clickAttrs btn
     in
-    case options.buttonType of
-        Link url ->
+    case click of
+        ClickHref url ->
             Element.link
                 attrs
                 { url = url
-                , label = elFromContent options.content
+                , label = elFromBody body
                 }
 
         _ ->
-            el attrs <|
-                elFromContent options.content
+            Element.el attrs <|
+                elFromBody body
 
 
-colorAttrs : Options msg -> List (Attr () msg)
-colorAttrs { colorScheme, buttonType, isDisabled } =
-    let
-        attrs normal hover =
-            case buttonType of
-                Link _ ->
-                    [ Font.color hover.text
-                    , Font.underline
-                    , mouseOver
-                        [ Font.color Theme.black
-                        ]
-                    ]
+baseAttrs : Button msg -> List (Attribute msg)
+baseAttrs ((Button { click } _) as btn) =
+    case click of
+        ClickHref _ ->
+            []
 
-                _ ->
-                    [ Background.color normal.bg
-                    , Font.color normal.text
-                    , mouseOver
-                        [ Background.color hover.bg
-                        , Font.color hover.text
-                        , Border.color hover.border
-                        ]
-                    , Border.color normal.border
-                    , Attributes.transition 100 [ "color", "background-color" ]
-                    ]
-
-        disabledMode =
-            attrs disabledColorScheme.normal disabledColorScheme.hover
-
-        enabledMode =
-            case buttonType of
-                Normal _ ->
-                    attrs colorScheme.normal colorScheme.hover
-
-                Link _ ->
-                    attrs colorScheme.normal colorScheme.hover
-
-                Toggle _ isEnabled ->
-                    if isEnabled then
-                        attrs colorScheme.normal colorScheme.hover
-
-                    else
-                        attrs colorScheme.hover colorScheme.normal
-    in
-    ifThenElse isDisabled disabledMode enabledMode
+        _ ->
+            [ Font.size 16
+            , Font.center
+            , Primitives.roundedBorders
+            , buttonWidth btn
+            , buttonPadding btn
+            ]
 
 
-elFromContent : Content msg -> Element msg
-elFromContent content =
-    case content of
-        Text str ->
-            text str
+buttonWidth : Button msg -> Attribute msg
+buttonWidth (Button _ { width }) =
+    if width == WidthFull then
+        Element.width Element.fill
 
-        Custom el ->
+    else
+        Element.width Element.shrink
+
+
+buttonPadding : Button msg -> Attribute msg
+buttonPadding (Button { body } _) =
+    case body of
+        BodyText _ ->
+            Element.paddingXY 32 8
+
+        BodyIcon _ ->
+            Element.paddingXY 10 12
+
+        BodyEl _ ->
+            Element.paddingXY 10 12
+
+
+colorAttrs : Button msg -> List (Attribute msg)
+colorAttrs (Button _ { tone }) =
+    []
+
+
+disabledAttrs : Button msg -> List (Attribute msg)
+disabledAttrs (Button _ { mode }) =
+    if mode == ModeDisabled then
+        Element.disabled
+
+    else
+        [ Element.pointer ]
+
+
+clickAttrs : Button msg -> List (Attribute msg)
+clickAttrs (Button { click } { mode }) =
+    case ( mode, click ) of
+        ( ModeEnabled, ClickMsg msg ) ->
+            [ Events.onClick msg ]
+
+        ( ModeEnabled, ClickToggle msg isEnabled ) ->
+            [ Events.onClick (msg (not isEnabled)) ]
+
+        ( ModeEnabled, ClickHref _ ) ->
+            []
+
+        ( ModeDisabled, _ ) ->
+            []
+
+
+elFromBody : ButtonBody msg -> Element msg
+elFromBody body =
+    case body of
+        BodyText str ->
+            Element.text str
+
+        BodyIcon _ ->
+            Element.none
+
+        BodyEl el ->
             el

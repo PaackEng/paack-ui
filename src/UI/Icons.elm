@@ -1,5 +1,6 @@
 module UI.Icons exposing
-    ( checked
+    ( Icon
+    , checked
     , chevronDown
     , chevronLeft
     , chevronRight
@@ -30,6 +31,10 @@ import Element exposing (..)
 import Html
 import Html.Attributes as HtmlAttr
 import UI.Attributes exposing (title)
+
+
+type Icon
+    = Soon
 
 
 spinner : Element msg
