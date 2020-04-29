@@ -16,6 +16,7 @@ import Msg exposing (Msg(..))
 import PopUps as PopUps
 import Return as R
 import Tables.Stories as Tables
+import Texts as Texts
 import Theme as Theme
 import UIExplorer exposing (Config, UIExplorerProgram, explore, logoFromHtml)
 import UIExplorer.Plugins.Note as Note
@@ -47,7 +48,8 @@ main : UIExplorerProgram Model Msg PluginOptions
 main =
     explore
         config
-        [ Icons.stories
+        [ Texts.stories
+        , Icons.stories
         , Theme.stories
         , Buttons.stories
         , ActionBars.stories
