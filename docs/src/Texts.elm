@@ -11,8 +11,26 @@ stories =
     storiesOf
         "Texts"
         [ ( "Texts"
-          , \_ -> textsView
-          , { note = "" }
+          , textsView
+          , { note = """
+```elm
+"Wherever You Will Go"
+    |> Text.heading1
+    |> Text.toEl
+
+\"\"\"
+So lately, been wondering
+Who will be there to take my place?
+\"\"\"
+    |> Text.body1
+    |> Text.toEl
+```
+
+Futures discussions includes:
+* How we'll add responsives attributes (font-size may variate with device size).
+* * Maybe `Text.toEl <device>`
+* is `Text.toEl` really necessary?
+""" }
           )
         ]
 
@@ -39,11 +57,10 @@ styleView ( component, label ) =
         |> Text.toEl
 
 
-textsView =
+textsView content =
     styles
         |> List.map styleView
         |> Element.column
             [ Element.spacing 20
-            , Font.family [ Font.typeface "Inter", Font.sansSerif ]
             ]
-        |> Element.layout []
+        |> Element.layout [ Font.family [ Font.typeface "Inter", Font.sansSerif ] ]
