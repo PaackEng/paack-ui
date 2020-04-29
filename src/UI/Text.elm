@@ -19,6 +19,7 @@ module UI.Text exposing
 import Element exposing (Attribute, Element)
 import Element.Font as Font
 import List
+import UI.Utils.Element as Element
 
 
 type alias Properties =
@@ -124,37 +125,64 @@ deskAttributes : TextSize -> List (Attribute msg)
 deskAttributes size =
     case size of
         SizeHeading1 ->
-            [ Font.size 92 ]
+            [ Font.size 92
+            , Element.letterSpacing -4.5
+            ]
 
         SizeHeading2 ->
-            [ Font.size 64 ]
+            [ Font.size 64
+            , Element.letterSpacing -3
+            ]
 
         SizeHeading3 ->
-            [ Font.size 48 ]
+            [ Font.size 48
+            , Element.letterSpacing -2
+            ]
 
         SizeHeading4 ->
-            [ Font.size 32 ]
+            [ Font.size 32
+            , Element.letterSpacing -1
+            ]
 
         SizeHeading5 ->
-            [ Font.size 24 ]
+            [ Font.size 24
+            , Element.letterSpacing 0
+            ]
 
         SizeHeading6 ->
-            [ Font.size 20 ]
+            [ Font.size 20
+            , Element.letterSpacing 0.15
+            ]
 
         SizeSubtitle1 ->
-            [ Font.size 16 ]
+            [ Font.size 16
+            , Element.letterSpacing 0.2
+            ]
 
         SizeSubtitle2 ->
-            [ Font.size 14 ]
+            [ Font.size 14
+            , Element.letterSpacing 0.25
+            ]
 
         SizeBody1 ->
-            [ Font.size 16, Element.spacing 24 ]
+            [ Font.size 16
+            , Element.spacing 8
+            , Element.letterSpacing 0.2
+            ]
 
         SizeBody2 ->
-            [ Font.size 14, Element.spacing 24 ]
+            [ Font.size 14
+            , Element.spacing 10
+            , Element.letterSpacing 0.25
+            ]
 
         SizeCaption ->
-            [ Font.size 12, Element.spacing 16 ]
+            [ Font.size 12
+            , Element.spacing 4
+            , Element.letterSpacing 0.5
+            ]
 
         SizeOverline ->
-            [ Font.size 10 ]
+            [ Font.size 10
+            , Element.letterSpacing 2
+            ]
