@@ -17,6 +17,8 @@ stories renderConfig =
         , dangerStory renderConfig
         , lightStory renderConfig
         , linkStory renderConfig
+        , fullWidthStory renderConfig
+        , outlineStory renderConfig
         ]
 
 
@@ -120,5 +122,68 @@ linkStory renderConfig =
         , Btn.bodyText "Go to Blank"
             |> Btn.link "about:blank"
             |> Btn.toEl renderConfig
-        , { note = "" }
+        , { note = """
+```elm
+-- Text
+Btn.bodyText "Go to Blank"
+    |> Btn.link "about:blank"
+    |> Btn.toEl renderConfig
+```
+""" }
+        )
+
+
+fullWidthStory renderConfig =
+    story
+        ( "Full Width"
+        , Btn.bodyText "Super Long Prompt"
+            |> Btn.button Msg.NoOp
+            |> Btn.withWidth Btn.widthFull
+            |> Btn.toEl renderConfig
+        , { note = """
+```elm
+-- Text
+
+Btn.bodyText "Some Text"
+    |> Btn.button Your Message
+    |> Btn.withWidth Btn.widthFull
+    |> Btn.toEl renderConfig
+```
+""" }
+        )
+
+
+outlineStory renderConfig =
+    storyList
+        ( "Outline"
+        , [ Btn.bodyText "Prompt"
+                |> Btn.button Msg.NoOp
+                |> Btn.withStyle Btn.styleOutlined
+                |> Btn.withTone Btn.toneDanger
+                |> Btn.toEl renderConfig
+          , Btn.bodyIcon Ico.toggle
+                |> Btn.button Msg.NoOp
+                |> Btn.withStyle Btn.styleOutlined
+                |> Btn.withTone Btn.toneDanger
+                |> Btn.toEl renderConfig
+          ]
+        , { note = """
+```elm
+-- Text
+
+Button.bodyText "Some Text"
+    |> Button.button YourMessage
+    |> Btn.withStyle Btn.styleOutlined
+    |> Btn.withTone Btn.toneDanger
+    |> Button.toEl renderConfig
+
+
+-- Icon
+Btn.bodyIcon Ico.someIcon
+    |> Btn.button YourMessage
+    |> Btn.withStyle Btn.styleOutlined
+    |> Btn.withTone Btn.toneDanger
+    |> Btn.toEl renderConfig
+```
+""" }
         )

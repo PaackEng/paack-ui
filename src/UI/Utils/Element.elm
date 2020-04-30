@@ -18,7 +18,7 @@ disabled =
 colorTransition : Int -> List (Attribute msg)
 colorTransition time =
     [ ( "transition-property", "color, background-color, border-color" )
-    , ( "transition-duration", String.fromInt time ++ "s" )
+    , ( "transition-duration", String.fromInt time ++ "ms" )
     , ( "transition-timing-function", "linear" )
     ]
         |> List.map stylePair
