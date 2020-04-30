@@ -6,6 +6,7 @@ module UI.Icons exposing
     , chevronRight
     , chevronUp
     , close
+    , close_
     , collapse
     , expand
     , filter
@@ -42,6 +43,7 @@ import UI.RenderConfig exposing (RenderConfig)
 
 type Icon
     = Toggle
+    | Close
 
 
 toggle : Icon
@@ -49,11 +51,19 @@ toggle =
     Toggle
 
 
+close_ : Icon
+close_ =
+    Close
+
+
 toEl : RenderConfig -> Icon -> Element msg
 toEl _ ico =
     case ico of
         Toggle ->
             fasIcon "map" "Toggle"
+
+        Close ->
+            fasIcon "times" ""
 
 
 

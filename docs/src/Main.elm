@@ -62,7 +62,7 @@ main =
         , Icons.stories
         , Theme.stories
         , Buttons.stories renderConfig
-        , ActionBars.stories
+        , ActionBars.stories renderConfig
         , Alerts.stories
         , PopUps.stories
         , Badges.stories

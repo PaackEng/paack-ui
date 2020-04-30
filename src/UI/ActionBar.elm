@@ -14,6 +14,7 @@ import Element.Border as Border
 import Element.Font as Font
 import UI.Button as Button exposing (Button)
 import UI.Icons as Icons
+import UI.RenderConfig exposing (RenderConfig)
 import UI.Theme as Theme
 
 
@@ -71,8 +72,8 @@ withButtons buttons (ActionBar options) =
         }
 
 
-toEl : ActionBar msg -> Element msg
-toEl (ActionBar options) =
+toEl : RenderConfig -> ActionBar msg -> Element msg
+toEl cfg (ActionBar options) =
     row
         [ width fill
         , paddingEach
@@ -88,7 +89,7 @@ toEl (ActionBar options) =
         , alignBottom
         ]
         [ viewTextContainer options
-        , viewButtonsContainer options
+        , viewButtonsContainer cfg options
         ]
 
 
@@ -103,29 +104,26 @@ viewTextContainer options =
         ]
 
 
-viewButtonsContainer : Options msg -> Element msg
-viewButtonsContainer options =
+viewButtonsContainer : RenderConfig -> Options msg -> Element msg
+viewButtonsContainer cfg options =
     let
         closeBtn =
             case options.onClose of
                 Just msg ->
-                    {- TODO
-                       Button.button msg
-                           |> Button.withDangerColor
-                           |> Button.withIcon (Icons.close "")
-                           |> Button.toEl
-                    -}
-                    none
+                    Button.bodyIcon Icons.close_
+                        |> Button.button msg
+                        |> Button.withTone Button.toneDanger
+                        |> Button.toEl cfg
 
                 Nothing ->
                     none
 
+        customBtns =
+            List.map (Button.toEl cfg) options.buttons
+
         buttons =
-            {- TODO
-               [ closeBtn ]
-                   |> List.append (List.map Button.toEl options.buttons)
-            -}
-            [ none ]
+            [ closeBtn ]
+                |> List.append customBtns
     in
     row [ alignRight, Theme.smallSpacing ]
         buttons

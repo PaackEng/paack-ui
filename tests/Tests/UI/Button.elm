@@ -10,11 +10,20 @@ import Test.Html.Selector as Selector
 import Tests.Utils.Element exposing (elementToHtml, hasIconInside)
 import UI.Button as B
 import UI.Icons as Icons
+import UI.RenderConfig
 
 
 type Msg
     = OnButtonClicked
     | OnToggleChanged Bool
+
+
+fakeRenderConfig : UI.RenderConfig.RenderConfig
+fakeRenderConfig =
+    UI.RenderConfig.fromWindow
+        { width = 1920
+        , height = 1080
+        }
 
 
 tests : Test
@@ -31,15 +40,15 @@ withIconTests : Test
 withIconTests =
     let
         iconHintText =
-            "Show Map"
+            "Toggle"
     in
     describe "#withIcon"
         [ test "sets the content with an icon" <|
             \_ ->
-                B.button OnButtonClicked
-                    |> B.withPrimaryColor
-                    |> B.withIcon (Icons.map iconHintText)
-                    |> B.toEl
+                B.bodyIcon Icons.toggle
+                    |> B.button OnButtonClicked
+                    |> B.withTone B.tonePrimary
+                    |> B.toEl fakeRenderConfig
                     |> elementToHtml
                     |> findBtnQuery
                     |> hasIconInside iconHintText
@@ -62,10 +71,10 @@ disabledTests =
         [ describe "when withDisabledMode is set to True"
             [ test "Button doesn't fire message on click" <|
                 \_ ->
-                    B.button OnButtonClicked
-                        |> B.withText "Click Here"
-                        |> B.withDisabledMode True
-                        |> B.toEl
+                    B.bodyText "Click Here"
+                        |> B.button OnButtonClicked
+                        |> B.withMode B.modeDisabled
+                        |> B.toEl fakeRenderConfig
                         |> elementToHtml
                         |> findBtnQuery
                         |> Event.simulate Event.click
@@ -73,18 +82,18 @@ disabledTests =
                         |> Expect.err
             , test "Button has disabled attribute" <|
                 \_ ->
-                    B.button OnButtonClicked
-                        |> B.withText "Click Here"
-                        |> B.withDisabledMode True
-                        |> B.toEl
+                    B.bodyText "Click Here"
+                        |> B.button OnButtonClicked
+                        |> B.withMode B.modeDisabled
+                        |> B.toEl fakeRenderConfig
                         |> elementToHtml
                         |> Query.has [ Selector.attribute (HtmlAttr.attribute "disabled" "true") ]
             , test "Toggle doesn't fires message on click" <|
                 \_ ->
-                    B.toggle OnToggleChanged False
-                        |> B.withText "Click Here"
-                        |> B.withDisabledMode True
-                        |> B.toEl
+                    B.bodyText "Click Here"
+                        |> B.toggle OnToggleChanged False
+                        |> B.withMode B.modeDisabled
+                        |> B.toEl fakeRenderConfig
                         |> elementToHtml
                         |> findBtnQuery
                         |> Event.simulate Event.click
@@ -94,19 +103,19 @@ disabledTests =
         , describe "when withDisabledMode is set to False"
             [ test "Button fires OnButtonClicked message on click" <|
                 \_ ->
-                    B.button OnButtonClicked
-                        |> B.withText "Click Here"
-                        |> B.withDisabledMode False
-                        |> B.toEl
+                    B.bodyText "Click Here"
+                        |> B.button OnButtonClicked
+                        |> B.withMode B.modeEnabled
+                        |> B.toEl fakeRenderConfig
                         |> elementToHtml
                         |> findBtnQuery
                         |> Event.simulate Event.click
                         |> Event.expect OnButtonClicked
             , test "Toogle fires OnButtonClicked message on click" <|
                 \_ ->
-                    B.toggle OnToggleChanged False
-                        |> B.withText "Click Here"
-                        |> B.toEl
+                    B.bodyText "Click Here"
+                        |> B.toggle OnToggleChanged False
+                        |> B.toEl fakeRenderConfig
                         |> elementToHtml
                         |> findBtnQuery
                         |> Event.simulate Event.click
@@ -128,18 +137,18 @@ eventsTests =
         , describe "#toggle"
             [ test "Click fires the (OnToggleChanged True) when is Off" <|
                 \_ ->
-                    B.toggle OnToggleChanged False
-                        |> B.withText "Click Here"
-                        |> B.toEl
+                    B.bodyText "Click Here"
+                        |> B.toggle OnToggleChanged False
+                        |> B.toEl fakeRenderConfig
                         |> elementToHtml
                         |> findBtnQuery
                         |> Event.simulate Event.click
                         |> Event.expect (OnToggleChanged True)
             , test "Click fires the (OnToggleChanged False) when is On" <|
                 \_ ->
-                    B.toggle OnToggleChanged True
-                        |> B.withText "Click Here"
-                        |> B.toEl
+                    B.bodyText "Click Here"
+                        |> B.toggle OnToggleChanged True
+                        |> B.toEl fakeRenderConfig
                         |> elementToHtml
                         |> findBtnQuery
                         |> Event.simulate Event.click
@@ -148,9 +157,9 @@ eventsTests =
         , describe "#link"
             [ test "Click do not fires the any Message" <|
                 \_ ->
-                    B.link "http://www.google.com"
-                        |> B.withText "Click Here"
-                        |> B.toEl
+                    B.bodyText "Click Here"
+                        |> B.link "http://www.google.com"
+                        |> B.toEl fakeRenderConfig
                         |> elementToHtml
                         |> findBtnQuery
                         |> Event.simulate Event.click
@@ -162,9 +171,9 @@ eventsTests =
                         url =
                             "http://www.google.com"
                     in
-                    B.link url
-                        |> B.withText "Click Here"
-                        |> B.toEl
+                    B.bodyText "Click Here"
+                        |> B.link url
+                        |> B.toEl fakeRenderConfig
                         |> elementToHtml
                         |> Query.has [ Selector.attribute (HtmlAttr.attribute "href" url) ]
             ]
@@ -178,8 +187,8 @@ findBtnQuery item =
 
 clickableBtn : Query.Single Msg
 clickableBtn =
-    B.button OnButtonClicked
-        |> B.withText "Click Here"
-        |> B.toEl
+    B.bodyText "Click Here"
+        |> B.button OnButtonClicked
+        |> B.toEl fakeRenderConfig
         |> elementToHtml
         |> findBtnQuery
