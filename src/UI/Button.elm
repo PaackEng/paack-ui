@@ -33,9 +33,10 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
-import UI.Icons exposing (Icon)
+import UI.Icons as Icon exposing (Icon)
 import UI.Internal.Palette as Palette exposing (Color)
 import UI.Internal.Primitives as Primitives
+import UI.RenderConfig exposing (RenderConfig)
 import UI.Utils.Element as Element
 
 
@@ -221,8 +222,8 @@ widthRelative =
 -- Render
 
 
-toEl : Button msg -> Element msg
-toEl ((Button { click, body } _) as btn) =
+toEl : RenderConfig -> Button msg -> Element msg
+toEl cfg ((Button { click, body } _) as btn) =
     let
         attrs =
             baseAttrs btn
@@ -235,12 +236,12 @@ toEl ((Button { click, body } _) as btn) =
             Element.link
                 attrs
                 { url = url
-                , label = elFromBody body
+                , label = elFromBody cfg body
                 }
 
         _ ->
             Element.el attrs <|
-                elFromBody body
+                elFromBody cfg body
 
 
 baseAttrs : Button msg -> List (Attribute msg)
@@ -271,7 +272,7 @@ buttonPadding : Button msg -> Attribute msg
 buttonPadding (Button { body } _) =
     case body of
         BodyText _ ->
-            Element.paddingXY 32 8
+            Element.paddingXY 32 12
 
         BodyIcon _ ->
             Element.paddingXY 10 12
@@ -296,9 +297,9 @@ styleAttrs ((Button { click } { style }) as btn) =
     case ( click, style ) of
         ( ClickHref _, _ ) ->
             [ Font.underline
-            , Font.color active
+            , Font.color passive
             , Element.mouseOver
-                [ Font.color hoverActive
+                [ Font.color hoverPassive
                 ]
             ]
 
@@ -338,7 +339,7 @@ colorHelper (Button { click, body } { mode, tone }) =
             if mode == ModeDisabled then
                 case ( body, tone ) of
                     ( BodyIcon _, _ ) ->
-                        ( ( Palette.gray.lightest, Palette.gray.lighter )
+                        ( ( Palette.gray.lightest, Palette.gray.light )
                         , Nothing
                         )
 
@@ -413,14 +414,14 @@ clickAttrs (Button { click } { mode }) =
             []
 
 
-elFromBody : ButtonBody msg -> Element msg
-elFromBody body =
+elFromBody : RenderConfig -> ButtonBody msg -> Element msg
+elFromBody cfg body =
     case body of
         BodyText str ->
             Element.text str
 
-        BodyIcon _ ->
-            Element.none
+        BodyIcon ico ->
+            Icon.toEl cfg ico
 
         BodyEl el ->
             el

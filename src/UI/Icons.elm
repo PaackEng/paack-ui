@@ -22,6 +22,8 @@ module UI.Icons exposing
     , search
     , settings
     , spinner
+    , toEl
+    , toggle
     , trash
     , unchecked
     , warning
@@ -31,10 +33,31 @@ import Element exposing (..)
 import Html
 import Html.Attributes as HtmlAttr
 import UI.Attributes exposing (title)
+import UI.RenderConfig exposing (RenderConfig)
+
+
+
+-- NEW
 
 
 type Icon
-    = Soon
+    = Toggle
+
+
+toggle : Icon
+toggle =
+    Toggle
+
+
+toEl : RenderConfig -> Icon -> Element msg
+toEl _ ico =
+    case ico of
+        Toggle ->
+            fasIcon "map" "Toggle"
+
+
+
+-- OLD
 
 
 spinner : Element msg

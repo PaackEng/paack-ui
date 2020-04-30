@@ -109,17 +109,23 @@ viewButtonsContainer options =
         closeBtn =
             case options.onClose of
                 Just msg ->
-                    Button.button msg
-                        |> Button.withDangerColor
-                        |> Button.withIcon (Icons.close "")
-                        |> Button.toEl
+                    {- TODO
+                       Button.button msg
+                           |> Button.withDangerColor
+                           |> Button.withIcon (Icons.close "")
+                           |> Button.toEl
+                    -}
+                    none
 
                 Nothing ->
                     none
 
         buttons =
-            [ closeBtn ]
-                |> List.append (List.map Button.toEl options.buttons)
+            {- TODO
+               [ closeBtn ]
+                   |> List.append (List.map Button.toEl options.buttons)
+            -}
+            [ none ]
     in
     row [ alignRight, Theme.smallSpacing ]
         buttons

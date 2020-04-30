@@ -1,8 +1,6 @@
 module Texts exposing (stories)
 
 import Element
-import Element.Border as Border
-import Element.Font as Font
 import UI.Text as Text
 import UIExplorer exposing (storiesOf)
 
@@ -63,4 +61,4 @@ textsView renderConfig content =
         |> Element.column
             [ Element.spacing 20
             ]
-        |> Element.layout [ Font.family [ Font.typeface "Inter", Font.sansSerif ] ]
+        |> Element.layout []

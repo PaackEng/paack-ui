@@ -45,7 +45,7 @@ gray =
 primary : ToneColors
 primary =
     { darkest = rgb255 12 66 156
-    , middle = rgb255 27 96 216
+    , middle = rgb255 27 96 216 -- #1B60D8
     , light = rgb255 81 145 255
     , lighter = rgb255 147 187 255
     , lightest = rgb255 227 238 255

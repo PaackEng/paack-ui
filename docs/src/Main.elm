@@ -4,6 +4,8 @@ import ActionBars as ActionBars
 import Alerts as Alerts
 import Badges as Badges
 import Buttons as Buttons
+import Element exposing (Element)
+import Element.Font as Font
 import Form.Checkboxes as Checkboxes
 import Form.Input as Input
 import Form.State as FormState
@@ -18,7 +20,7 @@ import Return as R
 import Tables.Stories as Tables
 import Texts as Texts
 import Theme as Theme
-import UI.RenderConfig
+import UI.RenderConfig exposing (RenderConfig)
 import UIExplorer exposing (Config, UIExplorerProgram, explore, logoFromHtml)
 import UIExplorer.Plugins.Note as Note
 import Utils exposing (story)
@@ -59,7 +61,7 @@ main =
         [ Texts.stories renderConfig
         , Icons.stories
         , Theme.stories
-        , Buttons.stories
+        , Buttons.stories renderConfig
         , ActionBars.stories
         , Alerts.stories
         , PopUps.stories

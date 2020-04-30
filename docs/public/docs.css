@@ -7,6 +7,6 @@
   background: #282c34;
 }
 
-body {
-    font-family: 'Inter', sans-serif;
+body, .font-open-sanshelveticaverdanasans-serif {
+    font-family: 'Inter', sans-serif !important;
 }

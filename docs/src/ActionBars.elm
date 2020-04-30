@@ -50,12 +50,14 @@ withExtraButtonsStory =
                 |> ActionBar.withTitle "Menu title"
                 |> ActionBar.withSubtitle "Cool menu subtitle"
                 |> ActionBar.withButtons
-                    [ Button.button Msg.NoOp
-                        |> Button.withPrimaryColor
-                        |> Button.withIcon (Icons.plus "Add item")
-                    , Button.button Msg.NoOp
-                        |> Button.withPrimaryColor
-                        |> Button.withText "Make something great"
+                    [{- TODO
+                        Button.button Msg.NoOp
+                            |> Button.withPrimaryColor
+                            |> Button.withIcon (Icons.plus "Add item")
+                        , Button.button Msg.NoOp
+                            |> Button.withPrimaryColor
+                            |> Button.withText "Make something great"
+                     -}
                     ]
             )
         , { note =
@@ -110,12 +112,14 @@ allFeaturesStory =
                 |> ActionBar.withTitle "Menu title"
                 |> ActionBar.withSubtitle "Cool menu subtitle"
                 |> ActionBar.withButtons
-                    [ Button.button Msg.NoOp
-                        |> Button.withPrimaryColor
-                        |> Button.withIcon (Icons.plus "Add item")
-                    , Button.button Msg.NoOp
-                        |> Button.withPrimaryColor
-                        |> Button.withText "Make something great"
+                    [{- TODO
+                        Button.button Msg.NoOp
+                            |> Button.withPrimaryColor
+                            |> Button.withIcon (Icons.plus "Add item")
+                        , Button.button Msg.NoOp
+                            |> Button.withPrimaryColor
+                            |> Button.withText "Make something great"
+                     -}
                     ]
                 |> ActionBar.withCloseButton Msg.NoOp
             )
