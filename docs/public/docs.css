@@ -6,3 +6,7 @@
   color: #abb2bf;
   background: #282c34;
 }
+
+body {
+    font-family: 'Inter', sans-serif;
+}
