@@ -7,23 +7,23 @@ import UI.Text as Text
 import UIExplorer exposing (storiesOf)
 
 
-stories =
+stories renderConfig =
     storiesOf
         "Texts"
         [ ( "Texts"
-          , textsView
+          , textsView renderConfig
           , { note = """
 ```elm
 "Wherever You Will Go"
     |> Text.heading1
-    |> Text.toEl
+    |> Text.toEl renderConfig
 
 \"\"\"
 So lately, been wondering
 Who will be there to take my place?
 \"\"\"
     |> Text.body1
-    |> Text.toEl
+    |> Text.toEl renderConfig
 ```
 
 Futures discussions includes:
@@ -51,15 +51,15 @@ styles =
     ]
 
 
-styleView ( component, label ) =
+styleView renderConfig ( component, label ) =
     label
         |> component
-        |> Text.toEl
+        |> Text.toEl renderConfig
 
 
-textsView content =
+textsView renderConfig content =
     styles
-        |> List.map styleView
+        |> List.map (styleView renderConfig)
         |> Element.column
             [ Element.spacing 20
             ]

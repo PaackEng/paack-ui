@@ -18,6 +18,7 @@ import Return as R
 import Tables.Stories as Tables
 import Texts as Texts
 import Theme as Theme
+import UI.RenderConfig
 import UIExplorer exposing (Config, UIExplorerProgram, explore, logoFromHtml)
 import UIExplorer.Plugins.Note as Note
 import Utils exposing (story)
@@ -46,9 +47,16 @@ config =
 
 main : UIExplorerProgram Model Msg PluginOptions
 main =
+    let
+        renderConfig =
+            UI.RenderConfig.fromWindow
+                { width = 1920
+                , height = 1080
+                }
+    in
     explore
         config
-        [ Texts.stories
+        [ Texts.stories renderConfig
         , Icons.stories
         , Theme.stories
         , Buttons.stories
