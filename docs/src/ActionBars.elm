@@ -50,7 +50,7 @@ withExtraButtonsStory cfg =
                 |> ActionBar.withTitle "Menu title"
                 |> ActionBar.withSubtitle "Cool menu subtitle"
                 |> ActionBar.withButtons
-                    [ Button.bodyIcon Icons.toggle
+                    [ Button.bodyIcon (Icons.toggle "Toggle something")
                         |> Button.button Msg.NoOp
                         |> Button.withTone Button.tonePrimary
                     , Button.bodyText "Make something great"
@@ -65,7 +65,7 @@ ActionBar.actionBar
     |> ActionBar.withTitle "Menu title"
     |> ActionBar.withSubtitle "Cool menu subtitle"
     |> ActionBar.withButtons
-        [ Button.bodyIcon Icons.toggle
+        [ Button.bodyIcon (Icons.toggle "Toggle something")
             |> Button.button Msg.NoOp
             |> Button.withTone Button.tonePrimary
         , Button.bodyText "Make something great"
@@ -110,7 +110,7 @@ allFeaturesStory cfg =
                 |> ActionBar.withTitle "Menu title"
                 |> ActionBar.withSubtitle "Cool menu subtitle"
                 |> ActionBar.withButtons
-                    [ Button.bodyIcon Icons.toggle
+                    [ Button.bodyIcon (Icons.toggle "Toggle something")
                         |> Button.button Msg.NoOp
                         |> Button.withTone Button.tonePrimary
                     , Button.bodyText "Make something great"
@@ -126,7 +126,7 @@ ActionBar.actionBar
     |> ActionBar.withTitle "Menu title"
     |> ActionBar.withSubtitle "Cool menu subtitle"
     |> ActionBar.withButtons
-        [ Button.bodyIcon Icons.toggle
+        [ Button.bodyIcon (Icons.toggle "Toggle something")
             |> Button.button Msg.NoOp
             |> Button.withTone Button.tonePrimary
         , Button.bodyText "Make something great"

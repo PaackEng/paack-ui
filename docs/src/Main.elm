@@ -3,7 +3,7 @@ module Main exposing (main)
 import ActionBars as ActionBars
 import Alerts as Alerts
 import Badges as Badges
-import Buttons as Buttons
+import Buttons.Stories as Buttons
 import Element exposing (Element)
 import Element.Font as Font
 import Form.Checkboxes as Checkboxes
@@ -105,6 +105,12 @@ updateStories msg ({ customModel } as model) =
               }
             , Cmd.none
             )
+
+        ButtonsStoriesMsg subMsg ->
+            Buttons.update subMsg customModel.buttonsStories
+                |> R.map (\t -> { customModel | buttonsStories = t })
+                |> R.map (\newCustomModel -> { model | customModel = newCustomModel })
+                |> Tuple.mapSecond (always Cmd.none)
 
         NoOp ->
             ( model, Cmd.none )

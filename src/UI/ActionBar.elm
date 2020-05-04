@@ -110,7 +110,7 @@ viewButtonsContainer cfg options =
         closeBtn =
             case options.onClose of
                 Just msg ->
-                    Button.bodyIcon Icons.close_
+                    Button.bodyIcon (Icons.close_ "Close")
                         |> Button.button msg
                         |> Button.withTone Button.toneDanger
                         |> Button.toEl cfg

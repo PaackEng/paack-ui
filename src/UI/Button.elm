@@ -230,13 +230,22 @@ buttonWidth (Button _ { width }) =
 
 
 buttonPadding : Button msg -> Attribute msg
-buttonPadding (Button { body } _) =
-    case body of
-        BodyText _ ->
-            Element.paddingXY 32 12
+buttonPadding ((Button { body } _) as btn) =
+    if isOutlined btn then
+        case body of
+            BodyText _ ->
+                Element.paddingXY 31 11
 
-        BodyIcon _ ->
-            Element.paddingXY 10 12
+            BodyIcon _ ->
+                Element.paddingXY 9 11
+
+    else
+        case body of
+            BodyText _ ->
+                Element.paddingXY 32 12
+
+            BodyIcon _ ->
+                Element.paddingXY 10 12
 
 
 type alias InvertableColor =
@@ -288,7 +297,7 @@ styleAttrs btn =
 isOutlined : Button msg -> Bool
 isOutlined (Button { click } _) =
     case click of
-        ClickToggle _ _ ->
+        ClickToggle _ False ->
             True
 
         _ ->

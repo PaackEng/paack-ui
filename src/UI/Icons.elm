@@ -41,29 +41,39 @@ import UI.RenderConfig exposing (RenderConfig)
 -- NEW
 
 
+type alias Properties =
+    { hint : String
+    , glyph : IconGlyph
+    }
+
+
 type Icon
+    = Icon Properties
+
+
+type IconGlyph
     = Toggle
     | Close
 
 
-toggle : Icon
-toggle =
-    Toggle
+toggle : String -> Icon
+toggle hint =
+    Icon (Properties hint Toggle)
 
 
-close_ : Icon
-close_ =
-    Close
+close_ : String -> Icon
+close_ hint =
+    Icon (Properties hint Close)
 
 
 toEl : RenderConfig -> Icon -> Element msg
-toEl _ ico =
-    case ico of
+toEl _ (Icon { hint, glyph }) =
+    case glyph of
         Toggle ->
-            fasIcon "map" "Toggle"
+            fasIcon "map" hint
 
         Close ->
-            fasIcon "times" ""
+            fasIcon "times" hint
 
 
 
