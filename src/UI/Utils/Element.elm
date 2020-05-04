@@ -6,13 +6,13 @@ import Html.Attributes as HtmlAttrs
 
 disabled : List (Attribute msg)
 disabled =
-    [ ( "disabled", "true" )
-    , ( "aria-disabled", "true" )
-    , ( "tabindex", "-1" )
-    , ( "pointer-events", "none" )
-    , ( "cursor", "default" )
+    [ HtmlAttrs.attribute "disabled" "true"
+    , HtmlAttrs.attribute "aria-disabled" "true"
+    , HtmlAttrs.attribute "tabindex" "-1"
+    , HtmlAttrs.attribute "pointer-events" "none"
+    , HtmlAttrs.style "cursor" "default"
     ]
-        |> List.map stylePair
+        |> List.map Element.htmlAttribute
 
 
 colorTransition : Int -> List (Attribute msg)

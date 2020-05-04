@@ -33,6 +33,7 @@ import UI.Internal.Palette as Palette exposing (Color)
 import UI.Internal.Primitives as Primitives
 import UI.Link as Link exposing (Link)
 import UI.RenderConfig exposing (RenderConfig)
+import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element
 
 
@@ -198,6 +199,7 @@ toEl cfg ((Button { click, body } _) as btn) =
                 ++ styleAttrs btn
                 ++ disabledAttrs btn
                 ++ clickAttrs btn
+                ++ ariaAttrs
     in
     case click of
         ClickLink linkMeta ->
@@ -246,6 +248,11 @@ buttonPadding ((Button { body } _) as btn) =
 
             BodyIcon _ ->
                 Element.paddingXY 10 12
+
+
+ariaAttrs : List (Attribute msg)
+ariaAttrs =
+    [ ARIA.roleAttr ARIA.roleButton ]
 
 
 type alias InvertableColor =
