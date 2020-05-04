@@ -31,6 +31,7 @@ import Element.Font as Font
 import UI.Icons as Icon exposing (Icon)
 import UI.Internal.Palette as Palette exposing (Color)
 import UI.Internal.Primitives as Primitives
+import UI.Link as Link exposing (Link)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Utils.Element as Element
 
@@ -59,7 +60,7 @@ type ButtonBody msg
 
 type ButtonClick msg
     = ClickMsg msg
-    | ClickHref String
+    | ClickLink Link
     | ClickToggle (Bool -> msg) Bool
 
 
@@ -107,9 +108,9 @@ toggle msg isEnabled =
     buttonAny (ClickToggle msg isEnabled)
 
 
-link : String -> ButtonBody msg -> Button msg
-link url =
-    buttonAny (ClickHref url)
+link : Link -> ButtonBody msg -> Button msg
+link realLink =
+    buttonAny (ClickLink realLink)
 
 
 
@@ -199,12 +200,10 @@ toEl cfg ((Button { click, body } _) as btn) =
                 ++ clickAttrs btn
     in
     case click of
-        ClickHref url ->
-            Element.link
-                attrs
-                { url = url
-                , label = elFromBody cfg body
-                }
+        ClickLink linkMeta ->
+            body
+                |> elFromBody cfg
+                |> Link.packEl cfg attrs linkMeta
 
         _ ->
             Element.el attrs <|
@@ -240,27 +239,60 @@ buttonPadding (Button { body } _) =
             Element.paddingXY 10 12
 
 
+type alias InvertableColor =
+    -- This inverts when outlined
+    { active : Color
+    , passive : Color
+    }
+
+
 type alias ColorIntermediary =
-    ( ( Color, Color ), Maybe ( Color, Color ) )
+    { normal : InvertableColor
+    , onHover : Maybe InvertableColor
+    }
 
 
 styleAttrs : Button msg -> List (Attribute msg)
 styleAttrs btn =
     let
-        ( ( active, passive ) as normal, maybeHover ) =
+        ({ normal } as interm) =
             colorHelper btn
 
-        ( hoverActive, hoverPassive ) =
-            Maybe.withDefault normal maybeHover
+        hover =
+            Maybe.withDefault normal interm.onHover
     in
-    [ Background.color active
-    , Font.color passive
-    , Element.mouseOver
-        [ Background.color hoverActive
-        , Font.color hoverPassive
+    if isOutlined btn then
+        [ Background.color normal.passive
+        , Font.color normal.active
+        , Element.mouseOver
+            [ Background.color hover.passive
+            , Font.color hover.active
+            , Border.color hover.active
+            ]
+        , Border.color normal.active
+        , Border.width 1
         ]
-    ]
-        ++ Element.colorTransition 100
+            ++ Element.colorTransition 100
+
+    else
+        [ Background.color normal.active
+        , Font.color normal.passive
+        , Element.mouseOver
+            [ Background.color hover.active
+            , Font.color hover.passive
+            ]
+        ]
+            ++ Element.colorTransition 100
+
+
+isOutlined : Button msg -> Bool
+isOutlined (Button { click } _) =
+    case click of
+        ClickToggle _ _ ->
+            True
+
+        _ ->
+            False
 
 
 colorHelper : Button msg -> ColorIntermediary
@@ -268,41 +300,41 @@ colorHelper (Button { click, body } { mode, tone }) =
     if mode == ModeDisabled then
         case ( body, tone ) of
             ( BodyIcon _, _ ) ->
-                ( ( Palette.gray.lightest, Palette.gray.light )
-                , Nothing
-                )
+                ColorIntermediary
+                    { active = Palette.gray.lightest, passive = Palette.gray.light }
+                    Nothing
 
             ( BodyText _, ToneLight ) ->
-                ( ( Palette.gray.lightest, Palette.textDisbledWithGrayLightest )
-                , Nothing
-                )
+                ColorIntermediary
+                    { active = Palette.gray.lightest, passive = Palette.textDisbledWithGrayLightest }
+                    Nothing
 
             _ ->
-                ( ( Palette.gray.light, Palette.textWithBg )
-                , Nothing
-                )
+                ColorIntermediary
+                    { active = Palette.gray.light, passive = Palette.textWithBg }
+                    Nothing
 
     else
         case tone of
             TonePrimary ->
-                ( ( Palette.primary.middle, Palette.textWithBg )
-                , Just ( Palette.primary.darkest, Palette.textWithBg )
-                )
+                ColorIntermediary
+                    { active = Palette.primary.middle, passive = Palette.textWithBg }
+                    (Just { active = Palette.primary.darkest, passive = Palette.textWithBg })
 
             ToneSuccess ->
-                ( ( Palette.success.middle, Palette.textWithBg )
-                , Just ( Palette.success.darkest, Palette.textWithBg )
-                )
+                ColorIntermediary
+                    { active = Palette.success.middle, passive = Palette.textWithBg }
+                    (Just { active = Palette.success.darkest, passive = Palette.textWithBg })
 
             ToneDanger ->
-                ( ( Palette.danger.middle, Palette.textWithBg )
-                , Just ( Palette.danger.darkest, Palette.textWithBg )
-                )
+                ColorIntermediary
+                    { active = Palette.danger.middle, passive = Palette.textWithBg }
+                    (Just { active = Palette.danger.darkest, passive = Palette.textWithBg })
 
             ToneLight ->
-                ( ( Palette.gray.lightest, Palette.textWithGrayLightest )
-                , Just ( Palette.gray.lighter, Palette.textWithGrayLighter )
-                )
+                ColorIntermediary
+                    { active = Palette.gray.lightest, passive = Palette.textWithGrayLightest }
+                    (Just { active = Palette.gray.lighter, passive = Palette.textWithGrayLighter })
 
 
 disabledAttrs : Button msg -> List (Attribute msg)
@@ -323,7 +355,7 @@ clickAttrs (Button { click } { mode }) =
         ( ModeEnabled, ClickToggle msg isEnabled ) ->
             [ Events.onClick (msg (not isEnabled)) ]
 
-        ( ModeEnabled, ClickHref _ ) ->
+        ( ModeEnabled, ClickLink _ ) ->
             []
 
         ( ModeDisabled, _ ) ->
