@@ -135,7 +135,6 @@ linkStory renderConfig =
             |> Button.toEl renderConfig
         , { note = """
 ```elm
--- Text
 Button.bodyText "Go to Blank"
     |> Button.link "about:blank"
     |> Button.toEl renderConfig
@@ -153,10 +152,8 @@ fullWidthStory renderConfig =
             |> Button.toEl renderConfig
         , { note = """
 ```elm
--- Text
-
 Button.bodyText "Some Text"
-    |> Button.button Your Message
+    |> Button.button YourMessage
     |> Button.withWidth Button.widthFull
     |> Button.toEl renderConfig
 ```
@@ -183,4 +180,10 @@ toggleStory renderConfig =
                     ]
     in
     storyWithModel
-        ( "Toggle", body, { note = "" } )
+        ( "Toggle", body, { note = """
+```elm
+Button.bodyIcon (Icon.toggle "Some Hint")
+    |> Button.toggle YourMessage TrueOrFalse
+    |> Button.toEl renderConfig
+```
+""" } )
