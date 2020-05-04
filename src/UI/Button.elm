@@ -2,18 +2,14 @@ module UI.Button exposing
     ( Button
     , ButtonClick
     , ButtonMode
-    , ButtonStyle
     , ButtonTone
     , ButtonWidth
-    , bodyEl
     , bodyIcon
     , bodyText
     , button
     , link
     , modeDisabled
     , modeEnabled
-    , styleFilled
-    , styleOutlined
     , toEl
     , toggle
     , toneDanger
@@ -23,7 +19,6 @@ module UI.Button exposing
     , widthFull
     , widthRelative
     , withMode
-    , withStyle
     , withTone
     , withWidth
     )
@@ -42,7 +37,6 @@ import UI.Utils.Element as Element
 
 type alias Options =
     { mode : ButtonMode
-    , style : ButtonStyle
     , tone : ButtonTone
     , width : ButtonWidth
     }
@@ -61,7 +55,6 @@ type Button msg
 type ButtonBody msg
     = BodyText String
     | BodyIcon Icon
-    | BodyEl (Element msg)
 
 
 type ButtonClick msg
@@ -73,11 +66,6 @@ type ButtonClick msg
 type ButtonMode
     = ModeEnabled
     | ModeDisabled
-
-
-type ButtonStyle
-    = StyleFilled
-    | StyleOutlined
 
 
 type ButtonTone
@@ -99,7 +87,6 @@ type ButtonWidth
 defaultOptions : Options
 defaultOptions =
     { mode = ModeEnabled
-    , style = StyleFilled
     , tone = TonePrimary
     , width = WidthRelative
     }
@@ -134,11 +121,6 @@ withMode mode (Button prop opt) =
     Button prop { opt | mode = mode }
 
 
-withStyle : ButtonStyle -> Button msg -> Button msg
-withStyle style (Button prop opt) =
-    Button prop { opt | style = style }
-
-
 withTone : ButtonTone -> Button msg -> Button msg
 withTone tone (Button prop opt) =
     Button prop { opt | tone = tone }
@@ -151,11 +133,6 @@ withWidth width (Button prop opt) =
 
 
 -- Expose all properties
-
-
-bodyEl : Element msg -> ButtonBody msg
-bodyEl elem =
-    BodyEl elem
 
 
 bodyIcon : Icon -> ButtonBody msg
@@ -176,16 +153,6 @@ modeDisabled =
 modeEnabled : ButtonMode
 modeEnabled =
     ModeEnabled
-
-
-styleFilled : ButtonStyle
-styleFilled =
-    StyleFilled
-
-
-styleOutlined : ButtonStyle
-styleOutlined =
-    StyleOutlined
 
 
 toneDanger : ButtonTone
@@ -245,18 +212,13 @@ toEl cfg ((Button { click, body } _) as btn) =
 
 
 baseAttrs : Button msg -> List (Attribute msg)
-baseAttrs ((Button { click } _) as btn) =
-    case click of
-        ClickHref _ ->
-            []
-
-        _ ->
-            [ Font.size 16
-            , Font.center
-            , Primitives.roundedBorders
-            , buttonWidth btn
-            , buttonPadding btn
-            ]
+baseAttrs btn =
+    [ Font.size 16
+    , Font.center
+    , Primitives.roundedBorders
+    , buttonWidth btn
+    , buttonPadding btn
+    ]
 
 
 buttonWidth : Button msg -> Attribute msg
@@ -277,16 +239,13 @@ buttonPadding (Button { body } _) =
         BodyIcon _ ->
             Element.paddingXY 10 12
 
-        BodyEl _ ->
-            Element.paddingXY 10 12
-
 
 type alias ColorIntermediary =
     ( ( Color, Color ), Maybe ( Color, Color ) )
 
 
 styleAttrs : Button msg -> List (Attribute msg)
-styleAttrs ((Button { click } { style }) as btn) =
+styleAttrs btn =
     let
         ( ( active, passive ) as normal, maybeHover ) =
             colorHelper btn
@@ -294,99 +253,56 @@ styleAttrs ((Button { click } { style }) as btn) =
         ( hoverActive, hoverPassive ) =
             Maybe.withDefault normal maybeHover
     in
-    case ( click, style ) of
-        ( ClickHref _, _ ) ->
-            [ Font.underline
-            , Font.color passive
-            , Element.mouseOver
-                [ Font.color hoverPassive
-                ]
-            ]
-
-        ( _, StyleFilled ) ->
-            [ Background.color active
-            , Font.color passive
-            , Element.mouseOver
-                [ Background.color hoverActive
-                , Font.color hoverPassive
-                ]
-            ]
-                ++ Element.colorTransition 100
-
-        ( _, StyleOutlined ) ->
-            [ Background.color passive
-            , Font.color active
-            , Element.mouseOver
-                [ Background.color hoverPassive
-                , Font.color hoverActive
-                , Border.color hoverActive
-                ]
-            , Border.color active
-            , Border.width 1
-            ]
-                ++ Element.colorTransition 100
+    [ Background.color active
+    , Font.color passive
+    , Element.mouseOver
+        [ Background.color hoverActive
+        , Font.color hoverPassive
+        ]
+    ]
+        ++ Element.colorTransition 100
 
 
 colorHelper : Button msg -> ColorIntermediary
 colorHelper (Button { click, body } { mode, tone }) =
-    case click of
-        ClickHref _ ->
-            ( ( Palette.gray.lightest, Palette.primary.middle )
-            , Just ( Palette.gray.lighter, Palette.primary.darkest )
-            )
+    if mode == ModeDisabled then
+        case ( body, tone ) of
+            ( BodyIcon _, _ ) ->
+                ( ( Palette.gray.lightest, Palette.gray.light )
+                , Nothing
+                )
 
-        _ ->
-            if mode == ModeDisabled then
-                case ( body, tone ) of
-                    ( BodyIcon _, _ ) ->
-                        ( ( Palette.gray.lightest, Palette.gray.light )
-                        , Nothing
-                        )
+            ( BodyText _, ToneLight ) ->
+                ( ( Palette.gray.lightest, Palette.textDisbledWithGrayLightest )
+                , Nothing
+                )
 
-                    ( BodyText _, ToneLight ) ->
-                        ( ( Palette.gray.lightest, Palette.textDisbledWithGrayLightest )
-                        , Nothing
-                        )
+            _ ->
+                ( ( Palette.gray.light, Palette.textWithBg )
+                , Nothing
+                )
 
-                    _ ->
-                        ( ( Palette.gray.light, Palette.textWithBg )
-                        , Nothing
-                        )
+    else
+        case tone of
+            TonePrimary ->
+                ( ( Palette.primary.middle, Palette.textWithBg )
+                , Just ( Palette.primary.darkest, Palette.textWithBg )
+                )
 
-            else
-                case tone of
-                    TonePrimary ->
-                        ( ( Palette.primary.middle, Palette.textWithBg )
-                        , Just ( Palette.primary.darkest, Palette.textWithBg )
-                        )
+            ToneSuccess ->
+                ( ( Palette.success.middle, Palette.textWithBg )
+                , Just ( Palette.success.darkest, Palette.textWithBg )
+                )
 
-                    ToneSuccess ->
-                        ( ( Palette.success.middle, Palette.textWithBg )
-                        , Just ( Palette.success.darkest, Palette.textWithBg )
-                        )
+            ToneDanger ->
+                ( ( Palette.danger.middle, Palette.textWithBg )
+                , Just ( Palette.danger.darkest, Palette.textWithBg )
+                )
 
-                    ToneDanger ->
-                        ( ( Palette.danger.middle, Palette.textWithBg )
-                        , Just ( Palette.danger.darkest, Palette.textWithBg )
-                        )
-
-                    ToneLight ->
-                        ( ( Palette.gray.lightest, Palette.textWithGrayLightest )
-                        , Just ( Palette.gray.lighter, Palette.textWithGrayLighter )
-                        )
-
-
-isOutlined : Button msg -> Bool
-isOutlined (Button { click } { style }) =
-    case ( click, style ) of
-        ( ClickToggle _ False, _ ) ->
-            True
-
-        ( _, StyleOutlined ) ->
-            True
-
-        _ ->
-            False
+            ToneLight ->
+                ( ( Palette.gray.lightest, Palette.textWithGrayLightest )
+                , Just ( Palette.gray.lighter, Palette.textWithGrayLighter )
+                )
 
 
 disabledAttrs : Button msg -> List (Attribute msg)
@@ -422,6 +338,3 @@ elFromBody cfg body =
 
         BodyIcon ico ->
             Icon.toEl cfg ico
-
-        BodyEl el ->
-            el
