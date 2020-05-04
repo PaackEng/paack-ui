@@ -1,0 +1,33 @@
+{
+    "checks" : {
+        "BooleanCase": true,
+        "DebugLog": true,
+        "DropConcatOfLists": true,
+        "DropConsOfItemAndList": true,
+        "DuplicateImport": true,
+        "DuplicateImportedVariable": true,
+        "ExposeAll": false,
+        "FileLoadFailed": true,
+        "NoUncurriedPrefix": false,
+        "FunctionInLet": false,
+        "ImportAll" : false,
+        "MapNothingToNothing": true,
+        "MultiLineRecordFormatting": false,
+        "NoTopLevelSignature": true,
+        "SingleFieldRecord": false,
+        "UnnecessaryListConcat": true,
+        "UnnecessaryParens": false,
+        "UnnecessaryPortModule": true,
+        "UnusedImport": true,
+        "UnusedImportAlias": true,
+        "UnusedImportedVariable": true,
+        "UnusedPatternVariable": true,
+        "UnusedTopLevel": true,
+        "UnusedTypeAlias": true,
+        "UnusedValueConstructor": false,
+        "UnusedVariable": true,
+        "UseConsOverConcat": true 
+    },
+    "TriggerWords" : { "words": [ "REVIEW" ] },
+    "excludedPaths" : []
+}
