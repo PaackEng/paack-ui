@@ -19,6 +19,7 @@ module UI.Text exposing
 import Element exposing (Attribute, Element)
 import Element.Font as Font
 import List
+import UI.RenderConfig exposing (RenderConfig, isMobile)
 
 
 type alias Properties =
@@ -106,18 +107,27 @@ overline content =
     Text (Properties content SizeOverline)
 
 
-toEl : Text -> Element msg
-toEl text =
+toEl : RenderConfig -> Text -> Element msg
+toEl cfg text =
     case text of
         Text { content, size } ->
             content
                 |> Element.text
                 |> List.singleton
-                |> Element.paragraph (deskAttributes size)
+                |> Element.paragraph (attributes cfg size)
 
 
 
 -- Internal
+
+
+attributes : RenderConfig -> TextSize -> List (Attribute msg)
+attributes config =
+    if isMobile config then
+        mobileAttributes
+
+    else
+        deskAttributes
 
 
 deskAttributes : TextSize -> List (Attribute msg)
@@ -141,6 +151,73 @@ deskAttributes size =
         SizeHeading4 ->
             [ Font.size 32
             , Font.letterSpacing -1
+            ]
+
+        SizeHeading5 ->
+            [ Font.size 24
+            , Font.letterSpacing 0
+            ]
+
+        SizeHeading6 ->
+            [ Font.size 20
+            , Font.letterSpacing 0.15
+            ]
+
+        SizeSubtitle1 ->
+            [ Font.size 16
+            , Font.letterSpacing 0.2
+            ]
+
+        SizeSubtitle2 ->
+            [ Font.size 14
+            , Font.letterSpacing 0.25
+            ]
+
+        SizeBody1 ->
+            [ Font.size 16
+            , Element.spacing 8
+            , Font.letterSpacing 0.2
+            ]
+
+        SizeBody2 ->
+            [ Font.size 14
+            , Element.spacing 10
+            , Font.letterSpacing 0.25
+            ]
+
+        SizeCaption ->
+            [ Font.size 12
+            , Element.spacing 4
+            , Font.letterSpacing 0.5
+            ]
+
+        SizeOverline ->
+            [ Font.size 10
+            , Font.letterSpacing 2
+            ]
+
+
+mobileAttributes : TextSize -> List (Attribute msg)
+mobileAttributes size =
+    case size of
+        SizeHeading1 ->
+            [ Font.size 56
+            , Font.letterSpacing -2
+            ]
+
+        SizeHeading2 ->
+            [ Font.size 48
+            , Font.letterSpacing -1.5
+            ]
+
+        SizeHeading3 ->
+            [ Font.size 40
+            , Font.letterSpacing -1
+            ]
+
+        SizeHeading4 ->
+            [ Font.size 32
+            , Font.letterSpacing -0.5
             ]
 
         SizeHeading5 ->
