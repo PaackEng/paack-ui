@@ -16,7 +16,8 @@ import Element.Events exposing (onClick)
 import Element.Font as Font
 import ElementExtra exposing (when)
 import UI.Attributes as ExtraAttrs
-import UI.Icons as Icons
+import UI.Icon as Icon
+import UI.RenderConfig as RenderConfig
 import UI.Theme as Theme
 
 
@@ -106,6 +107,11 @@ toEl (Alert { title, subtitle, colorScheme, onCloseButtonClicked }) =
         ]
 
 
+dummyCfg =
+    -- TODO: Remove
+    RenderConfig.fromWindow { width = 192, height = 1080 }
+
+
 closeBtn : Maybe msg -> Element msg
 closeBtn maybeMsg =
     let
@@ -121,7 +127,7 @@ closeBtn maybeMsg =
                     , pointer
                     , Font.size 12
                     ]
-                    (el [ Font.color Theme.white ] (Icons.close ""))
+                    (el [ Font.color Theme.white ] (Icon.close "Close" |> Icon.toEl dummyCfg))
     in
     maybeMsg
         |> Maybe.map btnView

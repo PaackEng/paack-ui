@@ -1,4 +1,4 @@
-module UI.RenderConfig exposing (RenderConfig, fromWindow, isMobile, isPortrait)
+module UI.RenderConfig exposing (RenderConfig, fromWindow, isMobile, isPortrait, rootAttributes)
 
 {- -- Future thoughts:
 
@@ -11,7 +11,8 @@ module UI.RenderConfig exposing (RenderConfig, fromWindow, isMobile, isPortrait)
    isDark : DateTime -> RenderConfig -> Bool
 -}
 
-import Element
+import Element exposing (Attribute)
+import Element.Font as Font
 
 
 type alias RenderConfigData =
@@ -44,3 +45,9 @@ isMobile (RenderConfig { deviceClass }) =
 isPortrait : RenderConfig -> Bool
 isPortrait (RenderConfig { deviceOrientation }) =
     deviceOrientation == Element.Portrait
+
+
+rootAttributes : RenderConfig -> List (Attribute msg)
+rootAttributes _ =
+    -- Why here? Accessabilities settings may change fonts, backgrounds, etc...
+    [ Font.family [ Font.typeface "Inter", Font.sansSerif ] ]

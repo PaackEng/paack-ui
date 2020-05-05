@@ -5,7 +5,7 @@ import Element.Background as Background
 import Msg as Msg
 import UI.ActionBar as ActionBar exposing (ActionBar)
 import UI.Button as Button
-import UI.Icons as Icons
+import UI.Icon as Icons
 import UI.Theme as Theme
 import UIExplorer exposing (storiesOf)
 import Utils exposing (story, storyList)

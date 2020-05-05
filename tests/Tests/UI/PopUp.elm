@@ -8,7 +8,7 @@ import Test.Html.Event as Event
 import Test.Html.Query as Query
 import Test.Html.Selector as Selector
 import Tests.Utils.Element exposing (elementToHtml)
-import UI.Icons as Icons
+import UI.Icon as Icons
 import UI.PopUp as PopUp
 
 

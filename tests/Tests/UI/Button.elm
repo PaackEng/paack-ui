@@ -9,7 +9,7 @@ import Test.Html.Query as Query
 import Test.Html.Selector as Selector
 import Tests.Utils.Element exposing (elementToHtml, hasIconInside)
 import UI.Button as Button
-import UI.Icons as Icon
+import UI.Icon as Icon
 import UI.Link as Link
 import UI.RenderConfig
 

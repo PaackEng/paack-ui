@@ -7,7 +7,7 @@ import Element.Events as Events exposing (onClick)
 import Element.Font as Font
 import Helpers exposing (ifThenElse)
 import UI.Attributes exposing (ariaLabel, ariaRole, borderBottomWidth)
-import UI.Icons as Icons
+import UI.Icon as Icon
 import UI.Theme as Theme
 
 
@@ -123,7 +123,7 @@ toEl (PopUp options) =
         actionIcon =
             case options.popUpStyle of
                 Closable onCloseMsg ->
-                    icon onCloseMsg Icons.close "pop-up-close"
+                    icon onCloseMsg Icon.todo "pop-up-close"
 
                 Collapsable onCollapseMsg ->
                     let
@@ -131,7 +131,7 @@ toEl (PopUp options) =
                             onCollapseMsg (not options.collapsed)
 
                         collapseIcon =
-                            ifThenElse options.collapsed Icons.chevronUp Icons.chevronDown
+                            ifThenElse options.collapsed Icon.todo Icon.todo
 
                         label =
                             ifThenElse options.collapsed "pop-up-expand" "pop-up-collapse"

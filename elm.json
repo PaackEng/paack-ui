@@ -5,19 +5,12 @@
     "license": "BSD-3-Clause",
     "version": "1.0.0",
     "exposed-modules": [
-        "UI.Input.Checkbox",
-        "UI.ActionBar",
-        "UI.Alert",
-        "UI.Attributes",
-        "UI.Badge",
-        "UI.Events",
-        "UI.Icons",
-        "UI.Input",
-        "UI.LoadingView",
-        "UI.PopUp",
-        "UI.Table",
+        "UI.Icon",
+        "UI.Button",
+        "UI.Link",
         "UI.Text",
-        "UI.Theme"
+        "UI.Utils.ARIA",
+        "UI.Utils.Element"
     ],
     "elm-version": "0.19.0 <= v < 0.20.0",
     "dependencies": {

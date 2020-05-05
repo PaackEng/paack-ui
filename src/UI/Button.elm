@@ -28,7 +28,7 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
-import UI.Icons as Icon exposing (Icon)
+import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Palette as Palette exposing (Color)
 import UI.Internal.Primitives as Primitives
 import UI.Link as Link exposing (Link)
