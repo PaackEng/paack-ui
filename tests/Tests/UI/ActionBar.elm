@@ -9,11 +9,20 @@ import Tests.Utils.Element exposing (elementToHtml, hasIconInside)
 import Tests.Utils.ExtraSelectors as ExtraSelectors
 import UI.ActionBar as ActionBar
 import UI.Button as Button
+import UI.RenderConfig
 
 
 type Msg
     = OnCloseButtonClicked
     | TheOtherButtonClicked
+
+
+fakeRenderConfig : UI.RenderConfig.RenderConfig
+fakeRenderConfig =
+    UI.RenderConfig.fromWindow
+        { width = 1920
+        , height = 1080
+        }
 
 
 tests : Test
@@ -27,7 +36,7 @@ tests =
                 in
                 ActionBar.actionBar
                     |> ActionBar.withTitle title
-                    |> ActionBar.toEl
+                    |> ActionBar.toEl fakeRenderConfig
                     |> elementToHtml
                     |> Query.has [ Selector.text title ]
         , test "show the subtitle when is set" <|
@@ -38,14 +47,14 @@ tests =
                 in
                 ActionBar.actionBar
                     |> ActionBar.withSubtitle subtitle
-                    |> ActionBar.toEl
+                    |> ActionBar.toEl fakeRenderConfig
                     |> elementToHtml
                     |> Query.has [ Selector.text subtitle ]
         , test "shows the close button when is set" <|
             \_ ->
                 ActionBar.actionBar
                     |> ActionBar.withCloseButton OnCloseButtonClicked
-                    |> ActionBar.toEl
+                    |> ActionBar.toEl fakeRenderConfig
                     |> elementToHtml
                     |> Query.has
                         [ ExtraSelectors.button
@@ -55,7 +64,7 @@ tests =
             \_ ->
                 ActionBar.actionBar
                     |> ActionBar.withCloseButton OnCloseButtonClicked
-                    |> ActionBar.toEl
+                    |> ActionBar.toEl fakeRenderConfig
                     |> elementToHtml
                     |> Query.find
                         [ ExtraSelectors.button
@@ -71,11 +80,11 @@ tests =
                 in
                 ActionBar.actionBar
                     |> ActionBar.withButtons
-                        [ Button.button TheOtherButtonClicked
-                            |> Button.withPrimaryColor
-                            |> Button.withText buttonLabel
+                        [ Button.bodyText buttonLabel
+                            |> Button.button TheOtherButtonClicked
+                            |> Button.withTone Button.tonePrimary
                         ]
-                    |> ActionBar.toEl
+                    |> ActionBar.toEl fakeRenderConfig
                     |> elementToHtml
                     |> Query.has (ExtraSelectors.textButton buttonLabel)
         ]

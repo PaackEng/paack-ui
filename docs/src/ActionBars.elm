@@ -11,20 +11,20 @@ import UIExplorer exposing (storiesOf)
 import Utils exposing (story, storyList)
 
 
-stories =
+stories cfg =
     storiesOf
         "ActionBars"
-        [ defaultStory
-        , withExtraButtonsStory
-        , withCloseButtonStory
-        , allFeaturesStory
+        [ defaultStory cfg
+        , withExtraButtonsStory cfg
+        , withCloseButtonStory cfg
+        , allFeaturesStory cfg
         ]
 
 
-defaultStory =
+defaultStory cfg =
     story
         ( "Default"
-        , viewBase
+        , viewBase cfg
             (ActionBar.actionBar
                 |> ActionBar.withTitle "Menu title"
                 |> ActionBar.withSubtitle "Cool menu subtitle"
@@ -42,20 +42,20 @@ ActionBar.actionBar
         )
 
 
-withExtraButtonsStory =
+withExtraButtonsStory cfg =
     story
         ( "Extra Buttons"
-        , viewBase
+        , viewBase cfg
             (ActionBar.actionBar
                 |> ActionBar.withTitle "Menu title"
                 |> ActionBar.withSubtitle "Cool menu subtitle"
                 |> ActionBar.withButtons
-                    [ Button.button Msg.NoOp
-                        |> Button.withPrimaryColor
-                        |> Button.withIcon (Icons.plus "Add item")
-                    , Button.button Msg.NoOp
-                        |> Button.withPrimaryColor
-                        |> Button.withText "Make something great"
+                    [ Button.bodyIcon (Icons.toggle "Toggle something")
+                        |> Button.button Msg.NoOp
+                        |> Button.withTone Button.tonePrimary
+                    , Button.bodyText "Make something great"
+                        |> Button.button Msg.NoOp
+                        |> Button.withTone Button.tonePrimary
                     ]
             )
         , { note =
@@ -65,12 +65,12 @@ ActionBar.actionBar
     |> ActionBar.withTitle "Menu title"
     |> ActionBar.withSubtitle "Cool menu subtitle"
     |> ActionBar.withButtons
-        [ Button.button Msg.NoOp
-            |> Button.withPrimaryColor
-            |> Button.withIcon (Icons.plus "Add item")
-        , Button.button Msg.NoOp
-            |> Button.withPrimaryColor
-            |> Button.withText "Make something great"
+        [ Button.bodyIcon (Icons.toggle "Toggle something")
+            |> Button.button Msg.NoOp
+            |> Button.withTone Button.tonePrimary
+        , Button.bodyText "Make something great"
+            |> Button.button Msg.NoOp
+            |> Button.withTone Button.tonePrimary
         ]
     |> ActionBar.toEl
 ```
@@ -79,10 +79,10 @@ ActionBar.actionBar
         )
 
 
-withCloseButtonStory =
+withCloseButtonStory cfg =
     story
         ( "Close Button"
-        , viewBase
+        , viewBase cfg
             (ActionBar.actionBar
                 |> ActionBar.withTitle "Menu title"
                 |> ActionBar.withSubtitle "Cool menu subtitle"
@@ -102,20 +102,20 @@ ActionBar.actionBar
         )
 
 
-allFeaturesStory =
+allFeaturesStory cfg =
     story
         ( "All Features"
-        , viewBase
+        , viewBase cfg
             (ActionBar.actionBar
                 |> ActionBar.withTitle "Menu title"
                 |> ActionBar.withSubtitle "Cool menu subtitle"
                 |> ActionBar.withButtons
-                    [ Button.button Msg.NoOp
-                        |> Button.withPrimaryColor
-                        |> Button.withIcon (Icons.plus "Add item")
-                    , Button.button Msg.NoOp
-                        |> Button.withPrimaryColor
-                        |> Button.withText "Make something great"
+                    [ Button.bodyIcon (Icons.toggle "Toggle something")
+                        |> Button.button Msg.NoOp
+                        |> Button.withTone Button.tonePrimary
+                    , Button.bodyText "Make something great"
+                        |> Button.button Msg.NoOp
+                        |> Button.withTone Button.tonePrimary
                     ]
                 |> ActionBar.withCloseButton Msg.NoOp
             )
@@ -126,12 +126,12 @@ ActionBar.actionBar
     |> ActionBar.withTitle "Menu title"
     |> ActionBar.withSubtitle "Cool menu subtitle"
     |> ActionBar.withButtons
-        [ Button.button Msg.NoOp
-            |> Button.withPrimaryColor
-            |> Button.withText (Icons.plus "Add item")
-        , Button.button Msg.NoOp
-            |> Button.withPrimaryColor
-            |> Button.withText "Make something great"
+        [ Button.bodyIcon (Icons.toggle "Toggle something")
+            |> Button.button Msg.NoOp
+            |> Button.withTone Button.tonePrimary
+        , Button.bodyText "Make something great"
+            |> Button.button Msg.NoOp
+            |> Button.withTone Button.tonePrimary
         ]
     |> ActionBar.withOnCloseMessage Msg.NoOp
     |> ActionBar.toEl
@@ -141,5 +141,11 @@ ActionBar.actionBar
         )
 
 
-viewBase content =
-    el [ width fill, height (px 300), Background.color Theme.black ] (ActionBar.toEl content)
+viewBase cfg content =
+    content
+        |> ActionBar.toEl cfg
+        |> el
+            [ width fill
+            , height (px 300)
+            , Background.color Theme.black
+            ]

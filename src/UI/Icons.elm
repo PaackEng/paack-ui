@@ -1,10 +1,12 @@
 module UI.Icons exposing
-    ( checked
+    ( Icon
+    , checked
     , chevronDown
     , chevronLeft
     , chevronRight
     , chevronUp
     , close
+    , close_
     , collapse
     , expand
     , filter
@@ -21,6 +23,8 @@ module UI.Icons exposing
     , search
     , settings
     , spinner
+    , toEl
+    , toggle
     , trash
     , unchecked
     , warning
@@ -30,6 +34,50 @@ import Element exposing (..)
 import Html
 import Html.Attributes as HtmlAttr
 import UI.Attributes exposing (title)
+import UI.RenderConfig exposing (RenderConfig)
+
+
+
+-- NEW
+
+
+type alias Properties =
+    { hint : String
+    , glyph : IconGlyph
+    }
+
+
+type Icon
+    = Icon Properties
+
+
+type IconGlyph
+    = Toggle
+    | Close
+
+
+toggle : String -> Icon
+toggle hint =
+    Icon (Properties hint Toggle)
+
+
+close_ : String -> Icon
+close_ hint =
+    Icon (Properties hint Close)
+
+
+toEl : RenderConfig -> Icon -> Element msg
+toEl _ (Icon { hint, glyph }) =
+    case glyph of
+        Toggle ->
+            fasIcon "map" hint
+
+        Close ->
+            fasIcon "times" hint
+
+
+
+-- OLD
 
 
 spinner : Element msg

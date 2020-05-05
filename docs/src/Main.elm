@@ -3,7 +3,9 @@ module Main exposing (main)
 import ActionBars as ActionBars
 import Alerts as Alerts
 import Badges as Badges
-import Buttons as Buttons
+import Buttons.Stories as Buttons
+import Element exposing (Element)
+import Element.Font as Font
 import Form.Checkboxes as Checkboxes
 import Form.Input as Input
 import Form.State as FormState
@@ -18,7 +20,7 @@ import Return as R
 import Tables.Stories as Tables
 import Texts as Texts
 import Theme as Theme
-import UI.RenderConfig
+import UI.RenderConfig exposing (RenderConfig)
 import UIExplorer exposing (Config, UIExplorerProgram, explore, logoFromHtml)
 import UIExplorer.Plugins.Note as Note
 import Utils exposing (story)
@@ -59,8 +61,8 @@ main =
         [ Texts.stories renderConfig
         , Icons.stories
         , Theme.stories
-        , Buttons.stories
-        , ActionBars.stories
+        , Buttons.stories renderConfig
+        , ActionBars.stories renderConfig
         , Alerts.stories
         , PopUps.stories
         , Badges.stories
@@ -103,6 +105,12 @@ updateStories msg ({ customModel } as model) =
               }
             , Cmd.none
             )
+
+        ButtonsStoriesMsg subMsg ->
+            Buttons.update subMsg customModel.buttonsStories
+                |> R.map (\t -> { customModel | buttonsStories = t })
+                |> R.map (\newCustomModel -> { model | customModel = newCustomModel })
+                |> Tuple.mapSecond (always Cmd.none)
 
         NoOp ->
             ( model, Cmd.none )
