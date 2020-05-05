@@ -1,6 +1,6 @@
 module UI.Text exposing
     ( Text
-    , TextSize
+    , TextBrightness
     , body1
     , body2
     , caption
@@ -10,16 +10,25 @@ module UI.Text exposing
     , heading4
     , heading5
     , heading6
+    , lumBright
+    , lumBrightest
+    , lumNormal
     , overline
     , subtitle1
     , subtitle2
     , toEl
+    , withBrightness
     )
 
 import Element exposing (Attribute, Element)
 import Element.Font as Font
 import List
+import UI.Internal.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig, isMobile)
+
+
+type alias Options =
+    { brightness : TextBrightness }
 
 
 type alias Properties =
@@ -29,7 +38,7 @@ type alias Properties =
 
 
 type Text
-    = Text Properties
+    = Text Properties Options
 
 
 type TextSize
@@ -47,87 +56,136 @@ type TextSize
     | SizeOverline
 
 
+type TextBrightness
+    = LumNormal
+    | LumBright
+    | LumBrightest
+
+
 heading1 : String -> Text
 heading1 content =
-    Text (Properties content SizeHeading1)
+    defaultText SizeHeading1 content
 
 
 heading2 : String -> Text
 heading2 content =
-    Text (Properties content SizeHeading2)
+    defaultText SizeHeading2 content
 
 
 heading3 : String -> Text
 heading3 content =
-    Text (Properties content SizeHeading3)
+    defaultText SizeHeading3 content
 
 
 heading4 : String -> Text
 heading4 content =
-    Text (Properties content SizeHeading4)
+    defaultText SizeHeading4 content
 
 
 heading5 : String -> Text
 heading5 content =
-    Text (Properties content SizeHeading5)
+    defaultText SizeHeading5 content
 
 
 heading6 : String -> Text
 heading6 content =
-    Text (Properties content SizeHeading6)
+    defaultText SizeHeading6 content
 
 
 subtitle1 : String -> Text
 subtitle1 content =
-    Text (Properties content SizeSubtitle1)
+    defaultText SizeSubtitle1 content
 
 
 subtitle2 : String -> Text
 subtitle2 content =
-    Text (Properties content SizeSubtitle2)
+    defaultText SizeSubtitle2 content
 
 
 body1 : String -> Text
 body1 content =
-    Text (Properties content SizeBody1)
+    defaultText SizeBody1 content
 
 
 body2 : String -> Text
 body2 content =
-    Text (Properties content SizeBody2)
+    defaultText SizeBody2 content
 
 
 caption : String -> Text
 caption content =
-    Text (Properties content SizeCaption)
+    defaultText SizeCaption content
 
 
 overline : String -> Text
 overline content =
-    Text (Properties content SizeOverline)
+    defaultText SizeOverline content
+
+
+lumBright : TextBrightness
+lumBright =
+    LumBright
+
+
+lumBrightest : TextBrightness
+lumBrightest =
+    LumBrightest
+
+
+lumNormal : TextBrightness
+lumNormal =
+    LumNormal
+
+
+withBrightness : TextBrightness -> Text -> Text
+withBrightness brightness (Text prop opt) =
+    Text prop { opt | brightness = brightness }
 
 
 toEl : RenderConfig -> Text -> Element msg
 toEl cfg text =
     case text of
-        Text { content, size } ->
+        Text { content, size } { brightness } ->
             content
                 |> Element.text
                 |> List.singleton
-                |> Element.paragraph (attributes cfg size)
+                |> Element.paragraph (attributes cfg size brightness)
 
 
 
 -- Internal
 
 
-attributes : RenderConfig -> TextSize -> List (Attribute msg)
-attributes config =
-    if isMobile config then
-        mobileAttributes
+defaultText : TextSize -> String -> Text
+defaultText size content =
+    Text
+        (Properties content size)
+        (Options LumNormal)
 
-    else
-        deskAttributes
+
+attributes : RenderConfig -> TextSize -> TextBrightness -> List (Attribute msg)
+attributes config size brightness =
+    let
+        fontColor =
+            Font.color <|
+                case brightness of
+                    LumNormal ->
+                        Palette.gray.darkest
+
+                    LumBright ->
+                        Palette.gray.middle
+
+                    LumBrightest ->
+                        Palette.gray.light
+
+        sizeAttrs =
+            if isMobile config then
+                mobileAttributes size
+
+            else
+                deskAttributes size
+    in
+    fontColor :: sizeAttrs
 
 
 deskAttributes : TextSize -> List (Attribute msg)
