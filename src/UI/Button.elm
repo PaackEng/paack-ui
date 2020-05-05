@@ -138,8 +138,8 @@ withWidth width (Button prop opt) =
 
 
 bodyIcon : Icon -> ButtonBody msg
-bodyIcon ico =
-    BodyIcon ico
+bodyIcon icon =
+    BodyIcon icon
 
 
 bodyText : String -> ButtonBody msg
@@ -233,21 +233,13 @@ buttonWidth (Button _ { width }) =
 
 buttonPadding : Button msg -> Attribute msg
 buttonPadding ((Button { body } _) as btn) =
-    if isOutlined btn then
-        case body of
-            BodyText _ ->
-                Element.paddingXY 31 11
+    -- Remove 1 pixel each side for borders
+    case body of
+        BodyText _ ->
+            Element.paddingXY 31 11
 
-            BodyIcon _ ->
-                Element.paddingXY 9 11
-
-    else
-        case body of
-            BodyText _ ->
-                Element.paddingXY 32 12
-
-            BodyIcon _ ->
-                Element.paddingXY 10 12
+        BodyIcon _ ->
+            Element.paddingXY 9 11
 
 
 ariaAttrs : List (Attribute msg)
@@ -272,33 +264,25 @@ styleAttrs : Button msg -> List (Attribute msg)
 styleAttrs btn =
     let
         ({ normal } as interm) =
-            colorHelper btn
+            btn
+                |> colorHelper
+                |> invertColorsWhen (isOutlined btn)
 
         hover =
-            Maybe.withDefault normal interm.onHover
+            interm.onHover
+                |> Maybe.withDefault normal
     in
-    if isOutlined btn then
-        [ Background.color normal.passive
-        , Font.color normal.active
-        , Element.mouseOver
-            [ Background.color hover.passive
-            , Font.color hover.active
-            , Border.color hover.active
-            ]
-        , Border.color normal.active
-        , Border.width 1
+    [ Background.color normal.active
+    , Font.color normal.passive
+    , Element.mouseOver
+        [ Background.color hover.active
+        , Font.color hover.passive
+        , Border.color hover.passive
         ]
-            ++ Element.colorTransition 100
-
-    else
-        [ Background.color normal.active
-        , Font.color normal.passive
-        , Element.mouseOver
-            [ Background.color hover.active
-            , Font.color hover.passive
-            ]
-        ]
-            ++ Element.colorTransition 100
+    , Border.color normal.passive
+    , Border.width 1
+    ]
+        ++ Element.colorTransition 100
 
 
 isOutlined : Button msg -> Bool
@@ -309,6 +293,20 @@ isOutlined (Button { click } _) =
 
         _ ->
             False
+
+
+invertColorsWhen : Bool -> ColorIntermediary -> ColorIntermediary
+invertColorsWhen trigger ({ normal, onHover } as default) =
+    let
+        invert { active, passive } =
+            { active = passive, passive = active }
+    in
+    if trigger then
+        ColorIntermediary (invert normal)
+            (Maybe.map invert onHover)
+
+    else
+        default
 
 
 colorHelper : Button msg -> ColorIntermediary
@@ -384,5 +382,5 @@ elFromBody cfg body =
         BodyText str ->
             Element.text str
 
-        BodyIcon ico ->
-            Icon.toEl cfg ico
+        BodyIcon icon ->
+            Icon.toEl cfg icon
