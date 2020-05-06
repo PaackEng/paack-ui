@@ -1,4 +1,4 @@
-module UI.RenderConfig exposing (RenderConfig, fromWindow, isMobile, isPortrait, rootAttributes)
+module UI.RenderConfig exposing (RenderConfig, elLayoutAttributes, fromWindow, isMobile, isPortrait)
 
 {- -- Future thoughts:
 
@@ -47,7 +47,7 @@ isPortrait (RenderConfig { deviceOrientation }) =
     deviceOrientation == Element.Portrait
 
 
-rootAttributes : RenderConfig -> List (Attribute msg)
-rootAttributes _ =
-    -- Why here? Accessabilities settings may change fonts, backgrounds, etc...
+elLayoutAttributes : RenderConfig -> List (Attribute msg)
+elLayoutAttributes _ =
+    -- Why here? Accessibility settings may change fonts, backgrounds, etc...
     [ Font.family [ Font.typeface "Inter", Font.sansSerif ] ]
