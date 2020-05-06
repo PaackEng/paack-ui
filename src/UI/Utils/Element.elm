@@ -1,7 +1,14 @@
-module UI.Utils.Element exposing (colorTransition, disabled)
+module UI.Utils.Element exposing (Focus, colorTransition, disabled)
 
 import Element exposing (Attribute)
 import Html.Attributes as HtmlAttrs
+
+
+type alias Focus msg =
+    { onEnter : msg
+    , tabIndex : Int
+    , hasFocus : Bool
+    }
 
 
 disabled : List (Attribute msg)
