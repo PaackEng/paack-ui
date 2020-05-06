@@ -195,7 +195,7 @@ static isMultiline label value =
 
 
 toEl : RenderConfig -> TextField msg -> Element msg
-toEl cfg =
+toEl cfg (TextField prop opt) =
     Element.none
 
 
