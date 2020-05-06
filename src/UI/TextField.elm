@@ -130,10 +130,9 @@ forUsername =
     ContentUsername
 
 
-forPassword : Bool -> Bool -> TextFieldContent
-forPassword isCurrent show =
-    PasswordOptions isCurrent show
-        |> ContentPassword
+forPassword : PasswordOptions -> TextFieldContent
+forPassword opt =
+    ContentPassword opt
 
 
 forEmail : TextFieldContent
@@ -215,12 +214,12 @@ toEl cfg (TextField prop opt) =
 
         ( Just msg, ContentPassword { show, isCurrent } ) ->
             if isCurrent then
-                inputPasswordOptions msg prop opt
+                inputPasswordOptions msg prop opt show
                     |> Input.currentPassword
                         (attrs cfg prop opt)
 
             else
-                inputPasswordOptions msg prop opt
+                inputPasswordOptions msg prop opt show
                     |> Input.newPassword
                         (attrs cfg prop opt)
 
@@ -296,7 +295,7 @@ inputMultilineOptions :
         , text : String
         , spellcheck : Bool
         }
-inputMultilineOptions onChange { label, currentValue } { placeHolder } =
+inputMultilineOptions onChange { label, currentValue } { placeHolder, labelVisible } =
     { label =
         if labelVisible then
             Input.labelAbove [] (Element.text label)
@@ -321,6 +320,7 @@ inputPasswordOptions :
     (String -> msg)
     -> Properties msg
     -> Options msg
+    -> Bool
     ->
         { label : Input.Label msg
         , onChange : String -> msg
@@ -328,7 +328,7 @@ inputPasswordOptions :
         , text : String
         , show : Bool
         }
-inputPasswordOptions onChange { label, currentValue } { placeHolder } =
+inputPasswordOptions onChange { label, currentValue } { placeHolder, labelVisible } show =
     { label =
         if labelVisible then
             Input.labelAbove [] (Element.text label)
@@ -344,7 +344,7 @@ inputPasswordOptions onChange { label, currentValue } { placeHolder } =
 
         else
             Nothing
-    , show = True
+    , show = show
     , text = currentValue
     }
 
