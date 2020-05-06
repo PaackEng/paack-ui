@@ -22,9 +22,11 @@ module UI.TextField exposing
     , withWidth
     )
 
-import Element exposing (Element)
+import Element exposing (Attribute, Element)
+import Element.Input as Input
 import UI.Icon exposing (Icon)
 import UI.RenderConfig exposing (RenderConfig)
+import UI.Text as Text
 import UI.Utils.Element exposing (Focus)
 
 
@@ -174,17 +176,12 @@ textField onChange label currentValue content =
         defaultOptions
 
 
-static : Bool -> String -> String -> TextField msg
-static isMultiline label value =
+static : String -> String -> TextField msg
+static label value =
     TextField
         { changeable = Nothing
         , label = label
-        , content =
-            if isMultiline then
-                ContentAnyMultiline
-
-            else
-                ContentAny
+        , content = ContentAnyMultiline
         , currentValue = value
         }
         defaultOptions
@@ -196,7 +193,51 @@ static isMultiline label value =
 
 toEl : RenderConfig -> TextField msg -> Element msg
 toEl cfg (TextField prop opt) =
-    Element.none
+    case ( prop.changeable, prop.content ) of
+        ( Nothing, _ ) ->
+            Text.body1 prop.currentValue
+                |> Text.toEl cfg
+
+        ( Just msg, ContentAny ) ->
+            inputAnyOptions msg prop opt
+                |> Input.text
+                    (attrs cfg prop opt)
+
+        ( Just msg, ContentAnyMultiline ) ->
+            inputMultilineOptions msg prop opt
+                |> Input.multiline
+                    (attrs cfg prop opt)
+
+        ( Just msg, ContentUsername ) ->
+            inputAnyOptions msg prop opt
+                |> Input.username
+                    (attrs cfg prop opt)
+
+        ( Just msg, ContentPassword { show, isCurrent } ) ->
+            if isCurrent then
+                inputPasswordOptions msg prop opt
+                    |> Input.currentPassword
+                        (attrs cfg prop opt)
+
+            else
+                inputPasswordOptions msg prop opt
+                    |> Input.newPassword
+                        (attrs cfg prop opt)
+
+        ( Just msg, ContentEmail ) ->
+            inputAnyOptions msg prop opt
+                |> Input.email
+                    (attrs cfg prop opt)
+
+        ( Just msg, ContentSearch ) ->
+            inputAnyOptions msg prop opt
+                |> Input.search
+                    (attrs cfg prop opt)
+
+        ( Just msg, ContentSpellChecked ) ->
+            inputAnyOptions msg prop opt
+                |> Input.spellChecked
+                    (attrs cfg prop opt)
 
 
 
@@ -212,3 +253,87 @@ defaultOptions =
     , width = WidthRelative
     , errorCaption = Nothing
     }
+
+
+inputAnyOptions :
+    (String -> msg)
+    -> Properties msg
+    -> Options msg
+    ->
+        { label : Input.Label msg
+        , onChange : String -> msg
+        , placeholder : Maybe (Input.Placeholder msg)
+        , text : String
+        }
+inputAnyOptions onChange { label, currentValue } { placeHolder } =
+    { label = Input.labelAbove [] (Element.text label)
+    , onChange = onChange
+    , placeholder =
+        if placeHolder /= "" then
+            Element.text placeHolder
+                |> Input.placeholder []
+                |> Just
+
+        else
+            Nothing
+    , text = currentValue
+    }
+
+
+inputMultilineOptions :
+    (String -> msg)
+    -> Properties msg
+    -> Options msg
+    ->
+        { label : Input.Label msg
+        , onChange : String -> msg
+        , placeholder : Maybe (Input.Placeholder msg)
+        , text : String
+        , spellcheck : Bool
+        }
+inputMultilineOptions onChange { label, currentValue } { placeHolder } =
+    { label = Input.labelAbove [] (Element.text label)
+    , onChange = onChange
+    , placeholder =
+        if placeHolder /= "" then
+            Element.text placeHolder
+                |> Input.placeholder []
+                |> Just
+
+        else
+            Nothing
+    , spellcheck = True
+    , text = currentValue
+    }
+
+
+inputPasswordOptions :
+    (String -> msg)
+    -> Properties msg
+    -> Options msg
+    ->
+        { label : Input.Label msg
+        , onChange : String -> msg
+        , placeholder : Maybe (Input.Placeholder msg)
+        , text : String
+        , show : Bool
+        }
+inputPasswordOptions onChange { label, currentValue } { placeHolder } =
+    { label = Input.labelAbove [] (Element.text label)
+    , onChange = onChange
+    , placeholder =
+        if placeHolder /= "" then
+            Element.text placeHolder
+                |> Input.placeholder []
+                |> Just
+
+        else
+            Nothing
+    , show = True
+    , text = currentValue
+    }
+
+
+attrs : RenderConfig -> Properties msg -> Options msg -> List (Attribute msg)
+attrs cfg prop opt =
+    []
