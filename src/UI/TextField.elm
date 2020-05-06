@@ -265,8 +265,13 @@ inputAnyOptions :
         , placeholder : Maybe (Input.Placeholder msg)
         , text : String
         }
-inputAnyOptions onChange { label, currentValue } { placeHolder } =
-    { label = Input.labelAbove [] (Element.text label)
+inputAnyOptions onChange { label, currentValue } { placeHolder, labelVisible } =
+    { label =
+        if labelVisible then
+            Input.labelAbove [] (Element.text label)
+
+        else
+            Input.labelHidden label
     , onChange = onChange
     , placeholder =
         if placeHolder /= "" then
@@ -292,7 +297,12 @@ inputMultilineOptions :
         , spellcheck : Bool
         }
 inputMultilineOptions onChange { label, currentValue } { placeHolder } =
-    { label = Input.labelAbove [] (Element.text label)
+    { label =
+        if labelVisible then
+            Input.labelAbove [] (Element.text label)
+
+        else
+            Input.labelHidden label
     , onChange = onChange
     , placeholder =
         if placeHolder /= "" then
@@ -319,7 +329,12 @@ inputPasswordOptions :
         , show : Bool
         }
 inputPasswordOptions onChange { label, currentValue } { placeHolder } =
-    { label = Input.labelAbove [] (Element.text label)
+    { label =
+        if labelVisible then
+            Input.labelAbove [] (Element.text label)
+
+        else
+            Input.labelHidden label
     , onChange = onChange
     , placeholder =
         if placeHolder /= "" then
