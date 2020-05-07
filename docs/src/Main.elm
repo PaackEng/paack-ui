@@ -7,8 +7,8 @@ import Buttons.Stories as Buttons
 import Element exposing (Element)
 import Element.Font as Font
 import Form.Checkboxes as Checkboxes
-import Form.Input as Input
 import Form.State as FormState
+import Form.TextField as TextField
 import Html exposing (Html, i)
 import Html.Attributes exposing (class, style)
 import Icons as Icons
@@ -66,7 +66,7 @@ main =
         , Alerts.stories
         , PopUps.stories
         , Badges.stories
-        , Input.stories
+        , TextField.stories renderConfig
         , Checkboxes.stories
         , LoadingView.stories
         , Tables.stories
