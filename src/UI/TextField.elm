@@ -32,7 +32,7 @@ import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
-import UI.Utils.Element exposing (Focus, focusAttributes)
+import UI.Utils.Focus exposing (Focus, focusAttributes)
 
 
 type alias Options msg =
@@ -357,15 +357,40 @@ inputPasswordOptions onChange { label, currentValue } { placeHolder, labelVisibl
 attrs : RenderConfig -> Properties msg -> Options msg -> List (Attribute msg)
 attrs cfg prop opt =
     let
-        styleAttr =
+        hasError =
+            opt.errorCaption /= Nothing
+
+        styleStaticAttr =
             [ Background.color Palette.gray.lightest
             , Primitives.roundedFields
-            , Border.width 1
-            , Border.color Palette.gray.lighter
+            , Border.color <|
+                if hasError then
+                    Element.rgb255 255 94 116
+
+                else
+                    Palette.gray.lighter
+            , Border.width <|
+                if hasError then
+                    2
+
+                else
+                    1
             , Font.size 14
             , Font.bold
             , Element.paddingXY 18 16
+            , Element.focused
+                [ Border.color <| Element.rgb255 147 187 255
+                ]
             ]
+
+        styleAttr =
+            if prop.currentValue /= "" then
+                styleStaticAttr
+                    |> (::) (Font.color Palette.gray.darkest)
+
+            else
+                styleStaticAttr
+                    |> (::) (Font.color Palette.gray.light)
     in
     case opt.focus of
         Just details ->

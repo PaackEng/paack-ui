@@ -1,15 +1,8 @@
-module UI.Utils.Element exposing (Focus, colorTransition, disabled, focusAttributes)
+module UI.Utils.Element exposing (colorTransition, disabled)
 
 import Element exposing (Attribute)
 import Element.Events as Events
 import Html.Attributes as HtmlAttrs
-
-
-type alias Focus msg =
-    { onEnter : msg
-    , tabIndex : Int
-    , hasFocus : Bool
-    }
 
 
 disabled : List (Attribute msg)
@@ -30,15 +23,6 @@ colorTransition time =
     , ( "transition-timing-function", "linear" )
     ]
         |> List.map stylePair
-
-
-focusAttributes : Focus msg -> List (Attribute msg)
-focusAttributes { onEnter, tabIndex } =
-    [ Events.onFocus onEnter
-    , String.fromInt tabIndex
-        |> HtmlAttrs.attribute "tabindex"
-        |> Element.htmlAttribute
-    ]
 
 
 
