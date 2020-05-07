@@ -100,31 +100,37 @@ deskAttributes size =
         SizeHeading1 ->
             [ Font.size 92
             , Font.letterSpacing -4.5
+            , Font.heavy
             ]
 
         SizeHeading2 ->
             [ Font.size 64
             , Font.letterSpacing -3
+            , Font.heavy
             ]
 
         SizeHeading3 ->
             [ Font.size 48
             , Font.letterSpacing -2
+            , Font.heavy
             ]
 
         SizeHeading4 ->
             [ Font.size 32
             , Font.letterSpacing -1
+            , Font.heavy
             ]
 
         SizeHeading5 ->
             [ Font.size 24
             , Font.letterSpacing 0
+            , Font.heavy
             ]
 
         SizeHeading6 ->
             [ Font.size 20
             , Font.letterSpacing 0.15
+            , Font.heavy
             ]
 
         SizeSubtitle1 ->
@@ -158,6 +164,7 @@ deskAttributes size =
         SizeOverline ->
             [ Font.size 10
             , Font.letterSpacing 2
+            , Font.heavy
             ]
 
 

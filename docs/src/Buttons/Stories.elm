@@ -136,7 +136,7 @@ linkStory renderConfig =
         , { note = """
 ```elm
 Button.bodyText "Go to Blank"
-    |> Button.link "about:blank"
+    |> Button.link (Link.link "about:blank")
     |> Button.toEl renderConfig
 ```
 """ }
