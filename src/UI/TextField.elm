@@ -23,11 +23,16 @@ module UI.TextField exposing
     )
 
 import Element exposing (Attribute, Element)
+import Element.Background as Background
+import Element.Border as Border
+import Element.Font as Font
 import Element.Input as Input
 import UI.Icon exposing (Icon)
+import UI.Internal.Palette as Palette
+import UI.Internal.Primitives as Primitives
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
-import UI.Utils.Element exposing (Focus)
+import UI.Utils.Element exposing (Focus, focusAttributes)
 
 
 type alias Options msg =
@@ -351,4 +356,21 @@ inputPasswordOptions onChange { label, currentValue } { placeHolder, labelVisibl
 
 attrs : RenderConfig -> Properties msg -> Options msg -> List (Attribute msg)
 attrs cfg prop opt =
-    []
+    let
+        styleAttr =
+            [ Background.color Palette.gray.lightest
+            , Primitives.roundedFields
+            , Border.width 1
+            , Border.color Palette.gray.lighter
+            , Font.size 14
+            , Font.bold
+            , Element.paddingXY 18 16
+            ]
+    in
+    case opt.focus of
+        Just details ->
+            focusAttributes details
+                |> (++) styleAttr
+
+        Nothing ->
+            styleAttr
