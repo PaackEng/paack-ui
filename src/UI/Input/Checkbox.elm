@@ -13,7 +13,7 @@ import Element.Font as Font
 import Element.Region as Region
 import Helpers exposing (ifThenElse)
 import UI.Attributes exposing (ariaChecked, ariaDisabled, ariaLabel, ariaRole, onClickWithoutPropagation, style, title)
-import UI.Icons as Icons
+import UI.Icon as Icon
 import UI.Theme as Theme
 
 
@@ -61,7 +61,7 @@ toEl : Checkbox msg -> Element msg
 toEl (Checkbox options) =
     let
         iconType =
-            ifThenElse options.isChecked Icons.checked Icons.unchecked
+            ifThenElse options.isChecked Icon.todo Icon.todo
 
         extraAttrs =
             if options.isDisabled then

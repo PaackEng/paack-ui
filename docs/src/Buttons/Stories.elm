@@ -6,7 +6,7 @@ import Element
 import Msg as Msg
 import Return as R exposing (Return)
 import UI.Button as Button
-import UI.Icons as Icon
+import UI.Icon as Icon
 import UI.Link as Link
 import UIExplorer exposing (storiesOf)
 import Utils exposing (story, storyList, storyWithModel)

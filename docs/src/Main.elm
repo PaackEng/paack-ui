@@ -59,7 +59,7 @@ main =
     explore
         config
         [ Texts.stories renderConfig
-        , Icons.stories
+        , Icons.stories renderConfig
         , Theme.stories
         , Buttons.stories renderConfig
         , ActionBars.stories renderConfig

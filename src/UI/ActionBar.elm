@@ -13,7 +13,7 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import UI.Button as Button exposing (Button)
-import UI.Icons as Icons
+import UI.Icon as Icon
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Theme as Theme
 
@@ -110,7 +110,7 @@ viewButtonsContainer cfg options =
         closeBtn =
             case options.onClose of
                 Just msg ->
-                    Button.bodyIcon (Icons.close_ "Close")
+                    Button.bodyIcon (Icon.close "Close")
                         |> Button.button msg
                         |> Button.withTone Button.toneDanger
                         |> Button.toEl cfg

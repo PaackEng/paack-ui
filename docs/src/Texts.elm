@@ -13,7 +13,12 @@ stories renderConfig =
           , { note = """
 ```elm
 "Wherever You Will Go"
-    |> Text.heading1
+    |> Text.heading5
+    |> Text.withColor Text.colorPrimary
+    |> Text.toEl renderConfig
+
+" - By The Calling"
+    |> Text.caption
     |> Text.toEl renderConfig
 
 \"\"\"
@@ -34,7 +39,10 @@ Futures discussions includes:
 
 
 styles =
-    [ ( Text.heading1, "Heading1" )
+    [ ( Text.heading1
+            >> Text.withColor Text.colorPrimary
+      , "Heading1"
+      )
     , ( Text.heading2, "Heading2" )
     , ( Text.heading3, "Heading3" )
     , ( Text.heading4, "Heading4" )

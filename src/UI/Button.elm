@@ -28,11 +28,14 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
-import UI.Icons as Icon exposing (Icon)
-import UI.Internal.Palette as Palette exposing (Color)
+import UI.Icon as Icon exposing (Icon)
+import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
+import UI.Internal.Text as Text exposing (TextColor)
 import UI.Link as Link exposing (Link)
+import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
+import UI.Text as Text
 import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element
 
@@ -247,42 +250,66 @@ ariaAttrs =
     [ ARIA.roleAttr ARIA.roleButton ]
 
 
-type alias InvertableColor =
-    -- This inverts when outlined
-    { active : Color
-    , passive : Color
+type alias ThemeTriple =
+    { primary : Palette.Color
+    , text : TextColor
+    , outlinedBg : Palette.Color
     }
 
 
-type alias ColorIntermediary =
-    { normal : InvertableColor
-    , onHover : Maybe InvertableColor
+type alias ButtonTheme =
+    { normal : ThemeTriple
+    , hover : Maybe ThemeTriple
     }
 
 
 styleAttrs : Button msg -> List (Attribute msg)
 styleAttrs btn =
     let
-        ({ normal } as interm) =
-            btn
-                |> colorHelper
-                |> invertColorsWhen (isOutlined btn)
+        theme =
+            colorHelper btn
 
-        hover =
-            interm.onHover
-                |> Maybe.withDefault normal
+        hover ( bg, border, text ) =
+            Element.mouseOver
+                [ Background.color bg
+                , Border.color border
+                , Font.color text
+                ]
+                :: Element.colorTransition 100
+
+        normal ( bg, border, text ) =
+            [ Background.color bg
+            , Border.color border
+            , Border.width 1
+            , Font.color text
+            ]
+
+        colors { primary, text, outlinedBg } =
+            if isOutlined btn then
+                ( Palette.toElColor outlinedBg
+                , Palette.toElColor primary
+                , Text.ColorPalette primary
+                    |> Text.fontColor
+                    |> Maybe.withDefault
+                        Palette.gray.middle
+                )
+
+            else
+                ( Palette.toElColor primary
+                , Palette.toElColor primary
+                , text
+                    |> Text.fontColor
+                    |> Maybe.withDefault
+                        Palette.gray.middle
+                )
     in
-    [ Background.color normal.active
-    , Font.color normal.passive
-    , Element.mouseOver
-        [ Background.color hover.active
-        , Font.color hover.passive
-        , Border.color hover.passive
-        ]
-    , Border.color normal.passive
-    , Border.width 1
-    ]
-        ++ Element.colorTransition 100
+    case theme.hover of
+        Just hoverTriple ->
+            normal (colors theme.normal)
+                ++ hover (colors hoverTriple)
+
+        Nothing ->
+            normal (colors theme.normal)
 
 
 isOutlined : Button msg -> Bool
@@ -295,60 +322,104 @@ isOutlined (Button { click } _) =
             False
 
 
-invertColorsWhen : Bool -> ColorIntermediary -> ColorIntermediary
-invertColorsWhen trigger ({ normal, onHover } as default) =
-    let
-        invert { active, passive } =
-            { active = passive, passive = active }
-    in
-    if trigger then
-        ColorIntermediary (invert normal)
-            (Maybe.map invert onHover)
-
-    else
-        default
-
-
-colorHelper : Button msg -> ColorIntermediary
+colorHelper : Button msg -> ButtonTheme
 colorHelper (Button { click, body } { mode, tone }) =
     if mode == ModeDisabled then
-        case ( body, tone ) of
-            ( BodyIcon _, _ ) ->
-                ColorIntermediary
-                    { active = Palette.gray.lightest, passive = Palette.gray.light }
-                    Nothing
-
-            ( BodyText _, ToneLight ) ->
-                ColorIntermediary
-                    { active = Palette.gray.lightest, passive = Palette.textDisbledWithGrayLightest }
-                    Nothing
-
-            _ ->
-                ColorIntermediary
-                    { active = Palette.gray.light, passive = Palette.textWithBg }
-                    Nothing
+        colorHelperWhenDisabled body tone
 
     else
-        case tone of
-            TonePrimary ->
-                ColorIntermediary
-                    { active = Palette.primary.middle, passive = Palette.textWithBg }
-                    (Just { active = Palette.primary.darkest, passive = Palette.textWithBg })
+        colorHelperWhenEnabled tone
 
-            ToneSuccess ->
-                ColorIntermediary
-                    { active = Palette.success.middle, passive = Palette.textWithBg }
-                    (Just { active = Palette.success.darkest, passive = Palette.textWithBg })
 
-            ToneDanger ->
-                ColorIntermediary
-                    { active = Palette.danger.middle, passive = Palette.textWithBg }
-                    (Just { active = Palette.danger.darkest, passive = Palette.textWithBg })
+colorHelperWhenDisabled : ButtonBody msg -> ButtonTone -> ButtonTheme
+colorHelperWhenDisabled body tone =
+    case ( body, tone ) of
+        ( BodyIcon _, _ ) ->
+            { normal =
+                { primary = ( Palette.toneGray, Palette.lumLightest )
+                , text = Text.ColorBgDisabled
+                , outlinedBg = ( Palette.toneGray, Palette.lumLight )
+                }
+            , hover = Nothing
+            }
 
-            ToneLight ->
-                ColorIntermediary
-                    { active = Palette.gray.lightest, passive = Palette.textWithGrayLightest }
-                    (Just { active = Palette.gray.lighter, passive = Palette.textWithGrayLighter })
+        ( BodyText _, ToneLight ) ->
+            { normal =
+                { primary = ( Palette.toneGray, Palette.lumLightest )
+                , text = Text.ColorBgLightest
+                , outlinedBg = ( Palette.toneGray, Palette.lumLight )
+                }
+            , hover = Nothing
+            }
+
+        _ ->
+            { normal =
+                { primary = ( Palette.toneGray, Palette.lumLight )
+                , text = Text.ColorBgMiddle
+                , outlinedBg = ( Palette.toneGray, Palette.lumLight )
+                }
+            , hover = Nothing
+            }
+
+
+colorHelperWhenEnabled : ButtonTone -> ButtonTheme
+colorHelperWhenEnabled tone =
+    case tone of
+        TonePrimary ->
+            { normal =
+                { primary = ( Palette.tonePrimary, Palette.lumMiddle )
+                , text = Text.ColorBgMiddle
+                , outlinedBg = ( Palette.toneGray, Palette.lumLightest )
+                }
+            , hover =
+                Just
+                    { primary = ( Palette.tonePrimary, Palette.lumDarkest )
+                    , text = Text.ColorBgMiddle
+                    , outlinedBg = ( Palette.toneGray, Palette.lumLightest )
+                    }
+            }
+
+        ToneSuccess ->
+            { normal =
+                { primary = ( Palette.toneSuccess, Palette.lumMiddle )
+                , text = Text.ColorBgMiddle
+                , outlinedBg = ( Palette.toneGray, Palette.lumLightest )
+                }
+            , hover =
+                Just
+                    { primary = ( Palette.toneSuccess, Palette.lumDarkest )
+                    , text = Text.ColorBgMiddle
+                    , outlinedBg = ( Palette.toneGray, Palette.lumLightest )
+                    }
+            }
+
+        ToneDanger ->
+            { normal =
+                { primary = ( Palette.toneDanger, Palette.lumMiddle )
+                , text = Text.ColorBgMiddle
+                , outlinedBg = ( Palette.toneGray, Palette.lumLightest )
+                }
+            , hover =
+                Just
+                    { primary = ( Palette.toneDanger, Palette.lumDarkest )
+                    , text = Text.ColorBgMiddle
+                    , outlinedBg = ( Palette.toneGray, Palette.lumLightest )
+                    }
+            }
+
+        ToneLight ->
+            { normal =
+                { primary = ( Palette.toneGray, Palette.lumLightest )
+                , text = Text.ColorBgLightest
+                , outlinedBg = ( Palette.toneGray, Palette.lumLightest )
+                }
+            , hover =
+                Just
+                    { primary = ( Palette.toneGray, Palette.lumLighter )
+                    , text = Text.ColorBgLighter
+                    , outlinedBg = ( Palette.toneGray, Palette.lumLightest )
+                    }
+            }
 
 
 disabledAttrs : Button msg -> List (Attribute msg)
@@ -380,7 +451,9 @@ elFromBody : RenderConfig -> ButtonBody msg -> Element msg
 elFromBody cfg body =
     case body of
         BodyText str ->
-            Element.text str
+            Text.body1 str
+                |> Text.withColor Text.ColorInherit
+                |> Text.toEl cfg
 
         BodyIcon icon ->
             Icon.toEl cfg icon
