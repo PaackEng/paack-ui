@@ -365,7 +365,7 @@ attrs cfg prop opt =
             , Primitives.roundedFields
             , Border.color <|
                 if hasError then
-                    Element.rgb255 255 94 116
+                    Palette.danger.light
 
                 else
                     Palette.gray.lighter
@@ -379,7 +379,7 @@ attrs cfg prop opt =
             , Font.bold
             , Element.paddingXY 18 16
             , Element.focused
-                [ Border.color <| Element.rgb255 147 187 255
+                [ Border.color Palette.primary.lighter
                 ]
             ]
 
