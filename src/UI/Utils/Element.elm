@@ -1,6 +1,6 @@
-module UI.Utils.Element exposing (colorTransition, disabled, onEnterPressed, title)
+module UI.Utils.Element exposing (colorTransition, disabled, onEnterPressed, title, vhHeight)
 
-import Element exposing (Attribute)
+import Element exposing (Attribute, Element)
 import Element.Events as Events
 import Html.Attributes as HtmlAttrs
 import Html.Events as HtmlEvents
@@ -51,8 +51,18 @@ title value =
         |> Element.htmlAttribute
 
 
+vhHeight : Int -> Attribute msg
+vhHeight value =
+    style "max-height" (String.fromInt value ++ "vh")
+
+
 
 -- Helpers
+
+
+style : String -> String -> Attribute msg
+style k v =
+    Element.htmlAttribute <| HtmlAttrs.style k v
 
 
 stylePair : ( String, String ) -> Attribute msg

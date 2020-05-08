@@ -1,6 +1,13 @@
 module UI.Icon exposing
     ( Icon
     , close
+    , eventLog
+    , getHint
+    , logout
+    , notifications
+    , paackSpaces
+    , packages
+    , sandwichMenu
     , toEl
     , todo
     , toggle
@@ -32,6 +39,12 @@ type Icon
 type IconGlyph
     = Toggle
     | Close
+    | SandwichMenu
+    | Notifications
+    | PaackSpaces
+    | Packages
+    | EventLog
+    | Logout
 
 
 toggle : String -> Icon
@@ -44,6 +57,36 @@ close hint =
     Icon (Properties hint Close)
 
 
+sandwichMenu : String -> Icon
+sandwichMenu hint =
+    Icon (Properties hint SandwichMenu)
+
+
+notifications : String -> Icon
+notifications hint =
+    Icon (Properties hint Notifications)
+
+
+paackSpaces : String -> Icon
+paackSpaces hint =
+    Icon (Properties hint PaackSpaces)
+
+
+packages : String -> Icon
+packages hint =
+    Icon (Properties hint Packages)
+
+
+eventLog : String -> Icon
+eventLog hint =
+    Icon (Properties hint EventLog)
+
+
+logout : String -> Icon
+logout hint =
+    Icon (Properties hint Logout)
+
+
 toEl : RenderConfig -> Icon -> Element msg
 toEl _ (Icon { hint, glyph }) =
     case glyph of
@@ -52,6 +95,29 @@ toEl _ (Icon { hint, glyph }) =
 
         Close ->
             fasIcon "times" hint
+
+        SandwichMenu ->
+            fasIcon "bars" hint
+
+        Notifications ->
+            fasIcon "bell" hint
+
+        PaackSpaces ->
+            fasIcon "database" hint
+
+        Packages ->
+            fasIcon "box-open" hint
+
+        EventLog ->
+            fasIcon "comment" hint
+
+        Logout ->
+            fasIcon "user-circle" hint
+
+
+getHint : Icon -> String
+getHint (Icon { hint }) =
+    hint
 
 
 
