@@ -2,22 +2,25 @@ module UI.TextField exposing
     ( TextField
     , TextFieldContent
     , TextFieldWidth
-    , forAny
-    , forAnyMultiline
+    , forCurrentPassword
     , forEmail
-    , forPassword
+    , forMultilineText
+    , forNewPassword
     , forSearch
+    , forSinglelineText
     , forSpellChecked
     , forUsername
     , static
-    , textField
     , toEl
     , widthFull
     , widthRelative
     , withError
     , withFocus
     , withIcon
-    , withLabelVisible
+    , withInput
+    , withLabelNotHidden
+    , withOnEnterPressed
+    , withPasswordNotHidden
     , withPlaceholder
     , withWidth
     )
@@ -32,16 +35,19 @@ import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
+import UI.Utils.ARIA as ARIA
+import UI.Utils.Element as Element
 import UI.Utils.Focus exposing (Focus, focusAttributes)
 
 
 type alias Options msg =
-    { placeHolder : String
+    { placeholder : String
     , labelVisible : Bool
     , focus : Maybe (Focus msg)
     , icon : Maybe Icon
     , width : TextFieldWidth
     , errorCaption : Maybe String
+    , onEnterPressed : Maybe msg
     }
 
 
@@ -58,8 +64,8 @@ type TextField msg
 
 
 type TextFieldContent
-    = ContentAny
-    | ContentAnyMultiline
+    = ContentSinglelineText
+    | ContentMultilineText
     | ContentUsername
     | ContentPassword PasswordOptions
     | ContentEmail
@@ -69,7 +75,7 @@ type TextFieldContent
 
 type alias PasswordOptions =
     { isCurrent : Bool
-    , show : Bool
+    , isVisible : Bool
     }
 
 
@@ -97,9 +103,9 @@ withIcon icon (TextField prop opt) =
 
 
 withPlaceholder : String -> TextField msg -> TextField msg
-withPlaceholder placeHolder (TextField prop opt) =
+withPlaceholder placeholder (TextField prop opt) =
     TextField prop
-        { opt | placeHolder = placeHolder }
+        { opt | placeholder = placeholder }
 
 
 withWidth : TextFieldWidth -> TextField msg -> TextField msg
@@ -108,8 +114,8 @@ withWidth width (TextField prop opt) =
         { opt | width = width }
 
 
-withLabelVisible : Bool -> TextField msg -> TextField msg
-withLabelVisible isVisible (TextField prop opt) =
+withLabelNotHidden : Bool -> TextField msg -> TextField msg
+withLabelNotHidden isVisible (TextField prop opt) =
     TextField prop
         { opt | labelVisible = isVisible }
 
@@ -120,14 +126,38 @@ withError caption (TextField prop opt) =
         { opt | errorCaption = Just caption }
 
 
-forAny : TextFieldContent
-forAny =
-    ContentAny
+withOnEnterPressed : msg -> TextField msg -> TextField msg
+withOnEnterPressed msg (TextField prop opt) =
+    TextField prop
+        { opt | onEnterPressed = Just msg }
 
 
-forAnyMultiline : TextFieldContent
-forAnyMultiline =
-    ContentAnyMultiline
+withPasswordNotHidden : Bool -> TextField msg -> TextField msg
+withPasswordNotHidden isVisible ((TextField prop opt) as original) =
+    case prop.content of
+        ContentPassword { isCurrent } ->
+            TextField
+                { prop
+                    | content =
+                        ContentPassword
+                            { isCurrent = isCurrent
+                            , isVisible = isVisible
+                            }
+                }
+                opt
+
+        _ ->
+            original
+
+
+forSinglelineText : TextFieldContent
+forSinglelineText =
+    ContentSinglelineText
+
+
+forMultilineText : TextFieldContent
+forMultilineText =
+    ContentMultilineText
 
 
 forUsername : TextFieldContent
@@ -135,9 +165,20 @@ forUsername =
     ContentUsername
 
 
-forPassword : PasswordOptions -> TextFieldContent
-forPassword opt =
-    ContentPassword opt
+forNewPassword : TextFieldContent
+forNewPassword =
+    ContentPassword
+        { isCurrent = False
+        , isVisible = False
+        }
+
+
+forCurrentPassword : TextFieldContent
+forCurrentPassword =
+    ContentPassword
+        { isCurrent = True
+        , isVisible = False
+        }
 
 
 forEmail : TextFieldContent
@@ -169,8 +210,8 @@ widthRelative =
 -- Constructors
 
 
-textField : (String -> msg) -> String -> String -> TextFieldContent -> TextField msg
-textField onChange label currentValue content =
+withInput : (String -> msg) -> String -> String -> TextFieldContent -> TextField msg
+withInput onChange label currentValue content =
     TextField
         { changeable = Just onChange
         , label = label
@@ -185,7 +226,7 @@ static label value =
     TextField
         { changeable = Nothing
         , label = label
-        , content = ContentAnyMultiline
+        , content = ContentMultilineText
         , currentValue = value
         }
         defaultOptions
@@ -202,12 +243,12 @@ toEl cfg (TextField prop opt) =
             Text.body1 prop.currentValue
                 |> Text.toEl cfg
 
-        ( Just msg, ContentAny ) ->
+        ( Just msg, ContentSinglelineText ) ->
             inputAnyOptions msg prop opt
                 |> Input.text
                     (attrs cfg prop opt)
 
-        ( Just msg, ContentAnyMultiline ) ->
+        ( Just msg, ContentMultilineText ) ->
             inputMultilineOptions msg prop opt
                 |> Input.multiline
                     (attrs cfg prop opt)
@@ -217,14 +258,14 @@ toEl cfg (TextField prop opt) =
                 |> Input.username
                     (attrs cfg prop opt)
 
-        ( Just msg, ContentPassword { show, isCurrent } ) ->
+        ( Just msg, ContentPassword { isVisible, isCurrent } ) ->
             if isCurrent then
-                inputPasswordOptions msg prop opt show
+                inputPasswordOptions msg prop opt isVisible
                     |> Input.currentPassword
                         (attrs cfg prop opt)
 
             else
-                inputPasswordOptions msg prop opt show
+                inputPasswordOptions msg prop opt isVisible
                     |> Input.newPassword
                         (attrs cfg prop opt)
 
@@ -250,12 +291,13 @@ toEl cfg (TextField prop opt) =
 
 defaultOptions : Options msg
 defaultOptions =
-    { placeHolder = ""
+    { placeholder = ""
     , labelVisible = True
     , focus = Nothing
     , icon = Nothing
     , width = WidthRelative
     , errorCaption = Nothing
+    , onEnterPressed = Nothing
     }
 
 
@@ -269,7 +311,7 @@ inputAnyOptions :
         , placeholder : Maybe (Input.Placeholder msg)
         , text : String
         }
-inputAnyOptions onChange { label, currentValue } { placeHolder, labelVisible } =
+inputAnyOptions onChange { label, currentValue } { placeholder, labelVisible } =
     { label =
         if labelVisible then
             Input.labelAbove [] (Element.text label)
@@ -278,8 +320,8 @@ inputAnyOptions onChange { label, currentValue } { placeHolder, labelVisible } =
             Input.labelHidden label
     , onChange = onChange
     , placeholder =
-        if placeHolder /= "" then
-            Element.text placeHolder
+        if placeholder /= "" then
+            Element.text placeholder
                 |> Input.placeholder []
                 |> Just
 
@@ -300,7 +342,7 @@ inputMultilineOptions :
         , text : String
         , spellcheck : Bool
         }
-inputMultilineOptions onChange { label, currentValue } { placeHolder, labelVisible } =
+inputMultilineOptions onChange { label, currentValue } { placeholder, labelVisible } =
     { label =
         if labelVisible then
             Input.labelAbove [] (Element.text label)
@@ -309,8 +351,8 @@ inputMultilineOptions onChange { label, currentValue } { placeHolder, labelVisib
             Input.labelHidden label
     , onChange = onChange
     , placeholder =
-        if placeHolder /= "" then
-            Element.text placeHolder
+        if placeholder /= "" then
+            Element.text placeholder
                 |> Input.placeholder []
                 |> Just
 
@@ -333,7 +375,7 @@ inputPasswordOptions :
         , text : String
         , show : Bool
         }
-inputPasswordOptions onChange { label, currentValue } { placeHolder, labelVisible } show =
+inputPasswordOptions onChange { label, currentValue } { placeholder, labelVisible } isVisible =
     { label =
         if labelVisible then
             Input.labelAbove [] (Element.text label)
@@ -342,14 +384,14 @@ inputPasswordOptions onChange { label, currentValue } { placeHolder, labelVisibl
             Input.labelHidden label
     , onChange = onChange
     , placeholder =
-        if placeHolder /= "" then
-            Element.text placeHolder
+        if placeholder /= "" then
+            Element.text placeholder
                 |> Input.placeholder []
                 |> Just
 
         else
             Nothing
-    , show = show
+    , show = isVisible
     , text = currentValue
     }
 
@@ -360,42 +402,71 @@ attrs cfg prop opt =
         hasError =
             opt.errorCaption /= Nothing
 
-        styleStaticAttr =
-            [ Background.color Palette.gray.lightest
-            , Primitives.roundedFields
-            , Border.color <|
-                if hasError then
-                    Palette.danger.light
+        isPlaceholder =
+            prop.currentValue /= ""
 
-                else
-                    Palette.gray.lighter
-            , Border.width <|
-                if hasError then
-                    2
+        eventAttr acu =
+            case opt.onEnterPressed of
+                Just onEnterPressed ->
+                    Element.onEnterPressed onEnterPressed
+                        :: acu
 
-                else
-                    1
-            , Font.size 14
-            , Font.bold
-            , Element.paddingXY 18 16
-            , Element.focused
-                [ Border.color Palette.primary.lighter
-                ]
-            ]
+                Nothing ->
+                    acu
 
-        styleAttr =
-            if prop.currentValue /= "" then
-                styleStaticAttr
-                    |> (::) (Font.color Palette.gray.darkest)
+        focustAttr acu =
+            case opt.focus of
+                Just details ->
+                    focusAttributes details
+                        ++ acu
 
-            else
-                styleStaticAttr
-                    |> (::) (Font.color Palette.gray.light)
+                Nothing ->
+                    acu
     in
-    case opt.focus of
-        Just details ->
-            focusAttributes details
-                |> (++) styleAttr
+    genericAttr prop.label
+        isPlaceholder
+        hasError
+        opt.width
+        |> eventAttr
+        |> focustAttr
 
-        Nothing ->
-            styleAttr
+
+genericAttr : String -> Bool -> Bool -> TextFieldWidth -> List (Attribute msg)
+genericAttr label isPlaceholder hasError width =
+    [ Background.color Palette.gray.lightest
+    , Primitives.roundedFields
+    , Border.color <|
+        if hasError then
+            Palette.danger.light
+
+        else
+            Palette.gray.lighter
+    , Border.width <|
+        if hasError then
+            2
+
+        else
+            1
+    , Font.size 14
+    , Font.bold
+    , Element.paddingXY 18 16
+    , Element.focused
+        [ Border.color Palette.primary.lighter
+        ]
+    , Element.width <|
+        case width of
+            WidthFull ->
+                Element.fill
+
+            WidthRelative ->
+                Element.shrink
+    , Font.color <|
+        -- TODO: Use CSS pre-processor
+        if isPlaceholder then
+            Palette.gray.darkest
+
+        else
+            Palette.gray.light
+    , ARIA.labelAttr label
+    , Element.title label
+    ]

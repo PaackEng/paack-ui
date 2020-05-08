@@ -21,12 +21,12 @@ stories cfg =
 defaultTextFieldStory cfg =
     story
         ( "Default"
-        , TextField.forAny
-            |> TextField.textField (always RootMsg.NoOp)
+        , TextField.forSinglelineText
+            |> TextField.withInput (always RootMsg.NoOp)
                 "My cool default"
                 "Value"
             |> TextField.withPlaceholder "Enter your info here"
-            |> TextField.withLabelVisible True
+            |> TextField.withLabelNotHidden True
             |> TextField.toEl cfg
         , { note = """
 ```elm
@@ -36,12 +36,12 @@ type Msg
 
 
 -- Default
-, TextField.forAny
-    |> TextField.textField OnTextFieldChanged
+, TextField.forSinglelineText
+    |> TextField.withInput OnTextFieldChanged
         "My cool input"
         model.value
     |> TextField.withPlaceholder "Enter your info here"
-    |> TextField.withLabelVisible True
+    |> TextField.withLabelNotHidden True
     |> TextField.toEl renderCfg
 ```
 """
@@ -51,12 +51,12 @@ type Msg
 
 usernameTextFieldStory cfg =
     story
-        ( "Email"
-        , TextField.forEmail
-            |> TextField.textField (always RootMsg.NoOp)
+        ( "Username"
+        , TextField.forUsername
+            |> TextField.withInput (always RootMsg.NoOp)
                 "Enter your email"
                 "Value"
-            |> TextField.withLabelVisible True
+            |> TextField.withLabelNotHidden True
             |> TextField.toEl cfg
         , { note = """
 ```elm
@@ -67,10 +67,10 @@ type Msg
 
 -- Email
 TextField.forEmail
-    |> TextField.textField OnTextFieldChanged
+    |> TextField.withInput OnTextFieldChanged
         "Enter your email"
         model.emailValue
-    |> TextField.withLabelVisible true
+    |> TextField.withLabelNotHidden true
     |> TextField.toEl renderCfg
 ```
 """
@@ -81,12 +81,11 @@ TextField.forEmail
 passwordTextFieldStory cfg =
     story
         ( "Password"
-        , TextField.forPassword
-            { show = False, isCurrent = False }
-            |> TextField.textField (always RootMsg.NoOp)
+        , TextField.forCurrentPassword
+            |> TextField.withInput (always RootMsg.NoOp)
                 "Enter your password"
                 "Value"
-            |> TextField.withLabelVisible True
+            |> TextField.withLabelNotHidden True
             |> TextField.toEl cfg
         , { note = """
 ```elm
@@ -96,12 +95,11 @@ type Msg
 
 
 -- Password
-TextField.forPassword
-    { show = False, isCurrent = False }
-    |> TextField.textField OnTextFieldChanged
+TextField.forCurrentPassword
+    |> TextField.withInput OnTextFieldChanged
         "Enter your password"
         mode.passwordValue
-    |> TextField.withLabelVisible True
+    |> TextField.withLabelNotHidden True
     |> TextField.toEl renderCfg
 ```
 """
@@ -112,11 +110,11 @@ TextField.forPassword
 fullWidthStory cfg =
     story
         ( "Full Width"
-        , TextField.forAny
-            |> TextField.textField (always RootMsg.NoOp)
+        , TextField.forSinglelineText
+            |> TextField.withInput (always RootMsg.NoOp)
                 "My TextField"
-                ""
-            |> TextField.withLabelVisible True
+                "Some big text"
+            |> TextField.withLabelNotHidden True
             |> TextField.withWidth TextField.widthFull
             |> TextField.toEl cfg
         , { note = """
@@ -127,11 +125,11 @@ type Msg
 
 
 -- Full width
-TextField.forAny
-    |> TextField.textField OnTextFieldChanged
+TextField.forSinglelineText
+    |> TextField.withInput OnTextFieldChanged
         "My TextField"
         model.someFieldValue
-    |> TextField.withLabelVisible True
+    |> TextField.withLabelNotHidden True
     |> TextField.withWidth TextField.widthFull
     |> TextField.toEl renderCfg
 ```

@@ -13,7 +13,8 @@
         "UI.Text",
         "UI.TextField",
         "UI.Utils.ARIA",
-        "UI.Utils.Element"
+        "UI.Utils.Element",
+        "UI.Utils.Focus"
     ],
     "elm-version": "0.19.0 <= v < 0.20.0",
     "dependencies": {
