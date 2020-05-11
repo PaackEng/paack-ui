@@ -11,4 +11,4 @@ roundedBorders =
 
 roundedFields : Attribute msg
 roundedFields =
-    Border.rounded 4
+    Border.rounded 8
