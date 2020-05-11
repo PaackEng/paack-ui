@@ -239,10 +239,10 @@ buttonPadding ((Button { body } _) as btn) =
     -- Remove 1 pixel each side for borders
     case body of
         BodyText _ ->
-            Element.paddingXY 31 11
+            Element.paddingXY 31 15
 
         BodyIcon _ ->
-            Element.paddingXY 9 11
+            Element.paddingXY 9 15
 
 
 ariaAttrs : List (Attribute msg)

@@ -21,7 +21,7 @@ module UI.Text exposing
 import Element exposing (Attribute, Element)
 import Element.Font as Font
 import List
-import UI.Internal.Text as Internal exposing (TextColor(..), TextSize(..), defaultText)
+import UI.Internal.Text as Internal exposing (TextSize(..), defaultText)
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig, isMobile)
 
@@ -96,7 +96,8 @@ overline content =
 
 colorPrimary : TextColor
 colorPrimary =
-    ColorPalette ( Palette.tonePrimary, Palette.lumMiddle )
+    Internal.ColorPalette
+        ( Palette.tonePrimary, Palette.lumMiddle )
 
 
 withColor : TextColor -> Text -> Text
@@ -105,11 +106,9 @@ withColor color (Internal.Text prop _) =
 
 
 toEl : RenderConfig -> Text -> Element msg
-toEl cfg text =
-    case text of
-        Internal.Text { content, size } { color } ->
-            content
-                |> Element.text
-                |> List.singleton
-                |> Element.paragraph
-                    (Internal.attributes cfg size color)
+toEl cfg (Internal.Text { content, size } { color }) =
+    content
+        |> Element.text
+        |> List.singleton
+        |> Element.paragraph
+            (Internal.attributes cfg size color)

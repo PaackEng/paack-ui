@@ -1,7 +1,10 @@
-module UI.Utils.Element exposing (colorTransition, disabled)
+module UI.Utils.Element exposing (colorTransition, disabled, onEnterPressed, title)
 
 import Element exposing (Attribute)
+import Element.Events as Events
 import Html.Attributes as HtmlAttrs
+import Html.Events as HtmlEvents
+import Json.Decode as Decode
 
 
 disabled : List (Attribute msg)
@@ -22,6 +25,30 @@ colorTransition time =
     , ( "transition-timing-function", "linear" )
     ]
         |> List.map stylePair
+
+
+onEnterPressed : msg -> Attribute msg
+onEnterPressed msg =
+    Element.htmlAttribute
+        (HtmlEvents.on "keyup"
+            (Decode.field "key" Decode.string
+                |> Decode.andThen
+                    (\key ->
+                        if key == "Enter" then
+                            Decode.succeed msg
+
+                        else
+                            Decode.fail "Not the enter key"
+                    )
+            )
+        )
+
+
+title : String -> Attribute msg
+title value =
+    value
+        |> HtmlAttrs.title
+        |> Element.htmlAttribute
 
 
 

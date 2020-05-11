@@ -1,4 +1,4 @@
-module UI.Utils.ARIA exposing (Role, roleAttr, roleButton)
+module UI.Utils.ARIA exposing (Role, labelAttr, roleAttr, roleButton)
 
 import Element exposing (Attribute)
 import Html.Attributes as HtmlAttrs
@@ -20,3 +20,10 @@ roleAttr role =
             case role of
                 RoleButton ->
                     "button"
+
+
+labelAttr : String -> Attribute msg
+labelAttr value =
+    value
+        |> HtmlAttrs.attribute "aria-label"
+        |> Element.htmlAttribute
