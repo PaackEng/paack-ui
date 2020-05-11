@@ -2,28 +2,37 @@ module UI.TextField exposing
     ( TextField
     , TextFieldContent
     , TextFieldWidth
-    , forCurrentPassword
-    , forEmail
-    , forMultilineText
-    , forNewPassword
-    , forSearch
-    , forSinglelineText
-    , forSpellChecked
-    , forUsername
+    , currentPassword
+    , email
+    , multilineText
+    , newPassword
+    , search
+    , singlelineText
+    , spellChecked
     , static
     , toEl
+    , username
     , widthFull
     , widthRelative
     , withError
     , withFocus
     , withIcon
-    , withInput
     , withLabelNotHidden
     , withOnEnterPressed
     , withPasswordNotHidden
     , withPlaceholder
     , withWidth
     )
+
+{-
+   Notes about decisions taken on the development process:
+   * The "with(.+)NotHidden" pattern enforces that the default value is HIDDEN.
+   * Every input must have a label value, even if hidden, for accessibility purposes.
+   * Username, email, current password, and search activates in-browser autocomplete capabilities.
+   * Username and Email content-types may have the same use case scenario (e.g., login, sign up), but the email has an in-browser mask checking.
+
+   TODO: In the future, use 'Html' instead of 'Element', so we can apply style directly in the <input> tag (e.g., having the mask's error styled).
+-}
 
 import Element exposing (Attribute, Element)
 import Element.Background as Background
@@ -150,52 +159,6 @@ withPasswordNotHidden isVisible ((TextField prop opt) as original) =
             original
 
 
-forSinglelineText : TextFieldContent
-forSinglelineText =
-    ContentSinglelineText
-
-
-forMultilineText : TextFieldContent
-forMultilineText =
-    ContentMultilineText
-
-
-forUsername : TextFieldContent
-forUsername =
-    ContentUsername
-
-
-forNewPassword : TextFieldContent
-forNewPassword =
-    ContentPassword
-        { isCurrent = False
-        , isVisible = False
-        }
-
-
-forCurrentPassword : TextFieldContent
-forCurrentPassword =
-    ContentPassword
-        { isCurrent = True
-        , isVisible = False
-        }
-
-
-forEmail : TextFieldContent
-forEmail =
-    ContentEmail
-
-
-forSearch : TextFieldContent
-forSearch =
-    ContentSearch
-
-
-forSpellChecked : TextFieldContent
-forSpellChecked =
-    ContentSpellChecked
-
-
 widthFull : TextFieldWidth
 widthFull =
     WidthFull
@@ -210,15 +173,68 @@ widthRelative =
 -- Constructors
 
 
-withInput : (String -> msg) -> String -> String -> TextFieldContent -> TextField msg
-withInput onChange label currentValue content =
-    TextField
-        { changeable = Just onChange
-        , label = label
-        , content = content
-        , currentValue = currentValue
-        }
-        defaultOptions
+singlelineText : (String -> msg) -> String -> String -> TextField msg
+singlelineText onChange label currentValue =
+    input onChange
+        label
+        currentValue
+        ContentSinglelineText
+
+
+multilineText : (String -> msg) -> String -> String -> TextField msg
+multilineText onChange label currentValue =
+    input onChange
+        label
+        currentValue
+        ContentMultilineText
+
+
+username : (String -> msg) -> String -> String -> TextField msg
+username onChange label currentValue =
+    input onChange
+        label
+        currentValue
+        ContentUsername
+
+
+newPassword : (String -> msg) -> String -> String -> TextField msg
+newPassword onChange label currentValue =
+    input onChange
+        label
+        currentValue
+        forNewPassword
+
+
+currentPassword : (String -> msg) -> String -> String -> TextField msg
+currentPassword onChange label currentValue =
+    input onChange
+        label
+        currentValue
+        forCurrentPassword
+
+
+email : (String -> msg) -> String -> String -> TextField msg
+email onChange label currentValue =
+    input onChange
+        label
+        currentValue
+        ContentEmail
+
+
+search : (String -> msg) -> String -> String -> TextField msg
+search onChange label currentValue =
+    input onChange
+        label
+        currentValue
+        ContentSearch
+
+
+spellChecked : (String -> msg) -> String -> String -> TextField msg
+spellChecked onChange label currentValue =
+    input onChange
+        label
+        currentValue
+        ContentSpellChecked
 
 
 static : String -> String -> TextField msg
@@ -238,51 +254,90 @@ static label value =
 
 toEl : RenderConfig -> TextField msg -> Element msg
 toEl cfg (TextField prop opt) =
-    case ( prop.changeable, prop.content ) of
-        ( Nothing, _ ) ->
-            Text.body1 prop.currentValue
+    let
+        elAttrs =
+            attrs cfg prop opt
+
+        nonStatic content msg =
+            case content of
+                ContentSinglelineText ->
+                    inputAnyOptions msg prop opt
+                        |> Input.text elAttrs
+
+                ContentMultilineText ->
+                    inputMultilineOptions msg prop opt
+                        |> Input.multiline elAttrs
+
+                ContentUsername ->
+                    inputAnyOptions msg prop opt
+                        |> Input.username elAttrs
+
+                ContentPassword pswOpt ->
+                    whenPassword content msg pswOpt
+
+                ContentEmail ->
+                    inputAnyOptions msg prop opt
+                        |> Input.email elAttrs
+
+                ContentSearch ->
+                    inputAnyOptions msg prop opt
+                        |> Input.search elAttrs
+
+                ContentSpellChecked ->
+                    inputAnyOptions msg prop opt
+                        |> Input.spellChecked elAttrs
+
+        whenStatic value =
+            Text.body1 value
                 |> Text.toEl cfg
+                |> Element.el elAttrs
 
-        ( Just msg, ContentSinglelineText ) ->
-            inputAnyOptions msg prop opt
-                |> Input.text
-                    (attrs cfg prop opt)
-
-        ( Just msg, ContentMultilineText ) ->
-            inputMultilineOptions msg prop opt
-                |> Input.multiline
-                    (attrs cfg prop opt)
-
-        ( Just msg, ContentUsername ) ->
-            inputAnyOptions msg prop opt
-                |> Input.username
-                    (attrs cfg prop opt)
-
-        ( Just msg, ContentPassword { isVisible, isCurrent } ) ->
+        whenPassword content msg { isVisible, isCurrent } =
             if isCurrent then
                 inputPasswordOptions msg prop opt isVisible
-                    |> Input.currentPassword
-                        (attrs cfg prop opt)
+                    |> Input.currentPassword elAttrs
 
             else
                 inputPasswordOptions msg prop opt isVisible
-                    |> Input.newPassword
-                        (attrs cfg prop opt)
+                    |> Input.newPassword elAttrs
+    in
+    case prop.changeable of
+        Just msg ->
+            nonStatic prop.content msg
 
-        ( Just msg, ContentEmail ) ->
-            inputAnyOptions msg prop opt
-                |> Input.email
-                    (attrs cfg prop opt)
+        Nothing ->
+            whenStatic prop.currentValue
 
-        ( Just msg, ContentSearch ) ->
-            inputAnyOptions msg prop opt
-                |> Input.search
-                    (attrs cfg prop opt)
 
-        ( Just msg, ContentSpellChecked ) ->
-            inputAnyOptions msg prop opt
-                |> Input.spellChecked
-                    (attrs cfg prop opt)
+
+-- Internals for contructors
+
+
+forNewPassword : TextFieldContent
+forNewPassword =
+    ContentPassword
+        { isCurrent = False
+        , isVisible = False
+        }
+
+
+forCurrentPassword : TextFieldContent
+forCurrentPassword =
+    ContentPassword
+        { isCurrent = True
+        , isVisible = False
+        }
+
+
+input : (String -> msg) -> String -> String -> TextFieldContent -> TextField msg
+input onChange label currentValue content =
+    TextField
+        { changeable = Just onChange
+        , label = label
+        , content = content
+        , currentValue = currentValue
+        }
+        defaultOptions
 
 
 

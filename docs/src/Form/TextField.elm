@@ -21,10 +21,9 @@ stories cfg =
 defaultTextFieldStory cfg =
     story
         ( "Default"
-        , TextField.forSinglelineText
-            |> TextField.withInput (always RootMsg.NoOp)
-                "My cool default"
-                "Value"
+        , TextField.singlelineText (always RootMsg.NoOp)
+            "My cool default"
+            "Value"
             |> TextField.withPlaceholder "Enter your info here"
             |> TextField.withLabelNotHidden True
             |> TextField.toEl cfg
@@ -36,8 +35,7 @@ type Msg
 
 
 -- Default
-, TextField.forSinglelineText
-    |> TextField.withInput OnTextFieldChanged
+, TextField.singlelineText OnTextFieldChanged
         "My cool input"
         model.value
     |> TextField.withPlaceholder "Enter your info here"
@@ -52,10 +50,9 @@ type Msg
 usernameTextFieldStory cfg =
     story
         ( "Username"
-        , TextField.forUsername
-            |> TextField.withInput (always RootMsg.NoOp)
-                "Enter your email"
-                "Value"
+        , TextField.username (always RootMsg.NoOp)
+            "Enter your email"
+            "Value"
             |> TextField.withLabelNotHidden True
             |> TextField.toEl cfg
         , { note = """
@@ -66,8 +63,7 @@ type Msg
 
 
 -- Email
-TextField.forEmail
-    |> TextField.withInput OnTextFieldChanged
+TextField.email OnTextFieldChanged
         "Enter your email"
         model.emailValue
     |> TextField.withLabelNotHidden true
@@ -81,10 +77,9 @@ TextField.forEmail
 passwordTextFieldStory cfg =
     story
         ( "Password"
-        , TextField.forCurrentPassword
-            |> TextField.withInput (always RootMsg.NoOp)
-                "Enter your password"
-                "Value"
+        , TextField.currentPassword (always RootMsg.NoOp)
+            "Enter your password"
+            "Value"
             |> TextField.withLabelNotHidden True
             |> TextField.toEl cfg
         , { note = """
@@ -95,8 +90,7 @@ type Msg
 
 
 -- Password
-TextField.forCurrentPassword
-    |> TextField.withInput OnTextFieldChanged
+TextField.currentPassword OnTextFieldChanged
         "Enter your password"
         mode.passwordValue
     |> TextField.withLabelNotHidden True
@@ -110,10 +104,9 @@ TextField.forCurrentPassword
 fullWidthStory cfg =
     story
         ( "Full Width"
-        , TextField.forSinglelineText
-            |> TextField.withInput (always RootMsg.NoOp)
-                "My TextField"
-                "Some big text"
+        , TextField.singlelineText (always RootMsg.NoOp)
+            "My TextField"
+            "Some big text"
             |> TextField.withLabelNotHidden True
             |> TextField.withWidth TextField.widthFull
             |> TextField.toEl cfg
@@ -125,8 +118,7 @@ type Msg
 
 
 -- Full width
-TextField.forSinglelineText
-    |> TextField.withInput OnTextFieldChanged
+TextField.singlelineText OnTextFieldChanged
         "My TextField"
         model.someFieldValue
     |> TextField.withLabelNotHidden True

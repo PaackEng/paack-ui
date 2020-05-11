@@ -41,25 +41,24 @@ labelTests : Test
 labelTests =
     let
         testTextField input attribute labelValue =
-            input
-                |> TextField.withInput OnTextFieldChanged labelValue "some text"
+            input OnTextFieldChanged labelValue "some text"
                 |> TextField.toEl fakeRenderConfig
                 |> findTextField
                 |> Query.has [ ExtraSelectors.hasAttribute attribute labelValue ]
     in
     describe "when withLabel called"
-        [ fuzz Fuzz.string "TextField.forSinglelineText sets the aria-label correctly" <|
-            \randomString -> testTextField TextField.forSinglelineText "aria-label" randomString
-        , fuzz Fuzz.string "TextField.forSinglelineText sets the title correctly" <|
-            \randomString -> testTextField TextField.forSinglelineText "title" randomString
-        , fuzz Fuzz.string "TextField.forEmail sets the aria-label correctly" <|
-            \randomString -> testTextField TextField.forEmail "aria-label" randomString
-        , fuzz Fuzz.string "TextField.forEmail sets the title correctly" <|
-            \randomString -> testTextField TextField.forEmail "title" randomString
-        , fuzz Fuzz.string "TextField.forCurrentPassword sets the aria-label correctly" <|
-            \randomString -> testTextField TextField.forCurrentPassword "aria-label" randomString
-        , fuzz Fuzz.string "TextField.forCurrentPassword sets the title correctly" <|
-            \randomString -> testTextField TextField.forCurrentPassword "title" randomString
+        [ fuzz Fuzz.string "TextField.singlelineText sets the aria-label correctly" <|
+            \randomString -> testTextField TextField.singlelineText "aria-label" randomString
+        , fuzz Fuzz.string "TextField.singlelineText sets the title correctly" <|
+            \randomString -> testTextField TextField.singlelineText "title" randomString
+        , fuzz Fuzz.string "TextField.email sets the aria-label correctly" <|
+            \randomString -> testTextField TextField.email "aria-label" randomString
+        , fuzz Fuzz.string "TextField.email sets the title correctly" <|
+            \randomString -> testTextField TextField.email "title" randomString
+        , fuzz Fuzz.string "TextField.currentPassword sets the aria-label correctly" <|
+            \randomString -> testTextField TextField.currentPassword "aria-label" randomString
+        , fuzz Fuzz.string "TextField.currentPassword sets the title correctly" <|
+            \randomString -> testTextField TextField.currentPassword "title" randomString
         ]
 
 
@@ -67,19 +66,18 @@ textTests : Test
 textTests =
     let
         testTextField input value =
-            input
-                |> TextField.withInput OnTextFieldChanged "some label" value
+            input OnTextFieldChanged "some label" value
                 |> TextField.toEl fakeRenderConfig
                 |> findTextField
                 |> Query.has [ ExtraSelectors.hasAttribute "value" value ]
     in
     describe "when withText called"
-        [ fuzz Fuzz.string "TextField.forSinglelineText sets the text correctly" <|
-            \randomString -> testTextField TextField.forSinglelineText randomString
-        , fuzz Fuzz.string "TextField.forEmail sets the text correctly" <|
-            \randomString -> testTextField TextField.forEmail randomString
-        , fuzz Fuzz.string "TextField.forCurrentPassword sets the text correctly" <|
-            \randomString -> testTextField TextField.forCurrentPassword randomString
+        [ fuzz Fuzz.string "TextField.singlelineText sets the text correctly" <|
+            \randomString -> testTextField TextField.singlelineText randomString
+        , fuzz Fuzz.string "TextField.email sets the text correctly" <|
+            \randomString -> testTextField TextField.email randomString
+        , fuzz Fuzz.string "TextField.currentPassword sets the text correctly" <|
+            \randomString -> testTextField TextField.currentPassword randomString
         ]
 
 
@@ -87,8 +85,7 @@ placeholderTests : Test
 placeholderTests =
     let
         testTextField input placeholderValue =
-            input
-                |> TextField.withInput OnTextFieldChanged "some label" "some text"
+            input OnTextFieldChanged "some label" "some text"
                 |> TextField.withPlaceholder placeholderValue
                 |> TextField.toEl fakeRenderConfig
                 |> elementToHtml
@@ -96,12 +93,12 @@ placeholderTests =
                 |> Query.has [ Selector.text placeholderValue ]
     in
     describe "when withPlaceholder called"
-        [ fuzz Fuzz.string "TextField.forSinglelineText sets the placeholder correctly" <|
-            \randomString -> testTextField TextField.forSinglelineText randomString
-        , fuzz Fuzz.string "TextField.forEmail sets the placeholder correctly" <|
-            \randomString -> testTextField TextField.forEmail randomString
-        , fuzz Fuzz.string "TextField.forCurrentPassword sets the placeholder correctly" <|
-            \randomString -> testTextField TextField.forCurrentPassword randomString
+        [ fuzz Fuzz.string "TextField.singlelineText sets the placeholder correctly" <|
+            \randomString -> testTextField TextField.singlelineText randomString
+        , fuzz Fuzz.string "TextField.email sets the placeholder correctly" <|
+            \randomString -> testTextField TextField.email randomString
+        , fuzz Fuzz.string "TextField.currentPassword sets the placeholder correctly" <|
+            \randomString -> testTextField TextField.currentPassword randomString
         ]
 
 
@@ -109,8 +106,7 @@ eventsTests : Test
 eventsTests =
     let
         defaultTextField input =
-            input
-                |> TextField.withInput OnTextFieldChanged "some label" "some text"
+            input OnTextFieldChanged "some label" "some text"
                 |> TextField.withOnEnterPressed OnEnterPressed
 
         testTextFieldForOnEnterPressed input =
@@ -129,20 +125,20 @@ eventsTests =
     in
     describe "Events"
         [ describe "when input changed event is triggered"
-            [ test "TextField.forSinglelineText triggers OnTextFieldChanged" <|
-                \_ -> testTextFieldForOnTextFieldChanged TextField.forSinglelineText
-            , test "TextField.forEmail triggers OnTextFieldChanged" <|
-                \_ -> testTextFieldForOnTextFieldChanged TextField.forEmail
-            , test "TextField.forCurrentPassword triggers OnTextFieldChanged" <|
-                \_ -> testTextFieldForOnTextFieldChanged TextField.forCurrentPassword
+            [ test "TextField.singlelineText triggers OnTextFieldChanged" <|
+                \_ -> testTextFieldForOnTextFieldChanged TextField.singlelineText
+            , test "TextField.email triggers OnTextFieldChanged" <|
+                \_ -> testTextFieldForOnTextFieldChanged TextField.email
+            , test "TextField.currentPassword triggers OnTextFieldChanged" <|
+                \_ -> testTextFieldForOnTextFieldChanged TextField.currentPassword
             ]
         , describe "when enter is triggered"
-            [ test "TextField.forSinglelineText triggers OnEnterPressed" <|
-                \_ -> testTextFieldForOnEnterPressed TextField.forSinglelineText
-            , test "TextField.forEmail triggers OnEnterPressed" <|
-                \_ -> testTextFieldForOnEnterPressed TextField.forEmail
-            , test "TextField.forCurrentPassword triggers OnEnterPressed" <|
-                \_ -> testTextFieldForOnEnterPressed TextField.forCurrentPassword
+            [ test "TextField.singlelineText triggers OnEnterPressed" <|
+                \_ -> testTextFieldForOnEnterPressed TextField.singlelineText
+            , test "TextField.email triggers OnEnterPressed" <|
+                \_ -> testTextFieldForOnEnterPressed TextField.email
+            , test "TextField.currentPassword triggers OnEnterPressed" <|
+                \_ -> testTextFieldForOnEnterPressed TextField.currentPassword
             ]
         ]
 
