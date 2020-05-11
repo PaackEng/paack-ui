@@ -42,6 +42,8 @@ import Element.Input as Input
 import UI.Icon exposing (Icon)
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
+import UI.Internal.Text as Text
+import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UI.Utils.ARIA as ARIA
@@ -261,30 +263,30 @@ toEl cfg (TextField prop opt) =
         nonStatic content msg =
             case content of
                 ContentSinglelineText ->
-                    inputAnyOptions msg prop opt
+                    inputAnyOptions cfg msg prop opt
                         |> Input.text elAttrs
 
                 ContentMultilineText ->
-                    inputMultilineOptions msg prop opt
+                    inputMultilineOptions cfg msg prop opt
                         |> Input.multiline elAttrs
 
                 ContentUsername ->
-                    inputAnyOptions msg prop opt
+                    inputAnyOptions cfg msg prop opt
                         |> Input.username elAttrs
 
                 ContentPassword pswOpt ->
                     whenPassword content msg pswOpt
 
                 ContentEmail ->
-                    inputAnyOptions msg prop opt
+                    inputAnyOptions cfg msg prop opt
                         |> Input.email elAttrs
 
                 ContentSearch ->
-                    inputAnyOptions msg prop opt
+                    inputAnyOptions cfg msg prop opt
                         |> Input.search elAttrs
 
                 ContentSpellChecked ->
-                    inputAnyOptions msg prop opt
+                    inputAnyOptions cfg msg prop opt
                         |> Input.spellChecked elAttrs
 
         whenStatic value =
@@ -294,11 +296,11 @@ toEl cfg (TextField prop opt) =
 
         whenPassword content msg { isVisible, isCurrent } =
             if isCurrent then
-                inputPasswordOptions msg prop opt isVisible
+                inputPasswordOptions cfg msg prop opt isVisible
                     |> Input.currentPassword elAttrs
 
             else
-                inputPasswordOptions msg prop opt isVisible
+                inputPasswordOptions cfg msg prop opt isVisible
                     |> Input.newPassword elAttrs
     in
     case prop.changeable of
@@ -357,7 +359,8 @@ defaultOptions =
 
 
 inputAnyOptions :
-    (String -> msg)
+    RenderConfig
+    -> (String -> msg)
     -> Properties msg
     -> Options msg
     ->
@@ -366,13 +369,8 @@ inputAnyOptions :
         , placeholder : Maybe (Input.Placeholder msg)
         , text : String
         }
-inputAnyOptions onChange { label, currentValue } { placeholder, labelVisible } =
-    { label =
-        if labelVisible then
-            Input.labelAbove [] (Element.text label)
-
-        else
-            Input.labelHidden label
+inputAnyOptions cfg onChange { label, currentValue } { placeholder, labelVisible } =
+    { label = inputLabel cfg label labelVisible
     , onChange = onChange
     , placeholder =
         if placeholder /= "" then
@@ -387,7 +385,8 @@ inputAnyOptions onChange { label, currentValue } { placeholder, labelVisible } =
 
 
 inputMultilineOptions :
-    (String -> msg)
+    RenderConfig
+    -> (String -> msg)
     -> Properties msg
     -> Options msg
     ->
@@ -397,13 +396,8 @@ inputMultilineOptions :
         , text : String
         , spellcheck : Bool
         }
-inputMultilineOptions onChange { label, currentValue } { placeholder, labelVisible } =
-    { label =
-        if labelVisible then
-            Input.labelAbove [] (Element.text label)
-
-        else
-            Input.labelHidden label
+inputMultilineOptions cfg onChange { label, currentValue } { placeholder, labelVisible } =
+    { label = inputLabel cfg label labelVisible
     , onChange = onChange
     , placeholder =
         if placeholder /= "" then
@@ -419,7 +413,8 @@ inputMultilineOptions onChange { label, currentValue } { placeholder, labelVisib
 
 
 inputPasswordOptions :
-    (String -> msg)
+    RenderConfig
+    -> (String -> msg)
     -> Properties msg
     -> Options msg
     -> Bool
@@ -430,13 +425,8 @@ inputPasswordOptions :
         , text : String
         , show : Bool
         }
-inputPasswordOptions onChange { label, currentValue } { placeholder, labelVisible } isVisible =
-    { label =
-        if labelVisible then
-            Input.labelAbove [] (Element.text label)
-
-        else
-            Input.labelHidden label
+inputPasswordOptions cfg onChange { label, currentValue } { placeholder, labelVisible } isVisible =
+    { label = inputLabel cfg label labelVisible
     , onChange = onChange
     , placeholder =
         if placeholder /= "" then
@@ -525,3 +515,22 @@ genericAttr label isPlaceholder hasError width =
     , ARIA.labelAttr label
     , Element.title label
     ]
+
+
+inputLabelAttr : RenderConfig -> List (Attribute msg)
+inputLabelAttr cfg =
+    ( Palette.toneGray, Palette.lumDarkest )
+        |> Text.ColorPalette
+        |> Text.attributes cfg Text.SizeCaption
+        |> (::) (Element.paddingEach { top = 0, left = 0, right = 0, bottom = 3 })
+
+
+inputLabel : RenderConfig -> String -> Bool -> Input.Label msg
+inputLabel cfg label labelVisible =
+    if labelVisible then
+        Input.labelAbove
+            (inputLabelAttr cfg)
+            (Element.text label)
+
+    else
+        Input.labelHidden label

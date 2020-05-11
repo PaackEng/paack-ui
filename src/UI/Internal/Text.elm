@@ -48,10 +48,14 @@ type TextColor
 
 defaultText : TextSize -> String -> Text
 defaultText size content =
+    Text (Properties content size)
+        (Options defaultColor)
+
+
+defaultColor : TextColor
+defaultColor =
     ( Palette.toneGray, Palette.lumDarkest )
         |> ColorPalette
-        |> Options
-        |> Text (Properties content size)
 
 
 fontColor : TextColor -> Maybe Element.Color
@@ -174,31 +178,37 @@ mobileAttributes size =
         SizeHeading1 ->
             [ Font.size 56
             , Font.letterSpacing -2
+            , Font.heavy
             ]
 
         SizeHeading2 ->
             [ Font.size 48
             , Font.letterSpacing -1.5
+            , Font.heavy
             ]
 
         SizeHeading3 ->
             [ Font.size 40
             , Font.letterSpacing -1
+            , Font.heavy
             ]
 
         SizeHeading4 ->
             [ Font.size 32
             , Font.letterSpacing -0.5
+            , Font.heavy
             ]
 
         SizeHeading5 ->
             [ Font.size 24
             , Font.letterSpacing 0
+            , Font.heavy
             ]
 
         SizeHeading6 ->
             [ Font.size 20
             , Font.letterSpacing 0.15
+            , Font.heavy
             ]
 
         SizeSubtitle1 ->
@@ -232,4 +242,5 @@ mobileAttributes size =
         SizeOverline ->
             [ Font.size 10
             , Font.letterSpacing 2
+            , Font.heavy
             ]
