@@ -104,71 +104,76 @@ deskAttributes size =
         SizeHeading1 ->
             [ Font.size 92
             , Font.letterSpacing -4.5
-            , Font.heavy
+            , Font.semiBold
             ]
 
         SizeHeading2 ->
             [ Font.size 64
             , Font.letterSpacing -3
-            , Font.heavy
+            , Font.semiBold
             ]
 
         SizeHeading3 ->
             [ Font.size 48
             , Font.letterSpacing -2
-            , Font.heavy
+            , Font.semiBold
             ]
 
         SizeHeading4 ->
             [ Font.size 32
             , Font.letterSpacing -1
-            , Font.heavy
+            , Font.semiBold
             ]
 
         SizeHeading5 ->
             [ Font.size 24
             , Font.letterSpacing 0
-            , Font.heavy
+            , Font.semiBold
             ]
 
         SizeHeading6 ->
             [ Font.size 20
             , Font.letterSpacing 0.15
-            , Font.heavy
+            , Font.semiBold
             ]
 
         SizeSubtitle1 ->
             [ Font.size 16
             , Font.letterSpacing 0.2
+            , Font.medium
             ]
 
         SizeSubtitle2 ->
             [ Font.size 14
             , Font.letterSpacing 0.25
+            , Font.semiBold
             ]
 
         SizeBody1 ->
             [ Font.size 16
             , Element.spacing 8
             , Font.letterSpacing 0.2
+            , Font.regular
             ]
 
         SizeBody2 ->
             [ Font.size 14
             , Element.spacing 10
             , Font.letterSpacing 0.25
+            , Font.regular
             ]
 
         SizeCaption ->
             [ Font.size 12
             , Element.spacing 4
             , Font.letterSpacing 0.5
+            , Font.medium
             ]
 
         SizeOverline ->
             [ Font.size 10
             , Font.letterSpacing 2
-            , Font.heavy
+            , Font.extraBold
             ]
 
 
@@ -178,69 +183,74 @@ mobileAttributes size =
         SizeHeading1 ->
             [ Font.size 56
             , Font.letterSpacing -2
-            , Font.heavy
+            , Font.semiBold
             ]
 
         SizeHeading2 ->
             [ Font.size 48
             , Font.letterSpacing -1.5
-            , Font.heavy
+            , Font.semiBold
             ]
 
         SizeHeading3 ->
             [ Font.size 40
             , Font.letterSpacing -1
-            , Font.heavy
+            , Font.semiBold
             ]
 
         SizeHeading4 ->
             [ Font.size 32
             , Font.letterSpacing -0.5
-            , Font.heavy
+            , Font.semiBold
             ]
 
         SizeHeading5 ->
             [ Font.size 24
             , Font.letterSpacing 0
-            , Font.heavy
+            , Font.semiBold
             ]
 
         SizeHeading6 ->
             [ Font.size 20
             , Font.letterSpacing 0.15
-            , Font.heavy
+            , Font.semiBold
             ]
 
         SizeSubtitle1 ->
             [ Font.size 16
             , Font.letterSpacing 0.2
+            , Font.medium
             ]
 
         SizeSubtitle2 ->
             [ Font.size 14
             , Font.letterSpacing 0.25
+            , Font.semiBold
             ]
 
         SizeBody1 ->
             [ Font.size 16
             , Element.spacing 8
             , Font.letterSpacing 0.2
+            , Font.regular
             ]
 
         SizeBody2 ->
             [ Font.size 14
             , Element.spacing 10
             , Font.letterSpacing 0.25
+            , Font.regular
             ]
 
         SizeCaption ->
             [ Font.size 12
             , Element.spacing 4
             , Font.letterSpacing 0.5
+            , Font.medium
             ]
 
         SizeOverline ->
             [ Font.size 10
             , Font.letterSpacing 2
-            , Font.heavy
+            , Font.extraBold
             ]

@@ -215,11 +215,14 @@ toEl cfg ((Button { click, body } _) as btn) =
                 elFromBody cfg body
 
 
+fontAttrs : RenderConfig -> List (Attribute msg)
+fontAttrs cfg =
+    Text.attributes cfg Text.SizeSubtitle1 Text.defaultColor
+
+
 baseAttrs : Button msg -> List (Attribute msg)
 baseAttrs btn =
-    [ Font.size 16
-    , Font.center
-    , Primitives.roundedBorders
+    [ Primitives.roundedBorders
     , buttonWidth btn
     , buttonPadding btn
     ]
@@ -451,9 +454,12 @@ elFromBody : RenderConfig -> ButtonBody msg -> Element msg
 elFromBody cfg body =
     case body of
         BodyText str ->
-            Text.body1 str
-                |> Text.withColor Text.ColorInherit
-                |> Text.toEl cfg
+            Element.el
+                [ Font.size 16
+                , Element.spacing 8
+                , Font.semiBold
+                ]
+                (Element.text str)
 
         BodyIcon icon ->
             Icon.toEl cfg icon
