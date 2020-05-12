@@ -290,7 +290,7 @@ toEl cfg (TextField prop opt) =
                         |> Input.spellChecked elAttrs
 
         whenStatic value =
-            Text.body1 value
+            Text.subtitle2 value
                 |> Text.toEl cfg
                 |> Element.el elAttrs
 
@@ -474,6 +474,12 @@ attrs cfg prop opt =
         opt.width
         |> eventAttr
         |> focustAttr
+        |> (++) (textAttrs cfg)
+
+
+textAttrs : RenderConfig -> List (Attribute msg)
+textAttrs cfg =
+    Text.attributes cfg Text.SizeSubtitle2 Text.ColorInherit
 
 
 genericAttr : String -> Bool -> Bool -> TextFieldWidth -> List (Attribute msg)
@@ -492,11 +498,6 @@ genericAttr label isPlaceholder hasError width =
 
         else
             1
-
-    -- This Font attributes are the same of Subtitle2
-    , Font.size 14
-    , Font.semiBold
-    , Font.letterSpacing 0.25
     , Element.paddingXY 18 16
     , Element.focused
         [ Border.color Palette.primary.lighter

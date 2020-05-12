@@ -1,4 +1,4 @@
-module UI.Internal.Text exposing (Options, Properties, Text(..), TextColor(..), TextSize(..), attributes, defaultColor, defaultText, deskAttributes, fontColor, mobileAttributes)
+module UI.Internal.Text exposing (..)
 
 import Element exposing (Attribute, Element)
 import Element.Font as Font
