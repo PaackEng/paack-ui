@@ -492,8 +492,11 @@ genericAttr label isPlaceholder hasError width =
 
         else
             1
+
+    -- This Font attributes are the same of Subtitle2
     , Font.size 14
-    , Font.bold
+    , Font.semiBold
+    , Font.letterSpacing 0.25
     , Element.paddingXY 18 16
     , Element.focused
         [ Border.color Palette.primary.lighter

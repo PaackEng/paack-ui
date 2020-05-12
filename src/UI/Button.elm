@@ -217,8 +217,11 @@ toEl cfg ((Button { click, body } _) as btn) =
 
 baseAttrs : Button msg -> List (Attribute msg)
 baseAttrs btn =
+    -- Text attributes are the same of subtitle1
     [ Font.size 16
-    , Font.center
+    , Element.spacing 8
+    , Font.letterSpacing 0.2
+    , Font.regular
     , Primitives.roundedBorders
     , buttonWidth btn
     , buttonPadding btn
@@ -451,7 +454,7 @@ elFromBody : RenderConfig -> ButtonBody msg -> Element msg
 elFromBody cfg body =
     case body of
         BodyText str ->
-            Text.body1 str
+            Text.subtitle2 str
                 |> Text.withColor Text.ColorInherit
                 |> Text.toEl cfg
 
