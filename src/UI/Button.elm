@@ -458,8 +458,10 @@ elFromBody cfg body =
                 [ Font.size 16
                 , Element.spacing 8
                 , Font.semiBold
+                , Element.centerX
                 ]
                 (Element.text str)
 
         BodyIcon icon ->
-            Icon.toEl cfg icon
+            Element.el [ Element.centerX ]
+                (Icon.toEl cfg icon)
