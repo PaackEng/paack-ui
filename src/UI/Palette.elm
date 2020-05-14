@@ -1,4 +1,4 @@
-module UI.Palette exposing (Brightness, Color, Tone, color, lumDarkest, lumLight, lumLighter, lumLightest, lumMiddle, toElColor, toneDanger, toneGray, tonePrimary, toneSuccess, toneWarning)
+module UI.Palette exposing (Brightness, Color, Tone, color, lumDarkest, lumLight, lumLighter, lumLightest, lumMiddle, toCssColor, toElColor, toneDanger, toneGray, tonePrimary, toneSuccess, toneWarning)
 
 import Element
 import UI.Internal.Palette exposing (..)
@@ -34,6 +34,23 @@ toElColor ( tone, brightness ) =
     tone
         |> toColors
         |> getLum brightness
+
+
+toCssColor : Color -> String
+toCssColor data =
+    toElColor data
+        |> Element.toRgb
+        |> (\{ red, green, blue, alpha } ->
+                "rgba("
+                    ++ String.fromInt (ceiling (red * 255))
+                    ++ ","
+                    ++ String.fromInt (ceiling (green * 255))
+                    ++ ","
+                    ++ String.fromInt (ceiling (blue * 255))
+                    ++ ","
+                    ++ String.fromFloat alpha
+                    ++ ")"
+           )
 
 
 lumDarkest : Brightness
