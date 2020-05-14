@@ -1,4 +1,4 @@
-module UI.Internal.SideBar exposing (desktopColumn)
+module UI.Internal.SideBar exposing (desktopColumn, mobileDrawer)
 
 import Element exposing (Attribute, Element, fill, height, padding, paddingEach, paddingXY, px, scrollbarY, shrink, spacing, width)
 import Element.Background as Background
@@ -20,9 +20,9 @@ import UI.Utils.Element as Element
 
 
 desktopColumn : RenderConfig -> Element msg -> Menu msg -> Element msg
-desktopColumn cfg page sidebar =
+desktopColumn cfg page menu =
     Element.row [ width fill, height fill ]
-        [ view cfg sidebar
+        [ viewSide cfg menu
         , Element.column
             [ width fill
             , Element.vhHeight 100
@@ -33,16 +33,61 @@ desktopColumn cfg page sidebar =
         ]
 
 
+mobileDrawer : RenderConfig -> Element msg -> Menu msg -> String -> Element msg
+mobileDrawer cfg page ((Menu.Menu { isExpanded } _) as menu) title =
+    let
+        staticAttrs =
+            [ width fill, height fill ]
+
+        attrs =
+            if isExpanded then
+                Element.inFront (viewSide cfg menu)
+                    :: staticAttrs
+
+            else
+                staticAttrs
+    in
+    Element.column attrs
+        [ Element.column
+            [ width fill
+            , Element.vhHeight 100
+            , scrollbarY
+            , Element.alignTop
+            ]
+            [ viewHead cfg menu title
+            , page
+            ]
+        ]
+
+
 
 -- Internals
 
 
-view : RenderConfig -> Menu msg -> Element msg
-view cfg (Menu.Menu prop opt) =
+viewHead : RenderConfig -> Menu msg -> String -> Element msg
+viewHead cfg (Menu.Menu prop opt) title =
+    let
+        mobileHeadSandwich =
+            Icon.sandwichMenu "Expand sidebar"
+                |> Icon.toEl cfg
+                |> Element.el (headerButtonAttr (prop.toggleMsg True) 48 20)
+    in
+    Element.row
+        [ width fill
+        , Element.inFront mobileHeadSandwich
+        ]
+        [ Element.el
+            [ Element.centerX, padding 20 ]
+            (Text.heading5 title |> Text.toEl cfg)
+        ]
+
+
+viewSide : RenderConfig -> Menu msg -> Element msg
+viewSide cfg (Menu.Menu prop opt) =
     if prop.isExpanded then
         Element.column
             [ height fill
-            , width (px 228)
+            , width (fill |> Element.maximum 228)
             , padding 12
             , Background.color Palette.gray.lightest
             ]

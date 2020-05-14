@@ -205,9 +205,12 @@ toEl cfg page model =
                     single cfg
 
         body =
-            -- HERE WILL GO THE RESPONSIVE MAGIC (Drawer vs SideBar vs TitleBar)
             if hasMenu then
-                SideBar.desktopColumn cfg contentBody model.menu
+                if RenderConfig.isMobile cfg then
+                    SideBar.mobileDrawer cfg contentBody model.menu title
+
+                else
+                    SideBar.desktopColumn cfg contentBody model.menu
 
             else
                 contentBody
