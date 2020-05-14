@@ -4,6 +4,8 @@ module UI.Text exposing
     , body1
     , body2
     , caption
+    , colorBgMiddle
+    , colorInherit
     , colorPrimary
     , heading1
     , heading2
@@ -98,6 +100,16 @@ colorPrimary : TextColor
 colorPrimary =
     Internal.ColorPalette
         ( Palette.tonePrimary, Palette.lumMiddle )
+
+
+colorBgMiddle : TextColor
+colorBgMiddle =
+    Internal.ColorBgMiddle
+
+
+colorInherit : TextColor
+colorInherit =
+    Internal.ColorInherit
 
 
 withColor : TextColor -> Text -> Text

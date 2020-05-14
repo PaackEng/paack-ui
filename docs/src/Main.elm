@@ -63,7 +63,7 @@ main =
         , Theme.stories
         , Buttons.stories renderConfig
         , ActionBars.stories renderConfig
-        , Alerts.stories
+        , Alerts.stories renderConfig
         , PopUps.stories
         , Badges.stories
         , TextField.stories renderConfig
