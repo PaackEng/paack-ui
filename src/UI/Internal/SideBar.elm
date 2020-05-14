@@ -1,6 +1,6 @@
 module UI.Internal.SideBar exposing (desktopColumn, mobileDrawer)
 
-import Element exposing (Attribute, Element, fill, height, padding, paddingEach, paddingXY, px, scrollbarY, shrink, spacing, width)
+import Element exposing (Attribute, Element, fill, fillPortion, height, padding, paddingEach, paddingXY, px, scrollbarY, shrink, spacing, width)
 import Element.Background as Background
 import Element.Events as Events
 import Element.Font as Font
@@ -22,42 +22,60 @@ import UI.Utils.Element as Element
 desktopColumn : RenderConfig -> Element msg -> Menu msg -> Element msg
 desktopColumn cfg page menu =
     Element.row [ width fill, height fill ]
-        [ viewSide cfg menu
-        , Element.column
+        [ viewSide cfg False menu
+        , Element.el
             [ width fill
-            , Element.vhHeight 100
+            , Element.maxHeightVH 100
             , scrollbarY
             , Element.alignTop
             ]
-            [ page ]
+            page
         ]
 
 
 mobileDrawer : RenderConfig -> Element msg -> Menu msg -> String -> Element msg
 mobileDrawer cfg page ((Menu.Menu { isExpanded } _) as menu) title =
     let
-        staticAttrs =
-            [ width fill, height fill ]
-
-        attrs =
-            if isExpanded then
-                Element.inFront (viewSide cfg menu)
-                    :: staticAttrs
-
-            else
-                staticAttrs
-    in
-    Element.column attrs
-        [ Element.column
-            [ width fill
-            , Element.vhHeight 100
-            , scrollbarY
-            , Element.alignTop
-            ]
+        content =
             [ viewHead cfg menu title
             , page
             ]
-        ]
+
+        content100vh =
+            Element.column
+                [ width fill
+                , Element.maxHeightVH 100
+                , Element.alignTop
+                , scrollbarY
+                ]
+                content
+
+        expanedBar =
+            Element.row [ width fill, height fill ]
+                [ viewSide cfg True menu
+                , Element.el
+                    [ Palette.gray.darkest
+                        |> Element.colorWithOpacity 0.85
+                        |> Background.color
+                    , width (fillPortion 25)
+                    , height fill
+                    ]
+                    Element.none
+                ]
+
+        containerWithBar =
+            Element.column
+                [ width fill
+                , height fill
+                , Element.inFront expanedBar
+                ]
+                [ content100vh ]
+    in
+    if isExpanded then
+        containerWithBar
+
+    else
+        Element.column [ width fill ] content
 
 
 
@@ -82,38 +100,40 @@ viewHead cfg (Menu.Menu prop opt) title =
         ]
 
 
-viewSide : RenderConfig -> Menu msg -> Element msg
-viewSide cfg (Menu.Menu prop opt) =
-    if prop.isExpanded then
-        Element.column
-            [ height fill
-            , width (fill |> Element.maximum 228)
-            , padding 12
-            , Background.color Palette.gray.lightest
-            ]
-            [ headerView cfg (prop.toggleMsg False) opt.logo
-            , pagesView cfg
-                opt.pages
-                prop.isExpanded
-            , actionsView cfg
-                opt.actions
-                prop.isExpanded
-            ]
+viewSide : RenderConfig -> Bool -> Menu msg -> Element msg
+viewSide cfg proportional (Menu.Menu prop opt) =
+    let
+        adaptWidth =
+            if prop.isExpanded then
+                if proportional then
+                    width (fillPortion 75)
 
-    else
-        Element.column
-            [ height fill
-            , width shrink
-            , Background.color Palette.gray.lightest
-            ]
-            [ slimHeaderView cfg (prop.toggleMsg True) opt.logo
-            , pagesView cfg
-                opt.pages
-                prop.isExpanded
-            , actionsView cfg
-                opt.actions
-                prop.isExpanded
-            ]
+                else
+                    width (px 228)
+
+            else
+                width shrink
+
+        adaptHeader =
+            if prop.isExpanded then
+                headerView
+
+            else
+                slimHeaderView
+    in
+    Element.column
+        [ height fill
+        , adaptWidth
+        , Background.color Palette.gray.lightest
+        ]
+        [ adaptHeader cfg (prop.toggleMsg (not prop.isExpanded)) opt.logo
+        , pagesView cfg
+            opt.pages
+            prop.isExpanded
+        , actionsView cfg
+            opt.actions
+            prop.isExpanded
+        ]
 
 
 headerView : RenderConfig -> msg -> Maybe (Menu.Logo msg) -> Element msg
@@ -260,11 +280,7 @@ pageItem cfg icon link isSelected =
 
         selectedColor =
             Palette.primary.darkest
-                |> Element.toRgb
-                |> (\color ->
-                        { color | alpha = 0.12 }
-                   )
-                |> Element.fromRgb
+                |> Element.colorWithOpacity 0.12
 
         attrs =
             if isSelected then

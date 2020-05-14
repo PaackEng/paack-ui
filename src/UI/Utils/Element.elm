@@ -1,4 +1,4 @@
-module UI.Utils.Element exposing (colorTransition, disabled, onEnterPressed, title, vhHeight)
+module UI.Utils.Element exposing (colorTransition, colorWithOpacity, disabled, maxHeightVH, onEnterPressed, overTop, title)
 
 import Element exposing (Attribute, Element)
 import Element.Events as Events
@@ -51,9 +51,30 @@ title value =
         |> Element.htmlAttribute
 
 
-vhHeight : Int -> Attribute msg
-vhHeight value =
+maxHeightVH : Int -> Attribute msg
+maxHeightVH value =
     style "max-height" (String.fromInt value ++ "vh")
+
+
+colorWithOpacity : Float -> Element.Color -> Element.Color
+colorWithOpacity alpha color =
+    color
+        |> Element.toRgb
+        |> (\rgba ->
+                { rgba | alpha = alpha }
+           )
+        |> Element.fromRgb
+
+
+overTop : List (Attribute msg)
+overTop =
+    [ ( "position", "fixed" )
+    , ( "top", "0" )
+    , ( "left", "0" )
+    , ( "width", "100vw" )
+    , ( "height", "100vh" )
+    ]
+        |> List.map stylePair
 
 
 
