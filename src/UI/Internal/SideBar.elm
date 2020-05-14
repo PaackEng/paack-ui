@@ -34,7 +34,7 @@ desktopColumn cfg page menu =
 
 
 mobileDrawer : RenderConfig -> Element msg -> Menu msg -> String -> Element msg
-mobileDrawer cfg page ((Menu.Menu { isExpanded } _) as menu) title =
+mobileDrawer cfg page ((Menu.Menu { isExpanded, toggleMsg } _) as menu) title =
     let
         content =
             [ viewHead cfg menu title
@@ -59,6 +59,7 @@ mobileDrawer cfg page ((Menu.Menu { isExpanded } _) as menu) title =
                         |> Background.color
                     , width (fillPortion 25)
                     , height fill
+                    , Events.onClick (toggleMsg (not isExpanded))
                     ]
                     Element.none
                 ]
