@@ -25,28 +25,30 @@ desktopColumn cfg page menu =
         [ viewSide cfg False menu
         , Element.el
             [ width fill
+            , height fill
             , Element.maxHeightVH 100
-            , scrollbarY
-            , Element.alignTop
+            , Element.clipY
+            , Element.scrollbarY
             ]
             page
         ]
 
 
-mobileDrawer : RenderConfig -> Element msg -> Menu msg -> String -> Element msg
-mobileDrawer cfg page ((Menu.Menu { isExpanded, toggleMsg } _) as menu) title =
+mobileDrawer : RenderConfig -> Element msg -> Menu msg -> String -> Maybe msg -> Element msg
+mobileDrawer cfg page ((Menu.Menu { isExpanded, toggleMsg } _) as menu) title maybeGoBack =
     let
         content =
-            [ viewHead cfg menu title
+            [ viewHead cfg menu title maybeGoBack
             , page
             ]
 
         content100vh =
             Element.column
                 [ width fill
+                , height fill
                 , Element.maxHeightVH 100
-                , Element.alignTop
-                , scrollbarY
+                , Element.clipY
+                , Element.scrollbarY
                 ]
                 content
 
@@ -76,24 +78,37 @@ mobileDrawer cfg page ((Menu.Menu { isExpanded, toggleMsg } _) as menu) title =
         containerWithBar
 
     else
-        Element.column [ width fill ] content
+        content100vh
 
 
 
 -- Internals
 
 
-viewHead : RenderConfig -> Menu msg -> String -> Element msg
-viewHead cfg (Menu.Menu prop opt) title =
+viewHead : RenderConfig -> Menu msg -> String -> Maybe msg -> Element msg
+viewHead cfg (Menu.Menu prop opt) title maybeGoBack =
     let
         mobileHeadSandwich =
             Icon.sandwichMenu "Expand sidebar"
                 |> Icon.toEl cfg
                 |> Element.el (headerButtonAttr (prop.toggleMsg True) 48 20)
+
+        mobileHeadGoBack msg =
+            Icon.close "Go back"
+                |> Icon.toEl cfg
+                |> Element.el (headerButtonAttr msg 48 20)
+
+        mobileHeadButton =
+            case maybeGoBack of
+                Just msg ->
+                    mobileHeadGoBack msg
+
+                Nothing ->
+                    mobileHeadSandwich
     in
     Element.row
         [ width fill
-        , Element.inFront mobileHeadSandwich
+        , Element.inFront mobileHeadButton
         ]
         [ Element.el
             [ Element.centerX, padding 20 ]

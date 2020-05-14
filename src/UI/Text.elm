@@ -5,6 +5,8 @@ module UI.Text exposing
     , body2
     , caption
     , colorBgMiddle
+    , colorFromPalette
+    , colorGray
     , colorInverted
     , colorPrimary
     , heading1
@@ -18,6 +20,7 @@ module UI.Text exposing
     , subtitle2
     , toEl
     , withColor
+    , withEllipsis
     )
 
 import Element exposing (Attribute, Element)
@@ -112,15 +115,34 @@ colorInverted =
     Internal.ColorInverted
 
 
+colorGray : TextColor
+colorGray =
+    Internal.ColorPalette
+        ( Palette.toneGray, Palette.lumMiddle )
+
+
+colorFromPalette : Palette.Color -> TextColor
+colorFromPalette color =
+    Internal.ColorPalette color
+
+
 withColor : TextColor -> Text -> Text
-withColor color (Internal.Text prop _) =
-    Internal.Text prop (Internal.Options color)
+withColor color (Internal.Text prop opt) =
+    Internal.Text prop { opt | color = color }
+
+
+withEllipsis : Bool -> Text -> Text
+withEllipsis val (Internal.Text prop opt) =
+    Internal.Text prop { opt | oneLineEllipsis = val }
 
 
 toEl : RenderConfig -> Text -> Element msg
-toEl cfg (Internal.Text { content, size } { color }) =
+toEl cfg (Internal.Text { content, size } { color, oneLineEllipsis }) =
+    let
+        attrs =
+            Internal.attributes cfg size oneLineEllipsis color
+    in
     content
         |> Element.text
         |> List.singleton
-        |> Element.paragraph
-            (Internal.attributes cfg size color)
+        |> Element.paragraph attrs

@@ -1,13 +1,17 @@
 module UI.NavigationContainer exposing
     ( Container
     , Content
+    , Dialog
     , MenuAction
     , MenuPage
     , Msg
     , Navigator
     , State
     , containerMap
+    , contentResponsive
     , contentSingle
+    , contentStackChild
+    , dialog
     , menuAction
     , menuPage
     , navigator
@@ -20,12 +24,19 @@ module UI.NavigationContainer exposing
     )
 
 import Element exposing (Attribute, Element)
+import Element.Background as Background
+import Element.Events as Events
 import Html exposing (Html)
 import UI.Icon as Icon exposing (Icon)
+import UI.Internal.Basics exposing (lazyMap)
+import UI.Internal.Dialog as Dialog exposing (dialogMap)
 import UI.Internal.Menu as Menu
+import UI.Internal.Palette as Palette
 import UI.Internal.SideBar as SideBar
 import UI.Link as Link exposing (Link)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
+import UI.Text as Text
+import UI.Utils.Element as Element
 
 
 
@@ -59,13 +70,12 @@ type Msg
 
 type Content msg
     = ContentSingle (RenderConfig -> Element msg)
+    | ContentStackChild String msg (RenderConfig -> Element msg)
+    | ContentResponsive (RenderConfig -> Content msg)
 
 
 type alias Dialog msg =
-    { title : String
-    , close : msg
-    , body : RenderConfig -> Element msg
-    }
+    Dialog.Dialog msg
 
 
 type alias Container msg =
@@ -135,13 +145,14 @@ contentMap applier data =
                 |> lazyMap (Element.map applier)
                 |> ContentSingle
 
+        ContentStackChild subTitle goBack element ->
+            element
+                |> lazyMap (Element.map applier)
+                |> ContentStackChild subTitle (applier goBack)
 
-dialogMap : (a -> b) -> Dialog a -> Dialog b
-dialogMap applier data =
-    { title = data.title
-    , close = applier data.close
-    , body = lazyMap (Element.map applier) data.body
-    }
+        ContentResponsive subContent ->
+            lazyMap (contentMap applier) subContent
+                |> ContentResponsive
 
 
 stateUpdate : Msg -> State -> ( State, Cmd Msg )
@@ -155,14 +166,24 @@ stateUpdate msg state =
 -- Constructors
 
 
-stateInit : State
-stateInit =
-    { menuExpanded = True }
+stateInit : RenderConfig -> State
+stateInit cfg =
+    { menuExpanded = not <| RenderConfig.isMobile cfg }
 
 
 contentSingle : (RenderConfig -> Element msg) -> Content msg
 contentSingle body =
     ContentSingle body
+
+
+contentResponsive : (RenderConfig -> Content msg) -> Content msg
+contentResponsive subContent =
+    ContentResponsive subContent
+
+
+contentStackChild : String -> msg -> (RenderConfig -> Element msg) -> Content msg
+contentStackChild subTitle goBack body =
+    ContentStackChild subTitle goBack body
 
 
 menuPage : Icon -> Link -> Bool -> MenuPage
@@ -185,6 +206,14 @@ navigator applier state pagesContainers =
         (menu applier state)
 
 
+dialog : String -> msg -> (RenderConfig -> Element msg) -> Dialog msg
+dialog title onClose body =
+    { title = title
+    , close = onClose
+    , body = body
+    }
+
+
 
 -- Render
 
@@ -196,18 +225,23 @@ toEl :
     -> { body : List (Html msg), title : String }
 toEl cfg page model =
     let
-        { content, title, dialog, hasMenu } =
+        container =
             model.container page
 
-        contentBody =
-            case content of
-                ContentSingle single ->
-                    single cfg
+        { content, title, hasMenu } =
+            container
+
+        ( contentBody, maybeGoBack, seenTitle ) =
+            contentProps cfg title content
 
         body =
             if hasMenu then
                 if RenderConfig.isMobile cfg then
-                    SideBar.mobileDrawer cfg contentBody model.menu title
+                    SideBar.mobileDrawer cfg
+                        contentBody
+                        model.menu
+                        seenTitle
+                        maybeGoBack
 
                 else
                     SideBar.desktopColumn cfg contentBody model.menu
@@ -215,11 +249,24 @@ toEl cfg page model =
             else
                 contentBody
 
+        bodyWithModal =
+            case container.dialog of
+                Just state ->
+                    Element.el
+                        [ Element.inFront (Dialog.view cfg state)
+                        , Element.width Element.fill
+                        , Element.height Element.fill
+                        ]
+                        body
+
+                Nothing ->
+                    body
+
         defaultAttrs =
             RenderConfig.elLayoutAttributes cfg
     in
     { title = title
-    , body = [ Element.layout defaultAttrs body ]
+    , body = [ Element.layout defaultAttrs bodyWithModal ]
     }
 
 
@@ -232,6 +279,14 @@ menu applier { menuExpanded } =
     Menu.default (ToggleMenu >> applier) menuExpanded
 
 
-lazyMap : (a -> b) -> (c -> a) -> (c -> b)
-lazyMap applier original =
-    \whatever -> applier (original whatever)
+contentProps : RenderConfig -> String -> Content msg -> ( Element msg, Maybe msg, String )
+contentProps cfg mainTitle content =
+    case content of
+        ContentSingle single ->
+            ( single cfg, Nothing, mainTitle )
+
+        ContentStackChild subTitle goBack single ->
+            ( single cfg, Just goBack, subTitle )
+
+        ContentResponsive subContent ->
+            contentProps cfg mainTitle (subContent cfg)

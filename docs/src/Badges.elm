@@ -2,43 +2,32 @@ module Badges exposing (stories)
 
 import UI.Badge as Badge
 import UIExplorer exposing (storiesOf)
-import Utils exposing (storyList)
+import Utils exposing (story)
 
 
-stories =
+stories cfg =
     storiesOf
         "Badges"
-        [ storyList
-            ( "Badges"
-            , [ Badge.light "ETA 2.5L"
-              , Badge.dark "ETA 2.5L"
-              , Badge.primary "ETA 2.5L"
-              , Badge.success "ETA 2.5L"
-              , Badge.warning "ETA 2.5L"
-              , Badge.error "ETA 2.5L"
-              ]
-            , { note =
-                    """
+        [ oneBadge cfg Badge.light "light"
+        , oneBadge cfg Badge.dark "dark"
+        , oneBadge cfg Badge.primary "primary"
+        , oneBadge cfg Badge.warning "warning"
+        , oneBadge cfg Badge.danger "danger"
+        , oneBadge cfg Badge.success "success"
+        ]
+
+
+oneBadge cfg constructor str =
+    story
+        ( "Badge " ++ str
+        , Badge.toEl cfg <| constructor "123"
+        , { note =
+                """
 ```elm
-Badge.light "ETA 2.5L"
-
-
-Badge.dark "ETA 2.5L"
-
-
-Badge.primary "ETA 2.5L"
-
-
-Badge.success "ETA 2.5L"
-
-
-Badge.warning "ETA 2.5L"
-
-
-Badge.error "ETA 2.5L"
+Badge.""" ++ str ++ """ "123"
+  |> Badge.toEl renderCfg
 
 ```
 """
-              }
-            )
-        ]
+          }
+        )

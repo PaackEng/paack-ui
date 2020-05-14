@@ -4,7 +4,6 @@ import Element exposing (..)
 import Element.Background as Background
 import Msg as Msg
 import UI.Alert as Alert
-import UI.Theme as Theme
 import UIExplorer exposing (storiesOf)
 import Utils exposing (story)
 
@@ -80,9 +79,4 @@ Alert.danger "Hey I just met you"
 
 
 baseView renderConfig content =
-    el
-        [ width fill
-        , height (px 400)
-        , Background.color Theme.black
-        ]
-        (Alert.toEl renderConfig content)
+    Alert.toEl renderConfig content

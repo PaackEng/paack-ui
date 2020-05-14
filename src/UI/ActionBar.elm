@@ -11,11 +11,14 @@ module UI.ActionBar exposing
 import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
+import Element.Events as Events
 import Element.Font as Font
 import UI.Button as Button exposing (Button)
 import UI.Icon as Icon
+import UI.Internal.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
-import UI.Theme as Theme
+import UI.Text as Text
+import UI.Utils.ARIA as ARIA
 
 
 type alias Options msg =
@@ -77,53 +80,59 @@ toEl cfg (ActionBar options) =
     row
         [ width fill
         , paddingEach
-            { bottom = 20
+            { bottom = 12
             , left = 40
-            , right = 20
-            , top = 20
+            , right = 16
+            , top = 12
             }
-        , Border.color Theme.gray4
+        , Border.color Palette.gray.lighter
         , Border.width 1
-        , Background.color Theme.white
-        , Theme.borderShadow
         , alignBottom
         ]
-        [ viewTextContainer options
-        , viewButtonsContainer cfg options
+        [ row [ width fill, height (shrink |> minimum 48) ]
+            [ viewTextContainer cfg options
+            , viewButtonsContainer cfg options
+            ]
         ]
 
 
-viewTextContainer : Options msg -> Element msg
-viewTextContainer options =
+viewTextContainer : RenderConfig -> Options msg -> Element msg
+viewTextContainer cfg options =
     column
         [ alignLeft
-        , Theme.tinySpacing
+        , width fill
         ]
-        [ el [ Theme.title, Font.bold ] <| text options.title
-        , el [ Theme.subtitle ] <| text options.subtitle
+        [ Text.heading6 options.title
+            |> Text.toEl cfg
+        , Text.caption options.subtitle
+            |> Text.toEl cfg
         ]
 
 
 viewButtonsContainer : RenderConfig -> Options msg -> Element msg
 viewButtonsContainer cfg options =
     let
-        closeBtn =
-            case options.onClose of
-                Just msg ->
-                    Button.bodyIcon (Icon.close "Close")
-                        |> Button.button msg
-                        |> Button.withTone Button.toneDanger
-                        |> Button.toEl cfg
-
-                Nothing ->
-                    none
+        closeBtn msg =
+            Icon.close "Close"
+                |> Icon.toEl cfg
+                |> Element.el
+                    [ Element.pointer
+                    , ARIA.roleAttr ARIA.roleButton
+                    , ARIA.labelAttr "Close"
+                    , Font.color Palette.danger.middle
+                    , Events.onClick msg
+                    ]
 
         customBtns =
             List.map (Button.toEl cfg) options.buttons
 
         buttons =
-            [ closeBtn ]
-                |> List.append customBtns
+            case options.onClose of
+                Just msg ->
+                    customBtns ++ [ closeBtn msg ]
+
+                Nothing ->
+                    customBtns
     in
-    row [ alignRight, Theme.smallSpacing ]
+    row [ alignRight, width shrink, spacing 12 ]
         buttons

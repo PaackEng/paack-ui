@@ -6,7 +6,6 @@ import Msg as Msg
 import UI.ActionBar as ActionBar exposing (ActionBar)
 import UI.Button as Button
 import UI.Icon as Icons
-import UI.Theme as Theme
 import UIExplorer exposing (storiesOf)
 import Utils exposing (story, storyList)
 
@@ -144,8 +143,3 @@ ActionBar.actionBar
 viewBase cfg content =
     content
         |> ActionBar.toEl cfg
-        |> el
-            [ width fill
-            , height (px 300)
-            , Background.color Theme.black
-            ]

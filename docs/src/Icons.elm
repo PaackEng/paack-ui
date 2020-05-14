@@ -4,7 +4,7 @@ import Element
 import Element.Background as Background
 import Element.Font as Font
 import UI.Icon as Icon
-import UI.Theme as Theme
+import UI.Internal.Palette as Palette
 import UIExplorer exposing (storiesOf)
 
 
@@ -26,8 +26,8 @@ icons =
 
 iconView cfg ( iconFn, label ) =
     Element.column
-        [ Background.color Theme.primary
-        , Font.color Theme.white
+        [ Background.color Palette.primary.middle
+        , Font.color Palette.textBgMiddle
         , Element.spacing 10
         , Element.padding 10
         ]

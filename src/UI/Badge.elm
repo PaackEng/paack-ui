@@ -1,55 +1,110 @@
-module UI.Badge exposing (dark, error, light, primary, success, warning)
+module UI.Badge exposing (Badge, danger, dark, light, primary, success, toEl, warning)
 
-import Element exposing (..)
+import Element exposing (Element, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
-import UI.Theme as Theme
+import UI.Internal.Palette as Palette
+import UI.Internal.Primitives as Primitives
+import UI.RenderConfig exposing (RenderConfig)
+import UI.Text as Text exposing (TextColor)
 
 
-type alias ColorScheme =
-    { font : Color
-    , background : Color
-    }
+type Badge
+    = Badge Properties Options
 
 
-light : String -> Element msg
-light =
-    view { font = Theme.black, background = Theme.gray3 }
+type alias Properties =
+    { content : String }
 
 
-primary : String -> Element msg
-primary =
-    view { font = Theme.white, background = Theme.primary }
+type alias Options =
+    { tone : BadgeTone }
 
 
-dark : String -> Element msg
-dark =
-    view { font = Theme.white, background = Theme.black }
+type BadgeTone
+    = ToneLight
+    | ToneDark
+    | TonePrimary
+    | ToneWarning
+    | ToneDanger
+    | ToneSuccess
 
 
-success : String -> Element msg
-success =
-    view { font = Theme.black, background = Theme.success }
+light : String -> Badge
+light content =
+    Badge { content = content } { tone = ToneLight }
 
 
-warning : String -> Element msg
-warning =
-    view { font = Theme.black, background = Theme.warning }
+dark : String -> Badge
+dark content =
+    Badge { content = content } { tone = ToneDark }
 
 
-error : String -> Element msg
-error =
-    view { font = Theme.black, background = Theme.error }
+primary : String -> Badge
+primary content =
+    Badge { content = content } { tone = TonePrimary }
 
 
-view : ColorScheme -> String -> Element msg
-view { font, background } t =
-    el
-        [ Background.color background
-        , Font.color font
-        , Theme.regular
-        , Border.rounded 20
-        , paddingXY 10 6
-        ]
-        (text t)
+warning : String -> Badge
+warning content =
+    Badge { content = content } { tone = ToneWarning }
+
+
+danger : String -> Badge
+danger content =
+    Badge { content = content } { tone = ToneDanger }
+
+
+success : String -> Badge
+success content =
+    Badge { content = content } { tone = ToneSuccess }
+
+
+
+-- Render
+
+
+toEl : RenderConfig -> Badge -> Element msg
+toEl cfg (Badge { content } { tone }) =
+    let
+        ( bg, fg ) =
+            toneToColors tone
+    in
+    Text.overline content
+        |> Text.withColor fg
+        |> Text.toEl cfg
+        |> Element.el
+            [ Element.width shrink
+            , Font.center
+            , Background.color bg
+            , Element.paddingEach { top = 4, bottom = 4, left = 5, right = 3 }
+            , Element.height (px 20)
+            , Primitives.roundedBorders
+            ]
+
+
+
+-- Internal
+
+
+toneToColors : BadgeTone -> ( Element.Color, TextColor )
+toneToColors tone =
+    case tone of
+        ToneLight ->
+            ( Palette.gray.lighter, Text.colorInverted )
+
+        ToneDark ->
+            ( Palette.gray.darkest, Text.colorBgMiddle )
+
+        TonePrimary ->
+            ( Palette.primary.light, Text.colorBgMiddle )
+
+        ToneWarning ->
+            ( Palette.warning.light, Text.colorBgMiddle )
+
+        ToneDanger ->
+            ( Palette.danger.light, Text.colorBgMiddle )
+
+        ToneSuccess ->
+            ( Palette.success.light, Text.colorInverted )

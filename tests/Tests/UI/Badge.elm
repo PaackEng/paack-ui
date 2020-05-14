@@ -5,6 +5,7 @@ import Test exposing (..)
 import Test.Html.Query as Query
 import Test.Html.Selector as Selector
 import Tests.Utils.Element exposing (elementToHtml, hasIconInside)
+import Tests.Utils.RenderConfig exposing (desktopWindowConfig)
 import UI.Badge as Badge
 
 
@@ -12,7 +13,8 @@ tests =
     describe "UI.Badge"
         [ fuzz Fuzz.string "sets the text content" <|
             \val ->
-                Badge.light val
+                Badge.primary val
+                    |> Badge.toEl desktopWindowConfig
                     |> elementToHtml
                     |> Query.has [ Selector.text val ]
         ]

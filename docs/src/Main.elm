@@ -65,7 +65,7 @@ main =
         , ActionBars.stories renderConfig
         , Alerts.stories renderConfig
         , PopUps.stories
-        , Badges.stories
+        , Badges.stories renderConfig
         , TextField.stories renderConfig
         , Checkboxes.stories
         , LoadingView.stories
