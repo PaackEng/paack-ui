@@ -70,6 +70,7 @@ toEl cfg (Alert { title, tone }) =
             |> getBackgroundColor
             |> Palette.toElColor
             |> Background.color
+        , Element.alignTop
         ]
         [ Text.subtitle2 title
             |> Text.withColor (getTextColor tone)

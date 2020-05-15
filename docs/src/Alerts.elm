@@ -84,6 +84,5 @@ baseView renderConfig content =
         [ width fill
         , height (px 400)
         , Background.color Theme.black
-        , alignTop
         ]
         (Alert.toEl renderConfig content)
