@@ -85,7 +85,7 @@ getTextColor : AlertTone -> Text.TextColor
 getTextColor alertTone =
     case alertTone of
         ToneWarning ->
-            Text.colorInherit
+            Text.colorInverted
 
         ToneDanger ->
             Text.colorBgMiddle
@@ -94,7 +94,7 @@ getTextColor alertTone =
             Text.colorBgMiddle
 
         ToneSuccess ->
-            Text.colorInherit
+            Text.colorInverted
 
 
 getBackgroundColor : AlertTone -> Palette.Color

@@ -5,7 +5,7 @@ module UI.Text exposing
     , body2
     , caption
     , colorBgMiddle
-    , colorInherit
+    , colorInverted
     , colorPrimary
     , heading1
     , heading2
@@ -107,9 +107,9 @@ colorBgMiddle =
     Internal.ColorBgMiddle
 
 
-colorInherit : TextColor
-colorInherit =
-    Internal.ColorInherit
+colorInverted : TextColor
+colorInverted =
+    Internal.ColorInverted
 
 
 withColor : TextColor -> Text -> Text

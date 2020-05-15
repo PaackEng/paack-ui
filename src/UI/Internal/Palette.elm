@@ -70,6 +70,12 @@ warning =
 -- Text
 
 
+textBgInverted : Element.Color
+textBgInverted =
+    -- #000000
+    rgb255 0 0 0
+
+
 textBgMiddle : Element.Color
 textBgMiddle =
     -- #FFF
