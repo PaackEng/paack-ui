@@ -43,6 +43,7 @@ type TextColor
     | ColorBgLightest
     | ColorBgLighter
     | ColorBgDisabled
+    | ColorInverted
     | ColorInherit
 
 
@@ -75,6 +76,9 @@ fontColor color =
 
         ColorBgDisabled ->
             Just <| Palette.textComponentDisabled
+
+        ColorInverted ->
+            Just <| Palette.textBgInverted
 
         ColorInherit ->
             Nothing

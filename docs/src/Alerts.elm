@@ -9,28 +9,24 @@ import UIExplorer exposing (storiesOf)
 import Utils exposing (story)
 
 
-stories =
+stories renderConfig =
     storiesOf
         "Alerts"
-        [ infoStory
-        , successStory
-        , warningStory
-        , errorStory
-        , subtitleStory
-        , withCloseButtonStory
+        [ primaryStory renderConfig
+        , successStory renderConfig
+        , warningStory renderConfig
+        , dangerStory renderConfig
         ]
 
 
-infoStory =
+primaryStory renderConfig =
     story
-        ( "Info"
-        , Alert.info
-            |> Alert.withTitle "Hey I just met you"
-            |> baseView
+        ( "Primary"
+        , Alert.primary "Hey I just met you"
+            |> baseView renderConfig
         , { note = """
 ```elm
-Alert.info
-    |> Alert.withTitle "Hey I just met you"
+Alert.success "Hey I just met you"
     |> Alert.toEl
 ```
 """
@@ -38,16 +34,14 @@ Alert.info
         )
 
 
-successStory =
+successStory renderConfig =
     story
         ( "Success"
-        , Alert.success
-            |> Alert.withTitle "Hey I just met you"
-            |> baseView
+        , Alert.success "Hey I just met you"
+            |> baseView renderConfig
         , { note = """
 ```elm
-Alert.success
-    |> Alert.withTitle "Hey I just met you"
+Alert.success "Hey I just met you"
     |> Alert.toEl
 ```
 """
@@ -55,16 +49,14 @@ Alert.success
         )
 
 
-warningStory =
+warningStory renderConfig =
     story
         ( "Warning"
-        , Alert.warning
-            |> Alert.withTitle "Hey I just met you"
-            |> baseView
+        , Alert.warning "Hey I just met you"
+            |> baseView renderConfig
         , { note = """
 ```elm
-Alert.warning
-    |> Alert.withTitle "Hey I just met you"
+Alert.warning "Hey I just met you"
     |> Alert.toEl
 ```
 """
@@ -72,16 +64,14 @@ Alert.warning
         )
 
 
-errorStory =
+dangerStory renderConfig =
     story
-        ( "Error"
-        , Alert.error
-            |> Alert.withTitle "Hey I just met you"
-            |> baseView
+        ( "Danger"
+        , Alert.danger "Hey I just met you"
+            |> baseView renderConfig
         , { note = """
 ```elm
-Alert.error
-    |> Alert.withTitle "Hey I just met you"
+Alert.danger "Hey I just met you"
     |> Alert.toEl
 ```
 """
@@ -89,51 +79,10 @@ Alert.error
         )
 
 
-subtitleStory =
-    story
-        ( "Subtitle"
-        , Alert.info
-            |> Alert.withTitle "Hey I just met you"
-            |> Alert.withSubtitle "And this is crazy"
-            |> baseView
-        , { note = """
-```elm
-Alert.info
-    |> Alert.withTitle "Hey I just met you"
-    |> Alert.withSubtitle "And this is crazy"
-    |> Alert.toEl
-```
-"""
-          }
-        )
-
-
-withCloseButtonStory =
-    story
-        ( "With Close Button"
-        , Alert.info
-            |> Alert.withTitle "Hey I just met you"
-            |> Alert.withSubtitle "And look, we have a button"
-            |> Alert.withCloseButton Msg.NoOp
-            |> baseView
-        , { note = """
-```elm
-Alert.info
-    |> Alert.withTitle "Hey I just met you"
-    |> Alert.withSubtitle "And this is crazy"
-    |> Alert.withCloseButton YourCoolMsg
-    |> Alert.toEl
-```
-"""
-          }
-        )
-
-
-baseView content =
+baseView renderConfig content =
     el
         [ width fill
         , height (px 400)
         , Background.color Theme.black
-        , alignTop
         ]
-        (Alert.toEl content)
+        (Alert.toEl renderConfig content)

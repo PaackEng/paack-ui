@@ -1,150 +1,118 @@
 module UI.Alert exposing
     ( Alert
-    , error
-    , info
+    , danger
+    , primary
     , success
     , toEl
     , warning
-    , withCloseButton
-    , withSubtitle
-    , withTitle
     )
 
-import Element exposing (..)
+import Element exposing (Element)
 import Element.Background as Background
-import Element.Events exposing (onClick)
-import Element.Font as Font
-import ElementExtra exposing (when)
-import UI.Attributes as ExtraAttrs
-import UI.Icon as Icon
-import UI.RenderConfig as RenderConfig
-import UI.Theme as Theme
+import UI.Palette as Palette
+import UI.RenderConfig exposing (RenderConfig)
+import UI.Text as Text
+
+
+type alias Properties =
+    { title : String
+    , tone : AlertTone
+    }
 
 
 type Alert msg
-    = Alert (Options msg)
+    = Alert Properties
 
 
-type alias Options msg =
-    { colorScheme : ColorScheme
-    , title : String
-    , subtitle : String
-    , onCloseButtonClicked : Maybe msg
-    }
+type AlertTone
+    = ToneDanger
+    | ToneWarning
+    | TonePrimary
+    | ToneSuccess
 
 
-type alias ColorScheme =
-    { text : Color
-    , background : Color
-    }
-
-
-defaultOptions : Options msg
-defaultOptions =
-    { colorScheme = { text = Theme.white, background = Theme.primary }
-    , title = ""
-    , subtitle = ""
-    , onCloseButtonClicked = Nothing
-    }
-
-
-withTitle : String -> Alert msg -> Alert msg
-withTitle title (Alert options) =
-    Alert { options | title = title }
-
-
-withSubtitle : String -> Alert msg -> Alert msg
-withSubtitle subtitle (Alert options) =
-    Alert { options | subtitle = subtitle }
-
-
-withCloseButton : msg -> Alert msg -> Alert msg
-withCloseButton msg (Alert options) =
-    Alert { options | onCloseButtonClicked = Just msg }
-
-
-info : Alert msg
-info =
+primary : String -> Alert msg
+primary title =
     Alert
-        { defaultOptions
-            | colorScheme = { text = Theme.white, background = Theme.primary }
-        }
+        { title = title, tone = TonePrimary }
 
 
-success : Alert msg
-success =
+success : String -> Alert msg
+success title =
     Alert
-        { defaultOptions
-            | colorScheme = { text = Theme.black, background = Theme.success }
-        }
+        { title = title, tone = ToneSuccess }
 
 
-warning : Alert msg
-warning =
+warning : String -> Alert msg
+warning title =
     Alert
-        { defaultOptions
-            | colorScheme = { text = Theme.black, background = Theme.warning }
-        }
+        { title = title, tone = ToneWarning }
 
 
-error : Alert msg
-error =
+danger : String -> Alert msg
+danger title =
     Alert
-        { defaultOptions
-            | colorScheme = { text = Theme.white, background = Theme.error }
-        }
+        { title = title, tone = ToneDanger }
 
 
-toEl : Alert msg -> Element msg
-toEl (Alert { title, subtitle, colorScheme, onCloseButtonClicked }) =
-    row
-        [ width fill
-        , height shrink
-        , Background.color colorScheme.background
+toEl : RenderConfig -> Alert msg -> Element msg
+toEl cfg (Alert { title, tone }) =
+    Element.row
+        [ Element.width Element.fill
+        , Element.height Element.shrink
+        , Element.paddingEach
+            { top = 12
+            , left = 20
+            , right = 0
+            , bottom = 12
+            }
+        , tone
+            |> getBackgroundColor
+            |> Palette.toElColor
+            |> Background.color
+        , Element.alignTop
         ]
-        [ textView title subtitle colorScheme.text
-        , closeBtn onCloseButtonClicked
+        [ Text.subtitle2 title
+            |> Text.withColor (getTextColor tone)
+            |> Text.toEl cfg
         ]
 
 
-dummyCfg =
-    -- TODO: Remove
-    RenderConfig.fromWindow { width = 192, height = 1080 }
+
+-- Internals
 
 
-closeBtn : Maybe msg -> Element msg
-closeBtn maybeMsg =
+getTextColor : AlertTone -> Text.TextColor
+getTextColor alertTone =
+    case alertTone of
+        ToneWarning ->
+            Text.colorInverted
+
+        ToneDanger ->
+            Text.colorBgMiddle
+
+        TonePrimary ->
+            Text.colorBgMiddle
+
+        ToneSuccess ->
+            Text.colorInverted
+
+
+getBackgroundColor : AlertTone -> Palette.Color
+getBackgroundColor alertTone =
     let
-        btnView msg =
-            el [ padding 6, alignRight ] <|
-                el
-                    [ Background.color Theme.blackShade
-                    , paddingXY 10 10
-                    , Theme.roundedBorder
-                    , alignRight
-                    , ExtraAttrs.ariaRole "button"
-                    , onClick msg
-                    , pointer
-                    , Font.size 12
-                    ]
-                    (el [ Font.color Theme.white ] (Icon.close "Close" |> Icon.toEl dummyCfg))
+        colorTone =
+            case alertTone of
+                ToneWarning ->
+                    Palette.toneWarning
+
+                ToneDanger ->
+                    Palette.toneDanger
+
+                TonePrimary ->
+                    Palette.tonePrimary
+
+                ToneSuccess ->
+                    Palette.toneSuccess
     in
-    maybeMsg
-        |> Maybe.map btnView
-        |> Maybe.withDefault none
-
-
-textView : String -> String -> Color -> Element msg
-textView title subtitle textColor =
-    column
-        [ Theme.tinySpacing
-        , Font.color textColor
-        , paddingXY Theme.sizings.large Theme.sizings.small
-        , Theme.tinySpacing
-        , height (fill |> minimum 45)
-        ]
-        [ column [ centerY ]
-            [ el [ Theme.title ] <| text title
-            , el [ Theme.subtitle ] <| text subtitle
-            ]
-        ]
+    Palette.color colorTone Palette.lumMiddle

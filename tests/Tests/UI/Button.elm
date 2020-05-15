@@ -8,23 +8,15 @@ import Test.Html.Event as Event
 import Test.Html.Query as Query
 import Test.Html.Selector as Selector
 import Tests.Utils.Element exposing (elementToHtml, hasIconInside)
+import Tests.Utils.RenderConfig exposing (desktopWindowConfig)
 import UI.Button as Button
 import UI.Icon as Icon
 import UI.Link as Link
-import UI.RenderConfig
 
 
 type Msg
     = OnButtonClicked
     | OnToggleChanged Bool
-
-
-fakeRenderConfig : UI.RenderConfig.RenderConfig
-fakeRenderConfig =
-    UI.RenderConfig.fromWindow
-        { width = 1920
-        , height = 1080
-        }
 
 
 tests : Test
@@ -49,7 +41,7 @@ withIconTests =
                 Button.bodyIcon (Icon.toggle iconHintText)
                     |> Button.button OnButtonClicked
                     |> Button.withTone Button.tonePrimary
-                    |> Button.toEl fakeRenderConfig
+                    |> Button.toEl desktopWindowConfig
                     |> elementToHtml
                     |> findBtnQuery
                     |> hasIconInside iconHintText
@@ -75,7 +67,7 @@ disabledTests =
                     Button.bodyText "Click Here"
                         |> Button.button OnButtonClicked
                         |> Button.withMode Button.modeDisabled
-                        |> Button.toEl fakeRenderConfig
+                        |> Button.toEl desktopWindowConfig
                         |> elementToHtml
                         |> findBtnQuery
                         |> Event.simulate Event.click
@@ -86,7 +78,7 @@ disabledTests =
                     Button.bodyText "Click Here"
                         |> Button.button OnButtonClicked
                         |> Button.withMode Button.modeDisabled
-                        |> Button.toEl fakeRenderConfig
+                        |> Button.toEl desktopWindowConfig
                         |> elementToHtml
                         |> Query.has [ Selector.attribute (HtmlAttr.attribute "disabled" "true") ]
             , test "Toggle doesn't fires message on click" <|
@@ -94,7 +86,7 @@ disabledTests =
                     Button.bodyText "Click Here"
                         |> Button.toggle OnToggleChanged False
                         |> Button.withMode Button.modeDisabled
-                        |> Button.toEl fakeRenderConfig
+                        |> Button.toEl desktopWindowConfig
                         |> elementToHtml
                         |> findBtnQuery
                         |> Event.simulate Event.click
@@ -107,7 +99,7 @@ disabledTests =
                     Button.bodyText "Click Here"
                         |> Button.button OnButtonClicked
                         |> Button.withMode Button.modeEnabled
-                        |> Button.toEl fakeRenderConfig
+                        |> Button.toEl desktopWindowConfig
                         |> elementToHtml
                         |> findBtnQuery
                         |> Event.simulate Event.click
@@ -116,7 +108,7 @@ disabledTests =
                 \_ ->
                     Button.bodyText "Click Here"
                         |> Button.toggle OnToggleChanged False
-                        |> Button.toEl fakeRenderConfig
+                        |> Button.toEl desktopWindowConfig
                         |> elementToHtml
                         |> findBtnQuery
                         |> Event.simulate Event.click
@@ -140,7 +132,7 @@ eventsTests =
                 \_ ->
                     Button.bodyText "Click Here"
                         |> Button.toggle OnToggleChanged False
-                        |> Button.toEl fakeRenderConfig
+                        |> Button.toEl desktopWindowConfig
                         |> elementToHtml
                         |> findBtnQuery
                         |> Event.simulate Event.click
@@ -149,7 +141,7 @@ eventsTests =
                 \_ ->
                     Button.bodyText "Click Here"
                         |> Button.toggle OnToggleChanged True
-                        |> Button.toEl fakeRenderConfig
+                        |> Button.toEl desktopWindowConfig
                         |> elementToHtml
                         |> findBtnQuery
                         |> Event.simulate Event.click
@@ -160,7 +152,7 @@ eventsTests =
                 \_ ->
                     Button.bodyText "Click Here"
                         |> Button.link (Link.link "http://www.google.com")
-                        |> Button.toEl fakeRenderConfig
+                        |> Button.toEl desktopWindowConfig
                         |> elementToHtml
                         |> findBtnQuery
                         |> Event.simulate Event.click
@@ -174,7 +166,7 @@ eventsTests =
                     in
                     Button.bodyText "Click Here"
                         |> Button.link (Link.link url)
-                        |> Button.toEl fakeRenderConfig
+                        |> Button.toEl desktopWindowConfig
                         |> elementToHtml
                         |> Query.has [ Selector.attribute (HtmlAttr.attribute "href" url) ]
             ]
@@ -190,6 +182,6 @@ clickableBtn : Query.Single Msg
 clickableBtn =
     Button.bodyText "Click Here"
         |> Button.button OnButtonClicked
-        |> Button.toEl fakeRenderConfig
+        |> Button.toEl desktopWindowConfig
         |> elementToHtml
         |> findBtnQuery
