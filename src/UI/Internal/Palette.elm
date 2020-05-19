@@ -38,7 +38,7 @@ primary =
 
 success : ToneColors
 success =
-    { darkest = rgb255 26 158 86 -- #1A9E56
+    { darkest = rgb255 1 167 76 -- #01A74C
     , middle = rgb255 34 229 123 -- #22E57B
     , light = rgb255 95 255 168 -- #5FFFA8
     , lighter = rgb255 183 255 216 -- #B7FFD8
@@ -49,7 +49,7 @@ success =
 danger : ToneColors
 danger =
     { darkest = rgb255 182 0 24 -- #B60018
-    , middle = rgb255 255 44 72 -- #FF2C48
+    , middle = rgb255 239 19 49 -- #EF1331
     , light = rgb255 255 94 116 -- #FF5E74
     , lighter = rgb255 255 174 185 -- #FFAEB9
     , lightest = rgb255 255 218 223 -- #FFDADF

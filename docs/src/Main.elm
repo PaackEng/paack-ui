@@ -15,11 +15,11 @@ import Icons as Icons
 import LoadingView as LoadingView
 import Model as Model exposing (Model)
 import Msg exposing (Msg(..))
+import Palette as Palette
 import PopUps as PopUps
 import Return as R
 import Tables.Stories as Tables
 import Texts as Texts
-import Theme as Theme
 import UI.RenderConfig exposing (RenderConfig)
 import UIExplorer exposing (Config, UIExplorerProgram, explore, logoFromHtml)
 import UIExplorer.Plugins.Note as Note
@@ -60,7 +60,7 @@ main =
         config
         [ Texts.stories renderConfig
         , Icons.stories renderConfig
-        , Theme.stories
+        , Palette.stories
         , Buttons.stories renderConfig
         , ActionBars.stories renderConfig
         , Alerts.stories renderConfig
