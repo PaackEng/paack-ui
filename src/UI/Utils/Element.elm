@@ -7,6 +7,7 @@ module UI.Utils.Element exposing
     , maxHeightPct
     , maxHeightVH
     , onEnterPressed
+    , svg
     , title
     )
 
@@ -15,7 +16,18 @@ import Element.Events as Events
 import Html.Attributes as HtmlAttrs
 import Html.Events as HtmlEvents
 import Json.Decode as Decode
+import Svg
+import Svg.Attributes as SvgAttr
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
+import UI.Utils.ARIA as ARIA
+
+
+svg : String -> List (Svg.Attribute msg) -> List (Svg.Svg msg) -> Element msg
+svg altText attrs children =
+    children
+        |> Svg.svg attrs
+        |> Element.html
+        |> Element.el [ ARIA.roleAttr ARIA.roleImage, ARIA.labelAttr altText ]
 
 
 disabled : List (Attribute msg)
