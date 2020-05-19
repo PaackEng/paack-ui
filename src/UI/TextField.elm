@@ -128,7 +128,7 @@ withWidth width (TextField prop opt) =
 withLabelNotHidden : Bool -> TextField msg -> TextField msg
 withLabelNotHidden isVisible (TextField prop opt) =
     TextField prop
-        { opt | labelVisible = isVisible }
+        { opt | labelVisible = not isVisible }
 
 
 withError : String -> TextField msg -> TextField msg
@@ -479,7 +479,7 @@ attrs cfg prop opt =
 
 textAttrs : RenderConfig -> List (Attribute msg)
 textAttrs cfg =
-    Text.attributes cfg Text.SizeSubtitle2 Text.ColorInherit
+    Text.attributes cfg Text.SizeSubtitle2 False Text.ColorInherit
 
 
 genericAttr : String -> Bool -> Bool -> TextFieldWidth -> List (Attribute msg)
@@ -525,7 +525,7 @@ inputLabelAttr : RenderConfig -> List (Attribute msg)
 inputLabelAttr cfg =
     ( Palette.toneGray, Palette.lumDarkest )
         |> Text.ColorPalette
-        |> Text.attributes cfg Text.SizeCaption
+        |> Text.attributes cfg Text.SizeCaption True
         |> (::) (Element.paddingEach { top = 0, left = 0, right = 0, bottom = 3 })
 
 

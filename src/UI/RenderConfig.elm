@@ -1,4 +1,4 @@
-module UI.RenderConfig exposing (RenderConfig, elLayoutAttributes, fromWindow, isMobile, isPortrait)
+module UI.RenderConfig exposing (RenderConfig, elLayoutAttributes, fromWindow, isMobile, isPortrait, updateWindow)
 
 {- -- Future thoughts:
 
@@ -33,6 +33,19 @@ fromWindow window =
     in
     { deviceClass = class
     , deviceOrientation = orientation
+    }
+        |> RenderConfig
+
+
+updateWindow : { window | height : Int, width : Int } -> RenderConfig -> RenderConfig
+updateWindow window (RenderConfig oldData) =
+    let
+        { class, orientation } =
+            Element.classifyDevice window
+    in
+    { oldData
+        | deviceClass = class
+        , deviceOrientation = orientation
     }
         |> RenderConfig
 

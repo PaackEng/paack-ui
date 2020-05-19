@@ -217,7 +217,7 @@ toEl cfg ((Button { click, body } _) as btn) =
 
 fontAttrs : RenderConfig -> List (Attribute msg)
 fontAttrs cfg =
-    Text.attributes cfg Text.SizeSubtitle1 Text.defaultColor
+    Text.attributes cfg Text.SizeSubtitle1 True Text.defaultColor
 
 
 baseAttrs : Button msg -> List (Attribute msg)
@@ -245,7 +245,7 @@ buttonPadding ((Button { body } _) as btn) =
             Element.paddingXY 31 15
 
         BodyIcon _ ->
-            Element.paddingXY 9 15
+            Element.paddingXY 9 13
 
 
 ariaAttrs : List (Attribute msg)

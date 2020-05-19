@@ -1,10 +1,21 @@
-module UI.Utils.Element exposing (colorTransition, colorWithOpacity, disabled, maxHeightVH, onEnterPressed, overTop, title)
+module UI.Utils.Element exposing
+    ( colorTransition
+    , colorWithOpacity
+    , desktopMaximum
+    , disabled
+    , ellipsis
+    , maxHeightPct
+    , maxHeightVH
+    , onEnterPressed
+    , title
+    )
 
 import Element exposing (Attribute, Element)
 import Element.Events as Events
 import Html.Attributes as HtmlAttrs
 import Html.Events as HtmlEvents
 import Json.Decode as Decode
+import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 
 
 disabled : List (Attribute msg)
@@ -56,6 +67,11 @@ maxHeightVH value =
     style "max-height" (String.fromInt value ++ "vh")
 
 
+maxHeightPct : Float -> Attribute msg
+maxHeightPct value =
+    style "max-height" (String.fromFloat value ++ "%")
+
+
 colorWithOpacity : Float -> Element.Color -> Element.Color
 colorWithOpacity alpha color =
     color
@@ -66,15 +82,22 @@ colorWithOpacity alpha color =
         |> Element.fromRgb
 
 
-overTop : List (Attribute msg)
-overTop =
-    [ ( "position", "fixed" )
-    , ( "top", "0" )
-    , ( "left", "0" )
-    , ( "width", "100vw" )
-    , ( "height", "100vh" )
+ellipsis : List (Attribute msg)
+ellipsis =
+    [ ( "text-overflow", "ellipsis" )
+    , ( "white-space", "nowrap" )
+    , ( "overflow", "hidden" )
     ]
         |> List.map stylePair
+
+
+desktopMaximum : RenderConfig -> Int -> Element.Length
+desktopMaximum cfg maxSize =
+    if RenderConfig.isMobile cfg then
+        Element.fill
+
+    else
+        Element.fill |> Element.maximum maxSize
 
 
 

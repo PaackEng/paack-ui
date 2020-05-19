@@ -1,5 +1,6 @@
 module UI.Icon exposing
     ( Icon
+    , add
     , close
     , eventLog
     , getHint
@@ -8,6 +9,7 @@ module UI.Icon exposing
     , paackSpaces
     , packages
     , sandwichMenu
+    , search
     , toEl
     , todo
     , toggle
@@ -16,7 +18,6 @@ module UI.Icon exposing
 import Element exposing (..)
 import Html
 import Html.Attributes as HtmlAttr
-import UI.Attributes exposing (title)
 import UI.RenderConfig exposing (RenderConfig)
 
 
@@ -39,17 +40,24 @@ type Icon
 type IconGlyph
     = Toggle
     | Close
+    | Add
     | SandwichMenu
     | Notifications
     | PaackSpaces
     | Packages
     | EventLog
     | Logout
+    | Search
 
 
 toggle : String -> Icon
 toggle hint =
     Icon (Properties hint Toggle)
+
+
+add : String -> Icon
+add hint =
+    Icon (Properties hint Add)
 
 
 close : String -> Icon
@@ -87,9 +95,17 @@ logout hint =
     Icon (Properties hint Logout)
 
 
+search : String -> Icon
+search hint =
+    Icon (Properties hint Search)
+
+
 toEl : RenderConfig -> Icon -> Element msg
 toEl _ (Icon { hint, glyph }) =
     case glyph of
+        Add ->
+            fasIcon "plus" hint
+
         Toggle ->
             fasIcon "map" hint
 
@@ -113,6 +129,9 @@ toEl _ (Icon { hint, glyph }) =
 
         Logout ->
             fasIcon "user-circle" hint
+
+        Search ->
+            fasIcon "search" hint
 
 
 getHint : Icon -> String

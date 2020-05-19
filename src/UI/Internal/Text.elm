@@ -6,10 +6,13 @@ import List
 import UI.Internal.Palette as Palette
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig, isMobile)
+import UI.Utils.Element as Element
 
 
 type alias Options =
-    { color : TextColor }
+    { color : TextColor
+    , oneLineEllipsis : Bool
+    }
 
 
 type alias Properties =
@@ -50,7 +53,12 @@ type TextColor
 defaultText : TextSize -> String -> Text
 defaultText size content =
     Text (Properties content size)
-        (Options defaultColor)
+        defaultOptions
+
+
+defaultOptions : Options
+defaultOptions =
+    Options defaultColor False
 
 
 defaultColor : TextColor
@@ -84,8 +92,8 @@ fontColor color =
             Nothing
 
 
-attributes : RenderConfig -> TextSize -> TextColor -> List (Attribute msg)
-attributes config size color =
+attributes : RenderConfig -> TextSize -> Bool -> TextColor -> List (Attribute msg)
+attributes config size ellipsis color =
     let
         sizeAttrs =
             if isMobile config then
@@ -93,13 +101,23 @@ attributes config size color =
 
             else
                 deskAttributes size
-    in
-    case fontColor color of
-        Just attr ->
-            Font.color attr :: sizeAttrs
 
-        Nothing ->
-            sizeAttrs
+        ellipsisAttrs attrs =
+            if ellipsis then
+                Element.ellipsis ++ attrs
+
+            else
+                attrs
+
+        colorAttr attrs =
+            case fontColor color of
+                Just elColor ->
+                    Font.color elColor :: attrs
+
+                Nothing ->
+                    attrs
+    in
+    sizeAttrs |> ellipsisAttrs |> colorAttr
 
 
 deskAttributes : TextSize -> List (Attribute msg)
