@@ -108,8 +108,17 @@ withEllipsis val text =
 
 toEl : RenderConfig -> Text -> Element msg
 toEl cfg (Internal.Text spans) =
-    List.map (Internal.spanRenderEl cfg) spans
-        |> Element.column [ Element.spacing 0 ]
+    case spans of
+        [] ->
+            Element.none
+
+        [ theOne ] ->
+            Internal.spanRenderEl cfg theOne
+
+        _ ->
+            -- TODO: Concat paragraphs
+            List.map (Internal.spanRenderEl cfg) spans
+                |> Element.column [ Element.spacing 0 ]
 
 
 multiline : (String -> Text) -> List String -> Text
