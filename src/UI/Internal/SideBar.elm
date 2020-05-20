@@ -9,6 +9,7 @@ import UI.Internal.Menu as Menu exposing (Menu)
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Link as Link exposing (Link)
+import UI.Palette as Palette exposing (lumMiddle, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UI.Utils.ARIA as ARIA
@@ -311,7 +312,7 @@ pageItem cfg icon link isSelected =
             |> Element.el iconAttr
         , Icon.getHint icon
             |> Text.body1
-            |> Text.withColor Text.colorPrimary
+            |> Text.withColor (Palette.color tonePrimary lumMiddle)
             |> Text.toEl cfg
         ]
         |> Link.packEl cfg [ width fill ] link
@@ -340,7 +341,7 @@ actionItem cfg icon msg =
             |> Element.el iconAttr
         , Icon.getHint icon
             |> Text.body1
-            |> Text.withColor Text.colorPrimary
+            |> Text.withColor (Palette.color tonePrimary lumMiddle)
             |> Text.toEl cfg
         ]
 
