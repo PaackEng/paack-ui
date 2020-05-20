@@ -14,7 +14,7 @@ import UI.Utils.Element as Element
 type alias Dialog msg =
     { title : String
     , close : msg
-    , body : RenderConfig -> Element msg
+    , body : Element msg
     }
 
 
@@ -22,7 +22,7 @@ dialogMap : (a -> b) -> Dialog a -> Dialog b
 dialogMap applier data =
     { title = data.title
     , close = applier data.close
-    , body = lazyMap (Element.map applier) data.body
+    , body = Element.map applier data.body
     }
 
 
@@ -52,6 +52,6 @@ view cfg { title, body, close } =
                         , Element.pointer
                         ]
                 ]
-            , body cfg
+            , body
             ]
         ]
