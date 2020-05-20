@@ -41,7 +41,7 @@ lums =
 colorView : Tone -> Palette.Brightness -> Element msg
 colorView tone brightness =
     Element.el
-        [ Background.color <| Palette.toElColor ( tone, brightness )
+        [ Background.color <| Palette.toElColor <| Palette.color tone brightness
         , Element.width (px 100)
         , Element.height (px 100)
         , Element.spacing 10

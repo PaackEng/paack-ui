@@ -67,34 +67,49 @@ warning =
 
 
 
+-- Contrasted Tones
+
+
+contrastGray : ToneColors
+contrastGray =
+    { darkest = rgb255 255 255 255 -- #FFF
+    , middle = rgb255 255 255 255 -- #FFF
+    , light = rgb255 255 255 255 -- #FFF
+    , lighter = gray.darkest
+    , lightest = gray.darkest
+    }
+
+
+contrastPrimary : ToneColors
+contrastPrimary =
+    contrastGray
+
+
+contrastSuccess : ToneColors
+contrastSuccess =
+    { darkest = rgb255 255 255 255 -- #FFF
+    , middle = gray.darkest
+    , light = gray.darkest
+    , lighter = gray.darkest
+    , lightest = gray.darkest
+    }
+
+
+contrastDanger : ToneColors
+contrastDanger =
+    contrastGray
+
+
+contrastWarning : ToneColors
+contrastWarning =
+    contrastGray
+
+
+
 -- Text
 
 
-textBgInverted : Element.Color
-textBgInverted =
-    -- #000000
-    rgb255 0 0 0
-
-
-textBgMiddle : Element.Color
-textBgMiddle =
-    -- #FFF
-    rgb255 255 255 255
-
-
-textBgLightest : Element.Color
-textBgLightest =
-    -- #1B60D8
-    rgb255 27 96 216
-
-
-textBgLighter : Element.Color
-textBgLighter =
-    -- #0C429C
-    rgb255 12 66 156
-
-
-textComponentDisabled : Element.Color
-textComponentDisabled =
-    -- #A5A5A5
-    rgb255 165 165 165
+textLightButtonDisabled : Element.Color
+textLightButtonDisabled =
+    -- #666666
+    rgb255 102 102 102

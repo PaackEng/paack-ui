@@ -4,17 +4,14 @@ module UI.Text exposing
     , body1
     , body2
     , caption
-    , colorBgMiddle
-    , colorFromPalette
-    , colorGray
-    , colorInverted
-    , colorPrimary
+    , combination
     , heading1
     , heading2
     , heading3
     , heading4
     , heading5
     , heading6
+    , multiline
     , overline
     , subtitle1
     , subtitle2
@@ -26,7 +23,7 @@ module UI.Text exposing
 import Element exposing (Attribute, Element)
 import Element.Font as Font
 import List
-import UI.Internal.Text as Internal exposing (TextSize(..), defaultText)
+import UI.Internal.Text as Internal exposing (TextSize(..), defaultText, mapOpt)
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig, isMobile)
 
@@ -99,50 +96,33 @@ overline content =
     defaultText SizeOverline content
 
 
-colorPrimary : TextColor
-colorPrimary =
-    Internal.ColorPalette
-        ( Palette.tonePrimary, Palette.lumMiddle )
-
-
-colorBgMiddle : TextColor
-colorBgMiddle =
-    Internal.ColorBgMiddle
-
-
-colorInverted : TextColor
-colorInverted =
-    Internal.ColorInverted
-
-
-colorGray : TextColor
-colorGray =
-    Internal.ColorPalette
-        ( Palette.toneGray, Palette.lumMiddle )
-
-
-colorFromPalette : Palette.Color -> TextColor
-colorFromPalette color =
-    Internal.ColorPalette color
-
-
-withColor : TextColor -> Text -> Text
-withColor color (Internal.Text prop opt) =
-    Internal.Text prop { opt | color = color }
+withColor : Palette.Color -> Text -> Text
+withColor color text =
+    mapOpt (\opt -> { opt | color = Internal.ColorPalette color }) text
 
 
 withEllipsis : Bool -> Text -> Text
-withEllipsis val (Internal.Text prop opt) =
-    Internal.Text prop { opt | oneLineEllipsis = val }
+withEllipsis val text =
+    mapOpt (\opt -> { opt | oneLineEllipsis = val }) text
 
 
 toEl : RenderConfig -> Text -> Element msg
-toEl cfg (Internal.Text { content, size } { color, oneLineEllipsis }) =
-    let
-        attrs =
-            Internal.attributes cfg size oneLineEllipsis color
-    in
-    content
-        |> Element.text
-        |> List.singleton
-        |> Element.paragraph attrs
+toEl cfg (Internal.Text spans) =
+    List.map (Internal.spanRenderEl cfg) spans
+        |> Element.column [ Element.spacing 0 ]
+
+
+multiline : (String -> Text) -> List String -> Text
+multiline style lines =
+    lines
+        |> List.map (style >> Internal.getSpans)
+        |> List.concat
+        |> Internal.Text
+
+
+combination : List Text -> Text
+combination parts =
+    parts
+        |> List.map Internal.getSpans
+        |> List.concat
+        |> Internal.Text

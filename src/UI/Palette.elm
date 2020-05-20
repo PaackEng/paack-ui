@@ -1,11 +1,42 @@
-module UI.Palette exposing (Brightness, Color, Tone, color, lumDarkest, lumLight, lumLighter, lumLightest, lumMiddle, toCssColor, toElColor, toneDanger, toneGray, tonePrimary, toneSuccess, toneWarning)
+module UI.Palette exposing
+    ( Brightness
+    , Color
+    , Tone
+    , color
+    , lumDarkest
+    , lumLight
+    , lumLighter
+    , lumLightest
+    , lumMiddle
+    , toCssColor
+    , toElColor
+    , toneDanger
+    , toneGray
+    , tonePrimary
+    , toneSuccess
+    , toneWarning
+    , withAlpha
+    , withContrast
+    )
 
 import Element
+import UI.Internal.Basics exposing (ifThenElse)
 import UI.Internal.Palette exposing (..)
+import UI.Utils.Element exposing (colorWithOpacity)
 
 
-type alias Color =
-    ( Tone, Brightness )
+type Color
+    = Color Properties Options
+
+
+type alias Properties =
+    { tone : Tone, brightness : Brightness }
+
+
+type alias Options =
+    { contrast : Bool
+    , alpha : Float
+    }
 
 
 type Tone
@@ -26,14 +57,25 @@ type Brightness
 
 color : Tone -> Brightness -> Color
 color tone brightness =
-    ( tone, brightness )
+    Color (Properties tone brightness) defaultOptions
 
 
 toElColor : Color -> Element.Color
-toElColor ( tone, brightness ) =
+toElColor (Color { tone, brightness } { alpha, contrast }) =
     tone
-        |> toColors
+        |> ifThenElse contrast contrastColors toColors
         |> getLum brightness
+        |> colorWithOpacity alpha
+
+
+withContrast : Bool -> Color -> Color
+withContrast enabled (Color prop opt) =
+    Color prop { opt | contrast = enabled }
+
+
+withAlpha : Float -> Color -> Color
+withAlpha alpha (Color prop opt) =
+    Color prop { opt | alpha = alpha }
 
 
 toCssColor : Color -> String
@@ -143,3 +185,29 @@ toColors tone =
 
         ToneWarning ->
             warning
+
+
+contrastColors : Tone -> ToneColors
+contrastColors tone =
+    case tone of
+        ToneGray ->
+            contrastGray
+
+        TonePrimary ->
+            contrastPrimary
+
+        ToneSuccess ->
+            contrastSuccess
+
+        ToneDanger ->
+            contrastDanger
+
+        ToneWarning ->
+            contrastWarning
+
+
+defaultOptions : Options
+defaultOptions =
+    { alpha = 1
+    , contrast = False
+    }

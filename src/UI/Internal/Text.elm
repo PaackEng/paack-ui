@@ -4,9 +4,17 @@ import Element exposing (Attribute, Element)
 import Element.Font as Font
 import List
 import UI.Internal.Palette as Palette
-import UI.Palette as Palette
+import UI.Palette as Palette exposing (lumDarkest, toneGray)
 import UI.RenderConfig exposing (RenderConfig, isMobile)
 import UI.Utils.Element as Element
+
+
+type Text
+    = Text (List Span)
+
+
+type Span
+    = Span Properties Options
 
 
 type alias Options =
@@ -19,10 +27,6 @@ type alias Properties =
     { content : String
     , size : TextSize
     }
-
-
-type Text
-    = Text Properties Options
 
 
 type TextSize
@@ -42,18 +46,13 @@ type TextSize
 
 type TextColor
     = ColorPalette Palette.Color
-    | ColorBgMiddle
-    | ColorBgLightest
-    | ColorBgLighter
-    | ColorBgDisabled
-    | ColorInverted
+    | ColorForLightButtonDisabled
     | ColorInherit
 
 
 defaultText : TextSize -> String -> Text
 defaultText size content =
-    Text (Properties content size)
-        defaultOptions
+    Text [ Span (Properties content size) defaultOptions ]
 
 
 defaultOptions : Options
@@ -63,8 +62,7 @@ defaultOptions =
 
 defaultColor : TextColor
 defaultColor =
-    ( Palette.toneGray, Palette.lumDarkest )
-        |> ColorPalette
+    ColorPalette <| Palette.color toneGray lumDarkest
 
 
 fontColor : TextColor -> Maybe Element.Color
@@ -73,20 +71,8 @@ fontColor color =
         ColorPalette paletteColor ->
             Just <| Palette.toElColor paletteColor
 
-        ColorBgMiddle ->
-            Just <| Palette.textBgMiddle
-
-        ColorBgLightest ->
-            Just <| Palette.textBgLightest
-
-        ColorBgLighter ->
-            Just <| Palette.textBgLighter
-
-        ColorBgDisabled ->
-            Just <| Palette.textComponentDisabled
-
-        ColorInverted ->
-            Just <| Palette.textBgInverted
+        ColorForLightButtonDisabled ->
+            Just <| Palette.textLightButtonDisabled
 
         ColorInherit ->
             Nothing
@@ -276,3 +262,29 @@ mobileAttributes size =
             , Font.letterSpacing 2
             , Font.extraBold
             ]
+
+
+mapOpt : (Options -> Options) -> Text -> Text
+mapOpt applier (Text spans) =
+    spans
+        |> List.map (spanMapOpt applier)
+        |> Text
+
+
+spanMapOpt : (Options -> Options) -> Span -> Span
+spanMapOpt applier (Span prop opt) =
+    Span prop (applier opt)
+
+
+spanRenderEl : RenderConfig -> Span -> Element msg
+spanRenderEl cfg (Span { content, size } { color, oneLineEllipsis }) =
+    content
+        |> Element.text
+        |> List.singleton
+        |> Element.paragraph
+            (attributes cfg size oneLineEllipsis color)
+
+
+getSpans : Text -> List Span
+getSpans (Text spans) =
+    spans

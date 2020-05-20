@@ -27,7 +27,7 @@ icons =
 iconView cfg ( iconFn, label ) =
     Element.column
         [ Background.color Palette.primary.middle
-        , Font.color Palette.textBgMiddle
+        , Font.color Palette.contrastPrimary.middle
         , Element.spacing 10
         , Element.padding 10
         ]

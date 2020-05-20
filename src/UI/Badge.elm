@@ -6,6 +6,7 @@ import Element.Border as Border
 import Element.Font as Font
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
+import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text exposing (TextColor)
 
@@ -68,8 +69,11 @@ success content =
 toEl : RenderConfig -> Badge -> Element msg
 toEl cfg (Badge { content } { tone }) =
     let
-        ( bg, fg ) =
-            toneToColors tone
+        bg =
+            toneToColor tone
+
+        fg =
+            Palette.withContrast True bg
     in
     Text.overline content
         |> Text.withColor fg
@@ -77,7 +81,7 @@ toEl cfg (Badge { content } { tone }) =
         |> Element.el
             [ Element.width shrink
             , Font.center
-            , Background.color bg
+            , Background.color <| Palette.toElColor bg
             , Element.paddingEach { top = 4, bottom = 4, left = 5, right = 3 }
             , Element.height (px 20)
             , Primitives.roundedBorders
@@ -88,23 +92,23 @@ toEl cfg (Badge { content } { tone }) =
 -- Internal
 
 
-toneToColors : BadgeTone -> ( Element.Color, TextColor )
-toneToColors tone =
+toneToColor : BadgeTone -> Palette.Color
+toneToColor tone =
     case tone of
         ToneLight ->
-            ( Palette.gray.lighter, Text.colorInverted )
+            Palette.color Palette.toneGray Palette.lumLighter
 
         ToneDark ->
-            ( Palette.gray.darkest, Text.colorBgMiddle )
+            Palette.color Palette.toneGray Palette.lumDarkest
 
         TonePrimary ->
-            ( Palette.primary.light, Text.colorBgMiddle )
+            Palette.color Palette.tonePrimary Palette.lumLight
 
         ToneWarning ->
-            ( Palette.warning.light, Text.colorBgMiddle )
+            Palette.color Palette.toneWarning Palette.lumLight
 
         ToneDanger ->
-            ( Palette.danger.light, Text.colorBgMiddle )
+            Palette.color Palette.toneDanger Palette.lumLight
 
         ToneSuccess ->
-            ( Palette.success.light, Text.colorInverted )
+            Palette.color Palette.toneSuccess Palette.lumLight
