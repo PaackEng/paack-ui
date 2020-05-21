@@ -43,7 +43,7 @@ import UI.Icon exposing (Icon)
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Text as Text
-import UI.Palette as Palette
+import UI.Palette as Palette exposing (brightnessMiddle, toneGray)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UI.Utils.ARIA as ARIA
@@ -128,7 +128,7 @@ withWidth width (TextField prop opt) =
 withLabelNotHidden : Bool -> TextField msg -> TextField msg
 withLabelNotHidden isVisible (TextField prop opt) =
     TextField prop
-        { opt | labelVisible = not isVisible }
+        { opt | labelVisible = isVisible }
 
 
 withError : String -> TextField msg -> TextField msg
@@ -521,20 +521,17 @@ genericAttr label isPlaceholder hasError width =
     ]
 
 
-inputLabelAttr : RenderConfig -> List (Attribute msg)
-inputLabelAttr cfg =
-    Palette.color Palette.toneGray Palette.brightnessDarkest
-        |> Text.ColorPalette
-        |> Text.attributes cfg Text.SizeCaption True
-        |> (::) (Element.paddingEach { top = 0, left = 0, right = 0, bottom = 3 })
-
-
 inputLabel : RenderConfig -> String -> Bool -> Input.Label msg
 inputLabel cfg label labelVisible =
     if labelVisible then
-        Input.labelAbove
-            (inputLabelAttr cfg)
-            (Element.text label)
+        Text.caption label
+            |> Text.withColor
+                (Palette.color toneGray brightnessMiddle)
+            |> Text.toEl cfg
+            |> Input.labelAbove
+                [ Element.paddingEach
+                    { top = 0, left = 0, right = 0, bottom = 3 }
+                ]
 
     else
         Input.labelHidden label

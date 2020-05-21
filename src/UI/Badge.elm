@@ -1,4 +1,4 @@
-module UI.Badge exposing (Badge, danger, dark, light, primary, success, toEl, warning)
+module UI.Badge exposing (Badge, danger, dark, light, primary, success, toEl, warning, withAlpha)
 
 import Element exposing (Element, px, shrink)
 import Element.Background as Background
@@ -20,7 +20,9 @@ type alias Properties =
 
 
 type alias Options =
-    { tone : BadgeTone }
+    { tone : BadgeTone
+    , alpha : Float
+    }
 
 
 type BadgeTone
@@ -34,32 +36,37 @@ type BadgeTone
 
 light : String -> Badge
 light content =
-    Badge { content = content } { tone = ToneLight }
+    Badge { content = content } { defaultOptions | tone = ToneLight }
 
 
 dark : String -> Badge
 dark content =
-    Badge { content = content } { tone = ToneDark }
+    Badge { content = content } { defaultOptions | tone = ToneDark }
 
 
 primary : String -> Badge
 primary content =
-    Badge { content = content } { tone = TonePrimary }
+    Badge { content = content } { defaultOptions | tone = TonePrimary }
 
 
 warning : String -> Badge
 warning content =
-    Badge { content = content } { tone = ToneWarning }
+    Badge { content = content } { defaultOptions | tone = ToneWarning }
 
 
 danger : String -> Badge
 danger content =
-    Badge { content = content } { tone = ToneDanger }
+    Badge { content = content } { defaultOptions | tone = ToneDanger }
 
 
 success : String -> Badge
 success content =
-    Badge { content = content } { tone = ToneSuccess }
+    Badge { content = content } { defaultOptions | tone = ToneSuccess }
+
+
+withAlpha : Float -> Badge -> Badge
+withAlpha alpha (Badge prop opt) =
+    Badge prop { opt | alpha = alpha }
 
 
 
@@ -67,21 +74,24 @@ success content =
 
 
 toEl : RenderConfig -> Badge -> Element msg
-toEl cfg (Badge { content } { tone }) =
+toEl cfg (Badge { content } { tone, alpha }) =
     let
-        bg =
+        background =
             toneToColor tone
 
-        fg =
-            Palette.withContrast True bg
+        textColor =
+            Palette.withContrast True background
     in
     Text.overline content
-        |> Text.withColor fg
+        |> Text.withColor textColor
         |> Text.toEl cfg
         |> Element.el
             [ Element.width shrink
             , Font.center
-            , Background.color <| Palette.toElColor bg
+            , background
+                |> Palette.withAlpha alpha
+                |> Palette.toElColor
+                |> Background.color
             , Element.paddingEach { top = 4, bottom = 4, left = 5, right = 3 }
             , Element.height (px 20)
             , Primitives.roundedBorders
@@ -90,6 +100,13 @@ toEl cfg (Badge { content } { tone }) =
 
 
 -- Internal
+
+
+defaultOptions : Options
+defaultOptions =
+    { tone = TonePrimary
+    , alpha = 1
+    }
 
 
 toneToColor : BadgeTone -> Palette.Color
