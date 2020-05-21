@@ -28,8 +28,8 @@ tones =
     ]
 
 
-brightnesss : List Palette.Brightness
-brightnesss =
+brightnesses : List Palette.Brightness
+brightnesses =
     [ Palette.brightnessDarkest
     , Palette.brightnessMiddle
     , Palette.brightnessLight
@@ -64,7 +64,7 @@ colorVarianceView : ( String, Tone ) -> Element msg
 colorVarianceView ( label, tone ) =
     Element.row
         [ Element.spacing 20 ]
-        [ brightnesss
+        [ brightnesses
             |> List.map (colorView tone)
             |> Element.row []
         , Element.text label
