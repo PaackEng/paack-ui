@@ -1,6 +1,6 @@
 module UI.Utils.Element exposing
-    ( colorTransition
-    , colorWithOpacity
+    ( colorSetOpacity
+    , colorTransition
     , desktopMaximum
     , disabled
     , ellipsis
@@ -84,8 +84,8 @@ maxHeightPct value =
     style "max-height" (String.fromFloat value ++ "%")
 
 
-colorWithOpacity : Float -> Element.Color -> Element.Color
-colorWithOpacity alpha color =
+colorSetOpacity : Float -> Element.Color -> Element.Color
+colorSetOpacity alpha color =
     color
         |> Element.toRgb
         |> (\rgba ->

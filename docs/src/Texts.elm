@@ -1,6 +1,7 @@
 module Texts exposing (stories)
 
 import Element
+import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
 import UI.Text as Text
 import UIExplorer exposing (storiesOf)
 
@@ -14,7 +15,7 @@ stories renderConfig =
 ```elm
 "Wherever You Will Go"
     |> Text.heading5
-    |> Text.withColor Text.colorPrimary
+    |> Text.withColor (Palette.color Palette.toneGray Palette.brightnessDarkest)
     |> Text.toEl renderConfig
 
 " - By The Calling"
@@ -40,7 +41,7 @@ Futures discussions includes:
 
 styles =
     [ ( Text.heading1
-            >> Text.withColor Text.colorPrimary
+            >> Text.withColor (Palette.color tonePrimary brightnessMiddle)
       , "Heading1"
       )
     , ( Text.heading2, "Heading2" )

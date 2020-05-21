@@ -9,6 +9,7 @@ import UI.Internal.Menu as Menu exposing (Menu)
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Link as Link exposing (Link)
+import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UI.Utils.ARIA as ARIA
@@ -57,7 +58,7 @@ mobileDrawer cfg page ((Menu.Menu { isExpanded, toggleMsg } _) as menu) title ma
                 [ viewSide cfg True menu
                 , Element.el
                     [ Palette.gray.darkest
-                        |> Element.colorWithOpacity 0.85
+                        |> Element.colorSetOpacity 0.85
                         |> Background.color
                     , width (fillPortion 25)
                     , height fill
@@ -296,7 +297,7 @@ pageItem cfg icon link isSelected =
 
         selectedColor =
             Palette.primary.darkest
-                |> Element.colorWithOpacity 0.12
+                |> Element.colorSetOpacity 0.12
 
         attrs =
             if isSelected then
@@ -311,7 +312,7 @@ pageItem cfg icon link isSelected =
             |> Element.el iconAttr
         , Icon.getHint icon
             |> Text.body1
-            |> Text.withColor Text.colorPrimary
+            |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
             |> Text.toEl cfg
         ]
         |> Link.packEl cfg [ width fill ] link
@@ -340,7 +341,7 @@ actionItem cfg icon msg =
             |> Element.el iconAttr
         , Icon.getHint icon
             |> Text.body1
-            |> Text.withColor Text.colorPrimary
+            |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
             |> Text.toEl cfg
         ]
 

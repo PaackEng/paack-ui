@@ -82,20 +82,11 @@ toEl cfg (Alert { title, tone }) =
 -- Internals
 
 
-getTextColor : AlertTone -> Text.TextColor
+getTextColor : AlertTone -> Palette.Color
 getTextColor alertTone =
-    case alertTone of
-        ToneWarning ->
-            Text.colorInverted
-
-        ToneDanger ->
-            Text.colorBgMiddle
-
-        TonePrimary ->
-            Text.colorBgMiddle
-
-        ToneSuccess ->
-            Text.colorInverted
+    alertTone
+        |> getBackgroundColor
+        |> Palette.withContrast True
 
 
 getBackgroundColor : AlertTone -> Palette.Color
@@ -115,4 +106,4 @@ getBackgroundColor alertTone =
                 ToneSuccess ->
                     Palette.toneSuccess
     in
-    Palette.color colorTone Palette.lumMiddle
+    Palette.color colorTone Palette.brightnessMiddle

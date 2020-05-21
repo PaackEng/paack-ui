@@ -523,7 +523,7 @@ genericAttr label isPlaceholder hasError width =
 
 inputLabelAttr : RenderConfig -> List (Attribute msg)
 inputLabelAttr cfg =
-    ( Palette.toneGray, Palette.lumDarkest )
+    Palette.color Palette.toneGray Palette.brightnessDarkest
         |> Text.ColorPalette
         |> Text.attributes cfg Text.SizeCaption True
         |> (::) (Element.paddingEach { top = 0, left = 0, right = 0, bottom = 3 })

@@ -1,11 +1,42 @@
-module UI.Palette exposing (Brightness, Color, Tone, color, lumDarkest, lumLight, lumLighter, lumLightest, lumMiddle, toCssColor, toElColor, toneDanger, toneGray, tonePrimary, toneSuccess, toneWarning)
+module UI.Palette exposing
+    ( Brightness
+    , Color
+    , Tone
+    , brightnessDarkest
+    , brightnessLight
+    , brightnessLighter
+    , brightnessLightest
+    , brightnessMiddle
+    , color
+    , toCssColor
+    , toElColor
+    , toneDanger
+    , toneGray
+    , tonePrimary
+    , toneSuccess
+    , toneWarning
+    , withAlpha
+    , withContrast
+    )
 
 import Element
+import UI.Internal.Basics exposing (ifThenElse)
 import UI.Internal.Palette exposing (..)
+import UI.Utils.Element exposing (colorSetOpacity)
 
 
-type alias Color =
-    ( Tone, Brightness )
+type Color
+    = Color Properties Options
+
+
+type alias Properties =
+    { tone : Tone, brightness : Brightness }
+
+
+type alias Options =
+    { contrast : Bool
+    , alpha : Float
+    }
 
 
 type Tone
@@ -17,23 +48,34 @@ type Tone
 
 
 type Brightness
-    = LumDarkest
-    | LumMiddle
-    | LumLight
-    | LumLighter
-    | LumLightest
+    = BrightnessDarkest
+    | BrightnessMiddle
+    | BrightnessLight
+    | BrightnessLighter
+    | BrightnessLightest
 
 
 color : Tone -> Brightness -> Color
 color tone brightness =
-    ( tone, brightness )
+    Color (Properties tone brightness) defaultOptions
 
 
 toElColor : Color -> Element.Color
-toElColor ( tone, brightness ) =
+toElColor (Color { tone, brightness } { alpha, contrast }) =
     tone
-        |> toColors
-        |> getLum brightness
+        |> ifThenElse contrast contrastColors toColors
+        |> getBrightness brightness
+        |> colorSetOpacity alpha
+
+
+withContrast : Bool -> Color -> Color
+withContrast enabled (Color prop opt) =
+    Color prop { opt | contrast = enabled }
+
+
+withAlpha : Float -> Color -> Color
+withAlpha alpha (Color prop opt) =
+    Color prop { opt | alpha = alpha }
 
 
 toCssColor : Color -> String
@@ -53,29 +95,29 @@ toCssColor data =
            )
 
 
-lumDarkest : Brightness
-lumDarkest =
-    LumDarkest
+brightnessDarkest : Brightness
+brightnessDarkest =
+    BrightnessDarkest
 
 
-lumLight : Brightness
-lumLight =
-    LumLight
+brightnessLight : Brightness
+brightnessLight =
+    BrightnessLight
 
 
-lumLighter : Brightness
-lumLighter =
-    LumLighter
+brightnessLighter : Brightness
+brightnessLighter =
+    BrightnessLighter
 
 
-lumLightest : Brightness
-lumLightest =
-    LumLightest
+brightnessLightest : Brightness
+brightnessLightest =
+    BrightnessLightest
 
 
-lumMiddle : Brightness
-lumMiddle =
-    LumMiddle
+brightnessMiddle : Brightness
+brightnessMiddle =
+    BrightnessMiddle
 
 
 toneDanger : Tone
@@ -107,22 +149,22 @@ toneWarning =
 -- Internals
 
 
-getLum : Brightness -> ToneColors -> Element.Color
-getLum brightness =
+getBrightness : Brightness -> ToneColors -> Element.Color
+getBrightness brightness =
     case brightness of
-        LumDarkest ->
+        BrightnessDarkest ->
             .darkest
 
-        LumMiddle ->
+        BrightnessMiddle ->
             .middle
 
-        LumLight ->
+        BrightnessLight ->
             .light
 
-        LumLighter ->
+        BrightnessLighter ->
             .lighter
 
-        LumLightest ->
+        BrightnessLightest ->
             .lightest
 
 
@@ -143,3 +185,29 @@ toColors tone =
 
         ToneWarning ->
             warning
+
+
+contrastColors : Tone -> ToneColors
+contrastColors tone =
+    case tone of
+        ToneGray ->
+            contrastGray
+
+        TonePrimary ->
+            contrastPrimary
+
+        ToneSuccess ->
+            contrastSuccess
+
+        ToneDanger ->
+            contrastDanger
+
+        ToneWarning ->
+            contrastWarning
+
+
+defaultOptions : Options
+defaultOptions =
+    { alpha = 1
+    , contrast = False
+    }

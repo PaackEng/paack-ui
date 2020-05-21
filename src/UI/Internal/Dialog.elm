@@ -32,7 +32,7 @@ view cfg { title, body, close } =
         [ Element.width fill
         , Element.height fill
         , Palette.gray.darkest
-            |> Element.colorWithOpacity 0.85
+            |> Element.colorSetOpacity 0.85
             |> Background.color
         ]
         [ Element.column
