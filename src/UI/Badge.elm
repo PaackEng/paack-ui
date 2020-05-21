@@ -96,19 +96,19 @@ toneToColor : BadgeTone -> Palette.Color
 toneToColor tone =
     case tone of
         ToneLight ->
-            Palette.color Palette.toneGray Palette.lumLighter
+            Palette.color Palette.toneGray Palette.brightnessLighter
 
         ToneDark ->
-            Palette.color Palette.toneGray Palette.lumDarkest
+            Palette.color Palette.toneGray Palette.brightnessDarkest
 
         TonePrimary ->
-            Palette.color Palette.tonePrimary Palette.lumLight
+            Palette.color Palette.tonePrimary Palette.brightnessLight
 
         ToneWarning ->
-            Palette.color Palette.toneWarning Palette.lumLight
+            Palette.color Palette.toneWarning Palette.brightnessLight
 
         ToneDanger ->
-            Palette.color Palette.toneDanger Palette.lumLight
+            Palette.color Palette.toneDanger Palette.brightnessLight
 
         ToneSuccess ->
-            Palette.color Palette.toneSuccess Palette.lumLight
+            Palette.color Palette.toneSuccess Palette.brightnessLight

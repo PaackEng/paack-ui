@@ -2,12 +2,12 @@ module UI.Palette exposing
     ( Brightness
     , Color
     , Tone
+    , brightnessDarkest
+    , brightnessLight
+    , brightnessLighter
+    , brightnessLightest
+    , brightnessMiddle
     , color
-    , lumDarkest
-    , lumLight
-    , lumLighter
-    , lumLightest
-    , lumMiddle
     , toCssColor
     , toElColor
     , toneDanger
@@ -22,7 +22,7 @@ module UI.Palette exposing
 import Element
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.Internal.Palette exposing (..)
-import UI.Utils.Element exposing (colorWithOpacity)
+import UI.Utils.Element exposing (colorSetOpacity)
 
 
 type Color
@@ -48,11 +48,11 @@ type Tone
 
 
 type Brightness
-    = LumDarkest
-    | LumMiddle
-    | LumLight
-    | LumLighter
-    | LumLightest
+    = BrightnessDarkest
+    | BrightnessMiddle
+    | BrightnessLight
+    | BrightnessLighter
+    | BrightnessLightest
 
 
 color : Tone -> Brightness -> Color
@@ -64,8 +64,8 @@ toElColor : Color -> Element.Color
 toElColor (Color { tone, brightness } { alpha, contrast }) =
     tone
         |> ifThenElse contrast contrastColors toColors
-        |> getLum brightness
-        |> colorWithOpacity alpha
+        |> getBrightness brightness
+        |> colorSetOpacity alpha
 
 
 withContrast : Bool -> Color -> Color
@@ -95,29 +95,29 @@ toCssColor data =
            )
 
 
-lumDarkest : Brightness
-lumDarkest =
-    LumDarkest
+brightnessDarkest : Brightness
+brightnessDarkest =
+    BrightnessDarkest
 
 
-lumLight : Brightness
-lumLight =
-    LumLight
+brightnessLight : Brightness
+brightnessLight =
+    BrightnessLight
 
 
-lumLighter : Brightness
-lumLighter =
-    LumLighter
+brightnessLighter : Brightness
+brightnessLighter =
+    BrightnessLighter
 
 
-lumLightest : Brightness
-lumLightest =
-    LumLightest
+brightnessLightest : Brightness
+brightnessLightest =
+    BrightnessLightest
 
 
-lumMiddle : Brightness
-lumMiddle =
-    LumMiddle
+brightnessMiddle : Brightness
+brightnessMiddle =
+    BrightnessMiddle
 
 
 toneDanger : Tone
@@ -149,22 +149,22 @@ toneWarning =
 -- Internals
 
 
-getLum : Brightness -> ToneColors -> Element.Color
-getLum brightness =
+getBrightness : Brightness -> ToneColors -> Element.Color
+getBrightness brightness =
     case brightness of
-        LumDarkest ->
+        BrightnessDarkest ->
             .darkest
 
-        LumMiddle ->
+        BrightnessMiddle ->
             .middle
 
-        LumLight ->
+        BrightnessLight ->
             .light
 
-        LumLighter ->
+        BrightnessLighter ->
             .lighter
 
-        LumLightest ->
+        BrightnessLightest ->
             .lightest
 
 

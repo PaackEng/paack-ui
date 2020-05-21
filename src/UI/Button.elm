@@ -33,7 +33,7 @@ import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Text as Text exposing (TextColor)
 import UI.Link as Link exposing (Link)
-import UI.Palette as Palette exposing (lumDarkest, lumLight, lumLighter, lumLightest, lumMiddle)
+import UI.Palette as Palette exposing (brightnessDarkest, brightnessLight, brightnessLighter, brightnessLightest, brightnessMiddle)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UI.Utils.ARIA as ARIA
@@ -339,32 +339,32 @@ colorHelperWhenDisabled body tone =
     case ( body, tone ) of
         ( BodyIcon _, _ ) ->
             { normal =
-                { primary = Palette.color Palette.toneGray lumLightest
+                { primary = Palette.color Palette.toneGray brightnessLightest
                 , text =
-                    Palette.color Palette.toneGray lumLight
+                    Palette.color Palette.toneGray brightnessLight
                         |> Text.ColorPalette
-                , outlinedBg = Palette.color Palette.toneGray lumLight
+                , outlinedBg = Palette.color Palette.toneGray brightnessLight
                 }
             , hover = Nothing
             }
 
         ( BodyText _, ToneLight ) ->
             { normal =
-                { primary = Palette.color Palette.toneGray lumLightest
+                { primary = Palette.color Palette.toneGray brightnessLightest
                 , text = Text.ColorForLightButtonDisabled
-                , outlinedBg = Palette.color Palette.toneGray lumLight
+                , outlinedBg = Palette.color Palette.toneGray brightnessLight
                 }
             , hover = Nothing
             }
 
         _ ->
             { normal =
-                { primary = Palette.color Palette.toneGray lumLight
+                { primary = Palette.color Palette.toneGray brightnessLight
                 , text =
-                    Palette.color Palette.toneGray lumLight
+                    Palette.color Palette.toneGray brightnessLight
                         |> Palette.withContrast True
                         |> Text.ColorPalette
-                , outlinedBg = Palette.color Palette.toneGray lumLight
+                , outlinedBg = Palette.color Palette.toneGray brightnessLight
                 }
             , hover = Nothing
             }
@@ -375,79 +375,79 @@ colorHelperWhenEnabled tone =
     case tone of
         TonePrimary ->
             { normal =
-                { primary = Palette.color Palette.tonePrimary lumMiddle
+                { primary = Palette.color Palette.tonePrimary brightnessMiddle
                 , text =
-                    Palette.color Palette.tonePrimary lumMiddle
+                    Palette.color Palette.tonePrimary brightnessMiddle
                         |> Palette.withContrast True
                         |> Text.ColorPalette
-                , outlinedBg = Palette.color Palette.toneGray lumLightest
+                , outlinedBg = Palette.color Palette.toneGray brightnessLightest
                 }
             , hover =
                 Just
-                    { primary = Palette.color Palette.tonePrimary lumDarkest
+                    { primary = Palette.color Palette.tonePrimary brightnessDarkest
                     , text =
-                        Palette.color Palette.tonePrimary lumDarkest
+                        Palette.color Palette.tonePrimary brightnessDarkest
                             |> Palette.withContrast True
                             |> Text.ColorPalette
-                    , outlinedBg = Palette.color Palette.toneGray lumLightest
+                    , outlinedBg = Palette.color Palette.toneGray brightnessLightest
                     }
             }
 
         ToneSuccess ->
             { normal =
-                { primary = Palette.color Palette.toneSuccess lumMiddle
+                { primary = Palette.color Palette.toneSuccess brightnessMiddle
                 , text =
-                    Palette.color Palette.toneSuccess lumMiddle
+                    Palette.color Palette.toneSuccess brightnessMiddle
                         |> Palette.withContrast True
                         |> Text.ColorPalette
-                , outlinedBg = Palette.color Palette.toneGray lumLightest
+                , outlinedBg = Palette.color Palette.toneGray brightnessLightest
                 }
             , hover =
                 Just
-                    { primary = Palette.color Palette.toneSuccess lumDarkest
+                    { primary = Palette.color Palette.toneSuccess brightnessDarkest
                     , text =
-                        Palette.color Palette.toneSuccess lumDarkest
+                        Palette.color Palette.toneSuccess brightnessDarkest
                             |> Palette.withContrast True
                             |> Text.ColorPalette
-                    , outlinedBg = Palette.color Palette.toneGray lumLightest
+                    , outlinedBg = Palette.color Palette.toneGray brightnessLightest
                     }
             }
 
         ToneDanger ->
             { normal =
-                { primary = Palette.color Palette.toneDanger lumMiddle
+                { primary = Palette.color Palette.toneDanger brightnessMiddle
                 , text =
-                    Palette.color Palette.toneDanger lumMiddle
+                    Palette.color Palette.toneDanger brightnessMiddle
                         |> Palette.withContrast True
                         |> Text.ColorPalette
-                , outlinedBg = Palette.color Palette.toneGray lumLightest
+                , outlinedBg = Palette.color Palette.toneGray brightnessLightest
                 }
             , hover =
                 Just
-                    { primary = Palette.color Palette.toneDanger lumDarkest
+                    { primary = Palette.color Palette.toneDanger brightnessDarkest
                     , text =
-                        Palette.color Palette.toneDanger lumDarkest
+                        Palette.color Palette.toneDanger brightnessDarkest
                             |> Palette.withContrast True
                             |> Text.ColorPalette
-                    , outlinedBg = Palette.color Palette.toneGray lumLightest
+                    , outlinedBg = Palette.color Palette.toneGray brightnessLightest
                     }
             }
 
         ToneLight ->
             { normal =
-                { primary = Palette.color Palette.toneGray lumLightest
+                { primary = Palette.color Palette.toneGray brightnessLightest
                 , text =
-                    Palette.color Palette.tonePrimary lumMiddle
+                    Palette.color Palette.tonePrimary brightnessMiddle
                         |> Text.ColorPalette
-                , outlinedBg = Palette.color Palette.toneGray lumLightest
+                , outlinedBg = Palette.color Palette.toneGray brightnessLightest
                 }
             , hover =
                 Just
-                    { primary = Palette.color Palette.toneGray lumLighter
+                    { primary = Palette.color Palette.toneGray brightnessLighter
                     , text =
-                        Palette.color Palette.tonePrimary lumDarkest
+                        Palette.color Palette.tonePrimary brightnessDarkest
                             |> Text.ColorPalette
-                    , outlinedBg = Palette.color Palette.toneGray lumLightest
+                    , outlinedBg = Palette.color Palette.toneGray brightnessLightest
                     }
             }
 

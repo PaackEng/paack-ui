@@ -106,4 +106,4 @@ getBackgroundColor alertTone =
                 ToneSuccess ->
                     Palette.toneSuccess
     in
-    Palette.color colorTone Palette.lumMiddle
+    Palette.color colorTone Palette.brightnessMiddle

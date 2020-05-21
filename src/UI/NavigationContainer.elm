@@ -233,7 +233,7 @@ toEl cfg page model =
                         maybeGoBack
 
                 else
-                    SideBar.desktopColumn cfg contentBody model.menu
+                    SideBar.desktopCobrightnessn cfg contentBody model.menu
 
             else
                 contentBody

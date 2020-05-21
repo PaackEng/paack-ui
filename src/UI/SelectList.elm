@@ -9,7 +9,7 @@ import UI.ActionBar as ActionBar
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Basics exposing (prependIf)
 import UI.Internal.Palette as Palette
-import UI.Palette as Palette exposing (lumMiddle, tonePrimary)
+import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UI.TextField as TextField
@@ -142,7 +142,7 @@ actionBarView cfg actionBar =
                 , Font.color Palette.primary.middle
                 ]
                 [ Text.body2 title
-                    |> Text.withColor (Palette.color tonePrimary lumMiddle)
+                    |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
                     |> Text.toEl cfg
                 , icon title
                     |> Icon.toEl cfg

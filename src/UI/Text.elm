@@ -23,7 +23,7 @@ module UI.Text exposing
 import Element exposing (Attribute, Element)
 import Element.Font as Font
 import List
-import UI.Internal.Text as Internal exposing (TextSize(..), defaultText, mapOpt)
+import UI.Internal.Text as Internal exposing (TextSize(..), defaultText, mapOptions)
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig, isMobile)
 
@@ -98,12 +98,12 @@ overline content =
 
 withColor : Palette.Color -> Text -> Text
 withColor color text =
-    mapOpt (\opt -> { opt | color = Internal.ColorPalette color }) text
+    mapOptions (\opt -> { opt | color = Internal.ColorPalette color }) text
 
 
 withEllipsis : Bool -> Text -> Text
 withEllipsis val text =
-    mapOpt (\opt -> { opt | oneLineEllipsis = val }) text
+    mapOptions (\opt -> { opt | oneLineEllipsis = val }) text
 
 
 toEl : RenderConfig -> Text -> Element msg

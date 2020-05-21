@@ -4,7 +4,7 @@ import Element exposing (Attribute, Element)
 import Element.Font as Font
 import List
 import UI.Internal.Palette as Palette
-import UI.Palette as Palette exposing (lumDarkest, toneGray)
+import UI.Palette as Palette exposing (brightnessDarkest, toneGray)
 import UI.RenderConfig exposing (RenderConfig, isMobile)
 import UI.Utils.Element as Element
 
@@ -62,7 +62,7 @@ defaultOptions =
 
 defaultColor : TextColor
 defaultColor =
-    ColorPalette <| Palette.color toneGray lumDarkest
+    ColorPalette <| Palette.color toneGray brightnessDarkest
 
 
 fontColor : TextColor -> Maybe Element.Color
@@ -264,15 +264,15 @@ mobileAttributes size =
             ]
 
 
-mapOpt : (Options -> Options) -> Text -> Text
-mapOpt applier (Text spans) =
+mapOptions : (Options -> Options) -> Text -> Text
+mapOptions applier (Text spans) =
     spans
-        |> List.map (spanMapOpt applier)
+        |> List.map (spanMapOptions applier)
         |> Text
 
 
-spanMapOpt : (Options -> Options) -> Span -> Span
-spanMapOpt applier (Span prop opt) =
+spanMapOptions : (Options -> Options) -> Span -> Span
+spanMapOptions applier (Span prop opt) =
     Span prop (applier opt)
 
 

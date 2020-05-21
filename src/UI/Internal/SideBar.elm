@@ -1,4 +1,4 @@
-module UI.Internal.SideBar exposing (desktopColumn, mobileDrawer)
+module UI.Internal.SideBar exposing (desktopCobrightnessn, mobileDrawer)
 
 import Element exposing (Attribute, Element, fill, fillPortion, height, padding, paddingEach, paddingXY, px, scrollbarY, shrink, spacing, width)
 import Element.Background as Background
@@ -9,7 +9,7 @@ import UI.Internal.Menu as Menu exposing (Menu)
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Link as Link exposing (Link)
-import UI.Palette as Palette exposing (lumMiddle, tonePrimary)
+import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UI.Utils.ARIA as ARIA
@@ -20,8 +20,8 @@ import UI.Utils.Element as Element
 -- Render
 
 
-desktopColumn : RenderConfig -> Element msg -> Menu msg -> Element msg
-desktopColumn cfg page menu =
+desktopCobrightnessn : RenderConfig -> Element msg -> Menu msg -> Element msg
+desktopCobrightnessn cfg page menu =
     Element.row [ width fill, height fill ]
         [ viewSide cfg False menu
         , Element.el
@@ -58,7 +58,7 @@ mobileDrawer cfg page ((Menu.Menu { isExpanded, toggleMsg } _) as menu) title ma
                 [ viewSide cfg True menu
                 , Element.el
                     [ Palette.gray.darkest
-                        |> Element.colorWithOpacity 0.85
+                        |> Element.colorSetOpacity 0.85
                         |> Background.color
                     , width (fillPortion 25)
                     , height fill
@@ -297,7 +297,7 @@ pageItem cfg icon link isSelected =
 
         selectedColor =
             Palette.primary.darkest
-                |> Element.colorWithOpacity 0.12
+                |> Element.colorSetOpacity 0.12
 
         attrs =
             if isSelected then
@@ -312,7 +312,7 @@ pageItem cfg icon link isSelected =
             |> Element.el iconAttr
         , Icon.getHint icon
             |> Text.body1
-            |> Text.withColor (Palette.color tonePrimary lumMiddle)
+            |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
             |> Text.toEl cfg
         ]
         |> Link.packEl cfg [ width fill ] link
@@ -341,7 +341,7 @@ actionItem cfg icon msg =
             |> Element.el iconAttr
         , Icon.getHint icon
             |> Text.body1
-            |> Text.withColor (Palette.color tonePrimary lumMiddle)
+            |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
             |> Text.toEl cfg
         ]
 
