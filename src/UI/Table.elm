@@ -1,441 +1,242 @@
 module UI.Table exposing
-    ( Events
-    , Msg
-    , State
-    , default
-    , initState
-    , isItemHovered
-    , isItemSelected
-    , noEvents
+    ( CellWidth
+    , HeaderRow
+    , OptRow
+    , Row
+    , Table
+    , cellFromButton
+    , cellFromText
+    , cellWidthEnd
+    , cellWidthPixels
+    , cellWidthPortion
+    , cellWidthShrink
+    , header
+    , headersEnd
+    , rowEnd
+    , table
     , toEl
-    , update
-    , withBody
-    , withCustomWidth
-    , withDisabled
-    , withHeader
-    , withOnRowClicked
-    , withOnRowDoubleClicked
-    , withOnRowSelected
-    , withOnRowUnselected
-    , withSelectableRows
-    , withTextAlignedToCenter
-    , withTextAlignedToLeft
-    , withTextAlignedToRight
+    , withCellsWidth
+    , withRows
+    , withWidth
     )
 
-import Element exposing (..)
+import Element exposing (Element, fill, fillPortion, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
-import Element.Events exposing (..)
+import Element.Events as Events
 import Element.Font as Font
-import Helpers exposing (ifThenElse)
-import Return exposing (Return)
-import ReturnExtra exposing (withCmd, withNoCmd)
-import Task
-import UI.Theme as Theme exposing (..)
+import UI.Button as Button exposing (Button)
+import UI.Internal.Basics exposing (..)
+import UI.Internal.NList as NList exposing (NList)
+import UI.Internal.Palette as Palette
+import UI.Internal.TypeNumbers as T
+import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
+import UI.RenderConfig as RenderConfig exposing (RenderConfig)
+import UI.Text as Text exposing (Text)
 
 
-type WidthType
-    = SameWidth
-    | CustomWidth (List Int)
+type Table msg columns
+    = Table (Properties columns) (Options msg columns)
 
 
-type TextAlignment
-    = Left
-    | Center
-    | Right
-
-
-type InternalMsg item
-    = RowHovered item
-    | None
-    | ClearHoverRow
-    | ToggleRowSelection item
-    | RowClicked item
-    | RowDoubleClicked item
-
-
-type Msg item
-    = Msg (InternalMsg item)
-
-
-type State item comparable
-    = State (InternalState item comparable)
-
-
-type alias InternalState item comparable =
-    { tableRowHovered : Maybe item
-    , tableRowSelected : Maybe item
-    , toComparable : item -> comparable
+type alias Properties columns =
+    { headers : HeaderRow columns
     }
 
 
-initState : (item -> comparable) -> State item comparable
-initState toComparable =
-    State
-        { tableRowHovered = Nothing
-        , tableRowSelected = Nothing
-        , toComparable = toComparable
-        }
-
-
-update : Msg item -> Events msg item -> State item comparable -> Return msg (State item comparable)
-update (Msg msg) (Events events) (State state) =
-    case msg of
-        RowHovered item ->
-            State
-                { state | tableRowHovered = Just item }
-                |> withNoCmd
-
-        ClearHoverRow ->
-            State
-                { state | tableRowHovered = Nothing }
-                |> withNoCmd
-
-        ToggleRowSelection newItem ->
-            let
-                newRowSelection =
-                    case state.tableRowSelected of
-                        Just oldItem ->
-                            ifThenElse (state.toComparable oldItem == state.toComparable newItem)
-                                Nothing
-                                (Just newItem)
-
-                        Nothing ->
-                            Just newItem
-
-                cmd =
-                    case newRowSelection of
-                        Just rowSelected ->
-                            events.onRowSelected
-                                |> Maybe.map (\event -> sendMsgToOutside (event rowSelected))
-                                |> Maybe.withDefault Cmd.none
-
-                        Nothing ->
-                            Maybe.map2
-                                (\event item -> sendMsgToOutside (event item))
-                                events.onRowUnselected
-                                state.tableRowSelected
-                                |> Maybe.withDefault Cmd.none
-            in
-            State { state | tableRowSelected = newRowSelection }
-                |> withCmd cmd
-
-        RowClicked row ->
-            let
-                cmd =
-                    events.onRowClicked
-                        |> Maybe.map (\event -> sendMsgToOutside (event row))
-                        |> Maybe.withDefault Cmd.none
-            in
-            State state |> withCmd cmd
-
-        None ->
-            State state |> withNoCmd
-
-        RowDoubleClicked item ->
-            let
-                cmd =
-                    case events.onRowDoubleClicked of
-                        Just doubleClickMsg ->
-                            sendMsgToOutside (doubleClickMsg item)
-
-                        Nothing ->
-                            Cmd.none
-            in
-            State state |> withCmd cmd
-
-
-
--- Table Builder
-
-
-type alias Options msg item =
-    { data : List item
-    , toParentMsg : Msg item -> msg
-    , body : List (item -> Element msg)
-    , selectableRows : Bool
-    , disabled : Bool
-    , onDoubleClick : Maybe (item -> msg)
-    , header : List (Element msg)
-    , width : WidthType
-    , textAlignment : TextAlignment
+type alias Options msg columns =
+    { rows : List (Row msg columns)
+    , width : Element.Length
     }
 
 
-type Table msg item
-    = Table (Options msg item)
+type alias Row msg columns =
+    NList (Cell msg) columns
 
 
-default : (Msg item -> msg) -> List item -> Table msg item
-default toParentMsg data =
-    Table
-        { data = data
-        , toParentMsg = toParentMsg
-        , body = []
-        , disabled = False
-        , selectableRows = False
-        , onDoubleClick = Nothing
-        , header = []
-        , width = SameWidth
-        , textAlignment = Center
-        }
+type alias HeaderRow columns =
+    NList HeaderCell columns
 
 
-withSelectableRows : Table msg item -> Table msg item
-withSelectableRows (Table options) =
-    Table
-        { options | selectableRows = True && not options.disabled }
+type alias OptRow value columns =
+    NList (Maybe value) columns
 
 
-withDisabled : Bool -> Table msg item -> Table msg item
-withDisabled bool (Table options) =
-    Table
-        { options | disabled = bool }
-
-
-withHeader : List (Element msg) -> Table msg item -> Table msg item
-withHeader header (Table options) =
-    Table
-        { options | header = header }
-
-
-withBody : List (item -> Element msg) -> Table msg item -> Table msg item
-withBody body (Table options) =
-    Table
-        { options | body = body }
-
-
-withCustomWidth : List Int -> Table msg item -> Table msg item
-withCustomWidth widths (Table options) =
-    Table
-        { options | width = CustomWidth widths }
-
-
-withTextAlignedToLeft : Table msg item -> Table msg item
-withTextAlignedToLeft (Table options) =
-    Table
-        { options | textAlignment = Left }
-
-
-withTextAlignedToCenter : Table msg item -> Table msg item
-withTextAlignedToCenter (Table options) =
-    Table
-        { options | textAlignment = Center }
-
-
-withTextAlignedToRight : Table msg item -> Table msg item
-withTextAlignedToRight (Table options) =
-    Table
-        { options | textAlignment = Right }
-
-
-toEl : State item comparable -> Table msg item -> Element msg
-toEl (State state) (Table options) =
-    column [ width fill, height fill, centerX ] (headerView options :: bodyView state options)
-
-
-
--- Events Builder
-
-
-type alias InternalEvents msg item =
-    { onRowClicked : Maybe (item -> msg)
-    , onRowSelected : Maybe (item -> msg)
-    , onRowUnselected : Maybe (item -> msg)
-    , onRowDoubleClicked : Maybe (item -> msg)
+type alias HeaderCell =
+    { title : String
+    , width : CellWidth
     }
 
 
-type Events msg item
-    = Events (InternalEvents msg item)
+type Cell msg
+    = CellText Text
+    | CellButton (Button msg)
 
 
-noEvents : Events msg item
-noEvents =
-    Events
-        { onRowClicked = Nothing
-        , onRowSelected = Nothing
-        , onRowUnselected = Nothing
-        , onRowDoubleClicked = Nothing
-        }
+type CellWidth
+    = WidthPixels Int
+    | WidthPortion Int
 
 
-withOnRowDoubleClicked : (item -> msg) -> Events msg item -> Events msg item
-withOnRowDoubleClicked onRowDoubleClicked (Events events) =
-    Events
-        { events | onRowDoubleClicked = Just onRowDoubleClicked }
+headersEnd : HeaderRow T.Zero
+headersEnd =
+    NList.empty
 
 
-withOnRowClicked : (item -> msg) -> Events msg item -> Events msg item
-withOnRowClicked onRowClicked (Events events) =
-    Events
-        { events | onRowClicked = Just onRowClicked }
+rowEnd : Row msg T.Zero
+rowEnd =
+    NList.empty
 
 
-withOnRowUnselected : (item -> msg) -> Events msg item -> Events msg item
-withOnRowUnselected onRowUnselected (Events events) =
-    Events
-        { events | onRowUnselected = Just onRowUnselected }
+header : String -> HeaderRow columns -> HeaderRow (T.Increase columns)
+header head tail =
+    NList.cons { title = head, width = WidthPortion 1 } tail
 
 
-withOnRowSelected : (item -> msg) -> Events msg item -> Events msg item
-withOnRowSelected onRowSelected (Events events) =
-    Events
-        { events | onRowSelected = Just onRowSelected }
+cellFromText : Text -> Row msg columns -> Row msg (T.Increase columns)
+cellFromText text tail =
+    NList.cons (CellText text) tail
+
+
+cellFromButton : Button msg -> Row msg columns -> Row msg (T.Increase columns)
+cellFromButton btn tail =
+    NList.cons (CellButton btn) tail
+
+
+table : HeaderRow columns -> Table msg columns
+table headers =
+    Table { headers = headers } defaultOptions
 
 
 
--- View
+-- Options
 
 
-bodyView : InternalState item comparable -> Options msg item -> List (Element msg)
-bodyView state options =
-    if List.length options.body == 0 then
-        []
-
-    else
-        List.map (rowView state options) options.data
+withRows : List (Row msg columns) -> Table msg columns -> Table msg columns
+withRows rows (Table prop opt_) =
+    Table prop { opt_ | rows = rows }
 
 
-rowView : InternalState item comparable -> Options msg item -> item -> Element msg
-rowView state options item =
+withWidth : Element.Length -> Table msg columns -> Table msg columns
+withWidth width (Table prop opt_) =
+    Table prop { opt_ | width = width }
+
+
+withCellsWidth : OptRow CellWidth columns -> Table msg columns -> Table msg columns
+withCellsWidth row (Table prop opt_) =
     let
-        isMaybeEqual maybeField =
-            maybeField
-                |> Maybe.map (\m -> state.toComparable m == state.toComparable item)
-                |> Maybe.withDefault False
+        mergeWidth header_ maybeWidth =
+            case maybeWidth of
+                Just len ->
+                    { header_ | width = len }
 
-        isHighligthed =
-            isMaybeEqual state.tableRowHovered
-                || (options.selectableRows && isMaybeEqual state.tableRowSelected)
-
-        ( borderColor, backgroundColor, fontColor ) =
-            if isHighligthed then
-                ( Theme.gray3, Theme.gray4, Theme.black )
-
-            else
-                ( Theme.white, Theme.white, Theme.gray1 )
-
-        rowClickMsg =
-            if options.selectableRows then
-                ToggleRowSelection
-
-            else if options.disabled then
-                always None
-
-            else
-                RowClicked
-
-        rowAttrs =
-            [ width fill
-            , Theme.roundedBorder
-            , Font.color fontColor
-            , Background.color backgroundColor
-            , Border.color borderColor
-            , Border.width 1
-            , onClick (options.toParentMsg <| Msg <| rowClickMsg item)
-            , onMouseEnter (options.toParentMsg <| Msg <| RowHovered item)
-            , onMouseLeave (options.toParentMsg <| Msg <| ClearHoverRow)
-            , onDoubleClick (options.toParentMsg <| Msg <| RowDoubleClicked item)
-            , paddingXY 10 5
-            , pointer
-            ]
+                Nothing ->
+                    header_
     in
-    row rowAttrs <|
-        case options.width of
-            SameWidth ->
-                List.map (cellView Nothing options.textAlignment item) options.body
-
-            CustomWidth portions ->
-                List.map2 (\portion fn -> cellView (Just portion) options.textAlignment item fn) portions options.body
+    Table { prop | headers = NList.map2 mergeWidth prop.headers row } opt_
 
 
-cellView : Maybe Int -> TextAlignment -> item -> (item -> Element msg) -> Element msg
-cellView maybePortion alignment item viewFn =
-    el
-        [ widthFromMaybeInt maybePortion
-        , textAlignmentAttr alignment
-        ]
-        (viewFn item)
+cellWidthPortion : Int -> OptRow CellWidth columns -> OptRow CellWidth (T.Increase columns)
+cellWidthPortion int accu =
+    opt (WidthPortion int) accu
 
 
-headerView : Options msg item -> Element msg
-headerView options =
-    if List.length options.header == 0 then
-        none
-
-    else
-        let
-            headerAttr =
-                [ Font.bold
-                , textAlignmentAttr options.textAlignment
-                , Font.color Theme.gray2
-                , width fill
-
-                -- Hack to comply with the body row border
-                , paddingXY 11 10
-                ]
-        in
-        row headerAttr <|
-            case options.width of
-                SameWidth ->
-                    List.map (headerItemView Nothing) options.header
-
-                CustomWidth portions ->
-                    List.map2
-                        (\headerEl portion -> headerItemView (Just portion) headerEl)
-                        options.header
-                        portions
+cellWidthPixels : Int -> OptRow CellWidth columns -> OptRow CellWidth (T.Increase columns)
+cellWidthPixels int accu =
+    opt (WidthPixels int) accu
 
 
-headerItemView : Maybe Int -> Element msg -> Element msg
-headerItemView maybeWidth headerEl =
-    el [ widthFromMaybeInt maybeWidth ] headerEl
+cellWidthShrink : OptRow CellWidth columns -> OptRow CellWidth (T.Increase columns)
+cellWidthShrink accu =
+    optKeep accu
 
 
-widthFromMaybeInt : Maybe Int -> Attribute msg
-widthFromMaybeInt maybePortion =
-    width <|
-        case maybePortion of
-            Just portion ->
-                fillPortion portion
-
-            Nothing ->
-                fill
+cellWidthEnd : OptRow CellWidth T.Zero
+cellWidthEnd =
+    optsEnd
 
 
 
--- Helpers
+-- Render
 
 
-textAlignmentAttr : TextAlignment -> Attribute msg
-textAlignmentAttr alignment =
-    case alignment of
-        Left ->
-            Font.alignLeft
+toEl : RenderConfig -> Table msg columns -> Element msg
+toEl cfg (Table { headers } { rows }) =
+    let
+        rowRender row =
+            row
+                |> NList.map2 (cellRender cfg) headers
+                |> NList.toList
+                |> Element.row [ Element.spacing 4, Element.width fill ]
+    in
+    rows
+        |> List.map rowRender
+        |> (::)
+            (headers
+                |> NList.map (headerRender cfg)
+                |> NList.toList
+                |> Element.row
+                    [ Element.spacing 4
+                    , Element.width fill
+                    , Element.paddingEach { bottom = 9, top = 0, left = 0, right = 0 }
+                    , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
+                    , Border.color Palette.gray.lightest
+                    ]
+            )
+        |> Element.column [ Element.spacing 16, Element.width fill ]
 
-        Center ->
-            Font.center
-
-        Right ->
-            Font.alignRight
 
 
-isItemHovered : item -> State item comparable -> Bool
-isItemHovered item (State state) =
-    state.tableRowHovered
-        |> Maybe.map (\selectedItem -> state.toComparable selectedItem == state.toComparable item)
-        |> Maybe.withDefault False
+-- Internals
 
 
-isItemSelected : item -> State item comparable -> Bool
-isItemSelected item (State state) =
-    state.tableRowSelected
-        |> Maybe.map (\selectedItem -> state.toComparable selectedItem == state.toComparable item)
-        |> Maybe.withDefault False
+headerRender : RenderConfig -> HeaderCell -> Element msg
+headerRender cfg { title, width } =
+    Text.overline title
+        |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
+        |> Text.toEl cfg
+        |> Element.el [ Element.width (widthToEl width) ]
 
 
-sendMsgToOutside : msg -> Cmd msg
-sendMsgToOutside msg =
-    Task.succeed msg |> Task.perform identity
+cellRender : RenderConfig -> HeaderCell -> Cell msg -> Element msg
+cellRender cfg { width } cell_ =
+    case cell_ of
+        CellText text ->
+            Text.toEl cfg text
+                |> Element.el [ Element.width (widthToEl width) ]
+
+        CellButton button ->
+            Button.toEl cfg button
+                |> Element.el [ Element.width (widthToEl width) ]
+
+
+widthToEl : CellWidth -> Element.Length
+widthToEl width =
+    case width of
+        WidthPortion int ->
+            fillPortion int
+
+        WidthPixels int ->
+            px int
+
+
+defaultOptions : Options msg columns
+defaultOptions =
+    { rows = []
+    , width = shrink
+    }
+
+
+optsEnd : OptRow value T.Zero
+optsEnd =
+    NList.empty
+
+
+optKeep : OptRow value columns -> OptRow value (T.Increase columns)
+optKeep tail =
+    NList.cons Nothing tail
+
+
+opt : value -> OptRow value columns -> OptRow value (T.Increase columns)
+opt head tail =
+    NList.cons (Just head) tail

@@ -1,8 +1,8 @@
 module Main exposing (main)
 
-import ActionBars as ActionBars
-import Alerts as Alerts
-import Badges as Badges
+import ActionBars
+import Alerts
+import Badges
 import Buttons.Stories as Buttons
 import Element exposing (Element)
 import Element.Font as Font
@@ -11,15 +11,15 @@ import Form.State as FormState
 import Form.TextField as TextField
 import Html exposing (Html, i)
 import Html.Attributes exposing (class, style)
-import Icons as Icons
+import Icons
 import LoadingView as LoadingView
 import Model as Model exposing (Model)
 import Msg exposing (Msg(..))
-import Palette as Palette
+import Palette
 import PopUps as PopUps
 import Return as R
-import Tables.Stories as Tables
-import Texts as Texts
+import Tables
+import Texts
 import UI.RenderConfig exposing (RenderConfig)
 import UIExplorer exposing (Config, UIExplorerProgram, explore, logoFromHtml)
 import UIExplorer.Plugins.Note as Note
@@ -69,7 +69,7 @@ main =
         , TextField.stories renderConfig
         , Checkboxes.stories
         , LoadingView.stories
-        , Tables.stories
+        , Tables.stories renderConfig
         ]
 
 
@@ -89,12 +89,6 @@ logo =
 updateStories : Msg -> UIExplorer.Model Model Msg PluginOptions -> ( UIExplorer.Model Model Msg PluginOptions, Cmd Msg )
 updateStories msg ({ customModel } as model) =
     case msg of
-        TablesStoriesMsg subMsg ->
-            Tables.update subMsg customModel.tablesStories
-                |> R.map (\t -> { customModel | tablesStories = t })
-                |> R.map (\newCustomModel -> { model | customModel = newCustomModel })
-                |> Tuple.mapSecond (always Cmd.none)
-
         FormStoriesMsg subMsg ->
             let
                 newFormStories =
