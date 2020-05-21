@@ -19,7 +19,6 @@ import Palette
 import PopUps as PopUps
 import Return as R
 import SafeTables
-import Tables.Stories as Tables
 import Texts
 import UI.RenderConfig exposing (RenderConfig)
 import UIExplorer exposing (Config, UIExplorerProgram, explore, logoFromHtml)
@@ -70,7 +69,6 @@ main =
         , TextField.stories renderConfig
         , Checkboxes.stories
         , LoadingView.stories
-        , Tables.stories
         , SafeTables.stories renderConfig
         ]
 
@@ -91,12 +89,6 @@ logo =
 updateStories : Msg -> UIExplorer.Model Model Msg PluginOptions -> ( UIExplorer.Model Model Msg PluginOptions, Cmd Msg )
 updateStories msg ({ customModel } as model) =
     case msg of
-        TablesStoriesMsg subMsg ->
-            Tables.update subMsg customModel.tablesStories
-                |> R.map (\t -> { customModel | tablesStories = t })
-                |> R.map (\newCustomModel -> { model | customModel = newCustomModel })
-                |> Tuple.mapSecond (always Cmd.none)
-
         FormStoriesMsg subMsg ->
             let
                 newFormStories =
