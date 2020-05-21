@@ -140,6 +140,10 @@ actionBarView cfg actionBar =
                     }
                 , Background.color Palette.primary.lightest
                 , Font.color Palette.primary.middle
+                , ARIA.roleAttr ARIA.roleButton
+                , ARIA.labelAttr title
+                , Element.pointer
+                , Events.onClick onClick
                 ]
                 [ Text.body2 title
                     |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
@@ -147,11 +151,7 @@ actionBarView cfg actionBar =
                 , icon title
                     |> Icon.toEl cfg
                     |> Element.el
-                        [ Element.pointer
-                        , ARIA.roleAttr ARIA.roleButton
-                        , ARIA.labelAttr title
-                        , Events.onClick onClick
-                        , Element.alignRight
+                        [ Element.alignRight
                         ]
                 ]
 
