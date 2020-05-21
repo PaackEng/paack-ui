@@ -1,8 +1,8 @@
-module SafeTables exposing (stories)
+module Tables exposing (stories)
 
 import Element exposing (Element, fill)
 import UI.RenderConfig exposing (RenderConfig)
-import UI.SafeTable as Table
+import UI.Table as Table
     exposing
         ( cellWidthEnd
         , cellWidthPortion

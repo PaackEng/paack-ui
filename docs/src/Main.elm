@@ -18,7 +18,7 @@ import Msg exposing (Msg(..))
 import Palette
 import PopUps as PopUps
 import Return as R
-import SafeTables
+import Tables
 import Texts
 import UI.RenderConfig exposing (RenderConfig)
 import UIExplorer exposing (Config, UIExplorerProgram, explore, logoFromHtml)
@@ -69,7 +69,7 @@ main =
         , TextField.stories renderConfig
         , Checkboxes.stories
         , LoadingView.stories
-        , SafeTables.stories renderConfig
+        , Tables.stories renderConfig
         ]
 
 

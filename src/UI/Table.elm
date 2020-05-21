@@ -1,4 +1,4 @@
-module UI.SafeTable exposing
+module UI.Table exposing
     ( CellWidth
     , HeaderRow
     , OptRow
