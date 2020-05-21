@@ -234,7 +234,7 @@ toEl cfg page model =
         { content, title, hasMenu } =
             container
 
-        ( contentBody, maybeGoBack, seenTitle ) =
+        ( contentBody, maybeStack, seenTitle ) =
             contentProps title content
 
         body =
@@ -244,7 +244,7 @@ toEl cfg page model =
                         contentBody
                         model.menu
                         seenTitle
-                        maybeGoBack
+                        maybeStack
 
                 else
                     SideBar.desktopColumn cfg contentBody model.menu
@@ -282,11 +282,11 @@ menu applier { menuExpanded } =
     Menu.default (ToggleMenu >> applier) menuExpanded
 
 
-contentProps : String -> Content msg -> ( Element msg, Maybe msg, String )
+contentProps : String -> Content msg -> ( Element msg, Maybe ( msg, List (Button msg) ), String )
 contentProps mainTitle content =
     case content of
         ContentSingle body ->
             ( body, Nothing, mainTitle )
 
-        ContentStackChild { title, goBackMsg } body ->
-            ( body, Just goBackMsg, title )
+        ContentStackChild { title, goBackMsg, buttons } body ->
+            ( body, Just ( goBackMsg, buttons ), title )
