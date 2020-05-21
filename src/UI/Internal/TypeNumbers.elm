@@ -1,9 +1,9 @@
 module UI.Internal.TypeNumbers exposing (..)
 
 
-type Zero
-    = Zero
+type alias Zero =
+    Never
 
 
-type Inc a
-    = Inc a
+type Increase a
+    = Increase a

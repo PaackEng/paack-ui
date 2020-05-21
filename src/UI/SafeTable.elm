@@ -6,13 +6,12 @@ module UI.SafeTable exposing
     , Table
     , cellFromButton
     , cellFromText
-    , cellPixels
-    , cellPortion
+    , cellWidthEnd
+    , cellWidthPixels
+    , cellWidthPortion
+    , cellWidthShrink
     , header
     , headersEnd
-    , opt
-    , optKeep
-    , optsEnd
     , rowEnd
     , table
     , toEl
@@ -89,32 +88,17 @@ rowEnd =
     NList.empty
 
 
-optsEnd : OptRow value T.Zero
-optsEnd =
-    NList.empty
-
-
-optKeep : OptRow value columns -> OptRow value (T.Inc columns)
-optKeep tail =
-    NList.cons Nothing tail
-
-
-opt : value -> OptRow value columns -> OptRow value (T.Inc columns)
-opt head tail =
-    NList.cons (Just head) tail
-
-
-header : String -> HeaderRow columns -> HeaderRow (T.Inc columns)
+header : String -> HeaderRow columns -> HeaderRow (T.Increase columns)
 header head tail =
     NList.cons { title = head, width = WidthPortion 1 } tail
 
 
-cellFromText : Text -> Row msg columns -> Row msg (T.Inc columns)
+cellFromText : Text -> Row msg columns -> Row msg (T.Increase columns)
 cellFromText text tail =
     NList.cons (CellText text) tail
 
 
-cellFromButton : Button msg -> Row msg columns -> Row msg (T.Inc columns)
+cellFromButton : Button msg -> Row msg columns -> Row msg (T.Increase columns)
 cellFromButton btn tail =
     NList.cons (CellButton btn) tail
 
@@ -152,14 +136,24 @@ withCellsWidth row (Table prop opt_) =
     Table { prop | headers = NList.map2 mergeWidth prop.headers row } opt_
 
 
-cellPortion : Int -> CellWidth
-cellPortion int =
-    WidthPortion int
+cellWidthPortion : Int -> OptRow CellWidth columns -> OptRow CellWidth (T.Increase columns)
+cellWidthPortion int accu =
+    opt (WidthPortion int) accu
 
 
-cellPixels : Int -> CellWidth
-cellPixels int =
-    WidthPixels int
+cellWidthPixels : Int -> OptRow CellWidth columns -> OptRow CellWidth (T.Increase columns)
+cellWidthPixels int accu =
+    opt (WidthPixels int) accu
+
+
+cellWidthShrink : OptRow CellWidth columns -> OptRow CellWidth (T.Increase columns)
+cellWidthShrink accu =
+    optKeep accu
+
+
+cellWidthEnd : OptRow CellWidth T.Zero
+cellWidthEnd =
+    optsEnd
 
 
 
@@ -231,3 +225,18 @@ defaultOptions =
     { rows = []
     , width = shrink
     }
+
+
+optsEnd : OptRow value T.Zero
+optsEnd =
+    NList.empty
+
+
+optKeep : OptRow value columns -> OptRow value (T.Increase columns)
+optKeep tail =
+    NList.cons Nothing tail
+
+
+opt : value -> OptRow value columns -> OptRow value (T.Increase columns)
+opt head tail =
+    NList.cons (Just head) tail
