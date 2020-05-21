@@ -1,12 +1,12 @@
 module UI.Internal.Dialog exposing (Dialog, dialogMap, view)
 
-import Element exposing (Element, fill, maximum, px)
+import Element exposing (Element, fill, maximum, px, shrink)
 import Element.Background as Background
 import Element.Events as Events
 import UI.Icon as Icon
-import UI.Internal.Basics exposing (lazyMap)
+import UI.Internal.Basics exposing (ifThenElse, lazyMap)
 import UI.Internal.Palette as Palette
-import UI.RenderConfig exposing (RenderConfig)
+import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UI.Utils.ARIA as ARIA exposing (roleButton)
 import UI.Utils.Element as Element
@@ -15,6 +15,7 @@ import UI.Utils.Element as Element
 type alias Dialog msg =
     { title : String
     , close : msg
+    , width : Element.Length
     , body : Element msg
     }
 
@@ -23,12 +24,13 @@ dialogMap : (a -> b) -> Dialog a -> Dialog b
 dialogMap applier data =
     { title = data.title
     , close = applier data.close
+    , width = data.width
     , body = Element.map applier data.body
     }
 
 
 view : RenderConfig -> Dialog msg -> Element msg
-view cfg { title, body, close } =
+view cfg { title, body, close, width } =
     Element.row
         [ Element.width fill
         , Element.height fill
@@ -38,8 +40,15 @@ view cfg { title, body, close } =
         ]
         [ Element.column
             [ Element.centerX
-            , Element.centerY
+            , ifThenElse (RenderConfig.isMobile cfg) Element.alignTop Element.centerY
+            , Element.height <|
+                if RenderConfig.isMobile cfg then
+                    fill
+
+                else
+                    shrink
             , Element.padding 12
+            , Element.width width
             , Background.color <| Palette.gray.lightest
             ]
             [ Element.row [ Element.width fill ]

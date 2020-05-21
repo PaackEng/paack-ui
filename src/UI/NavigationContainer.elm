@@ -6,6 +6,7 @@ module UI.NavigationContainer exposing
     , MenuPage
     , Msg
     , Navigator
+    , StackChild
     , State
     , containerMap
     , contentSingle
@@ -26,6 +27,7 @@ import Element exposing (Attribute, Element)
 import Element.Background as Background
 import Element.Events as Events
 import Html exposing (Html)
+import UI.Button as Button exposing (Button)
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Basics exposing (lazyMap)
 import UI.Internal.Dialog as Dialog exposing (dialogMap)
@@ -69,7 +71,7 @@ type Msg
 
 type Content msg
     = ContentSingle (Element msg)
-    | ContentStackChild String msg (Element msg)
+    | ContentStackChild (StackChild msg) (Element msg)
 
 
 type alias Dialog msg =
@@ -87,6 +89,13 @@ type alias Container msg =
 type alias Navigator page msg =
     { container : page -> Container msg
     , menu : Menu msg
+    }
+
+
+type alias StackChild msg =
+    { title : String
+    , buttons : List (Button msg)
+    , goBackMsg : msg
     }
 
 
@@ -143,10 +152,14 @@ contentMap applier data =
                 |> Element.map applier
                 |> ContentSingle
 
-        ContentStackChild subTitle goBack element ->
+        ContentStackChild stack element ->
             element
                 |> Element.map applier
-                |> ContentStackChild subTitle (applier goBack)
+                |> ContentStackChild
+                    { title = stack.title
+                    , goBackMsg = applier stack.goBackMsg
+                    , buttons = List.map (Button.map applier) stack.buttons
+                    }
 
 
 stateUpdate : Msg -> State -> ( State, Cmd Msg )
@@ -170,9 +183,9 @@ contentSingle body =
     ContentSingle body
 
 
-contentStackChild : String -> msg -> Element msg -> Content msg
-contentStackChild subTitle goBack body =
-    ContentStackChild subTitle goBack body
+contentStackChild : StackChild msg -> Element msg -> Content msg
+contentStackChild prop body =
+    ContentStackChild prop body
 
 
 menuPage : Icon -> Link -> Bool -> MenuPage
@@ -195,10 +208,11 @@ navigator applier state pagesContainers =
         (menu applier state)
 
 
-dialog : String -> msg -> Element msg -> Dialog msg
-dialog title onClose body =
+dialog : String -> msg -> Element.Length -> Element msg -> Dialog msg
+dialog title onClose width body =
     { title = title
     , close = onClose
+    , width = width
     , body = body
     }
 
@@ -274,5 +288,5 @@ contentProps mainTitle content =
         ContentSingle body ->
             ( body, Nothing, mainTitle )
 
-        ContentStackChild subTitle goBack body ->
-            ( body, Just goBack, subTitle )
+        ContentStackChild { title, goBackMsg } body ->
+            ( body, Just goBackMsg, title )
