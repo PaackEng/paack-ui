@@ -1,4 +1,4 @@
-module UI.Internal.SideBar exposing (desktopCobrightnessn, mobileDrawer)
+module UI.Internal.SideBar exposing (desktopColumn, mobileDrawer)
 
 import Element exposing (Attribute, Element, fill, fillPortion, height, padding, paddingEach, paddingXY, px, scrollbarY, shrink, spacing, width)
 import Element.Background as Background
@@ -20,8 +20,8 @@ import UI.Utils.Element as Element
 -- Render
 
 
-desktopCobrightnessn : RenderConfig -> Element msg -> Menu msg -> Element msg
-desktopCobrightnessn cfg page menu =
+desktopColumn : RenderConfig -> Element msg -> Menu msg -> Element msg
+desktopColumn cfg page menu =
     Element.row [ width fill, height fill ]
         [ viewSide cfg False menu
         , Element.el
