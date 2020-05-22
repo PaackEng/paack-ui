@@ -161,7 +161,7 @@ cellWidthEnd =
 
 
 toEl : RenderConfig -> Table msg columns -> Element msg
-toEl cfg (Table { headers } { rows }) =
+toEl cfg (Table { headers } { rows, width }) =
     let
         rowRender row =
             row
@@ -183,7 +183,7 @@ toEl cfg (Table { headers } { rows }) =
                     , Border.color Palette.gray.lightest
                     ]
             )
-        |> Element.column [ Element.spacing 16, Element.width fill ]
+        |> Element.column [ Element.spacing 16, Element.width width ]
 
 
 

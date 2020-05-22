@@ -1,6 +1,7 @@
 module UI.Alert exposing
     ( Alert
     , danger
+    , light
     , primary
     , success
     , toEl
@@ -9,7 +10,7 @@ module UI.Alert exposing
 
 import Element exposing (Element)
 import Element.Background as Background
-import UI.Palette as Palette
+import UI.Palette as Palette exposing (brightnessLighter, brightnessMiddle, toneDanger, toneGray, tonePrimary, toneSuccess, toneWarning)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 
@@ -29,6 +30,7 @@ type AlertTone
     | ToneWarning
     | TonePrimary
     | ToneSuccess
+    | ToneLight
 
 
 primary : String -> Alert msg
@@ -53,6 +55,12 @@ danger : String -> Alert msg
 danger title =
     Alert
         { title = title, tone = ToneDanger }
+
+
+light : String -> Alert msg
+light title =
+    Alert
+        { title = title, tone = ToneLight }
 
 
 toEl : RenderConfig -> Alert msg -> Element msg
@@ -91,19 +99,18 @@ getTextColor alertTone =
 
 getBackgroundColor : AlertTone -> Palette.Color
 getBackgroundColor alertTone =
-    let
-        colorTone =
-            case alertTone of
-                ToneWarning ->
-                    Palette.toneWarning
+    case alertTone of
+        ToneWarning ->
+            Palette.color toneWarning brightnessMiddle
 
-                ToneDanger ->
-                    Palette.toneDanger
+        ToneDanger ->
+            Palette.color toneDanger brightnessMiddle
 
-                TonePrimary ->
-                    Palette.tonePrimary
+        TonePrimary ->
+            Palette.color tonePrimary brightnessMiddle
 
-                ToneSuccess ->
-                    Palette.toneSuccess
-    in
-    Palette.color colorTone Palette.brightnessMiddle
+        ToneSuccess ->
+            Palette.color toneSuccess brightnessMiddle
+
+        ToneLight ->
+            Palette.color toneGray brightnessLighter

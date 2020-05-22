@@ -4,6 +4,7 @@ import Element exposing (Attribute, Element, fill, fillPortion, height, padding,
 import Element.Background as Background
 import Element.Events as Events
 import Element.Font as Font
+import UI.Button as Button exposing (Button)
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Menu as Menu exposing (Menu)
 import UI.Internal.Palette as Palette
@@ -35,11 +36,20 @@ desktopColumn cfg page menu =
         ]
 
 
-mobileDrawer : RenderConfig -> Element msg -> Menu msg -> String -> Maybe msg -> Element msg
-mobileDrawer cfg page ((Menu.Menu { isExpanded, toggleMsg } _) as menu) title maybeGoBack =
+mobileDrawer :
+    RenderConfig
+    -> Element msg
+    -> Menu msg
+    -> String
+    -> Maybe ( msg, List (Button msg) )
+    -> Element msg
+mobileDrawer cfg page menu title maybeStack =
     let
+        (Menu.Menu { isExpanded, toggleMsg } _) =
+            menu
+
         content =
-            [ viewHead cfg menu title maybeGoBack
+            [ viewHead cfg menu title maybeStack
             , page
             ]
 
@@ -53,7 +63,7 @@ mobileDrawer cfg page ((Menu.Menu { isExpanded, toggleMsg } _) as menu) title ma
                 ]
                 content
 
-        expanedBar =
+        menuView =
             Element.row [ width fill, height fill ]
                 [ viewSide cfg True menu
                 , Element.el
@@ -71,7 +81,7 @@ mobileDrawer cfg page ((Menu.Menu { isExpanded, toggleMsg } _) as menu) title ma
             Element.column
                 [ width fill
                 , height fill
-                , Element.inFront expanedBar
+                , Element.inFront menuView
                 ]
                 [ content100vh ]
     in
@@ -86,8 +96,8 @@ mobileDrawer cfg page ((Menu.Menu { isExpanded, toggleMsg } _) as menu) title ma
 -- Internals
 
 
-viewHead : RenderConfig -> Menu msg -> String -> Maybe msg -> Element msg
-viewHead cfg (Menu.Menu prop opt) title maybeGoBack =
+viewHead : RenderConfig -> Menu msg -> String -> Maybe ( msg, List (Button msg) ) -> Element msg
+viewHead cfg (Menu.Menu prop opt) title maybeStack =
     let
         mobileHeadSandwich =
             Icon.sandwichMenu "Expand sidebar"
@@ -95,26 +105,29 @@ viewHead cfg (Menu.Menu prop opt) title maybeGoBack =
                 |> Element.el (headerButtonAttr (prop.toggleMsg True) 48 20)
 
         mobileHeadGoBack msg =
-            Icon.close "Go back"
+            Icon.backwardContent "Go back"
                 |> Icon.toEl cfg
                 |> Element.el (headerButtonAttr msg 48 20)
-
-        mobileHeadButton =
-            case maybeGoBack of
-                Just msg ->
-                    mobileHeadGoBack msg
-
-                Nothing ->
-                    mobileHeadSandwich
     in
-    Element.row
-        [ width fill
-        , Element.inFront mobileHeadButton
-        ]
-        [ Element.el
-            [ Element.centerX, padding 20 ]
-            (Text.heading5 title |> Text.toEl cfg)
-        ]
+    case maybeStack of
+        Nothing ->
+            Element.row
+                [ width fill
+                , Element.inFront mobileHeadSandwich
+                ]
+                [ Element.el
+                    [ Element.width fill, Font.center, padding 20 ]
+                    (Text.heading5 title |> Text.toEl cfg)
+                ]
+
+        Just ( goBackMsg, stackButtons ) ->
+            Element.row [ width fill, spacing 8, paddingEach { left = 4, right = 12, top = 0, bottom = 0 } ] <|
+                [ mobileHeadGoBack goBackMsg
+                , Element.el
+                    [ Element.width fill, Element.centerY ]
+                    (Text.heading5 title |> Text.toEl cfg)
+                ]
+                    ++ List.map (Button.toEl cfg) stackButtons
 
 
 viewSide : RenderConfig -> Bool -> Menu msg -> Element msg

@@ -98,9 +98,9 @@ ellipsis : List (Attribute msg)
 ellipsis =
     [ ( "text-overflow", "ellipsis" )
     , ( "white-space", "nowrap" )
-    , ( "overflow", "hidden" )
     ]
         |> List.map stylePair
+        |> (::) Element.clip
 
 
 desktopMaximum : RenderConfig -> Int -> Element.Length

@@ -118,7 +118,7 @@ toEl cfg (Internal.Text spans) =
         _ ->
             -- TODO: Concat paragraphs
             List.map (Internal.spanRenderEl cfg) spans
-                |> Element.column [ Element.spacing 0 ]
+                |> Element.column []
 
 
 multiline : (String -> Text) -> List String -> Text

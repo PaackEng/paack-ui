@@ -1,13 +1,16 @@
 module UI.Icon exposing
     ( Icon
     , add
+    , backwardContent
     , close
+    , edit
     , eventLog
     , getHint
     , logout
     , notifications
     , paackSpaces
     , packages
+    , print
     , sandwichMenu
     , search
     , toEl
@@ -38,16 +41,19 @@ type Icon
 
 
 type IconGlyph
-    = Toggle
+    = Add
     | Close
-    | Add
-    | SandwichMenu
+    | Edit
+    | EventLog
+    | Logout
     | Notifications
     | PaackSpaces
     | Packages
-    | EventLog
-    | Logout
+    | Print
+    | SandwichMenu
     | Search
+    | Toggle
+    | BackwardContent
 
 
 toggle : String -> Icon
@@ -100,6 +106,21 @@ search hint =
     Icon (Properties hint Search)
 
 
+print : String -> Icon
+print hint =
+    Icon (Properties hint Print)
+
+
+edit : String -> Icon
+edit hint =
+    Icon (Properties hint Edit)
+
+
+backwardContent : String -> Icon
+backwardContent hint =
+    Icon (Properties hint BackwardContent)
+
+
 toEl : RenderConfig -> Icon -> Element msg
 toEl _ (Icon { hint, glyph }) =
     case glyph of
@@ -132,6 +153,15 @@ toEl _ (Icon { hint, glyph }) =
 
         Search ->
             fasIcon "search" hint
+
+        Print ->
+            fasIcon "print" hint
+
+        Edit ->
+            fasIcon "edit" hint
+
+        BackwardContent ->
+            fasIcon "chevron-left" hint
 
 
 getHint : Icon -> String

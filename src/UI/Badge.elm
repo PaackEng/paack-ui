@@ -1,4 +1,4 @@
-module UI.Badge exposing (Badge, danger, dark, light, primary, success, toEl, warning)
+module UI.Badge exposing (Badge, danger, dark, light, primary, success, toEl, warning, withBrightness)
 
 import Element exposing (Element, px, shrink)
 import Element.Background as Background
@@ -6,7 +6,7 @@ import Element.Border as Border
 import Element.Font as Font
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
-import UI.Palette as Palette
+import UI.Palette as Palette exposing (brightnessDarkest, brightnessLight, brightnessLighter, toneDanger, toneGray, tonePrimary, toneSuccess, toneWarning)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text exposing (TextColor)
 
@@ -16,50 +16,49 @@ type Badge
 
 
 type alias Properties =
-    { content : String }
+    { content : String
+    , tone : Palette.Tone
+    }
 
 
 type alias Options =
-    { tone : BadgeTone }
-
-
-type BadgeTone
-    = ToneLight
-    | ToneDark
-    | TonePrimary
-    | ToneWarning
-    | ToneDanger
-    | ToneSuccess
+    { brightness : Palette.Brightness
+    }
 
 
 light : String -> Badge
 light content =
-    Badge { content = content } { tone = ToneLight }
+    Badge { content = content, tone = toneGray } { defaultOptions | brightness = brightnessLighter }
 
 
 dark : String -> Badge
 dark content =
-    Badge { content = content } { tone = ToneDark }
+    Badge { content = content, tone = toneGray } { defaultOptions | brightness = brightnessDarkest }
 
 
 primary : String -> Badge
 primary content =
-    Badge { content = content } { tone = TonePrimary }
+    Badge { content = content, tone = tonePrimary } defaultOptions
 
 
 warning : String -> Badge
 warning content =
-    Badge { content = content } { tone = ToneWarning }
+    Badge { content = content, tone = toneWarning } defaultOptions
 
 
 danger : String -> Badge
 danger content =
-    Badge { content = content } { tone = ToneDanger }
+    Badge { content = content, tone = toneDanger } defaultOptions
 
 
 success : String -> Badge
 success content =
-    Badge { content = content } { tone = ToneSuccess }
+    Badge { content = content, tone = toneSuccess } defaultOptions
+
+
+withBrightness : Palette.Brightness -> Badge -> Badge
+withBrightness brightness (Badge prop opt) =
+    Badge prop { opt | brightness = brightness }
 
 
 
@@ -67,21 +66,23 @@ success content =
 
 
 toEl : RenderConfig -> Badge -> Element msg
-toEl cfg (Badge { content } { tone }) =
+toEl cfg (Badge { content, tone } { brightness }) =
     let
-        bg =
-            toneToColor tone
+        background =
+            Palette.color tone brightness
 
-        fg =
-            Palette.withContrast True bg
+        textColor =
+            Palette.withContrast True background
     in
     Text.overline content
-        |> Text.withColor fg
+        |> Text.withColor textColor
         |> Text.toEl cfg
         |> Element.el
             [ Element.width shrink
             , Font.center
-            , Background.color <| Palette.toElColor bg
+            , background
+                |> Palette.toElColor
+                |> Background.color
             , Element.paddingEach { top = 4, bottom = 4, left = 5, right = 3 }
             , Element.height (px 20)
             , Primitives.roundedBorders
@@ -92,23 +93,7 @@ toEl cfg (Badge { content } { tone }) =
 -- Internal
 
 
-toneToColor : BadgeTone -> Palette.Color
-toneToColor tone =
-    case tone of
-        ToneLight ->
-            Palette.color Palette.toneGray Palette.brightnessLighter
-
-        ToneDark ->
-            Palette.color Palette.toneGray Palette.brightnessDarkest
-
-        TonePrimary ->
-            Palette.color Palette.tonePrimary Palette.brightnessLight
-
-        ToneWarning ->
-            Palette.color Palette.toneWarning Palette.brightnessLight
-
-        ToneDanger ->
-            Palette.color Palette.toneDanger Palette.brightnessLight
-
-        ToneSuccess ->
-            Palette.color Palette.toneSuccess Palette.brightnessLight
+defaultOptions : Options
+defaultOptions =
+    { brightness = brightnessLight
+    }

@@ -8,6 +8,7 @@ module UI.Button exposing
     , bodyText
     , button
     , link
+    , map
     , modeDisabled
     , modeEnabled
     , toEl
@@ -29,6 +30,7 @@ import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
 import UI.Icon as Icon exposing (Icon)
+import UI.Internal.Basics exposing (lazyMap)
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Text as Text exposing (TextColor)
@@ -48,7 +50,7 @@ type alias Options =
 
 
 type alias Properties msg =
-    { body : ButtonBody msg
+    { body : ButtonBody
     , click : ButtonClick msg
     }
 
@@ -57,7 +59,7 @@ type Button msg
     = Button (Properties msg) Options
 
 
-type ButtonBody msg
+type ButtonBody
     = BodyText String
     | BodyIcon Icon
 
@@ -97,22 +99,22 @@ defaultOptions =
     }
 
 
-buttonAny : ButtonClick msg -> ButtonBody msg -> Button msg
+buttonAny : ButtonClick msg -> ButtonBody -> Button msg
 buttonAny click body =
     Button (Properties body click) defaultOptions
 
 
-button : msg -> ButtonBody msg -> Button msg
+button : msg -> ButtonBody -> Button msg
 button msg =
     buttonAny (ClickMsg msg)
 
 
-toggle : (Bool -> msg) -> Bool -> ButtonBody msg -> Button msg
+toggle : (Bool -> msg) -> Bool -> ButtonBody -> Button msg
 toggle msg isEnabled =
     buttonAny (ClickToggle msg isEnabled)
 
 
-link : Link -> ButtonBody msg -> Button msg
+link : Link -> ButtonBody -> Button msg
 link realLink =
     buttonAny (ClickLink realLink)
 
@@ -140,12 +142,12 @@ withWidth width (Button prop opt) =
 -- Expose all properties
 
 
-bodyIcon : Icon -> ButtonBody msg
+bodyIcon : Icon -> ButtonBody
 bodyIcon icon =
     BodyIcon icon
 
 
-bodyText : String -> ButtonBody msg
+bodyText : String -> ButtonBody
 bodyText text =
     BodyText text
 
@@ -188,6 +190,23 @@ widthFull =
 widthRelative : ButtonWidth
 widthRelative =
     WidthRelative
+
+
+map : (a -> b) -> Button a -> Button b
+map applier (Button prop opt) =
+    let
+        newClick =
+            case prop.click of
+                ClickMsg msg ->
+                    ClickMsg (applier msg)
+
+                ClickLink realLink ->
+                    ClickLink realLink
+
+                ClickToggle lambda state ->
+                    ClickToggle (lazyMap applier lambda) state
+    in
+    Button (Properties prop.body newClick) opt
 
 
 
@@ -334,7 +353,7 @@ colorHelper (Button { click, body } { mode, tone }) =
         colorHelperWhenEnabled tone
 
 
-colorHelperWhenDisabled : ButtonBody msg -> ButtonTone -> ButtonTheme
+colorHelperWhenDisabled : ButtonBody -> ButtonTone -> ButtonTheme
 colorHelperWhenDisabled body tone =
     case ( body, tone ) of
         ( BodyIcon _, _ ) ->
@@ -477,7 +496,7 @@ clickAttrs (Button { click } { mode }) =
             []
 
 
-elFromBody : RenderConfig -> ButtonBody msg -> Element msg
+elFromBody : RenderConfig -> ButtonBody -> Element msg
 elFromBody cfg body =
     case body of
         BodyText str ->
@@ -490,5 +509,5 @@ elFromBody cfg body =
                 (Element.text str)
 
         BodyIcon icon ->
-            Element.el [ Element.centerX ]
+            Element.el [ Font.center, Element.width (Element.px 28) ]
                 (Icon.toEl cfg icon)
