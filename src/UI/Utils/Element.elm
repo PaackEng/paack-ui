@@ -9,6 +9,7 @@ module UI.Utils.Element exposing
     , onEnterPressed
     , svg
     , title
+    , zeroPadding
     )
 
 import Element exposing (Attribute, Element)
@@ -110,6 +111,20 @@ desktopMaximum cfg maxSize =
 
     else
         Element.fill |> Element.maximum maxSize
+
+
+zeroPadding :
+    { top : Int
+    , left : Int
+    , right : Int
+    , bottom : Int
+    }
+zeroPadding =
+    { top = 0
+    , left = 0
+    , right = 0
+    , bottom = 0
+    }
 
 
 
