@@ -171,7 +171,6 @@ searchFieldView cfg searchField =
                     |> Maybe.map Tuple.first
                     |> Maybe.withDefault ""
                     |> TextField.search searchMsg label
-                    |> TextField.withLabelNotHidden True
                     |> TextField.withWidth TextField.widthFull
                     |> TextField.withPlaceholder label
                     |> TextField.withIcon (Icon.search "Search")

@@ -1,4 +1,4 @@
-module UI.Badge exposing (Badge, danger, dark, light, primary, success, toEl, warning, withAlpha)
+module UI.Badge exposing (Badge, danger, dark, light, primary, success, toEl, warning, withBrightness)
 
 import Element exposing (Element, px, shrink)
 import Element.Background as Background
@@ -6,7 +6,7 @@ import Element.Border as Border
 import Element.Font as Font
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
-import UI.Palette as Palette
+import UI.Palette as Palette exposing (brightnessDarkest, brightnessLight, brightnessLighter, toneDanger, toneGray, tonePrimary, toneSuccess, toneWarning)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text exposing (TextColor)
 
@@ -16,57 +16,49 @@ type Badge
 
 
 type alias Properties =
-    { content : String }
-
-
-type alias Options =
-    { tone : BadgeTone
-    , alpha : Float
+    { content : String
+    , tone : Palette.Tone
     }
 
 
-type BadgeTone
-    = ToneLight
-    | ToneDark
-    | TonePrimary
-    | ToneWarning
-    | ToneDanger
-    | ToneSuccess
+type alias Options =
+    { brightness : Palette.Brightness
+    }
 
 
 light : String -> Badge
 light content =
-    Badge { content = content } { defaultOptions | tone = ToneLight }
+    Badge { content = content, tone = toneGray } { defaultOptions | brightness = brightnessLighter }
 
 
 dark : String -> Badge
 dark content =
-    Badge { content = content } { defaultOptions | tone = ToneDark }
+    Badge { content = content, tone = toneGray } { defaultOptions | brightness = brightnessDarkest }
 
 
 primary : String -> Badge
 primary content =
-    Badge { content = content } { defaultOptions | tone = TonePrimary }
+    Badge { content = content, tone = tonePrimary } defaultOptions
 
 
 warning : String -> Badge
 warning content =
-    Badge { content = content } { defaultOptions | tone = ToneWarning }
+    Badge { content = content, tone = toneWarning } defaultOptions
 
 
 danger : String -> Badge
 danger content =
-    Badge { content = content } { defaultOptions | tone = ToneDanger }
+    Badge { content = content, tone = toneDanger } defaultOptions
 
 
 success : String -> Badge
 success content =
-    Badge { content = content } { defaultOptions | tone = ToneSuccess }
+    Badge { content = content, tone = toneSuccess } defaultOptions
 
 
-withAlpha : Float -> Badge -> Badge
-withAlpha alpha (Badge prop opt) =
-    Badge prop { opt | alpha = alpha }
+withBrightness : Palette.Brightness -> Badge -> Badge
+withBrightness brightness (Badge prop opt) =
+    Badge prop { opt | brightness = brightness }
 
 
 
@@ -74,10 +66,10 @@ withAlpha alpha (Badge prop opt) =
 
 
 toEl : RenderConfig -> Badge -> Element msg
-toEl cfg (Badge { content } { tone, alpha }) =
+toEl cfg (Badge { content, tone } { brightness }) =
     let
         background =
-            toneToColor tone
+            Palette.color tone brightness
 
         textColor =
             Palette.withContrast True background
@@ -89,7 +81,6 @@ toEl cfg (Badge { content } { tone, alpha }) =
             [ Element.width shrink
             , Font.center
             , background
-                |> Palette.withAlpha alpha
                 |> Palette.toElColor
                 |> Background.color
             , Element.paddingEach { top = 4, bottom = 4, left = 5, right = 3 }
@@ -104,28 +95,5 @@ toEl cfg (Badge { content } { tone, alpha }) =
 
 defaultOptions : Options
 defaultOptions =
-    { tone = TonePrimary
-    , alpha = 1
+    { brightness = brightnessLight
     }
-
-
-toneToColor : BadgeTone -> Palette.Color
-toneToColor tone =
-    case tone of
-        ToneLight ->
-            Palette.color Palette.toneGray Palette.brightnessLighter
-
-        ToneDark ->
-            Palette.color Palette.toneGray Palette.brightnessDarkest
-
-        TonePrimary ->
-            Palette.color Palette.tonePrimary Palette.brightnessLight
-
-        ToneWarning ->
-            Palette.color Palette.toneWarning Palette.brightnessLight
-
-        ToneDanger ->
-            Palette.color Palette.toneDanger Palette.brightnessLight
-
-        ToneSuccess ->
-            Palette.color Palette.toneSuccess Palette.brightnessLight

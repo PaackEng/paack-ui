@@ -349,7 +349,7 @@ input onChange label currentValue content =
 defaultOptions : Options msg
 defaultOptions =
     { placeholder = ""
-    , labelVisible = True
+    , labelVisible = False
     , focus = Nothing
     , icon = Nothing
     , width = WidthRelative

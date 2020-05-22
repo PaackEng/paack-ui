@@ -509,5 +509,5 @@ elFromBody cfg body =
                 (Element.text str)
 
         BodyIcon icon ->
-            Element.el [ Element.centerX ]
+            Element.el [ Font.center, Element.width (Element.px 28) ]
                 (Icon.toEl cfg icon)
