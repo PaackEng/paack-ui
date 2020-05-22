@@ -3,6 +3,7 @@ module UI.Internal.Text exposing (..)
 import Element exposing (Attribute, Element)
 import Element.Font as Font
 import List
+import UI.Internal.Basics exposing (ifThenElse)
 import UI.Internal.Palette as Palette
 import UI.Palette as Palette exposing (brightnessDarkest, toneGray)
 import UI.RenderConfig exposing (RenderConfig, isMobile)
@@ -81,8 +82,11 @@ fontColor color =
 attributes : RenderConfig -> TextSize -> Bool -> TextColor -> List (Attribute msg)
 attributes config size ellipsis color =
     let
+        mobile =
+            isMobile config
+
         sizeAttrs =
-            if isMobile config then
+            if mobile then
                 mobileAttributes size
 
             else
@@ -90,7 +94,7 @@ attributes config size ellipsis color =
 
         ellipsisAttrs attrs =
             if ellipsis then
-                Element.ellipsis ++ attrs
+                (oneLineHeight mobile size :: Element.ellipsis) ++ attrs
 
             else
                 attrs
@@ -103,7 +107,9 @@ attributes config size ellipsis color =
                 Nothing ->
                     attrs
     in
-    sizeAttrs |> ellipsisAttrs |> colorAttr
+    sizeAttrs
+        |> ellipsisAttrs
+        |> colorAttr
 
 
 deskAttributes : TextSize -> List (Attribute msg)
@@ -262,6 +268,47 @@ mobileAttributes size =
             , Font.letterSpacing 2
             , Font.extraBold
             ]
+
+
+oneLineHeight : Bool -> TextSize -> Attribute msg
+oneLineHeight isMobile size =
+    (Element.px >> Element.height) <|
+        case size of
+            SizeHeading1 ->
+                ifThenElse isMobile 56 92
+
+            SizeHeading2 ->
+                ifThenElse isMobile 48 64
+
+            SizeHeading3 ->
+                ifThenElse isMobile 40 48
+
+            SizeHeading4 ->
+                32
+
+            SizeHeading5 ->
+                24
+
+            SizeHeading6 ->
+                20
+
+            SizeSubtitle1 ->
+                16
+
+            SizeSubtitle2 ->
+                14
+
+            SizeBody1 ->
+                16 + 8
+
+            SizeBody2 ->
+                14 + 10
+
+            SizeCaption ->
+                12 + 4
+
+            SizeOverline ->
+                10
 
 
 mapOptions : (Options -> Options) -> Text -> Text
