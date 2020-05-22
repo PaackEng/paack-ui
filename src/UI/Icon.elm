@@ -6,11 +6,13 @@ module UI.Icon exposing
     , edit
     , eventLog
     , getHint
+    , leftArrow
     , logout
     , notifications
     , paackSpaces
     , packages
     , print
+    , rightArrow
     , sandwichMenu
     , search
     , toEl
@@ -54,6 +56,18 @@ type IconGlyph
     | Search
     | Toggle
     | BackwardContent
+    | LeftArrow
+    | RightArrow
+
+
+leftArrow : String -> Icon
+leftArrow hint =
+    Icon (Properties hint LeftArrow)
+
+
+rightArrow : String -> Icon
+rightArrow hint =
+    Icon (Properties hint RightArrow)
 
 
 toggle : String -> Icon
@@ -162,6 +176,12 @@ toEl _ (Icon { hint, glyph }) =
 
         BackwardContent ->
             fasIcon "chevron-left" hint
+
+        LeftArrow ->
+            fasIcon "chevron-left" hint
+
+        RightArrow ->
+            fasIcon "chevron-right" hint
 
 
 getHint : Icon -> String

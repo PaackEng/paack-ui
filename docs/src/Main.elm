@@ -15,6 +15,7 @@ import Icons
 import LoadingView as LoadingView
 import Model as Model exposing (Model)
 import Msg exposing (Msg(..))
+import Paginators.Stories as Paginators
 import Palette
 import PopUps as PopUps
 import Return as R
@@ -70,6 +71,7 @@ main =
         , Checkboxes.stories
         , LoadingView.stories
         , Tables.stories renderConfig
+        , Paginators.stories renderConfig
         ]
 
 
@@ -103,6 +105,12 @@ updateStories msg ({ customModel } as model) =
         ButtonsStoriesMsg subMsg ->
             Buttons.update subMsg customModel.buttonsStories
                 |> R.map (\t -> { customModel | buttonsStories = t })
+                |> R.map (\newCustomModel -> { model | customModel = newCustomModel })
+                |> Tuple.mapSecond (always Cmd.none)
+
+        PaginatorsStoriesMsg subMsg ->
+            Paginators.update subMsg customModel.paginatorsStories
+                |> R.map (\t -> { customModel | paginatorsStories = t })
                 |> R.map (\newCustomModel -> { model | customModel = newCustomModel })
                 |> Tuple.mapSecond (always Cmd.none)
 
