@@ -1,6 +1,7 @@
 module UI.Icon exposing
     ( Icon
     , add
+    , backwardContent
     , close
     , edit
     , eventLog
@@ -52,6 +53,7 @@ type IconGlyph
     | SandwichMenu
     | Search
     | Toggle
+    | BackwardContent
 
 
 toggle : String -> Icon
@@ -114,6 +116,11 @@ edit hint =
     Icon (Properties hint Edit)
 
 
+backwardContent : String -> Icon
+backwardContent hint =
+    Icon (Properties hint BackwardContent)
+
+
 toEl : RenderConfig -> Icon -> Element msg
 toEl _ (Icon { hint, glyph }) =
     case glyph of
@@ -152,6 +159,9 @@ toEl _ (Icon { hint, glyph }) =
 
         Edit ->
             fasIcon "edit" hint
+
+        BackwardContent ->
+            fasIcon "chevron-left" hint
 
 
 getHint : Icon -> String

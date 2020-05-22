@@ -1,6 +1,6 @@
 module UI.Internal.Dialog exposing (Dialog, dialogMap, view)
 
-import Element exposing (Element, fill, maximum, px, shrink)
+import Element exposing (Element, fill, maximum, px, rgb255, shrink)
 import Element.Background as Background
 import Element.Events as Events
 import UI.Icon as Icon
@@ -49,7 +49,7 @@ view cfg { title, body, close, width } =
                     shrink
             , Element.padding 12
             , Element.width width
-            , Background.color <| Palette.gray.lightest
+            , Background.color <| rgb255 255 255 255 -- NOTE: MAIN LAYOUT'S BACKGROUND COLOR REPEATES HERE
             ]
             [ Element.row [ Element.width fill ]
                 [ Text.heading5 title
