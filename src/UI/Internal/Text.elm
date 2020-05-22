@@ -308,7 +308,8 @@ oneLineHeight isMobile size =
                 12 + 4
 
             SizeOverline ->
-                10
+                -- TODO: Looks like OVERLINE has lineHeight
+                10 + 6
 
 
 mapOptions : (Options -> Options) -> Text -> Text

@@ -18,12 +18,18 @@ module UI.Icon exposing
     , toEl
     , todo
     , toggle
+    , toggleDown
+    , toggleUp
+    , withColor
     )
 
 import Element exposing (..)
+import Element.Font as Font
 import Html
 import Html.Attributes as HtmlAttr
+import UI.Palette as Palette exposing (brightnessDarkest, toneGray)
 import UI.RenderConfig exposing (RenderConfig)
+import UI.Utils.ARIA as ARIA
 
 
 todo : String -> Element msg
@@ -38,8 +44,17 @@ type alias Properties =
     }
 
 
+type alias Options =
+    { color : IconColor }
+
+
+type IconColor
+    = ColorFromPalette Palette.Color
+    | ColorInherit
+
+
 type Icon
-    = Icon Properties
+    = Icon Properties Options
 
 
 type IconGlyph
@@ -55,142 +70,190 @@ type IconGlyph
     | SandwichMenu
     | Search
     | Toggle
+    | ToggleDown
+    | ToggleUp
     | BackwardContent
     | LeftArrow
     | RightArrow
 
 
+withColor : Palette.Color -> Icon -> Icon
+withColor color (Icon prop opt) =
+    Icon prop { opt | color = ColorFromPalette color }
+
+
 leftArrow : String -> Icon
 leftArrow hint =
-    Icon (Properties hint LeftArrow)
+    Icon (Properties hint LeftArrow) defaultOptions
 
 
 rightArrow : String -> Icon
 rightArrow hint =
-    Icon (Properties hint RightArrow)
+    Icon (Properties hint RightArrow) defaultOptions
 
 
 toggle : String -> Icon
 toggle hint =
-    Icon (Properties hint Toggle)
+    Icon (Properties hint Toggle) defaultOptions
+
+
+toggleDown : String -> Icon
+toggleDown hint =
+    Icon (Properties hint ToggleDown) defaultOptions
+
+
+toggleUp : String -> Icon
+toggleUp hint =
+    Icon (Properties hint ToggleUp) defaultOptions
 
 
 add : String -> Icon
 add hint =
-    Icon (Properties hint Add)
+    Icon (Properties hint Add) defaultOptions
 
 
 close : String -> Icon
 close hint =
-    Icon (Properties hint Close)
+    Icon (Properties hint Close) defaultOptions
 
 
 sandwichMenu : String -> Icon
 sandwichMenu hint =
-    Icon (Properties hint SandwichMenu)
+    Icon (Properties hint SandwichMenu) defaultOptions
 
 
 notifications : String -> Icon
 notifications hint =
-    Icon (Properties hint Notifications)
+    Icon (Properties hint Notifications) defaultOptions
 
 
 paackSpaces : String -> Icon
 paackSpaces hint =
-    Icon (Properties hint PaackSpaces)
+    Icon (Properties hint PaackSpaces) defaultOptions
 
 
 packages : String -> Icon
 packages hint =
-    Icon (Properties hint Packages)
+    Icon (Properties hint Packages) defaultOptions
 
 
 eventLog : String -> Icon
 eventLog hint =
-    Icon (Properties hint EventLog)
+    Icon (Properties hint EventLog) defaultOptions
 
 
 logout : String -> Icon
 logout hint =
-    Icon (Properties hint Logout)
+    Icon (Properties hint Logout) defaultOptions
 
 
 search : String -> Icon
 search hint =
-    Icon (Properties hint Search)
+    Icon (Properties hint Search) defaultOptions
 
 
 print : String -> Icon
 print hint =
-    Icon (Properties hint Print)
+    Icon (Properties hint Print) defaultOptions
 
 
 edit : String -> Icon
 edit hint =
-    Icon (Properties hint Edit)
+    Icon (Properties hint Edit) defaultOptions
 
 
 backwardContent : String -> Icon
 backwardContent hint =
-    Icon (Properties hint BackwardContent)
+    Icon (Properties hint BackwardContent) defaultOptions
 
 
 toEl : RenderConfig -> Icon -> Element msg
-toEl _ (Icon { hint, glyph }) =
-    case glyph of
-        Add ->
-            fasIcon "plus" hint
+toEl _ (Icon { hint, glyph } { color }) =
+    let
+        staticAttrs =
+            [ ARIA.roleAttr ARIA.roleImage
+            , ARIA.labelAttr hint
+            , Element.centerX
+            ]
 
-        Toggle ->
-            fasIcon "map" hint
+        attrs =
+            case color of
+                ColorFromPalette realColor ->
+                    (realColor
+                        |> Palette.toElColor
+                        |> Font.color
+                    )
+                        :: staticAttrs
 
-        Close ->
-            fasIcon "times" hint
+                ColorInherit ->
+                    staticAttrs
+    in
+    Element.el attrs <|
+        case glyph of
+            Add ->
+                fasIcon "plus" hint
 
-        SandwichMenu ->
-            fasIcon "bars" hint
+            Toggle ->
+                fasIcon "map" hint
 
-        Notifications ->
-            fasIcon "bell" hint
+            ToggleDown ->
+                fasIcon "chevron-down" hint
 
-        PaackSpaces ->
-            fasIcon "database" hint
+            ToggleUp ->
+                fasIcon "chevron-up" hint
 
-        Packages ->
-            fasIcon "box-open" hint
+            Close ->
+                fasIcon "times" hint
 
-        EventLog ->
-            fasIcon "comment" hint
+            SandwichMenu ->
+                fasIcon "bars" hint
 
-        Logout ->
-            fasIcon "user-circle" hint
+            Notifications ->
+                fasIcon "bell" hint
 
-        Search ->
-            fasIcon "search" hint
+            PaackSpaces ->
+                fasIcon "database" hint
 
-        Print ->
-            fasIcon "print" hint
+            Packages ->
+                fasIcon "box-open" hint
 
-        Edit ->
-            fasIcon "edit" hint
+            EventLog ->
+                fasIcon "comment" hint
 
-        BackwardContent ->
-            fasIcon "chevron-left" hint
+            Logout ->
+                fasIcon "user-circle" hint
 
-        LeftArrow ->
-            fasIcon "chevron-left" hint
+            Search ->
+                fasIcon "search" hint
 
-        RightArrow ->
-            fasIcon "chevron-right" hint
+            Print ->
+                fasIcon "print" hint
+
+            Edit ->
+                fasIcon "edit" hint
+
+            BackwardContent ->
+                fasIcon "chevron-left" hint
+
+            LeftArrow ->
+                fasIcon "chevron-left" hint
+
+            RightArrow ->
+                fasIcon "chevron-right" hint
 
 
 getHint : Icon -> String
-getHint (Icon { hint }) =
+getHint (Icon { hint } _) =
     hint
 
 
 
--- primitives
+-- Internals
+
+
+defaultOptions : Options
+defaultOptions =
+    { color = ColorInherit }
 
 
 fasIcon : String -> String -> Element msg
@@ -207,8 +270,6 @@ faIcon : String -> String -> String -> Element msg
 faIcon prefix icon hintText =
     html
         (Html.i
-            [ HtmlAttr.class (prefix ++ " fa-" ++ icon)
-            , HtmlAttr.title hintText
-            ]
+            [ HtmlAttr.class (prefix ++ " fa-" ++ icon) ]
             []
         )
