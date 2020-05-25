@@ -1,4 +1,13 @@
-module UI.SelectList exposing (SelectList, selectList, toEl, withActionBar, withOptions, withSearchField, withSelected)
+module UI.SelectList exposing
+    ( SelectList
+    , selectList
+    , toEl
+    , withActionBar
+    , withOptions
+    , withSearchField
+    , withSelected
+    , withWidth
+    )
 
 import Element exposing (Attribute, Element, fill, shrink)
 import Element.Background as Background
@@ -30,6 +39,7 @@ type alias Options object msg =
     , searchField : Maybe (SearchOptions object msg)
     , actionBar : Maybe ( String, String -> Icon, msg ) -- TODO
     , isSelected : Maybe (object -> Bool)
+    , width : Element.Length
     }
 
 
@@ -83,6 +93,11 @@ withSelected isSelected (SelectList prop opt) =
     SelectList prop { opt | isSelected = Just isSelected }
 
 
+withWidth : Element.Length -> SelectList object msg -> SelectList object msg
+withWidth width (SelectList prop opt) =
+    SelectList prop { opt | width = width }
+
+
 
 -- Render
 
@@ -101,10 +116,9 @@ toEl cfg (SelectList prop opt) =
     Element.column
         [ Border.widthEach { bottom = 0, left = 0, right = 1, top = 0 }
         , Border.color Palette.gray.lightest
-        , Element.width fill
+        , Element.width opt.width
         , Element.height fill
-        , Element.maxHeightPct 100
-        , Element.clipY
+        , Element.scrollbarY
         ]
         [ searchFieldView cfg opt.searchField
         , opt.items
@@ -115,7 +129,6 @@ toEl cfg (SelectList prop opt) =
                 , Border.color Palette.gray.lightest
                 , Element.width fill
                 , Element.height fill
-                , Element.clipY
                 , Element.scrollbarY
                 ]
         , actionBarView cfg opt.actionBar
@@ -205,6 +218,7 @@ defaultOptions =
     , searchField = Nothing
     , actionBar = Nothing
     , isSelected = Nothing
+    , width = Element.fill
     }
 
 

@@ -29,7 +29,6 @@ desktopColumn cfg page menu =
             [ width fill
             , height fill
             , Element.maxHeightVH 100
-            , Element.clipY
             , Element.scrollbarY
             ]
             page
@@ -48,20 +47,15 @@ mobileDrawer cfg page menu title maybeStack =
         (Menu.Menu { isExpanded, toggleMsg } _) =
             menu
 
-        content =
-            [ viewHead cfg menu title maybeStack
-            , page
-            ]
-
         content100vh =
             Element.column
                 [ width fill
                 , height fill
                 , Element.maxHeightVH 100
-                , Element.clipY
-                , Element.scrollbarY
                 ]
-                content
+                [ viewHead cfg menu title maybeStack
+                , Element.el [ width fill, height fill, Element.scrollbarY ] page
+                ]
 
         menuView =
             Element.row [ width fill, height fill ]
