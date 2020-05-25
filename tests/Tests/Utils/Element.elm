@@ -17,7 +17,16 @@ elementToHtml content =
 hasIconInside : String -> Query.Single msg -> Expectation
 hasIconInside hintText content =
     content
-        |> Query.has [ Selector.tag "i", Selector.attribute (HtmlAttr.attribute "title" hintText) ]
+        |> Query.has
+            [ Selector.containing
+                [ Selector.attribute
+                    (HtmlAttr.attribute "role" "img")
+                , Selector.attribute
+                    (HtmlAttr.attribute "aria-label" hintText)
+                , Selector.containing
+                    [ Selector.tag "i" ]
+                ]
+            ]
 
 
 cursorPointer : Selector

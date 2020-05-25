@@ -191,7 +191,6 @@ itemView cfg { select, renderItem } selected obj =
         ([ Events.onClick (select obj)
          , Element.pointer
          , Element.width fill
-         , Element.paddingEach { top = 11, bottom = 11, left = 20, right = 12 }
          , Border.widthEach { bottom = 1, left = 0, right = 0, top = 0 }
          , Border.color Palette.gray.lightest
          ]
