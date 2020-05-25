@@ -20,9 +20,8 @@ module UI.Text exposing
     , withEllipsis
     )
 
-import Element exposing (Attribute, Element, fill)
+import Element exposing (Attribute, Element)
 import Element.Font as Font
-import Helpers.Basics exposing (ifThenElse)
 import List
 import UI.Internal.Text as Internal exposing (TextSize(..), defaultText, mapOptions)
 import UI.Palette as Palette
@@ -108,7 +107,7 @@ withEllipsis val text =
 
 
 toEl : RenderConfig -> Text -> Element msg
-toEl cfg (Internal.Text spans { ellipsis }) =
+toEl cfg (Internal.Text spans combo) =
     case spans of
         [] ->
             Element.none
@@ -119,7 +118,7 @@ toEl cfg (Internal.Text spans { ellipsis }) =
         _ ->
             -- TODO: Concat paragraphs
             List.map (Internal.spanRenderEl cfg) spans
-                |> Element.column (ifThenElse ellipsis [ Element.width fill, Element.clipX ] [])
+                |> Element.column (Internal.combinedAttrs combo)
 
 
 multiline : (String -> Text) -> List String -> Text

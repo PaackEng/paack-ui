@@ -1,6 +1,6 @@
 module UI.Internal.Text exposing (..)
 
-import Element exposing (Attribute, Element)
+import Element exposing (Attribute, Element, fill)
 import Element.Font as Font
 import List
 import UI.Internal.Basics exposing (ifThenElse)
@@ -357,3 +357,12 @@ withEllipsis val text =
     text
         |> mapOptions (\opt -> { opt | oneLineEllipsis = val })
         |> mapComboOptions (\opt -> { opt | ellipsis = val })
+
+
+combinedAttrs : CombinedOptions -> List (Attribute msg)
+combinedAttrs { ellipsis } =
+    if ellipsis then
+        [ Element.width fill, Element.clipX ]
+
+    else
+        []
