@@ -15,6 +15,7 @@ module UI.Icon exposing
     , rightArrow
     , sandwichMenu
     , search
+    , seeMore
     , toEl
     , todo
     , toggle
@@ -75,6 +76,7 @@ type IconGlyph
     | BackwardContent
     | LeftArrow
     | RightArrow
+    | SeeMore
 
 
 withColor : Palette.Color -> Icon -> Icon
@@ -167,6 +169,11 @@ backwardContent hint =
     Icon (Properties hint BackwardContent) defaultOptions
 
 
+seeMore : String -> Icon
+seeMore hint =
+    Icon (Properties hint SeeMore) defaultOptions
+
+
 toEl : RenderConfig -> Icon -> Element msg
 toEl _ (Icon { hint, glyph } { color }) =
     let
@@ -240,6 +247,9 @@ toEl _ (Icon { hint, glyph } { color }) =
 
             RightArrow ->
                 fasIcon "chevron-right" hint
+
+            SeeMore ->
+                fasIcon "ellipsis-h" hint
 
 
 getHint : Icon -> String
