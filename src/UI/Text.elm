@@ -20,8 +20,9 @@ module UI.Text exposing
     , withEllipsis
     )
 
-import Element exposing (Attribute, Element)
+import Element exposing (Attribute, Element, fill)
 import Element.Font as Font
+import Helpers.Basics exposing (ifThenElse)
 import List
 import UI.Internal.Text as Internal exposing (TextSize(..), defaultText, mapOptions)
 import UI.Palette as Palette
@@ -103,11 +104,11 @@ withColor color text =
 
 withEllipsis : Bool -> Text -> Text
 withEllipsis val text =
-    mapOptions (\opt -> { opt | oneLineEllipsis = val }) text
+    Internal.withEllipsis val text
 
 
 toEl : RenderConfig -> Text -> Element msg
-toEl cfg (Internal.Text spans) =
+toEl cfg (Internal.Text spans { ellipsis }) =
     case spans of
         [] ->
             Element.none
@@ -118,20 +119,26 @@ toEl cfg (Internal.Text spans) =
         _ ->
             -- TODO: Concat paragraphs
             List.map (Internal.spanRenderEl cfg) spans
-                |> Element.column [ Element.width Element.fill, Element.clipX ]
+                |> Element.column (ifThenElse ellipsis [ Element.width fill, Element.clipX ] [])
 
 
 multiline : (String -> Text) -> List String -> Text
 multiline style lines =
-    lines
-        |> List.map (style >> Internal.getSpans)
-        |> List.concat
-        |> Internal.Text
+    let
+        newSpans =
+            lines
+                |> List.map (style >> Internal.getSpans)
+                |> List.concat
+    in
+    Internal.Text newSpans Internal.defaultCombinedOptions
 
 
 combination : List Text -> Text
 combination parts =
-    parts
-        |> List.map Internal.getSpans
-        |> List.concat
-        |> Internal.Text
+    let
+        newSpans =
+            parts
+                |> List.map Internal.getSpans
+                |> List.concat
+    in
+    Internal.Text newSpans Internal.defaultCombinedOptions

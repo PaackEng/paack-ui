@@ -11,7 +11,7 @@ import UI.Utils.Element as Element
 
 
 type Text
-    = Text (List Span)
+    = Text (List Span) CombinedOptions
 
 
 type Span
@@ -28,6 +28,10 @@ type alias Properties =
     { content : String
     , size : TextSize
     }
+
+
+type alias CombinedOptions =
+    { ellipsis : Bool }
 
 
 type TextSize
@@ -53,12 +57,19 @@ type TextColor
 
 defaultText : TextSize -> String -> Text
 defaultText size content =
-    Text [ Span (Properties content size) defaultOptions ]
+    Text [ Span (Properties content size) defaultOptions ] defaultCombinedOptions
 
 
 defaultOptions : Options
 defaultOptions =
-    Options defaultColor False
+    { color = defaultColor
+    , oneLineEllipsis = False
+    }
+
+
+defaultCombinedOptions : CombinedOptions
+defaultCombinedOptions =
+    { ellipsis = False }
 
 
 defaultColor : TextColor
@@ -313,10 +324,8 @@ oneLineHeight isMobile size =
 
 
 mapOptions : (Options -> Options) -> Text -> Text
-mapOptions applier (Text spans) =
-    spans
-        |> List.map (spanMapOptions applier)
-        |> Text
+mapOptions applier (Text spans combo) =
+    Text (List.map (spanMapOptions applier) spans) combo
 
 
 spanMapOptions : (Options -> Options) -> Span -> Span
@@ -334,5 +343,17 @@ spanRenderEl cfg (Span { content, size } { color, oneLineEllipsis }) =
 
 
 getSpans : Text -> List Span
-getSpans (Text spans) =
+getSpans (Text spans _) =
     spans
+
+
+mapComboOptions : (CombinedOptions -> CombinedOptions) -> Text -> Text
+mapComboOptions applier (Text spans combo) =
+    Text spans (applier combo)
+
+
+withEllipsis : Bool -> Text -> Text
+withEllipsis val text =
+    text
+        |> mapOptions (\opt -> { opt | oneLineEllipsis = val })
+        |> mapComboOptions (\opt -> { opt | ellipsis = val })
