@@ -33,8 +33,12 @@ nonNumeric ({ first, offset, totalCount } as paginator) renderConfig =
                 |> String.fromInt
 
         lastItemCount =
-            (offset + first)
-                |> String.fromInt
+            String.fromInt <|
+                if (offset + first) > totalCount then
+                    totalCount
+
+                else
+                    offset + first
 
         previousStateMode =
             if offset > 0 then
