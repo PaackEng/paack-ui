@@ -103,11 +103,11 @@ withColor color text =
 
 withEllipsis : Bool -> Text -> Text
 withEllipsis val text =
-    mapOptions (\opt -> { opt | oneLineEllipsis = val }) text
+    Internal.withEllipsis val text
 
 
 toEl : RenderConfig -> Text -> Element msg
-toEl cfg (Internal.Text spans) =
+toEl cfg (Internal.Text spans opt) =
     case spans of
         [] ->
             Element.none
@@ -118,20 +118,26 @@ toEl cfg (Internal.Text spans) =
         _ ->
             -- TODO: Concat paragraphs
             List.map (Internal.spanRenderEl cfg) spans
-                |> Element.column [ Element.width Element.fill, Element.clipX ]
+                |> Element.column (Internal.combinedAttrs opt)
 
 
 multiline : (String -> Text) -> List String -> Text
 multiline style lines =
-    lines
-        |> List.map (style >> Internal.getSpans)
-        |> List.concat
-        |> Internal.Text
+    let
+        newSpans =
+            lines
+                |> List.map (style >> Internal.getSpans)
+                |> List.concat
+    in
+    Internal.Text newSpans Internal.textDefaultOptions
 
 
 combination : List Text -> Text
 combination parts =
-    parts
-        |> List.map Internal.getSpans
-        |> List.concat
-        |> Internal.Text
+    let
+        newSpans =
+            parts
+                |> List.map Internal.getSpans
+                |> List.concat
+    in
+    Internal.Text newSpans Internal.textDefaultOptions

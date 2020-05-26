@@ -1,6 +1,6 @@
 module UI.Internal.Text exposing (..)
 
-import Element exposing (Attribute, Element)
+import Element exposing (Attribute, Element, fill)
 import Element.Font as Font
 import List
 import UI.Internal.Basics exposing (ifThenElse)
@@ -11,11 +11,11 @@ import UI.Utils.Element as Element
 
 
 type Text
-    = Text (List Span)
+    = Text (List Span) TextOptions
 
 
 type Span
-    = Span Properties Options
+    = Span SpanProperties Options
 
 
 type alias Options =
@@ -24,10 +24,14 @@ type alias Options =
     }
 
 
-type alias Properties =
+type alias SpanProperties =
     { content : String
     , size : TextSize
     }
+
+
+type alias TextOptions =
+    { ellipsis : Bool }
 
 
 type TextSize
@@ -53,12 +57,19 @@ type TextColor
 
 defaultText : TextSize -> String -> Text
 defaultText size content =
-    Text [ Span (Properties content size) defaultOptions ]
+    Text [ Span (SpanProperties content size) spanDefaultOptions ] textDefaultOptions
 
 
-defaultOptions : Options
-defaultOptions =
-    Options defaultColor False
+spanDefaultOptions : Options
+spanDefaultOptions =
+    { color = defaultColor
+    , oneLineEllipsis = False
+    }
+
+
+textDefaultOptions : TextOptions
+textDefaultOptions =
+    { ellipsis = False }
 
 
 defaultColor : TextColor
@@ -313,10 +324,8 @@ oneLineHeight isMobile size =
 
 
 mapOptions : (Options -> Options) -> Text -> Text
-mapOptions applier (Text spans) =
-    spans
-        |> List.map (spanMapOptions applier)
-        |> Text
+mapOptions applier (Text spans combo) =
+    Text (List.map (spanMapOptions applier) spans) combo
 
 
 spanMapOptions : (Options -> Options) -> Span -> Span
@@ -334,5 +343,26 @@ spanRenderEl cfg (Span { content, size } { color, oneLineEllipsis }) =
 
 
 getSpans : Text -> List Span
-getSpans (Text spans) =
+getSpans (Text spans _) =
     spans
+
+
+textMapOptions : (TextOptions -> TextOptions) -> Text -> Text
+textMapOptions applier (Text spans combo) =
+    Text spans (applier combo)
+
+
+withEllipsis : Bool -> Text -> Text
+withEllipsis val text =
+    text
+        |> mapOptions (\opt -> { opt | oneLineEllipsis = val })
+        |> textMapOptions (\opt -> { opt | ellipsis = val })
+
+
+combinedAttrs : TextOptions -> List (Attribute msg)
+combinedAttrs { ellipsis } =
+    if ellipsis then
+        [ Element.width fill, Element.clipX ]
+
+    else
+        []
