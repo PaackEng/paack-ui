@@ -107,7 +107,7 @@ withEllipsis val text =
 
 
 toEl : RenderConfig -> Text -> Element msg
-toEl cfg (Internal.Text spans combo) =
+toEl cfg (Internal.Text spans opt) =
     case spans of
         [] ->
             Element.none
@@ -118,7 +118,7 @@ toEl cfg (Internal.Text spans combo) =
         _ ->
             -- TODO: Concat paragraphs
             List.map (Internal.spanRenderEl cfg) spans
-                |> Element.column (Internal.combinedAttrs combo)
+                |> Element.column (Internal.combinedAttrs opt)
 
 
 multiline : (String -> Text) -> List String -> Text
@@ -129,7 +129,7 @@ multiline style lines =
                 |> List.map (style >> Internal.getSpans)
                 |> List.concat
     in
-    Internal.Text newSpans Internal.defaultCombinedOptions
+    Internal.Text newSpans Internal.textDefaultOptions
 
 
 combination : List Text -> Text
@@ -140,4 +140,4 @@ combination parts =
                 |> List.map Internal.getSpans
                 |> List.concat
     in
-    Internal.Text newSpans Internal.defaultCombinedOptions
+    Internal.Text newSpans Internal.textDefaultOptions

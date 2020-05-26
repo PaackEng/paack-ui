@@ -11,11 +11,11 @@ import UI.Utils.Element as Element
 
 
 type Text
-    = Text (List Span) CombinedOptions
+    = Text (List Span) TextOptions
 
 
 type Span
-    = Span Properties Options
+    = Span SpanProperties Options
 
 
 type alias Options =
@@ -24,13 +24,13 @@ type alias Options =
     }
 
 
-type alias Properties =
+type alias SpanProperties =
     { content : String
     , size : TextSize
     }
 
 
-type alias CombinedOptions =
+type alias TextOptions =
     { ellipsis : Bool }
 
 
@@ -57,18 +57,18 @@ type TextColor
 
 defaultText : TextSize -> String -> Text
 defaultText size content =
-    Text [ Span (Properties content size) defaultOptions ] defaultCombinedOptions
+    Text [ Span (SpanProperties content size) spanDefaultOptions ] textDefaultOptions
 
 
-defaultOptions : Options
-defaultOptions =
+spanDefaultOptions : Options
+spanDefaultOptions =
     { color = defaultColor
     , oneLineEllipsis = False
     }
 
 
-defaultCombinedOptions : CombinedOptions
-defaultCombinedOptions =
+textDefaultOptions : TextOptions
+textDefaultOptions =
     { ellipsis = False }
 
 
@@ -347,8 +347,8 @@ getSpans (Text spans _) =
     spans
 
 
-mapComboOptions : (CombinedOptions -> CombinedOptions) -> Text -> Text
-mapComboOptions applier (Text spans combo) =
+textMapOptions : (TextOptions -> TextOptions) -> Text -> Text
+textMapOptions applier (Text spans combo) =
     Text spans (applier combo)
 
 
@@ -356,10 +356,10 @@ withEllipsis : Bool -> Text -> Text
 withEllipsis val text =
     text
         |> mapOptions (\opt -> { opt | oneLineEllipsis = val })
-        |> mapComboOptions (\opt -> { opt | ellipsis = val })
+        |> textMapOptions (\opt -> { opt | ellipsis = val })
 
 
-combinedAttrs : CombinedOptions -> List (Attribute msg)
+combinedAttrs : TextOptions -> List (Attribute msg)
 combinedAttrs { ellipsis } =
     if ellipsis then
         [ Element.width fill, Element.clipX ]
