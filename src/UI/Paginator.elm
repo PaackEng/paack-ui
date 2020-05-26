@@ -1,4 +1,4 @@
-module UI.Paginator exposing (nonNumeric)
+module UI.Paginator exposing (PaginatorConfig, nonNumeric)
 
 import Element exposing (Element, fill)
 import UI.Button as Button exposing (Button, ButtonMode)
