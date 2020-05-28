@@ -31,13 +31,13 @@ import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
 import UI.Icon as Icon exposing (Icon)
-import UI.Internal.Basics exposing (lazyMap)
+import UI.Internal.Basics exposing (lazyMap, pairUncurry)
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Text as Text exposing (TextColor)
 import UI.Link as Link exposing (Link)
 import UI.Palette as Palette exposing (brightnessDarkest, brightnessLight, brightnessLighter, brightnessLightest, brightnessMiddle)
-import UI.RenderConfig exposing (RenderConfig)
+import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element
@@ -224,7 +224,7 @@ toEl : RenderConfig -> Button msg -> Element msg
 toEl cfg ((Button { click, body } _) as btn) =
     let
         attrs =
-            baseAttrs btn
+            baseAttrs cfg btn
                 ++ styleAttrs btn
                 ++ disabledAttrs btn
                 ++ clickAttrs btn
@@ -246,11 +246,11 @@ fontAttrs cfg =
     Text.attributes cfg Text.SizeSubtitle1 True Text.defaultColor
 
 
-baseAttrs : Button msg -> List (Attribute msg)
-baseAttrs btn =
+baseAttrs : RenderConfig -> Button msg -> List (Attribute msg)
+baseAttrs cfg btn =
     [ Primitives.roundedBorders
     , buttonWidth btn
-    , buttonPadding btn
+    , buttonPadding cfg btn
     ]
 
 
@@ -263,15 +263,27 @@ buttonWidth (Button _ { width }) =
         Element.width Element.shrink
 
 
-buttonPadding : Button msg -> Attribute msg
-buttonPadding ((Button { body } _) as btn) =
-    -- Remove 1 pixel each side for borders
-    case body of
-        BodyText _ ->
-            Element.paddingXY 31 15
+buttonPadding : RenderConfig -> Button msg -> Attribute msg
+buttonPadding cfg ((Button { body } _) as btn) =
+    let
+        -- Remove 1 pixel each side for borders
+        paddingXY =
+            case body of
+                BodyText _ ->
+                    ( 31, 15 )
 
-        BodyIcon _ ->
-            Element.paddingXY 9 13
+                BodyIcon _ ->
+                    case RenderConfig.getContextualSize cfg of
+                        RenderConfig.SizeExtraLarge ->
+                            ( (48 - 26) // 2 - 1, (48 - 20) // 2 - 1 )
+
+                        RenderConfig.SizeLarge ->
+                            ( (40 - 20) // 2 - 1, (40 - 16) // 2 - 1 )
+
+                        RenderConfig.SizeSmall ->
+                            ( (24 - 16) // 2 - 1, (24 - 12) // 2 - 1 )
+    in
+    pairUncurry Element.paddingXY paddingXY
 
 
 ariaAttrs : List (Attribute msg)
@@ -537,5 +549,4 @@ elFromBody cfg body =
                 (Element.text str)
 
         BodyIcon icon ->
-            Element.el [ Font.center, Element.width (Element.px 28) ]
-                (Icon.toEl cfg icon)
+            Icon.toEl cfg icon

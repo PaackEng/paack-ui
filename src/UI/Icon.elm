@@ -29,7 +29,7 @@ import Element.Font as Font
 import Html
 import Html.Attributes as HtmlAttr
 import UI.Palette as Palette exposing (brightnessDarkest, toneGray)
-import UI.RenderConfig exposing (RenderConfig)
+import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Utils.ARIA as ARIA
 
 
@@ -175,12 +175,15 @@ seeMore hint =
 
 
 toEl : RenderConfig -> Icon -> Element msg
-toEl _ (Icon { hint, glyph } { color }) =
+toEl cfg (Icon { hint, glyph } { color }) =
     let
         staticAttrs =
             [ ARIA.roleAttr ARIA.roleImage
             , ARIA.labelAttr hint
             , Element.centerX
+            , Font.center
+            , Element.width <| Element.px width
+            , Font.size height
             ]
 
         attrs =
@@ -194,6 +197,17 @@ toEl _ (Icon { hint, glyph } { color }) =
 
                 ColorInherit ->
                     staticAttrs
+
+        ( width, height ) =
+            case RenderConfig.getContextualSize cfg of
+                RenderConfig.SizeExtraLarge ->
+                    ( 26, 20 )
+
+                RenderConfig.SizeLarge ->
+                    ( 20, 16 )
+
+                RenderConfig.SizeSmall ->
+                    ( 16, 12 )
     in
     Element.el attrs <|
         case glyph of
