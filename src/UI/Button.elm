@@ -13,6 +13,7 @@ module UI.Button exposing
     , modeEnabled
     , toEl
     , toggle
+    , toneClear
     , toneDanger
     , toneLight
     , tonePrimary
@@ -80,6 +81,7 @@ type ButtonTone
     | ToneLight
     | TonePrimary
     | ToneSuccess
+    | ToneClear
 
 
 type ButtonWidth
@@ -169,6 +171,11 @@ toneDanger =
 
 toneLight : ButtonTone
 toneLight =
+    ToneLight
+
+
+toneClear : ButtonTone
+toneClear =
     ToneLight
 
 
@@ -465,6 +472,27 @@ colorHelperWhenEnabled tone =
                     { primary = Palette.color Palette.toneGray brightnessLighter
                     , text =
                         Palette.color Palette.tonePrimary brightnessDarkest
+                            |> Text.ColorPalette
+                    , outlinedBg = Palette.color Palette.toneGray brightnessLightest
+                    }
+            }
+
+        ToneClear ->
+            { normal =
+                { primary =
+                    Palette.color Palette.toneGray brightnessLightest
+                        |> Palette.withAlpha 0
+                , text =
+                    Palette.color Palette.tonePrimary brightnessMiddle
+                        |> Text.ColorPalette
+                , outlinedBg = Palette.color Palette.toneGray brightnessLightest
+                }
+            , hover =
+                Just
+                    { primary =
+                        Palette.color Palette.toneGray brightnessLightest
+                    , text =
+                        Palette.color Palette.tonePrimary brightnessMiddle
                             |> Text.ColorPalette
                     , outlinedBg = Palette.color Palette.toneGray brightnessLightest
                     }
