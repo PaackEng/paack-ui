@@ -13,11 +13,11 @@ module UI.Text exposing
     , heading6
     , multiline
     , overline
+    , setEllipsis
     , subtitle1
     , subtitle2
     , toEl
     , withColor
-    , withEllipsis
     )
 
 import Element exposing (Attribute, Element)
@@ -101,9 +101,9 @@ withColor color text =
     mapOptions (\opt -> { opt | color = Internal.ColorPalette color }) text
 
 
-withEllipsis : Bool -> Text -> Text
-withEllipsis val text =
-    Internal.withEllipsis val text
+setEllipsis : Bool -> Text -> Text
+setEllipsis val text =
+    Internal.setEllipsis val text
 
 
 toEl : RenderConfig -> Text -> Element msg

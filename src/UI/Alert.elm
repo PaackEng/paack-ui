@@ -86,7 +86,7 @@ getTextColor : AlertTone -> Palette.Color
 getTextColor alertTone =
     alertTone
         |> getBackgroundColor
-        |> Palette.withContrast True
+        |> Palette.setContrasting True
 
 
 getBackgroundColor : AlertTone -> Palette.Color

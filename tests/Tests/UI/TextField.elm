@@ -86,7 +86,7 @@ placeholderTests =
     let
         testTextField input placeholderValue =
             input OnTextFieldChanged "some label" "some text"
-                |> TextField.withLabelNotHidden True
+                |> TextField.setLabelVisible True
                 |> TextField.withPlaceholder placeholderValue
                 |> TextField.toEl fakeRenderConfig
                 |> elementToHtml

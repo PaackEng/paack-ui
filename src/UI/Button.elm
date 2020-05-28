@@ -388,7 +388,7 @@ colorHelperWhenDisabled body tone =
                 { primary = Palette.color Palette.toneGray brightnessLight
                 , text =
                     Palette.color Palette.toneGray brightnessLight
-                        |> Palette.withContrast True
+                        |> Palette.setContrasting True
                         |> Text.ColorPalette
                 , outlinedBg = Palette.color Palette.toneGray brightnessLight
                 }
@@ -404,7 +404,7 @@ colorHelperWhenEnabled tone =
                 { primary = Palette.color Palette.tonePrimary brightnessMiddle
                 , text =
                     Palette.color Palette.tonePrimary brightnessMiddle
-                        |> Palette.withContrast True
+                        |> Palette.setContrasting True
                         |> Text.ColorPalette
                 , outlinedBg = Palette.color Palette.toneGray brightnessLightest
                 }
@@ -413,7 +413,7 @@ colorHelperWhenEnabled tone =
                     { primary = Palette.color Palette.tonePrimary brightnessDarkest
                     , text =
                         Palette.color Palette.tonePrimary brightnessDarkest
-                            |> Palette.withContrast True
+                            |> Palette.setContrasting True
                             |> Text.ColorPalette
                     , outlinedBg = Palette.color Palette.toneGray brightnessLightest
                     }
@@ -424,7 +424,7 @@ colorHelperWhenEnabled tone =
                 { primary = Palette.color Palette.toneSuccess brightnessMiddle
                 , text =
                     Palette.color Palette.toneSuccess brightnessMiddle
-                        |> Palette.withContrast True
+                        |> Palette.setContrasting True
                         |> Text.ColorPalette
                 , outlinedBg = Palette.color Palette.toneGray brightnessLightest
                 }
@@ -433,7 +433,7 @@ colorHelperWhenEnabled tone =
                     { primary = Palette.color Palette.toneSuccess brightnessDarkest
                     , text =
                         Palette.color Palette.toneSuccess brightnessDarkest
-                            |> Palette.withContrast True
+                            |> Palette.setContrasting True
                             |> Text.ColorPalette
                     , outlinedBg = Palette.color Palette.toneGray brightnessLightest
                     }
@@ -444,7 +444,7 @@ colorHelperWhenEnabled tone =
                 { primary = Palette.color Palette.toneDanger brightnessMiddle
                 , text =
                     Palette.color Palette.toneDanger brightnessMiddle
-                        |> Palette.withContrast True
+                        |> Palette.setContrasting True
                         |> Text.ColorPalette
                 , outlinedBg = Palette.color Palette.toneGray brightnessLightest
                 }
@@ -453,7 +453,7 @@ colorHelperWhenEnabled tone =
                     { primary = Palette.color Palette.toneDanger brightnessDarkest
                     , text =
                         Palette.color Palette.toneDanger brightnessDarkest
-                            |> Palette.withContrast True
+                            |> Palette.setContrasting True
                             |> Text.ColorPalette
                     , outlinedBg = Palette.color Palette.toneGray brightnessLightest
                     }

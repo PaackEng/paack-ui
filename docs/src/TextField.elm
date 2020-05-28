@@ -24,7 +24,7 @@ defaultTextFieldStory cfg =
             "My cool default"
             "Value"
             |> TextField.withPlaceholder "Enter your info here"
-            |> TextField.withLabelNotHidden True
+            |> TextField.setLabelVisible True
             |> TextField.toEl cfg
         , { note = """
 ```elm
@@ -38,7 +38,7 @@ type Msg
         "My cool input"
         model.value
     |> TextField.withPlaceholder "Enter your info here"
-    |> TextField.withLabelNotHidden True
+    |> TextField.setLabelVisible True
     |> TextField.toEl renderCfg
 ```
 """
@@ -52,7 +52,7 @@ usernameTextFieldStory cfg =
         , TextField.username (always RootMsg.NoOp)
             "Enter your email"
             "Value"
-            |> TextField.withLabelNotHidden True
+            |> TextField.setLabelVisible True
             |> TextField.toEl cfg
         , { note = """
 ```elm
@@ -65,7 +65,7 @@ type Msg
 TextField.email OnTextFieldChanged
         "Enter your email"
         model.emailValue
-    |> TextField.withLabelNotHidden true
+    |> TextField.setLabelVisible true
     |> TextField.toEl renderCfg
 ```
 """
@@ -79,7 +79,7 @@ passwordTextFieldStory cfg =
         , TextField.currentPassword (always RootMsg.NoOp)
             "Enter your password"
             "Value"
-            |> TextField.withLabelNotHidden True
+            |> TextField.setLabelVisible True
             |> TextField.toEl cfg
         , { note = """
 ```elm
@@ -92,7 +92,7 @@ type Msg
 TextField.currentPassword OnTextFieldChanged
         "Enter your password"
         mode.passwordValue
-    |> TextField.withLabelNotHidden True
+    |> TextField.setLabelVisible True
     |> TextField.toEl renderCfg
 ```
 """
@@ -106,7 +106,7 @@ fullWidthStory cfg =
         , TextField.singlelineText (always RootMsg.NoOp)
             "My TextField"
             "Some big text"
-            |> TextField.withLabelNotHidden True
+            |> TextField.setLabelVisible True
             |> TextField.withWidth TextField.widthFull
             |> TextField.toEl cfg
         , { note = """
@@ -120,7 +120,7 @@ type Msg
 TextField.singlelineText OnTextFieldChanged
         "My TextField"
         model.someFieldValue
-    |> TextField.withLabelNotHidden True
+    |> TextField.setLabelVisible True
     |> TextField.withWidth TextField.widthFull
     |> TextField.toEl renderCfg
 ```
