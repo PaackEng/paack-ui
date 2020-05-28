@@ -5,6 +5,8 @@ module UI.Icon exposing
     , close
     , edit
     , eventLog
+    , flagSpain
+    , flagUnitedKingdom
     , getHint
     , leftArrow
     , logout
@@ -24,7 +26,7 @@ module UI.Icon exposing
     , withColor
     )
 
-import Element exposing (..)
+import Element exposing (Element, html)
 import Element.Font as Font
 import Html
 import Html.Attributes as HtmlAttr
@@ -77,6 +79,8 @@ type IconGlyph
     | LeftArrow
     | RightArrow
     | SeeMore
+    | FlagSpain
+    | FlagUnitedKingdom
 
 
 withColor : Palette.Color -> Icon -> Icon
@@ -174,6 +178,16 @@ seeMore hint =
     Icon (Properties hint SeeMore) defaultOptions
 
 
+flagSpain : String -> Icon
+flagSpain hint =
+    Icon (Properties hint FlagSpain) defaultOptions
+
+
+flagUnitedKingdom : String -> Icon
+flagUnitedKingdom hint =
+    Icon (Properties hint FlagUnitedKingdom) defaultOptions
+
+
 toEl : RenderConfig -> Icon -> Element msg
 toEl _ (Icon { hint, glyph } { color }) =
     let
@@ -250,6 +264,12 @@ toEl _ (Icon { hint, glyph } { color }) =
 
             SeeMore ->
                 fasIcon "ellipsis-h" hint
+
+            FlagSpain ->
+                Element.text "🇪🇸"
+
+            FlagUnitedKingdom ->
+                Element.text "🇬🇧"
 
 
 getHint : Icon -> String
