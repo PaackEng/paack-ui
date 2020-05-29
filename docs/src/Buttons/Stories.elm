@@ -209,7 +209,7 @@ contextualSizeStory renderConfig =
                     |> Button.toEl cfg
                 , Button.bodyIcon (Icon.print "Print")
                     |> Button.button Msg.NoOp
-                    |> Button.withTone Button.toneLight
+                    |> Button.withTone Button.toneClear
                     |> Button.toEl cfg
                 , Button.bodyIcon (Icon.toggle "Toggle")
                     |> Button.button Msg.NoOp
@@ -244,7 +244,7 @@ collectionOfButtons cfg =
             |> Button.toEl cfg
         , Button.bodyIcon (Icon.print "Print")
             |> Button.button YourMessage
-            |> Button.withTone Button.toneLight
+            |> Button.withTone Button.toneClear
             |> Button.toEl cfg
         , Button.bodyIcon (Icon.toggle "Toggle")
             |> Button.button YourMessage
