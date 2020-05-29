@@ -8,6 +8,7 @@ import Return as R exposing (Return)
 import UI.Button as Button
 import UI.Icon as Icon
 import UI.Link as Link
+import UI.RenderConfig as RenderConfig
 import UIExplorer exposing (storiesOf)
 import Utils exposing (story, storyList, storyWithModel)
 
@@ -30,6 +31,7 @@ stories renderConfig =
         , linkStory renderConfig
         , fullWidthStory renderConfig
         , toggleStory renderConfig
+        , contextualSizeStory renderConfig
         ]
 
 
@@ -187,3 +189,52 @@ Button.bodyIcon (Icon.toggle "Some Hint")
     |> Button.toEl renderConfig
 ```
 """ } )
+
+
+contextualSizeStory renderConfig =
+    let
+        largeRenderConfig =
+            RenderConfig.withContextualSize RenderConfig.SizeLarge renderConfig
+
+        smallRenderConfig =
+            RenderConfig.withContextualSize RenderConfig.SizeSmall renderConfig
+    in
+    storyList
+        ( "Contextual Sizes"
+        , [ Button.bodyText "Prompt"
+                |> Button.button Msg.NoOp
+                |> Button.withTone Button.toneSuccess
+                |> Button.toEl renderConfig
+          , Button.bodyIcon (Icon.toggle "Toggle")
+                |> Button.button Msg.NoOp
+                |> Button.withTone Button.toneDanger
+                |> Button.toEl largeRenderConfig
+          , Button.bodyIcon (Icon.toggle "Toggle")
+                |> Button.button Msg.NoOp
+                |> Button.withTone Button.toneLight
+                |> Button.toEl smallRenderConfig
+          ]
+        , { note = """
+```elm
+-- Default (ExtraLarge)
+Button.bodyText "Some Text"
+    |> Button.button YourMessage
+    |> Button.withTone Button.toneSuccess
+    |> Button.toEl renderConfig
+
+
+-- Large
+Button.bodyIcon Icon.someIcon
+    |> Button.button YourMessage
+    |> Button.withTone Button.toneDanger
+    |> Button.toEl (RenderConfig.withContextualSize RenderConfig.SizeLarge renderConfig)
+
+-- Small
+Button.bodyIcon Icon.someIcon
+    |> Button.button YourMessage
+    |> Button.withTone Button.toneLight
+    |> Button.toEl (RenderConfig.withContextualSize RenderConfig.SizeSmall renderConfig)
+```
+"""
+          }
+        )
