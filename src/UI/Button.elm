@@ -497,7 +497,9 @@ colorHelperWhenEnabled tone =
                 , text =
                     Palette.color Palette.tonePrimary brightnessMiddle
                         |> Text.ColorPalette
-                , outlinedBg = Palette.color Palette.toneGray brightnessLightest
+                , outlinedBg =
+                    Palette.color Palette.toneGray brightnessLightest
+                        |> Palette.withAlpha 0
                 }
             , hover =
                 Just
