@@ -28,6 +28,7 @@ stories renderConfig =
         , successStory renderConfig
         , dangerStory renderConfig
         , lightStory renderConfig
+        , clearStory renderConfig
         , linkStory renderConfig
         , fullWidthStory renderConfig
         , toggleStory renderConfig
@@ -127,6 +128,13 @@ lightStory cfg =
         "Light"
         Button.toneLight
         "Button.toneLight"
+
+
+clearStory cfg =
+    enabledStory cfg
+        "Clear"
+        Button.toneClear
+        "Button.toneClear"
 
 
 linkStory renderConfig =

@@ -176,7 +176,7 @@ toneLight =
 
 toneClear : ButtonTone
 toneClear =
-    ToneLight
+    ToneClear
 
 
 tonePrimary : ButtonTone
