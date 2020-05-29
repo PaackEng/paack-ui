@@ -1,7 +1,6 @@
-module Form.TextField exposing (stories)
+module TextField exposing (stories)
 
 import Element exposing (..)
-import Form.State as FormMsg
 import Msg as RootMsg
 import UI.TextField as TextField
 import UIExplorer exposing (storiesOf)
