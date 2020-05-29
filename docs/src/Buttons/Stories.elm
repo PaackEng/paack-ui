@@ -2,7 +2,7 @@ module Buttons.Stories exposing (stories, update)
 
 import Buttons.Model as Buttons
 import Buttons.Msg as Buttons
-import Element
+import Element exposing (column, fill, row, spacing, text, width)
 import Msg as Msg
 import Return as R exposing (Return)
 import UI.Button as Button
@@ -201,47 +201,77 @@ Button.bodyIcon (Icon.toggle "Some Hint")
 
 contextualSizeStory renderConfig =
     let
-        largeRenderConfig =
-            RenderConfig.withContextualSize RenderConfig.SizeLarge renderConfig
-
-        smallRenderConfig =
-            RenderConfig.withContextualSize RenderConfig.SizeSmall renderConfig
+        collectionOfButtons cfg =
+            row [ spacing 8 ]
+                [ Button.bodyIcon (Icon.close "Close")
+                    |> Button.button Msg.NoOp
+                    |> Button.withTone Button.toneDanger
+                    |> Button.toEl cfg
+                , Button.bodyIcon (Icon.print "Print")
+                    |> Button.button Msg.NoOp
+                    |> Button.withTone Button.toneLight
+                    |> Button.toEl cfg
+                , Button.bodyIcon (Icon.toggle "Toggle")
+                    |> Button.button Msg.NoOp
+                    |> Button.withTone Button.toneLight
+                    |> Button.toEl cfg
+                ]
     in
-    storyList
+    story
         ( "Contextual Sizes"
-        , [ Button.bodyText "Prompt"
-                |> Button.button Msg.NoOp
-                |> Button.withTone Button.toneSuccess
-                |> Button.toEl renderConfig
-          , Button.bodyIcon (Icon.toggle "Toggle")
-                |> Button.button Msg.NoOp
-                |> Button.withTone Button.toneDanger
-                |> Button.toEl largeRenderConfig
-          , Button.bodyIcon (Icon.toggle "Toggle")
-                |> Button.button Msg.NoOp
-                |> Button.withTone Button.toneLight
-                |> Button.toEl smallRenderConfig
-          ]
+        , column [ width fill, spacing 12 ]
+            [ text "Extra Large (Default) context, where the user attention is required!"
+            , collectionOfButtons renderConfig
+            , text "Large context, these don't compete with attention."
+            , renderConfig
+                |> RenderConfig.withContextualSize
+                    RenderConfig.SizeLarge
+                |> collectionOfButtons
+            , text "Small context, unnecessary details."
+            , renderConfig
+                |> RenderConfig.withContextualSize
+                    RenderConfig.SizeSmall
+                |> collectionOfButtons
+            ]
         , { note = """
 ```elm
--- Default (ExtraLarge)
-Button.bodyText "Some Text"
-    |> Button.button YourMessage
-    |> Button.withTone Button.toneSuccess
-    |> Button.toEl renderConfig
+{- Imagine the following part of your view: -}
+collectionOfButtons cfg =
+    row [ spacing 8 ]
+        [ Button.bodyIcon (Icon.close "Close")
+            |> Button.button YourMessage
+            |> Button.withTone Button.toneDanger
+            |> Button.toEl cfg
+        , Button.bodyIcon (Icon.print "Print")
+            |> Button.button YourMessage
+            |> Button.withTone Button.toneLight
+            |> Button.toEl cfg
+        , Button.bodyIcon (Icon.toggle "Toggle")
+            |> Button.button YourMessage
+            |> Button.withTone Button.toneLight
+            |> Button.toEl cfg
+        ]
 
+{- With context you can change size to gather more/less attention,
+    WITHOUT THE FEAR of forgetting any (sub-)component -}
 
--- Large
-Button.bodyIcon Icon.someIcon
-    |> Button.button YourMessage
-    |> Button.withTone Button.toneDanger
-    |> Button.toEl (RenderConfig.withContextualSize RenderConfig.SizeLarge renderConfig)
+-- Extra Large (Default) context, where the user attention is required! 
+defaultContext cfg =
+    collectionOfButtons cfg
 
--- Small
-Button.bodyIcon Icon.someIcon
-    |> Button.button YourMessage
-    |> Button.withTone Button.toneLight
-    |> Button.toEl (RenderConfig.withContextualSize RenderConfig.SizeSmall renderConfig)
+-- Large context, these don't compete with attention.
+largeContext cfg =
+    cfg
+        |> RenderConfig.withContextualSize
+            RenderConfig.SizeLarge
+        |> collectionOfButtons
+
+-- Small context, unnecessary details.
+smallContext cfg =
+    cfg
+        |> RenderConfig.withContextualSize
+            RenderConfig.SizeSmall
+        |> collectionOfButtons
 ```
 """
           }
