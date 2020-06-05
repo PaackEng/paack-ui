@@ -32,7 +32,6 @@ stories renderConfig =
         , linkStory renderConfig
         , fullWidthStory renderConfig
         , toggleStory renderConfig
-        , contextualSizeStory renderConfig
         ]
 
 
@@ -197,82 +196,3 @@ Button.bodyIcon (Icon.toggle "Some Hint")
     |> Button.toEl renderConfig
 ```
 """ } )
-
-
-contextualSizeStory renderConfig =
-    let
-        collectionOfButtons cfg =
-            row [ spacing 8 ]
-                [ Button.bodyIcon (Icon.close "Close")
-                    |> Button.button Msg.NoOp
-                    |> Button.withTone Button.toneDanger
-                    |> Button.toEl cfg
-                , Button.bodyIcon (Icon.print "Print")
-                    |> Button.button Msg.NoOp
-                    |> Button.withTone Button.toneClear
-                    |> Button.toEl cfg
-                , Button.bodyIcon (Icon.toggle "Toggle")
-                    |> Button.button Msg.NoOp
-                    |> Button.withTone Button.toneLight
-                    |> Button.toEl cfg
-                ]
-    in
-    story
-        ( "Contextual Sizes"
-        , column [ width fill, spacing 12 ]
-            [ text "Extra Large (Default) context, where the user attention is required!"
-            , collectionOfButtons renderConfig
-            , text "Large context, these don't compete with attention."
-            , renderConfig
-                |> RenderConfig.withContextualSize
-                    RenderConfig.SizeLarge
-                |> collectionOfButtons
-            , text "Small context, unnecessary details."
-            , renderConfig
-                |> RenderConfig.withContextualSize
-                    RenderConfig.SizeSmall
-                |> collectionOfButtons
-            ]
-        , { note = """
-```elm
-{- Imagine the following part of your view: -}
-collectionOfButtons cfg =
-    row [ spacing 8 ]
-        [ Button.bodyIcon (Icon.close "Close")
-            |> Button.button YourMessage
-            |> Button.withTone Button.toneDanger
-            |> Button.toEl cfg
-        , Button.bodyIcon (Icon.print "Print")
-            |> Button.button YourMessage
-            |> Button.withTone Button.toneClear
-            |> Button.toEl cfg
-        , Button.bodyIcon (Icon.toggle "Toggle")
-            |> Button.button YourMessage
-            |> Button.withTone Button.toneLight
-            |> Button.toEl cfg
-        ]
-
-{- With context you can change size to gather more/less attention,
-    WITHOUT THE FEAR of forgetting any (sub-)component -}
-
--- Extra Large (Default) context, where the user attention is required! 
-defaultContext cfg =
-    collectionOfButtons cfg
-
--- Large context, these don't compete with attention.
-largeContext cfg =
-    cfg
-        |> RenderConfig.withContextualSize
-            RenderConfig.SizeLarge
-        |> collectionOfButtons
-
--- Small context, unnecessary details.
-smallContext cfg =
-    cfg
-        |> RenderConfig.withContextualSize
-            RenderConfig.SizeSmall
-        |> collectionOfButtons
-```
-"""
-          }
-        )

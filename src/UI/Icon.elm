@@ -28,6 +28,7 @@ import Element exposing (..)
 import Element.Font as Font
 import Html
 import Html.Attributes as HtmlAttr
+import UI.Internal.ContextualSize as ContextualSize exposing (ContextualSize)
 import UI.Palette as Palette exposing (brightnessDarkest, toneGray)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Utils.ARIA as ARIA
@@ -46,7 +47,9 @@ type alias Properties =
 
 
 type alias Options =
-    { color : IconColor }
+    { color : IconColor
+    , size : Maybe ContextualSize
+    }
 
 
 type IconColor
@@ -175,7 +178,7 @@ seeMore hint =
 
 
 toEl : RenderConfig -> Icon -> Element msg
-toEl cfg (Icon { hint, glyph } { color }) =
+toEl cfg (Icon { hint, glyph } { color, size }) =
     let
         staticAttrs =
             [ ARIA.roleAttr ARIA.roleImage
@@ -198,15 +201,18 @@ toEl cfg (Icon { hint, glyph } { color }) =
                 ColorInherit ->
                     staticAttrs
 
+        defaultedSize =
+            Maybe.withDefault ContextualSize.ExtraLarge size
+
         ( width, height ) =
-            case RenderConfig.getContextualSize cfg of
-                RenderConfig.SizeExtraLarge ->
+            case defaultedSize of
+                ContextualSize.ExtraLarge ->
                     ( 26, 20 )
 
-                RenderConfig.SizeLarge ->
+                ContextualSize.Large ->
                     ( 20, 16 )
 
-                RenderConfig.SizeSmall ->
+                ContextualSize.Small ->
                     ( 16, 12 )
     in
     Element.el attrs <|
@@ -277,7 +283,9 @@ getHint (Icon { hint } _) =
 
 defaultOptions : Options
 defaultOptions =
-    { color = ColorInherit }
+    { color = ColorInherit
+    , size = Nothing
+    }
 
 
 fasIcon : String -> String -> Element msg

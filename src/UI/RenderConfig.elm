@@ -1,13 +1,10 @@
 module UI.RenderConfig exposing
-    ( ContextualSize(..)
-    , RenderConfig
+    ( RenderConfig
     , elLayoutAttributes
     , fromWindow
-    , getContextualSize
     , isMobile
     , isPortrait
     , updateWindow
-    , withContextualSize
     )
 
 {- -- Future thoughts:
@@ -28,23 +25,11 @@ import Element.Font as Font
 type alias RenderConfigData =
     { deviceClass : Element.DeviceClass
     , deviceOrientation : Element.Orientation
-    , contextSize : Maybe ContextualSize
     }
-
-
-type ContextualSize
-    = SizeExtraLarge -- 48px
-    | SizeLarge -- 40px
-    | SizeSmall -- 24px
 
 
 type RenderConfig
     = RenderConfig RenderConfigData
-
-
-getContextualSize : RenderConfig -> ContextualSize
-getContextualSize (RenderConfig data) =
-    data.contextSize |> Maybe.withDefault SizeExtraLarge
 
 
 fromWindow : { window | height : Int, width : Int } -> RenderConfig
@@ -55,7 +40,6 @@ fromWindow window =
     in
     { deviceClass = class
     , deviceOrientation = orientation
-    , contextSize = Nothing
     }
         |> RenderConfig
 
@@ -71,11 +55,6 @@ updateWindow window (RenderConfig oldData) =
         , deviceOrientation = orientation
     }
         |> RenderConfig
-
-
-withContextualSize : ContextualSize -> RenderConfig -> RenderConfig
-withContextualSize size (RenderConfig data) =
-    RenderConfig { data | contextSize = Just size }
 
 
 isMobile : RenderConfig -> Bool

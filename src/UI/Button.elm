@@ -32,6 +32,7 @@ import Element.Events as Events
 import Element.Font as Font
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Basics exposing (lazyMap, pairUncurry)
+import UI.Internal.ContextualSize as ContextualSize exposing (ContextualSize)
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Text as Text exposing (TextColor)
@@ -47,6 +48,7 @@ type alias Options =
     { mode : ButtonMode
     , tone : ButtonTone
     , width : ButtonWidth
+    , size : Maybe ContextualSize
     }
 
 
@@ -98,6 +100,7 @@ defaultOptions =
     { mode = ModeEnabled
     , tone = TonePrimary
     , width = WidthRelative
+    , size = Nothing
     }
 
 
@@ -264,7 +267,7 @@ buttonWidth (Button _ { width }) =
 
 
 buttonPadding : RenderConfig -> Button msg -> Attribute msg
-buttonPadding cfg ((Button { body } _) as btn) =
+buttonPadding cfg ((Button { body } { size }) as btn) =
     let
         -- Remove 1 pixel each side for borders
         paddingXY =
@@ -273,14 +276,14 @@ buttonPadding cfg ((Button { body } _) as btn) =
                     ( 31, 15 )
 
                 BodyIcon _ ->
-                    case RenderConfig.getContextualSize cfg of
-                        RenderConfig.SizeExtraLarge ->
+                    case Maybe.withDefault ContextualSize.ExtraLarge size of
+                        ContextualSize.ExtraLarge ->
                             ( (48 - 26) // 2 - 1, (48 - 20) // 2 - 1 )
 
-                        RenderConfig.SizeLarge ->
+                        ContextualSize.Large ->
                             ( (40 - 20) // 2 - 1, (40 - 16) // 2 - 1 )
 
-                        RenderConfig.SizeSmall ->
+                        ContextualSize.Small ->
                             ( (24 - 16) // 2 - 1, (24 - 12) // 2 - 1 )
     in
     pairUncurry Element.paddingXY paddingXY
@@ -552,3 +555,7 @@ elFromBody cfg body =
 
         BodyIcon icon ->
             Icon.toEl cfg icon
+
+
+
+-- TODO => ICON HAVE TO PASSTHROUGH OUR SIZE
