@@ -230,7 +230,7 @@ map applier (Button prop opt) =
 
 
 toEl : RenderConfig -> Button msg -> Element msg
-toEl cfg ((Button { click, body } _) as btn) =
+toEl cfg ((Button { click, body } { size }) as btn) =
     let
         attrs =
             baseAttrs cfg btn
@@ -242,12 +242,12 @@ toEl cfg ((Button { click, body } _) as btn) =
     case click of
         ClickLink linkMeta ->
             body
-                |> elFromBody cfg
+                |> elFromBody cfg size
                 |> Link.packEl cfg attrs linkMeta
 
         _ ->
             Element.el attrs <|
-                elFromBody cfg body
+                elFromBody cfg size body
 
 
 fontAttrs : RenderConfig -> List (Attribute msg)
@@ -547,8 +547,8 @@ clickAttrs (Button { click } { mode }) =
             []
 
 
-elFromBody : RenderConfig -> ButtonBody -> Element msg
-elFromBody cfg body =
+elFromBody : RenderConfig -> Maybe ContextualSize -> ButtonBody -> Element msg
+elFromBody cfg maybeSize body =
     case body of
         BodyText str ->
             Element.el
@@ -560,7 +560,14 @@ elFromBody cfg body =
                 (Element.text str)
 
         BodyIcon icon ->
-            Icon.toEl cfg icon
+            case maybeSize of
+                Just size ->
+                    icon
+                        |> Icon.withSize size
+                        |> Icon.toEl cfg
+
+                Nothing ->
+                    Icon.toEl cfg icon
 
 
 
