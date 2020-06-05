@@ -22,6 +22,7 @@ module UI.Icon exposing
     , toggleDown
     , toggleUp
     , withColor
+    , withSize
     )
 
 import Element exposing (..)
@@ -85,6 +86,11 @@ type IconGlyph
 withColor : Palette.Color -> Icon -> Icon
 withColor color (Icon prop opt) =
     Icon prop { opt | color = ColorFromPalette color }
+
+
+withSize : ContextualSize -> Icon -> Icon
+withSize size (Icon prop opt) =
+    Icon prop { opt | size = Just size }
 
 
 leftArrow : String -> Icon
