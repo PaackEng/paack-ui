@@ -1,18 +1,18 @@
 module UI.Size exposing (sizeExtraLarge, sizeLarge, sizeSmall)
 
-import UI.Internal.Size as Internal exposing (ContextualSize)
+import UI.Internal.ContextualSize as Internal exposing (ContextualSize)
 
 
 sizeExtraLarge : ContextualSize
 sizeExtraLarge =
-    Internal.SizeExtraLarge
+    Internal.ExtraLarge
 
 
 sizeLarge : ContextualSize
 sizeLarge =
-    Internal.SizeLarge
+    Internal.Large
 
 
 sizeSmall : ContextualSize
 sizeSmall =
-    Internal.SizeSmall
+    Internal.Small

@@ -5,3 +5,8 @@ type ContextualSize
     = ExtraLarge
     | Large
     | Small
+
+
+default : ContextualSize
+default =
+    ExtraLarge

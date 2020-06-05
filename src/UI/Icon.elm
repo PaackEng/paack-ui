@@ -49,7 +49,7 @@ type alias Properties =
 
 type alias Options =
     { color : IconColor
-    , size : Maybe ContextualSize
+    , size : ContextualSize
     }
 
 
@@ -90,7 +90,7 @@ withColor color (Icon prop opt) =
 
 withSize : ContextualSize -> Icon -> Icon
 withSize size (Icon prop opt) =
-    Icon prop { opt | size = Just size }
+    Icon prop { opt | size = size }
 
 
 leftArrow : String -> Icon
@@ -207,11 +207,8 @@ toEl cfg (Icon { hint, glyph } { color, size }) =
                 ColorInherit ->
                     staticAttrs
 
-        defaultedSize =
-            Maybe.withDefault ContextualSize.ExtraLarge size
-
         ( width, height ) =
-            case defaultedSize of
+            case size of
                 ContextualSize.ExtraLarge ->
                     ( 26, 20 )
 
@@ -290,7 +287,7 @@ getHint (Icon { hint } _) =
 defaultOptions : Options
 defaultOptions =
     { color = ColorInherit
-    , size = Nothing
+    , size = ContextualSize.default
     }
 
 

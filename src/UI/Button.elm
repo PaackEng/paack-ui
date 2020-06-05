@@ -49,7 +49,7 @@ type alias Options =
     { mode : ButtonMode
     , tone : ButtonTone
     , width : ButtonWidth
-    , size : Maybe ContextualSize
+    , size : ContextualSize
     }
 
 
@@ -101,7 +101,7 @@ defaultOptions =
     { mode = ModeEnabled
     , tone = TonePrimary
     , width = WidthRelative
-    , size = Nothing
+    , size = ContextualSize.default
     }
 
 
@@ -146,7 +146,7 @@ withWidth width (Button prop opt) =
 
 withSize : ContextualSize -> Button msg -> Button msg
 withSize size (Button prop opt) =
-    Button prop { opt | size = Just size }
+    Button prop { opt | size = size }
 
 
 
@@ -282,7 +282,7 @@ buttonPadding cfg ((Button { body } { size }) as btn) =
                     ( 31, 15 )
 
                 BodyIcon _ ->
-                    case Maybe.withDefault ContextualSize.ExtraLarge size of
+                    case size of
                         ContextualSize.ExtraLarge ->
                             ( (48 - 26) // 2 - 1, (48 - 20) // 2 - 1 )
 
@@ -547,8 +547,8 @@ clickAttrs (Button { click } { mode }) =
             []
 
 
-elFromBody : RenderConfig -> Maybe ContextualSize -> ButtonBody -> Element msg
-elFromBody cfg maybeSize body =
+elFromBody : RenderConfig -> ContextualSize -> ButtonBody -> Element msg
+elFromBody cfg size body =
     case body of
         BodyText str ->
             Element.el
@@ -560,14 +560,9 @@ elFromBody cfg maybeSize body =
                 (Element.text str)
 
         BodyIcon icon ->
-            case maybeSize of
-                Just size ->
-                    icon
-                        |> Icon.withSize size
-                        |> Icon.toEl cfg
-
-                Nothing ->
-                    Icon.toEl cfg icon
+            icon
+                |> Icon.withSize size
+                |> Icon.toEl cfg
 
 
 
