@@ -2,12 +2,13 @@ module Buttons.Stories exposing (stories, update)
 
 import Buttons.Model as Buttons
 import Buttons.Msg as Buttons
-import Element
+import Element exposing (column, fill, row, spacing, text, width)
 import Msg as Msg
 import Return as R exposing (Return)
 import UI.Button as Button
 import UI.Icon as Icon
 import UI.Link as Link
+import UI.RenderConfig as RenderConfig
 import UIExplorer exposing (storiesOf)
 import Utils exposing (story, storyList, storyWithModel)
 
@@ -27,6 +28,7 @@ stories renderConfig =
         , successStory renderConfig
         , dangerStory renderConfig
         , lightStory renderConfig
+        , clearStory renderConfig
         , linkStory renderConfig
         , fullWidthStory renderConfig
         , toggleStory renderConfig
@@ -125,6 +127,13 @@ lightStory cfg =
         "Light"
         Button.toneLight
         "Button.toneLight"
+
+
+clearStory cfg =
+    enabledStory cfg
+        "Clear"
+        Button.toneClear
+        "Button.toneClear"
 
 
 linkStory renderConfig =

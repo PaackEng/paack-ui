@@ -352,8 +352,8 @@ textMapOptions applier (Text spans combo) =
     Text spans (applier combo)
 
 
-withEllipsis : Bool -> Text -> Text
-withEllipsis val text =
+setEllipsis : Bool -> Text -> Text
+setEllipsis val text =
     text
         |> mapOptions (\opt -> { opt | oneLineEllipsis = val })
         |> textMapOptions (\opt -> { opt | ellipsis = val })

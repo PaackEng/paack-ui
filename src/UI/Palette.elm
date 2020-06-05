@@ -8,6 +8,7 @@ module UI.Palette exposing
     , brightnessLightest
     , brightnessMiddle
     , color
+    , setContrasting
     , toCssColor
     , toElColor
     , toneDanger
@@ -16,7 +17,6 @@ module UI.Palette exposing
     , toneSuccess
     , toneWarning
     , withAlpha
-    , withContrast
     )
 
 import Element
@@ -68,8 +68,8 @@ toElColor (Color { tone, brightness } { alpha, contrast }) =
         |> colorSetOpacity alpha
 
 
-withContrast : Bool -> Color -> Color
-withContrast enabled (Color prop opt) =
+setContrasting : Bool -> Color -> Color
+setContrasting enabled (Color prop opt) =
     Color prop { opt | contrast = enabled }
 
 

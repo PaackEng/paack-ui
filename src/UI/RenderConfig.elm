@@ -1,4 +1,11 @@
-module UI.RenderConfig exposing (RenderConfig, elLayoutAttributes, fromWindow, isMobile, isPortrait, updateWindow)
+module UI.RenderConfig exposing
+    ( RenderConfig
+    , elLayoutAttributes
+    , fromWindow
+    , isMobile
+    , isPortrait
+    , updateWindow
+    )
 
 {- -- Future thoughts:
 

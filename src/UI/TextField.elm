@@ -7,6 +7,8 @@ module UI.TextField exposing
     , multilineText
     , newPassword
     , search
+    , setLabelVisible
+    , setPasswordVisible
     , singlelineText
     , spellChecked
     , static
@@ -17,9 +19,7 @@ module UI.TextField exposing
     , withError
     , withFocus
     , withIcon
-    , withLabelNotHidden
     , withOnEnterPressed
-    , withPasswordNotHidden
     , withPlaceholder
     , withWidth
     )
@@ -125,8 +125,8 @@ withWidth width (TextField prop opt) =
         { opt | width = width }
 
 
-withLabelNotHidden : Bool -> TextField msg -> TextField msg
-withLabelNotHidden isVisible (TextField prop opt) =
+setLabelVisible : Bool -> TextField msg -> TextField msg
+setLabelVisible isVisible (TextField prop opt) =
     TextField prop
         { opt | labelVisible = isVisible }
 
@@ -143,8 +143,8 @@ withOnEnterPressed msg (TextField prop opt) =
         { opt | onEnterPressed = Just msg }
 
 
-withPasswordNotHidden : Bool -> TextField msg -> TextField msg
-withPasswordNotHidden isVisible ((TextField prop opt) as original) =
+setPasswordVisible : Bool -> TextField msg -> TextField msg
+setPasswordVisible isVisible ((TextField prop opt) as original) =
     case prop.content of
         ContentPassword { isCurrent } ->
             TextField

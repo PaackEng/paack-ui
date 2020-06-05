@@ -22,14 +22,16 @@ module UI.Icon exposing
     , toggleDown
     , toggleUp
     , withColor
+    , withSize
     )
 
 import Element exposing (..)
 import Element.Font as Font
 import Html
 import Html.Attributes as HtmlAttr
+import UI.Internal.ContextualSize as ContextualSize exposing (ContextualSize)
 import UI.Palette as Palette exposing (brightnessDarkest, toneGray)
-import UI.RenderConfig exposing (RenderConfig)
+import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Utils.ARIA as ARIA
 
 
@@ -46,7 +48,9 @@ type alias Properties =
 
 
 type alias Options =
-    { color : IconColor }
+    { color : IconColor
+    , size : ContextualSize
+    }
 
 
 type IconColor
@@ -82,6 +86,11 @@ type IconGlyph
 withColor : Palette.Color -> Icon -> Icon
 withColor color (Icon prop opt) =
     Icon prop { opt | color = ColorFromPalette color }
+
+
+withSize : ContextualSize -> Icon -> Icon
+withSize size (Icon prop opt) =
+    Icon prop { opt | size = size }
 
 
 leftArrow : String -> Icon
@@ -175,12 +184,15 @@ seeMore hint =
 
 
 toEl : RenderConfig -> Icon -> Element msg
-toEl _ (Icon { hint, glyph } { color }) =
+toEl cfg (Icon { hint, glyph } { color, size }) =
     let
         staticAttrs =
             [ ARIA.roleAttr ARIA.roleImage
             , ARIA.labelAttr hint
             , Element.centerX
+            , Font.center
+            , Element.width <| Element.px width
+            , Font.size height
             ]
 
         attrs =
@@ -194,6 +206,17 @@ toEl _ (Icon { hint, glyph } { color }) =
 
                 ColorInherit ->
                     staticAttrs
+
+        ( width, height ) =
+            case size of
+                ContextualSize.ExtraLarge ->
+                    ( 26, 20 )
+
+                ContextualSize.Large ->
+                    ( 20, 16 )
+
+                ContextualSize.Small ->
+                    ( 16, 12 )
     in
     Element.el attrs <|
         case glyph of
@@ -263,7 +286,9 @@ getHint (Icon { hint } _) =
 
 defaultOptions : Options
 defaultOptions =
-    { color = ColorInherit }
+    { color = ColorInherit
+    , size = ContextualSize.default
+    }
 
 
 fasIcon : String -> String -> Element msg

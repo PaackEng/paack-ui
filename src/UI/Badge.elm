@@ -72,7 +72,7 @@ toEl cfg (Badge { content, tone } { brightness }) =
             Palette.color tone brightness
 
         textColor =
-            Palette.withContrast True background
+            Palette.setContrasting True background
     in
     Text.overline content
         |> Text.withColor textColor

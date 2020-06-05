@@ -22,3 +22,8 @@ ifThenElse condition ifThen ifElse =
 
     else
         ifElse
+
+
+pairUncurry : (a -> b -> c) -> ( a, b ) -> c
+pairUncurry applier ( first, second ) =
+    applier first second
