@@ -21,6 +21,7 @@ module UI.Button exposing
     , widthFull
     , widthRelative
     , withMode
+    , withSize
     , withTone
     , withWidth
     )
@@ -141,6 +142,11 @@ withTone tone (Button prop opt) =
 withWidth : ButtonWidth -> Button msg -> Button msg
 withWidth width (Button prop opt) =
     Button prop { opt | width = width }
+
+
+withSize : ContextualSize -> Button msg -> Button msg
+withSize size (Button prop opt) =
+    Button prop { opt | size = Just size }
 
 
 
