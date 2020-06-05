@@ -15,6 +15,7 @@
         "UI.Palette",
         "UI.RenderConfig",
         "UI.SelectList",
+        "UI.Size",
         "UI.Text",
         "UI.TextField",
         "UI.Utils.ARIA",
