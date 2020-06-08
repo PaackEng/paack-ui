@@ -3,6 +3,7 @@ module UI.Internal.Dialog exposing (Dialog, dialogMap, view)
 import Element exposing (Element, fill, maximum, px, rgb255, shrink)
 import Element.Background as Background
 import Element.Events as Events
+import UI.Button as Button
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (ifThenElse, lazyMap)
 import UI.Internal.Palette as Palette
@@ -31,43 +32,62 @@ dialogMap applier data =
 
 view : RenderConfig -> Dialog msg -> Element msg
 view cfg { title, body, close, width } =
-    Element.row
+    let
+        -- Mobile and deskop different aspects
+        ( ( align, height, padding ), textPadding, bodyPadding ) =
+            if RenderConfig.isMobile cfg then
+                ( ( Element.alignTop, fill, 0 )
+                , { top = 40, left = 20, right = 0, bottom = 0 }
+                , { top = 8, left = 20, right = 20, bottom = 20 }
+                )
+
+            else
+                ( ( Element.centerY, shrink, 12 )
+                , { top = 20, left = 32, right = 0, bottom = 0 }
+                , { top = 8, left = 32, right = 32, bottom = 32 }
+                )
+
+        headerRow =
+            Element.row [ Element.width fill ]
+                [ Text.heading5 title
+                    |> Text.toEl cfg
+                    |> Element.el
+                        [ Element.width fill
+                        , Element.paddingEach textPadding
+                        , Element.alignTop
+                        ]
+                , Icon.close "Close dialog"
+                    |> Button.bodyIcon
+                    |> Button.button close
+                    |> Button.withTone Button.toneClear
+                    |> Button.toEl cfg
+                ]
+    in
+    Element.column
+        [ Element.centerX
+        , align
+        , Element.height height
+        , Element.padding padding
+        , Element.width width
+        , Background.color <| rgb255 255 255 255 -- NOTE: MAIN LAYOUT'S BACKGROUND COLOR
+        ]
+        [ headerRow
+        , body
+            |> Element.el
+                [ Element.width fill
+                , Element.paddingEach bodyPadding
+                ]
+        ]
+        |> blackBackground
+
+
+blackBackground : Element msg -> Element msg
+blackBackground =
+    -- Desktop has a black background
+    Element.el
         [ Element.width fill
         , Element.height fill
         , Palette.gray.darkest
             |> Element.colorSetOpacity 0.85
             |> Background.color
-        ]
-        [ Element.column
-            [ Element.centerX
-            , ifThenElse (RenderConfig.isMobile cfg) Element.alignTop Element.centerY
-            , Element.height <|
-                if RenderConfig.isMobile cfg then
-                    fill
-
-                else
-                    shrink
-            , Element.padding 12
-            , Element.width width
-            , Background.color <| rgb255 255 255 255 -- NOTE: MAIN LAYOUT'S BACKGROUND COLOR REPEATES HERE
-            ]
-            [ Element.row [ Element.width fill ]
-                [ Text.heading5 title
-                    |> Text.toEl cfg
-                    |> Element.el
-                        [ Element.width fill
-                        , Element.paddingEach { top = 20, left = 20, right = 0, bottom = 0 }
-                        ]
-                , Icon.close "Close dialog"
-                    |> Icon.toEl cfg
-                    |> Element.el
-                        [ Events.onClick close
-                        , Element.pointer
-                        , Element.width (px 14)
-                        , Element.paddingXY 26 20
-                        , ARIA.roleAttr ARIA.roleButton
-                        ]
-                ]
-            , body
-            ]
         ]
