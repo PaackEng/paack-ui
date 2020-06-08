@@ -57,10 +57,14 @@ view cfg { title, body, close, width } =
                         , Element.alignTop
                         ]
                 , Icon.close "Close dialog"
-                    |> Button.bodyIcon
-                    |> Button.button close
-                    |> Button.withTone Button.toneClear
-                    |> Button.toEl cfg
+                    |> Icon.toEl cfg
+                    |> Element.el
+                        [ Events.onClick close
+                        , Element.pointer
+                        , Element.width (px 20)
+                        , Element.paddingXY 23 20
+                        , ARIA.roleAttr ARIA.roleButton
+                        ]
                 ]
     in
     Element.column
