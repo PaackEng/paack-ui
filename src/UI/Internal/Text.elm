@@ -319,7 +319,6 @@ oneLineHeight isMobile size =
                 12 + 4
 
             SizeOverline ->
-                -- TODO: Looks like OVERLINE has lineHeight
                 10 + 6
 
 

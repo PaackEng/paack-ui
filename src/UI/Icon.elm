@@ -17,7 +17,6 @@ module UI.Icon exposing
     , search
     , seeMore
     , toEl
-    , todo
     , toggle
     , toggleDown
     , toggleUp
@@ -33,12 +32,6 @@ import UI.Internal.ContextualSize as ContextualSize exposing (ContextualSize)
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Utils.ARIA as ARIA
-
-
-todo : String -> Element msg
-todo _ =
-    -- TODO: Remove
-    fasIcon "--------" ""
 
 
 type alias Properties =

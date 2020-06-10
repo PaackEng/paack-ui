@@ -115,7 +115,6 @@ toEl cfg (Internal.Text spans opt) =
             Internal.spanRenderEl cfg theOne
 
         _ ->
-            -- TODO: Concat paragraphs
             List.map (Internal.spanRenderEl cfg) spans
                 |> Element.column (Internal.combinedAttrs opt)
 

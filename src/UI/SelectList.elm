@@ -36,7 +36,7 @@ type alias Options object msg =
     -- FUTURE: sort: Maybe (List object -> List object)
     { items : List object
     , searchField : Maybe (SearchOptions object msg)
-    , actionBar : Maybe ( String, String -> Icon, msg ) -- TODO
+    , actionBar : Maybe ( String, String -> Icon, msg )
     , isSelected : Maybe (object -> Bool)
     , width : Element.Length
     }

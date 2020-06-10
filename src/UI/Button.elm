@@ -558,7 +558,3 @@ elFromBody cfg size body =
             icon
                 |> Icon.withSize size
                 |> Icon.toEl cfg
-
-
-
--- TODO => ICON HAVE TO PASSTHROUGH OUR SIZE
