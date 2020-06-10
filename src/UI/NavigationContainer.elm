@@ -208,11 +208,10 @@ navigator applier state pagesContainers =
         (menu applier state)
 
 
-dialog : String -> msg -> Element.Length -> Element msg -> Dialog msg
-dialog title onClose width body =
+dialog : String -> msg -> Element msg -> Dialog msg
+dialog title onClose body =
     { title = title
     , close = onClose
-    , width = width
     , body = body
     }
 
