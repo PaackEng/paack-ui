@@ -1,6 +1,6 @@
 module UI.Internal.Dialog exposing (Dialog, dialogMap, view)
 
-import Element exposing (Element, fill, maximum, px, rgb255, shrink)
+import Element exposing (Attribute, Element, fill, maximum, px, rgb255, shrink)
 import Element.Background as Background
 import Element.Events as Events
 import UI.Button as Button
@@ -10,13 +10,12 @@ import UI.Internal.Palette as Palette
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UI.Utils.ARIA as ARIA exposing (roleButton)
-import UI.Utils.Element as Element
+import UI.Utils.Element as Element exposing (RectangleSides)
 
 
 type alias Dialog msg =
     { title : String
     , close : msg
-    , width : Element.Length
     , body : Element msg
     }
 
@@ -25,73 +24,143 @@ dialogMap : (a -> b) -> Dialog a -> Dialog b
 dialogMap applier data =
     { title = data.title
     , close = applier data.close
-    , width = data.width
     , body = Element.map applier data.body
     }
 
 
 view : RenderConfig -> Dialog msg -> Element msg
-view cfg { title, body, close, width } =
+view cfg dialog =
     let
-        -- Mobile and deskop different aspects
-        ( ( align, height, padding ), textPadding, bodyPadding ) =
+        responsiveView =
             if RenderConfig.isMobile cfg then
-                ( ( Element.alignTop, fill, 0 )
-                , { top = 40, left = 20, right = 0, bottom = 0 }
-                , { top = 8, left = 20, right = 20, bottom = 20 }
-                )
+                mobileView
 
             else
-                ( ( Element.centerY, shrink, 12 )
-                , { top = 20, left = 32, right = 0, bottom = 0 }
-                , { top = 8, left = 32, right = 32, bottom = 32 }
-                )
-
-        headerRow =
-            Element.row [ Element.width fill ]
-                [ Text.heading5 title
-                    |> Text.toEl cfg
-                    |> Element.el
-                        [ Element.width fill
-                        , Element.paddingEach textPadding
-                        , Element.alignTop
-                        ]
-                , Icon.close "Close dialog"
-                    |> Icon.toEl cfg
-                    |> Element.el
-                        [ Events.onClick close
-                        , Element.pointer
-                        , Element.width (px 20)
-                        , Element.paddingXY 23 20
-                        , ARIA.roleAttr ARIA.roleButton
-                        ]
-                ]
+                desktopView
     in
+    responsiveView cfg dialog
+
+
+desktopView : RenderConfig -> Dialog msg -> Element msg
+desktopView cfg dialog =
+    -- Desktop has a black background
+    desktopDialogView cfg dialog
+        |> Element.el
+            [ Element.width fill
+            , Element.height fill
+            , Element.behindContent (blackBlock dialog.close)
+            ]
+
+
+desktopDialogView : RenderConfig -> Dialog msg -> Element msg
+desktopDialogView cfg { title, body, close } =
     Element.column
-        [ Element.centerX
-        , align
-        , Element.height height
-        , Element.padding padding
-        , Element.width width
-        , Background.color <| rgb255 255 255 255 -- NOTE: MAIN LAYOUT'S BACKGROUND COLOR
+        [ Element.width shrink
+        , Element.centerY
+        , Element.centerX
+        , Element.spacing 8
+        , whiteBg
         ]
-        [ headerRow
+        [ desktopHeaderRow cfg close title
+        , body
+            |> Element.el
+                [ Element.width shrink
+                , Element.paddingEach
+                    { top = 0, left = 32, right = 32, bottom = 32 }
+                ]
+        ]
+
+
+desktopHeaderRow : RenderConfig -> msg -> String -> Element msg
+desktopHeaderRow cfg close title =
+    Element.row
+        [ Element.width fill
+        , Element.paddingEach { top = 12, right = 12, left = 0, bottom = 0 }
+        ]
+        [ titleText cfg
+            { top = 20, left = 32, right = 0, bottom = 0 }
+            title
+        , closeButton cfg close
+        ]
+
+
+mobileView : RenderConfig -> Dialog msg -> Element msg
+mobileView cfg { title, body, close } =
+    Element.column
+        [ Element.width fill
+        , Element.height fill
+        , Element.alignTop
+        , Element.spacing 8
+        , whiteBg
+        ]
+        [ mobileHeaderRow cfg close title
         , body
             |> Element.el
                 [ Element.width fill
-                , Element.paddingEach bodyPadding
+                , Element.paddingEach
+                    { top = 0, left = 20, right = 20, bottom = 20 }
                 ]
         ]
-        |> blackBackground
 
 
-blackBackground : Element msg -> Element msg
-blackBackground =
-    -- Desktop has a black background
+mobileHeaderRow : RenderConfig -> msg -> String -> Element msg
+mobileHeaderRow cfg close title =
+    Element.row
+        [ Element.width fill
+        , Element.padding 0
+        ]
+        [ titleText cfg
+            { top = 40, left = 20, right = 0, bottom = 0 }
+            title
+        , closeButton cfg close
+        ]
+
+
+whiteBg : Attribute msg
+whiteBg =
+    -- NOTE: MAIN LAYOUT'S BACKGROUND COLOR
+    Background.color <| rgb255 255 255 255
+
+
+blackBg : Attribute msg
+blackBg =
+    Palette.gray.darkest
+        |> Element.colorSetOpacity 0.85
+        |> Background.color
+
+
+titleText : RenderConfig -> RectangleSides -> String -> Element msg
+titleText cfg padding title =
+    Text.heading5 title
+        |> Text.toEl cfg
+        |> Element.el
+            [ Element.width fill
+            , Element.paddingEach padding
+            , Element.alignTop
+            ]
+
+
+closeButton : RenderConfig -> msg -> Element msg
+closeButton cfg close =
+    Icon.close "Close dialog"
+        |> Icon.toEl cfg
+        |> Element.el
+            [ Events.onClick close
+            , Element.pointer
+            , Element.width (px 20)
+            , Element.paddingXY 20 10
+            , Element.height shrink
+            , Element.alignTop
+            , ARIA.roleAttr ARIA.roleButton
+            ]
+
+
+blackBlock : msg -> Element msg
+blackBlock close =
     Element.el
         [ Element.width fill
         , Element.height fill
-        , Palette.gray.darkest
-            |> Element.colorSetOpacity 0.85
-            |> Background.color
+        , blackBg
+        , Events.onClick close
         ]
+        Element.none

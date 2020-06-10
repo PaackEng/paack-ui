@@ -1,5 +1,6 @@
 module UI.Utils.Element exposing
-    ( colorSetOpacity
+    ( RectangleSides
+    , colorSetOpacity
     , colorTransition
     , desktopMaximum
     , disabled
@@ -21,6 +22,14 @@ import Svg
 import Svg.Attributes as SvgAttr
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Utils.ARIA as ARIA
+
+
+type alias RectangleSides =
+    { top : Int
+    , left : Int
+    , right : Int
+    , bottom : Int
+    }
 
 
 svg : String -> List (Svg.Attribute msg) -> List (Svg.Svg msg) -> Element msg
@@ -113,12 +122,7 @@ desktopMaximum cfg maxSize =
         Element.fill |> Element.maximum maxSize
 
 
-zeroPadding :
-    { top : Int
-    , left : Int
-    , right : Int
-    , bottom : Int
-    }
+zeroPadding : RectangleSides
 zeroPadding =
     { top = 0
     , left = 0
