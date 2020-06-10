@@ -482,19 +482,19 @@ colorHelperWhenEnabled tone =
 
         ToneLight ->
             { normal =
-                { primary = Palette.color Palette.toneGray brightnessLightest
+                { primary = Palette.color Palette.toneGray brightnessLighter
                 , text =
                     Palette.color Palette.tonePrimary brightnessMiddle
                         |> Text.ColorPalette
-                , outlinedBg = Palette.color Palette.toneGray brightnessLightest
+                , outlinedBg = Palette.color Palette.toneGray brightnessLighter
                 }
             , hover =
                 Just
-                    { primary = Palette.color Palette.toneGray brightnessLighter
+                    { primary = Palette.color Palette.toneGray brightnessLight
                     , text =
                         Palette.color Palette.tonePrimary brightnessDarkest
                             |> Text.ColorPalette
-                    , outlinedBg = Palette.color Palette.toneGray brightnessLightest
+                    , outlinedBg = Palette.color Palette.toneGray brightnessLight
                     }
             }
 
