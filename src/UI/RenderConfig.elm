@@ -35,8 +35,8 @@ type RenderConfig
 fromWindow : { window | height : Int, width : Int } -> RenderConfig
 fromWindow window =
     let
-        { class, orientation } =
-            Element.classifyDevice window
+        ( class, orientation ) =
+            classifyWindow window
     in
     { deviceClass = class
     , deviceOrientation = orientation
@@ -47,8 +47,8 @@ fromWindow window =
 updateWindow : { window | height : Int, width : Int } -> RenderConfig -> RenderConfig
 updateWindow window (RenderConfig oldData) =
     let
-        { class, orientation } =
-            Element.classifyDevice window
+        ( class, orientation ) =
+            classifyWindow window
     in
     { oldData
         | deviceClass = class
@@ -71,3 +71,19 @@ elLayoutAttributes : RenderConfig -> List (Attribute msg)
 elLayoutAttributes _ =
     -- Why here? Accessibility settings may change fonts, backgrounds, etc...
     [ Font.family [ Font.typeface "Inter", Font.sansSerif ] ]
+
+
+classifyWindow : { window | height : Int, width : Int } -> ( Element.DeviceClass, Element.Orientation )
+classifyWindow window =
+    let
+        { orientation } =
+            Element.classifyDevice window
+
+        class =
+            if window.width < 600 then
+                Element.Phone
+
+            else
+                Element.Desktop
+    in
+    ( class, orientation )

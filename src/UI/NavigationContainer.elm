@@ -252,24 +252,28 @@ toEl cfg page model =
             else
                 contentBody
 
-        bodyWithModal =
+        dialogView =
             case container.dialog of
                 Just state ->
-                    Element.el
-                        [ Element.inFront (Dialog.view cfg state)
-                        , Element.width Element.fill
-                        , Element.height Element.fill
-                        ]
-                        body
+                    Dialog.view cfg state
 
                 Nothing ->
-                    body
+                    Element.none
+
+        bodyWithDialog =
+            -- Always creating this element is required so we don't loose scrollbar state
+            Element.el
+                [ Element.inFront dialogView
+                , Element.width Element.fill
+                , Element.height Element.fill
+                ]
+                body
 
         defaultAttrs =
             RenderConfig.elLayoutAttributes cfg
     in
     { title = title
-    , body = [ Element.layout defaultAttrs bodyWithModal ]
+    , body = [ Element.layout defaultAttrs bodyWithDialog ]
     }
 
 
