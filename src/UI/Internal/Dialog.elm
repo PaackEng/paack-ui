@@ -30,15 +30,11 @@ dialogMap applier data =
 
 view : RenderConfig -> Dialog msg -> Element msg
 view cfg dialog =
-    let
-        responsiveView =
-            if RenderConfig.isMobile cfg then
-                mobileView
+    if RenderConfig.isMobile cfg then
+        mobileView cfg dialog
 
-            else
-                desktopView
-    in
-    responsiveView cfg dialog
+    else
+        desktopView cfg dialog
 
 
 desktopView : RenderConfig -> Dialog msg -> Element msg
