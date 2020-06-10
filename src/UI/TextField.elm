@@ -275,7 +275,7 @@ toEl cfg (TextField prop opt) =
                         |> Input.username elAttrs
 
                 ContentPassword pswOpt ->
-                    whenPassword content msg pswOpt
+                    whenPassword msg pswOpt
 
                 ContentEmail ->
                     inputAnyOptions cfg msg prop opt
@@ -294,7 +294,7 @@ toEl cfg (TextField prop opt) =
                 |> Text.toEl cfg
                 |> Element.el elAttrs
 
-        whenPassword content msg { isVisible, isCurrent } =
+        whenPassword msg { isVisible, isCurrent } =
             if isCurrent then
                 inputPasswordOptions cfg msg prop opt isVisible
                     |> Input.currentPassword elAttrs

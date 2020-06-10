@@ -91,7 +91,7 @@ mobileDrawer cfg page menu title maybeStack =
 
 
 viewHead : RenderConfig -> Menu msg -> String -> Maybe ( msg, List (Button msg) ) -> Element msg
-viewHead cfg (Menu.Menu prop opt) title maybeStack =
+viewHead cfg (Menu.Menu prop _) title maybeStack =
     let
         mobileHeadSandwich =
             Icon.sandwichMenu "Expand sidebar"
@@ -178,10 +178,11 @@ headerView cfg toggleMsg logo =
             case logo of
                 Just { hint, body } ->
                     [ body ]
-                        -- TODO: Add Hint
                         |> Element.column
                             [ paddingEach { top = 12, left = 0, right = 20, bottom = 0 }
                             , width fill
+                            , ARIA.roleAttr ARIA.roleImage
+                            , ARIA.labelAttr hint
                             ]
 
                 Nothing ->
@@ -199,7 +200,7 @@ headerView cfg toggleMsg logo =
 
 
 slimHeaderView : RenderConfig -> msg -> Maybe (Menu.Logo msg) -> Element msg
-slimHeaderView cfg toggleMsg logo =
+slimHeaderView cfg toggleMsg _ =
     Element.column [ height (px (72 + 48)) ]
         [ Icon.sandwichMenu "Expand sidebar"
             |> Icon.toEl cfg

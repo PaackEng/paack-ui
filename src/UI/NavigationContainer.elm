@@ -23,20 +23,15 @@ module UI.NavigationContainer exposing
     , withMenuPages
     )
 
-import Element exposing (Attribute, Element)
-import Element.Background as Background
-import Element.Events as Events
+import Element exposing (Element)
 import Html exposing (Html)
 import UI.Button as Button exposing (Button)
-import UI.Icon as Icon exposing (Icon)
-import UI.Internal.Basics exposing (lazyMap)
+import UI.Icon exposing (Icon)
 import UI.Internal.Dialog as Dialog exposing (dialogMap)
 import UI.Internal.Menu as Menu
-import UI.Internal.Palette as Palette
 import UI.Internal.SideBar as SideBar
-import UI.Link as Link exposing (Link)
+import UI.Link exposing (Link)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
-import UI.Text as Text
 import UI.Utils.Element as Element
 
 

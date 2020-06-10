@@ -20,12 +20,11 @@ module UI.Text exposing
     , withColor
     )
 
-import Element exposing (Attribute, Element)
-import Element.Font as Font
+import Element exposing (Element)
 import List
 import UI.Internal.Text as Internal exposing (TextSize(..), defaultText, mapOptions)
 import UI.Palette as Palette
-import UI.RenderConfig exposing (RenderConfig, isMobile)
+import UI.RenderConfig exposing (RenderConfig)
 
 
 type alias Text =

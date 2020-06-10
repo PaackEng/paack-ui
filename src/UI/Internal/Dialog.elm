@@ -1,11 +1,9 @@
 module UI.Internal.Dialog exposing (Dialog, dialogMap, view)
 
-import Element exposing (Attribute, Element, fill, maximum, px, rgb255, shrink)
+import Element exposing (Attribute, Element, fill, px, rgb255, shrink)
 import Element.Background as Background
 import Element.Events as Events
-import UI.Button as Button
 import UI.Icon as Icon
-import UI.Internal.Basics exposing (ifThenElse, lazyMap)
 import UI.Internal.Palette as Palette
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Text as Text

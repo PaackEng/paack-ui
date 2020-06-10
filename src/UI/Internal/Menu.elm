@@ -1,8 +1,8 @@
 module UI.Internal.Menu exposing (..)
 
 import Element exposing (Element)
-import UI.Icon as Icon exposing (Icon)
-import UI.Link as Link exposing (Link)
+import UI.Icon exposing (Icon)
+import UI.Link exposing (Link)
 
 
 type Menu msg

@@ -2,13 +2,12 @@ module UI.Badge exposing (Badge, danger, dark, light, primary, success, toEl, wa
 
 import Element exposing (Element, px, shrink)
 import Element.Background as Background
-import Element.Border as Border
 import Element.Font as Font
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Palette as Palette exposing (brightnessDarkest, brightnessLight, brightnessLighter, toneDanger, toneGray, tonePrimary, toneSuccess, toneWarning)
 import UI.RenderConfig exposing (RenderConfig)
-import UI.Text as Text exposing (TextColor)
+import UI.Text as Text
 
 
 type Badge
