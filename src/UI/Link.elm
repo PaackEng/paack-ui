@@ -59,7 +59,7 @@ packEl :
     -> Link
     -> Element msg
     -> Element msg
-packEl cfg attrs (Link { href } { target }) subElement =
+packEl _ attrs (Link { href } { target }) subElement =
     let
         thisLink =
             case target of

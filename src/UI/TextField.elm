@@ -26,12 +26,9 @@ module UI.TextField exposing
 
 {-
    Notes about decisions taken on the development process:
-   * The "with(.+)NotHidden" pattern enforces that the default value is HIDDEN.
    * Every input must have a label value, even if hidden, for accessibility purposes.
    * Username, email, current password, and search activates in-browser autocomplete capabilities.
    * Username and Email content-types may have the same use case scenario (e.g., login, sign up), but the email has an in-browser mask checking.
-
-   TODO: In the future, use 'Html' instead of 'Element', so we can apply style directly in the <input> tag (e.g., having the mask's error styled).
 -}
 
 import Element exposing (Attribute, Element)
@@ -275,7 +272,7 @@ toEl cfg (TextField prop opt) =
                         |> Input.username elAttrs
 
                 ContentPassword pswOpt ->
-                    whenPassword content msg pswOpt
+                    whenPassword msg pswOpt
 
                 ContentEmail ->
                     inputAnyOptions cfg msg prop opt
@@ -294,7 +291,7 @@ toEl cfg (TextField prop opt) =
                 |> Text.toEl cfg
                 |> Element.el elAttrs
 
-        whenPassword content msg { isVisible, isCurrent } =
+        whenPassword msg { isVisible, isCurrent } =
             if isCurrent then
                 inputPasswordOptions cfg msg prop opt isVisible
                     |> Input.currentPassword elAttrs

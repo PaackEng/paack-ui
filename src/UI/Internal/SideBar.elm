@@ -91,7 +91,7 @@ mobileDrawer cfg page menu title maybeStack =
 
 
 viewHead : RenderConfig -> Menu msg -> String -> Maybe ( msg, List (Button msg) ) -> Element msg
-viewHead cfg (Menu.Menu prop opt) title maybeStack =
+viewHead cfg (Menu.Menu prop _) title maybeStack =
     let
         mobileHeadSandwich =
             Icon.sandwichMenu "Expand sidebar"
@@ -178,10 +178,11 @@ headerView cfg toggleMsg logo =
             case logo of
                 Just { hint, body } ->
                     [ body ]
-                        -- TODO: Add Hint
                         |> Element.column
                             [ paddingEach { top = 12, left = 0, right = 20, bottom = 0 }
                             , width fill
+                            , ARIA.roleAttr ARIA.roleImage
+                            , ARIA.labelAttr hint
                             ]
 
                 Nothing ->
@@ -199,7 +200,7 @@ headerView cfg toggleMsg logo =
 
 
 slimHeaderView : RenderConfig -> msg -> Maybe (Menu.Logo msg) -> Element msg
-slimHeaderView cfg toggleMsg logo =
+slimHeaderView cfg toggleMsg _ =
     Element.column [ height (px (72 + 48)) ]
         [ Icon.sandwichMenu "Expand sidebar"
             |> Icon.toEl cfg
@@ -327,8 +328,10 @@ pageItem cfg icon link isSelected =
 
 slimPageItem : RenderConfig -> Icon -> Link -> Bool -> Element msg
 slimPageItem cfg icon link isSelected =
-    Icon.toEl cfg icon
-        |> Element.el (slimIconAttr isSelected)
+    icon
+        |> Icon.withColor (slimIconColor isSelected)
+        |> Icon.toEl cfg
+        |> Element.el slimIconAttr
         |> Link.packEl cfg [] link
 
 
@@ -344,7 +347,9 @@ actionItem cfg icon msg =
             ]
     in
     Element.row attrs
-        [ Icon.toEl cfg icon
+        [ icon
+            |> Icon.withColor (Palette.color tonePrimary brightnessMiddle)
+            |> Icon.toEl cfg
             |> Element.el iconAttr
         , Icon.getHint icon
             |> Text.body1
@@ -355,16 +360,16 @@ actionItem cfg icon msg =
 
 slimActionItem : RenderConfig -> Icon -> msg -> Element msg
 slimActionItem cfg icon msg =
-    let
-        attr =
-            slimIconAttr True
+    icon
+        |> Icon.withColor (slimIconColor True)
+        |> Icon.toEl cfg
+        |> Element.el
+            (slimIconAttr
                 ++ [ Element.pointer
                    , ARIA.roleAttr ARIA.roleButton -- TODO: Check on tests
                    , Events.onClick msg
                    ]
-    in
-    Icon.toEl cfg icon
-        |> Element.el attr
+            )
 
 
 iconAttr : List (Attribute msg)
@@ -372,25 +377,22 @@ iconAttr =
     [ width (px 32)
     , paddingXY 0 6
     , Font.center
-    , Font.color Palette.primary.middle -- TODO: Implement Icon.withColor
     ]
 
 
-slimIconAttr : Bool -> List (Attribute msg)
-slimIconAttr isSelected =
+slimIconAttr : List (Attribute msg)
+slimIconAttr =
     [ width (px 48)
     , paddingXY 0 14
     , Font.center
-    , Font.color <|
-        -- TODO: Implement Icon.withColor
-        if isSelected then
-            Palette.primary.middle
-
-        else
-            Palette.primary.middle
-                |> Element.toRgb
-                |> (\color ->
-                        { color | alpha = 0.4 }
-                   )
-                |> Element.fromRgb
     ]
+
+
+slimIconColor : Bool -> Palette.Color
+slimIconColor isSelected =
+    if isSelected then
+        Palette.color tonePrimary brightnessMiddle
+
+    else
+        Palette.color tonePrimary brightnessMiddle
+            |> Palette.withAlpha 0.4

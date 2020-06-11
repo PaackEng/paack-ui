@@ -32,6 +32,9 @@ jobs:
      - name: Run linter
        run: npx elm-format --validate src/ docs/
 
+     - name: Run analyse
+       run: npx elm-analyse
+
   validate:
      runs-on: ubuntu-latest
 

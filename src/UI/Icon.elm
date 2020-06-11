@@ -17,7 +17,6 @@ module UI.Icon exposing
     , search
     , seeMore
     , toEl
-    , todo
     , toggle
     , toggleDown
     , toggleUp
@@ -30,15 +29,9 @@ import Element.Font as Font
 import Html
 import Html.Attributes as HtmlAttr
 import UI.Internal.ContextualSize as ContextualSize exposing (ContextualSize)
-import UI.Palette as Palette exposing (brightnessDarkest, toneGray)
-import UI.RenderConfig as RenderConfig exposing (RenderConfig)
+import UI.Palette as Palette
+import UI.RenderConfig exposing (RenderConfig)
 import UI.Utils.ARIA as ARIA
-
-
-todo : String -> Element msg
-todo _ =
-    -- TODO: Remove
-    fasIcon "--------" ""
 
 
 type alias Properties =
@@ -184,7 +177,7 @@ seeMore hint =
 
 
 toEl : RenderConfig -> Icon -> Element msg
-toEl cfg (Icon { hint, glyph } { color, size }) =
+toEl _ (Icon { hint, glyph } { color, size }) =
     let
         staticAttrs =
             [ ARIA.roleAttr ARIA.roleImage
@@ -296,13 +289,8 @@ fasIcon icon hintText =
     faIcon "fas" icon hintText
 
 
-farIcon : String -> String -> Element msg
-farIcon icon hintText =
-    faIcon "far" icon hintText
-
-
 faIcon : String -> String -> String -> Element msg
-faIcon prefix icon hintText =
+faIcon prefix icon _ =
     html
         (Html.i
             [ HtmlAttr.class (prefix ++ " fa-" ++ icon) ]

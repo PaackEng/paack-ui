@@ -14,12 +14,10 @@ module UI.Utils.Element exposing
     )
 
 import Element exposing (Attribute, Element)
-import Element.Events as Events
 import Html.Attributes as HtmlAttrs
 import Html.Events as HtmlEvents
 import Json.Decode as Decode
 import Svg
-import Svg.Attributes as SvgAttr
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Utils.ARIA as ARIA
 

@@ -39,7 +39,7 @@ import UI.Internal.Primitives as Primitives
 import UI.Internal.Text as Text exposing (TextColor)
 import UI.Link as Link exposing (Link)
 import UI.Palette as Palette exposing (brightnessDarkest, brightnessLight, brightnessLighter, brightnessLightest, brightnessMiddle)
-import UI.RenderConfig as RenderConfig exposing (RenderConfig)
+import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element
@@ -250,11 +250,6 @@ toEl cfg ((Button { click, body } { size }) as btn) =
                 elFromBody cfg size body
 
 
-fontAttrs : RenderConfig -> List (Attribute msg)
-fontAttrs cfg =
-    Text.attributes cfg Text.SizeSubtitle1 True Text.defaultColor
-
-
 baseAttrs : RenderConfig -> Button msg -> List (Attribute msg)
 baseAttrs cfg btn =
     [ Primitives.roundedBorders
@@ -273,7 +268,7 @@ buttonWidth (Button _ { width }) =
 
 
 buttonPadding : RenderConfig -> Button msg -> Attribute msg
-buttonPadding cfg ((Button { body } { size }) as btn) =
+buttonPadding _ (Button { body } { size }) =
     let
         -- Remove 1 pixel each side for borders
         paddingXY =
@@ -373,7 +368,7 @@ isOutlined (Button { click } _) =
 
 
 colorHelper : Button msg -> ButtonTheme
-colorHelper (Button { click, body } { mode, tone }) =
+colorHelper (Button { body } { mode, tone }) =
     if mode == ModeDisabled then
         colorHelperWhenDisabled body tone
 
@@ -563,7 +558,3 @@ elFromBody cfg size body =
             icon
                 |> Icon.withSize size
                 |> Icon.toEl cfg
-
-
-
--- TODO => ICON HAVE TO PASSTHROUGH OUR SIZE
