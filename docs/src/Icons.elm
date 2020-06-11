@@ -59,11 +59,8 @@ iconsView cfg =
 
 
 svgSprite =
-    Element.el
-        []
-        (Element.html
-            (Html.node "svg-import"
-                []
-                []
-            )
+    Element.html
+        (Html.node "svg-import"
+            []
+            []
         )
