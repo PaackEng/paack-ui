@@ -16,7 +16,7 @@
         "NoTopLevelSignature": true,
         "SingleFieldRecord": false,
         "UnnecessaryListConcat": true,
-        "UnnecessaryParens": false,
+        "UnnecessaryParens": true,
         "UnnecessaryPortModule": true,
         "UnusedImport": true,
         "UnusedImportAlias": true,
