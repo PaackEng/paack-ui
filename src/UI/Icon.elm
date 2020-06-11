@@ -20,6 +20,7 @@ module UI.Icon exposing
     , toggle
     , toggleDown
     , toggleUp
+    , warning
     , withColor
     , withSize
     )
@@ -28,6 +29,8 @@ import Element exposing (..)
 import Element.Font as Font
 import Html
 import Html.Attributes as HtmlAttr
+import Svg
+import Svg.Attributes as SvgAttrs
 import UI.Internal.ContextualSize as ContextualSize exposing (ContextualSize)
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
@@ -74,6 +77,7 @@ type IconGlyph
     | LeftArrow
     | RightArrow
     | SeeMore
+    | Warning
 
 
 withColor : Palette.Color -> Icon -> Icon
@@ -176,6 +180,11 @@ seeMore hint =
     Icon (Properties hint SeeMore) defaultOptions
 
 
+warning : String -> Icon
+warning hint =
+    Icon (Properties hint Warning) defaultOptions
+
+
 toEl : RenderConfig -> Icon -> Element msg
 toEl _ (Icon { hint, glyph } { color, size }) =
     let
@@ -185,6 +194,7 @@ toEl _ (Icon { hint, glyph } { color, size }) =
             , Element.centerX
             , Font.center
             , Element.width <| Element.px width
+            , Element.height <| Element.px height
             , Font.size height
             ]
 
@@ -214,7 +224,7 @@ toEl _ (Icon { hint, glyph } { color, size }) =
     Element.el attrs <|
         case glyph of
             Add ->
-                fasIcon "plus" hint
+                svgIcon "Add1"
 
             Toggle ->
                 fasIcon "map" hint
@@ -226,7 +236,7 @@ toEl _ (Icon { hint, glyph } { color, size }) =
                 fasIcon "chevron-up" hint
 
             Close ->
-                fasIcon "times" hint
+                svgIcon "Close1"
 
             SandwichMenu ->
                 fasIcon "bars" hint
@@ -235,37 +245,40 @@ toEl _ (Icon { hint, glyph } { color, size }) =
                 fasIcon "bell" hint
 
             PaackSpaces ->
-                fasIcon "database" hint
+                svgIcon "Shelves1"
 
             Packages ->
-                fasIcon "box-open" hint
+                svgIcon "Map1"
 
             EventLog ->
-                fasIcon "comment" hint
+                svgIcon "Messages1"
 
             Logout ->
-                fasIcon "user-circle" hint
+                svgIcon "Person1"
 
             Search ->
-                fasIcon "search" hint
+                svgIcon "Search1"
 
             Print ->
-                fasIcon "print" hint
+                svgIcon "Print"
 
             Edit ->
                 fasIcon "edit" hint
 
             BackwardContent ->
-                fasIcon "chevron-left" hint
+                svgIcon "RightArrow1"
 
             LeftArrow ->
-                fasIcon "chevron-left" hint
+                svgIcon "LeftArrow1"
 
             RightArrow ->
                 fasIcon "chevron-right" hint
 
             SeeMore ->
-                fasIcon "ellipsis-h" hint
+                svgIcon "More1"
+
+            Warning ->
+                svgIcon "Warning1"
 
 
 getHint : Icon -> String
@@ -282,6 +295,18 @@ defaultOptions =
     { color = ColorInherit
     , size = ContextualSize.default
     }
+
+
+svgIcon : String -> Element msg
+svgIcon iconId =
+    Element.html <|
+        Svg.svg
+            [ SvgAttrs.width "100%"
+            , SvgAttrs.height "100%"
+            , SvgAttrs.fill "currentColor"
+            ]
+            [ Svg.use [ SvgAttrs.xlinkHref ("#" ++ iconId) ] []
+            ]
 
 
 fasIcon : String -> String -> Element msg
