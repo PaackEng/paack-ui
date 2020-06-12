@@ -314,13 +314,18 @@ pageItem cfg icon link isSelected =
 
             else
                 baseAttrs
+
+        textColor =
+            Palette.color tonePrimary brightnessMiddle
     in
     Element.row attrs
-        [ Icon.toEl cfg icon
+        [ icon
+            |> Icon.withColor textColor
+            |> Icon.toEl cfg
             |> Element.el iconAttr
         , Icon.getHint icon
             |> Text.body1
-            |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
+            |> Text.withColor textColor
             |> Text.toEl cfg
         ]
         |> Link.packEl cfg [ width fill ] link
