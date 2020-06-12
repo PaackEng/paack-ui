@@ -60,7 +60,7 @@ iconsView cfg =
 
 svgSprite =
     Element.html
-        (Html.node "svg-import"
+        (Html.node "paack-svg-icon-sprite"
             []
             []
         )
