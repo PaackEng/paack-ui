@@ -33,9 +33,9 @@ import Element.Events as Events
 import Element.Font as Font
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Basics exposing (lazyMap, pairUncurry)
-import UI.Internal.ContextualSize as ContextualSize exposing (ContextualSize)
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
+import UI.Internal.Size as Size exposing (Size)
 import UI.Internal.Text as Text exposing (TextColor)
 import UI.Link as Link exposing (Link)
 import UI.Palette as Palette exposing (brightnessDarkest, brightnessLight, brightnessLighter, brightnessLightest, brightnessMiddle)
@@ -49,7 +49,7 @@ type alias Options =
     { mode : ButtonMode
     , tone : ButtonTone
     , width : ButtonWidth
-    , size : ContextualSize
+    , size : Size
     }
 
 
@@ -101,7 +101,7 @@ defaultOptions =
     { mode = ModeEnabled
     , tone = TonePrimary
     , width = WidthRelative
-    , size = ContextualSize.default
+    , size = Size.default
     }
 
 
@@ -144,7 +144,7 @@ withWidth width (Button prop opt) =
     Button prop { opt | width = width }
 
 
-withSize : ContextualSize -> Button msg -> Button msg
+withSize : Size -> Button msg -> Button msg
 withSize size (Button prop opt) =
     Button prop { opt | size = size }
 
@@ -270,22 +270,38 @@ buttonWidth (Button _ { width }) =
 buttonPadding : RenderConfig -> Button msg -> Attribute msg
 buttonPadding _ (Button { body } { size }) =
     let
-        -- Remove 1 pixel each side for borders
+        border =
+            borderWidth size
+
         paddingXY =
             case body of
                 BodyText _ ->
-                    ( 31, 15 )
+                    case size of
+                        Size.Large ->
+                            ( (40 // 2) - border, ((60 - 20) // 2) - border )
+
+                        Size.Medium ->
+                            ( (32 // 2) - border, ((48 - 16) // 2) - border )
+
+                        Size.Small ->
+                            ( (20 // 2) - border, ((36 - 12) // 2) - border )
+
+                        Size.ExtraSmall ->
+                            ( (12 // 2) - border, ((24 - 10) // 2) - border )
 
                 BodyIcon _ ->
                     case size of
-                        ContextualSize.ExtraLarge ->
-                            ( (48 - 26) // 2 - 1, (48 - 20) // 2 - 1 )
+                        Size.Large ->
+                            ( (60 - 24) // 2 - border, (60 - 24) // 2 - border )
 
-                        ContextualSize.Large ->
-                            ( (40 - 20) // 2 - 1, (40 - 16) // 2 - 1 )
+                        Size.Medium ->
+                            ( (48 - 20) // 2 - border, (48 - 20) // 2 - border )
 
-                        ContextualSize.Small ->
-                            ( (24 - 16) // 2 - 1, (24 - 12) // 2 - 1 )
+                        Size.Small ->
+                            ( (36 - 16) // 2 - border, (36 - 16) // 2 - border )
+
+                        Size.ExtraSmall ->
+                            ( (24 - 10) // 2 - border, (24 - 10) // 2 - border )
     in
     pairUncurry Element.paddingXY paddingXY
 
@@ -293,6 +309,22 @@ buttonPadding _ (Button { body } { size }) =
 ariaAttrs : List (Attribute msg)
 ariaAttrs =
     [ ARIA.roleAttr ARIA.roleButton ]
+
+
+borderWidth : Size -> Int
+borderWidth size =
+    case size of
+        Size.Large ->
+            3
+
+        Size.Medium ->
+            3
+
+        Size.Small ->
+            2
+
+        Size.ExtraSmall ->
+            1
 
 
 type alias ThemeTriple =
@@ -309,7 +341,7 @@ type alias ButtonTheme =
 
 
 styleAttrs : Button msg -> List (Attribute msg)
-styleAttrs btn =
+styleAttrs ((Button _ opt) as btn) =
     let
         theme =
             colorHelper btn
@@ -325,7 +357,7 @@ styleAttrs btn =
         normal ( bg, border, text ) =
             [ Background.color bg
             , Border.color border
-            , Border.width 1
+            , Border.width <| borderWidth opt.size
             , Font.color text
             ]
 
@@ -431,7 +463,7 @@ colorHelperWhenEnabled tone =
                         Palette.color Palette.tonePrimary brightnessDarkest
                             |> Palette.setContrasting True
                             |> Text.ColorPalette
-                    , outlinedBg = Palette.color Palette.toneGray brightnessLightest
+                    , outlinedBg = Palette.color Palette.tonePrimary brightnessLightest
                     }
             }
 
@@ -477,19 +509,19 @@ colorHelperWhenEnabled tone =
 
         ToneLight ->
             { normal =
-                { primary = Palette.color Palette.toneGray brightnessLighter
+                { primary = Palette.color Palette.toneGray brightnessLightest
                 , text =
                     Palette.color Palette.tonePrimary brightnessMiddle
                         |> Text.ColorPalette
-                , outlinedBg = Palette.color Palette.toneGray brightnessLighter
+                , outlinedBg = Palette.color Palette.toneGray brightnessLightest
                 }
             , hover =
                 Just
-                    { primary = Palette.color Palette.toneGray brightnessLight
+                    { primary = Palette.color Palette.toneGray brightnessLighter
                     , text =
                         Palette.color Palette.tonePrimary brightnessDarkest
                             |> Text.ColorPalette
-                    , outlinedBg = Palette.color Palette.toneGray brightnessLight
+                    , outlinedBg = Palette.color Palette.toneGray brightnessLighter
                     }
             }
 
@@ -542,15 +574,31 @@ clickAttrs (Button { click } { mode }) =
             []
 
 
-elFromBody : RenderConfig -> ContextualSize -> ButtonBody -> Element msg
+textSize : Size -> Int
+textSize size =
+    case size of
+        Size.Large ->
+            20
+
+        Size.Medium ->
+            16
+
+        Size.Small ->
+            12
+
+        Size.ExtraSmall ->
+            10
+
+
+elFromBody : RenderConfig -> Size -> ButtonBody -> Element msg
 elFromBody cfg size body =
     case body of
         BodyText str ->
             Element.el
-                [ Font.size 16
-                , Element.spacing 8
+                [ Font.size <| textSize size
                 , Font.semiBold
                 , Element.centerX
+                , Element.spacing 8
                 ]
                 (Element.text str)
 
