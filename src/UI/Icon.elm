@@ -19,7 +19,6 @@ module UI.Icon exposing
     , toEl
     , toggle
     , toggleDown
-    , toggleUp
     , warning
     , withColor
     , withSize
@@ -72,7 +71,6 @@ type IconGlyph
     | Search
     | Toggle
     | ToggleDown
-    | ToggleUp
     | BackwardContent
     | LeftArrow
     | RightArrow
@@ -108,11 +106,6 @@ toggle hint =
 toggleDown : String -> Icon
 toggleDown hint =
     Icon (Properties hint ToggleDown) defaultOptions
-
-
-toggleUp : String -> Icon
-toggleUp hint =
-    Icon (Properties hint ToggleUp) defaultOptions
 
 
 add : String -> Icon
@@ -227,22 +220,19 @@ toEl _ (Icon { hint, glyph } { color, size }) =
                 svgIcon "Add1"
 
             Toggle ->
-                fasIcon "map" hint
+                svgIcon "Map1"
 
             ToggleDown ->
-                fasIcon "chevron-down" hint
-
-            ToggleUp ->
-                fasIcon "chevron-up" hint
+                svgIcon "DownArrow1"
 
             Close ->
                 svgIcon "Close1"
 
             SandwichMenu ->
-                fasIcon "bars" hint
+                svgIcon "Hamburger"
 
             Notifications ->
-                fasIcon "bell" hint
+                svgIcon "Bell"
 
             PaackSpaces ->
                 svgIcon "Shelves1"
@@ -263,16 +253,16 @@ toEl _ (Icon { hint, glyph } { color, size }) =
                 svgIcon "Print"
 
             Edit ->
-                fasIcon "edit" hint
+                svgIcon "Edit"
 
             BackwardContent ->
-                svgIcon "RightArrow1"
+                svgIcon "LeftArrow1"
 
             LeftArrow ->
                 svgIcon "LeftArrow1"
 
             RightArrow ->
-                fasIcon "chevron-right" hint
+                svgIcon "RightArrow1"
 
             SeeMore ->
                 svgIcon "More1"

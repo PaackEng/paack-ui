@@ -4072,10 +4072,10 @@ p-try@^2.0.0:
   resolved "https://registry.yarnpkg.com/p-try/-/p-try-2.2.0.tgz#cb2868540e313d61de58fafbe35ce9004d5540e6"
   integrity sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==
 
-paack-ui-assets@^0.0.5:
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/paack-ui-assets/-/paack-ui-assets-0.0.5.tgz#ac09c4aaa73e53347696c380ca9929ededba12ae"
-  integrity sha512-KRpc8a4+3WKT7HVX+QmaVFBl/10mjcKh8mYB6jWD8sGvEsVZA5quNdJLM/OJRmas5mflgKlbavLC2E50tb/8Nw==
+paack-ui-assets@^0.0.7:
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/paack-ui-assets/-/paack-ui-assets-0.0.7.tgz#dc527a4b198b7905a09118db68cd50f7e26eb36c"
+  integrity sha512-rwDzhF4fouJzwq9rE7ytm8bQRD/hiVXFMMChhsArEFRMqXdgIQ4w48IrhtsLGBwvqpNNuhSBYQgjFZj5+w8leQ==
 
 pako@^0.2.5:
   version "0.2.9"

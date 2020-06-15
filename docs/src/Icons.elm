@@ -5,7 +5,7 @@ import Element.Background as Background
 import Element.Font as Font
 import Html
 import UI.Icon as Icon
-import UI.Internal.Palette as Palette
+import UI.Palette as Palette
 import UIExplorer exposing (storiesOf)
 
 
@@ -14,7 +14,15 @@ stories cfg =
         "Icons"
         [ ( "IconsExample"
           , \_ -> iconsView cfg
-          , { note = "" }
+          , { note =
+                """
+```elm
+Icon.seeMore label
+    |> Icon.withColor (Palette.color Palette.tonePrimary Palette.brightnessMiddle)
+    |> Icon.toEl cfg
+```
+"""
+            }
           )
         ]
 
@@ -30,32 +38,45 @@ icons =
     , ( Icon.warning, "Warning" )
     , ( Icon.seeMore, "See More" )
     , ( Icon.backwardContent, "Back" )
-    , ( Icon.leftArrow, "LeftArrow: Wrong name in the svg" )
+    , ( Icon.sandwichMenu, "Sandwich Menu" )
+    , ( Icon.notifications, "Notifications" )
+    , ( Icon.edit, "Edit" )
     ]
 
 
-iconView cfg ( iconFn, label ) =
+iconView cfg color ( iconFn, label ) =
     Element.column
-        [ Background.color Palette.primary.middle
-        , Font.color Palette.contrastPrimary.middle
-        , Element.spacing 10
+        [ Element.spacing 10
         , Element.padding 10
         ]
         [ iconFn label
+            |> Icon.withColor color
             |> Icon.toEl cfg
             |> Element.el [ Element.centerX ]
         , Element.el [ Font.size 14 ] <| Element.text label
         ]
 
 
-iconsView cfg =
+iconsGroup cfg color =
     icons
-        |> List.map (iconView cfg)
+        |> List.map (iconView cfg color)
         |> (::) svgSprite
         |> Element.wrappedRow
             [ Element.spacing 10
             ]
-        |> Element.layout []
+
+
+iconsView cfg =
+    Element.layout [] <|
+        Element.column
+            []
+            [ iconsGroup cfg
+                (Palette.color Palette.tonePrimary Palette.brightnessMiddle)
+            , iconsGroup cfg
+                (Palette.color Palette.toneWarning Palette.brightnessMiddle)
+            , iconsGroup cfg
+                (Palette.color Palette.toneGray Palette.brightnessMiddle)
+            ]
 
 
 svgSprite =
