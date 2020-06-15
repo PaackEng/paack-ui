@@ -22,7 +22,7 @@
     "elm-hot": "^1.1.4",
     "elm-test": "^0.19.1-revision2",
     "node-elm-compiler": "^5.0.4",
-    "paack-ui-assets": "^0.0.7",
+    "paack-ui-assets": "^0.0.8",
     "parcel-bundler": "^1.12.4"
   },
   "dependencies": {}

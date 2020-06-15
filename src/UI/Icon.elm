@@ -19,6 +19,7 @@ module UI.Icon exposing
     , toEl
     , toggle
     , toggleDown
+    , toggleUp
     , warning
     , withColor
     , withSize
@@ -70,6 +71,7 @@ type IconGlyph
     | SandwichMenu
     | Search
     | Toggle
+    | ToggleUp
     | ToggleDown
     | BackwardContent
     | LeftArrow
@@ -101,6 +103,11 @@ rightArrow hint =
 toggle : String -> Icon
 toggle hint =
     Icon (Properties hint Toggle) defaultOptions
+
+
+toggleUp : String -> Icon
+toggleUp hint =
+    Icon (Properties hint ToggleUp) defaultOptions
 
 
 toggleDown : String -> Icon
@@ -221,6 +228,9 @@ toEl _ (Icon { hint, glyph } { color, size }) =
 
             Toggle ->
                 svgIcon "Map1"
+
+            ToggleUp ->
+                svgIcon "UpArrow1"
 
             ToggleDown ->
                 svgIcon "DownArrow1"

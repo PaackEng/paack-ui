@@ -28,19 +28,25 @@ Icon.seeMore label
 
 
 icons =
-    [ ( Icon.paackSpaces, "Spaces" )
-    , ( Icon.search, "Search" )
-    , ( Icon.packages, "Packages" )
-    , ( Icon.warning, "Warning" )
-    , ( Icon.print, "Print" )
-    , ( Icon.add, "Add" )
-    , ( Icon.logout, "Logout" )
-    , ( Icon.warning, "Warning" )
-    , ( Icon.seeMore, "See More" )
-    , ( Icon.backwardContent, "Back" )
-    , ( Icon.sandwichMenu, "Sandwich Menu" )
-    , ( Icon.notifications, "Notifications" )
-    , ( Icon.edit, "Edit" )
+    [ ( Icon.add, "Icon.Add" )
+    , ( Icon.close, "Icon.close" )
+    , ( Icon.edit, "Icon.edit" )
+    , ( Icon.eventLog, "Icon.eventLog" )
+    , ( Icon.logout, "Icon.logout" )
+    , ( Icon.notifications, "Icon.notifications" )
+    , ( Icon.paackSpaces, "Icon.paackSpaces" )
+    , ( Icon.packages, "Icon.packages" )
+    , ( Icon.print, "Icon.print" )
+    , ( Icon.sandwichMenu, "Icon.sandwichMenu," )
+    , ( Icon.search, "Icon.search" )
+    , ( Icon.toggle, "Icon.toggle" )
+    , ( Icon.toggleUp, "Icon.toggleUp" )
+    , ( Icon.toggleDown, "Icon.toggleDown" )
+    , ( Icon.backwardContent, "Icon.backwardContent" )
+    , ( Icon.leftArrow, "Icon.leftArrow" )
+    , ( Icon.rightArrow, "Icon.rightArrow" )
+    , ( Icon.seeMore, "Icon.seeMore" )
+    , ( Icon.warning, "Icon.warning" )
     ]
 
 
