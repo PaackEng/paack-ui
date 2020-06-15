@@ -26,7 +26,7 @@ module UI.NavigationContainer exposing
 import Element exposing (Element)
 import Html exposing (Html)
 import UI.Button as Button exposing (Button)
-import UI.Icon exposing (Icon)
+import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Dialog as Dialog exposing (dialogMap)
 import UI.Internal.Menu as Menu
 import UI.Internal.SideBar as SideBar
@@ -267,7 +267,10 @@ toEl cfg page model =
             RenderConfig.elLayoutAttributes cfg
     in
     { title = title
-    , body = [ Element.layout defaultAttrs bodyWithDialog ]
+    , body =
+        [ Icon.svgSpriteImport
+        , Element.layout defaultAttrs bodyWithDialog
+        ]
     }
 
 

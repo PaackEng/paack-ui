@@ -19,6 +19,7 @@ import UI.Internal.Basics exposing (prependIf)
 import UI.Internal.Palette as Palette
 import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
+import UI.Size as Size
 import UI.Text as Text
 import UI.TextField as TextField
 import UI.Utils.ARIA as ARIA
@@ -161,6 +162,7 @@ actionBarView cfg actionBar =
                     |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
                     |> Text.toEl cfg
                 , icon title
+                    |> Icon.withSize Size.sizeSmall
                     |> Icon.toEl cfg
                     |> Element.el
                         [ Element.alignRight

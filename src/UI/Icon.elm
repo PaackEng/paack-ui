@@ -16,6 +16,7 @@ module UI.Icon exposing
     , sandwichMenu
     , search
     , seeMore
+    , svgSpriteImport
     , toEl
     , toggle
     , toggleDown
@@ -213,13 +214,13 @@ toEl _ (Icon { hint, glyph } { color, size }) =
         ( width, height ) =
             case size of
                 ContextualSize.ExtraLarge ->
-                    ( 26, 20 )
+                    ( 26, 26 )
 
                 ContextualSize.Large ->
-                    ( 20, 16 )
+                    ( 20, 20 )
 
                 ContextualSize.Small ->
-                    ( 16, 12 )
+                    ( 16, 16 )
     in
     Element.el attrs <|
         case glyph of
@@ -321,3 +322,10 @@ faIcon prefix icon _ =
             [ HtmlAttr.class (prefix ++ " fa-" ++ icon) ]
             []
         )
+
+
+svgSpriteImport : Html.Html msg
+svgSpriteImport =
+    Html.node "paack-svg-icon-sprite"
+        []
+        []
