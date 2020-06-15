@@ -29,7 +29,6 @@ module UI.Icon exposing
 import Element exposing (..)
 import Element.Font as Font
 import Html
-import Html.Attributes as HtmlAttr
 import Svg
 import Svg.Attributes as SvgAttrs
 import UI.Internal.ContextualSize as ContextualSize exposing (ContextualSize)
@@ -308,20 +307,6 @@ svgIcon iconId =
             ]
             [ Svg.use [ SvgAttrs.xlinkHref ("#" ++ iconId) ] []
             ]
-
-
-fasIcon : String -> String -> Element msg
-fasIcon icon hintText =
-    faIcon "fas" icon hintText
-
-
-faIcon : String -> String -> String -> Element msg
-faIcon prefix icon _ =
-    html
-        (Html.i
-            [ HtmlAttr.class (prefix ++ " fa-" ++ icon) ]
-            []
-        )
 
 
 svgSpriteImport : Html.Html msg
