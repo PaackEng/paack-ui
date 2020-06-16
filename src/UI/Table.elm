@@ -32,8 +32,8 @@ import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text exposing (Text)
 
 
-type Table msg columns
-    = Table (Properties columns) (Options msg columns)
+type Table msg object columns
+    = Table (Properties columns) (Options msg object columns)
 
 
 type alias Properties columns =
@@ -41,10 +41,25 @@ type alias Properties columns =
     }
 
 
-type alias Options msg columns =
-    { rows : List (Row msg columns)
+type alias Options msg object columns =
+    { rows : Rows msg object columns
     , width : Element.Length
     }
+
+
+type alias ResponsiveOptions msg object columns =
+    { detailsShowLabel : String
+    , detailsCollapseLabel : String
+    , selectMsg : object -> msg
+    , isSelected : object -> Bool
+    , toRows : object -> Row msg columns
+    , items : List object
+    }
+
+
+type Rows msg object columns
+    = StaticRows (List (Row msg columns))
+    | ResponsiveRows (ResponsiveOptions msg object columns)
 
 
 type alias Row msg columns =
@@ -100,7 +115,7 @@ cellFromButton btn tail =
     NList.cons (CellButton btn) tail
 
 
-table : HeaderRow columns -> Table msg columns
+table : HeaderRow columns -> Table msg object columns
 table headers =
     Table { headers = headers } defaultOptions
 
@@ -109,17 +124,17 @@ table headers =
 -- Options
 
 
-withRows : List (Row msg columns) -> Table msg columns -> Table msg columns
+withRows : List (Row msg columns) -> Table msg object columns -> Table msg object columns
 withRows rows (Table prop opt_) =
-    Table prop { opt_ | rows = rows }
+    Table prop { opt_ | rows = StaticRows rows }
 
 
-withWidth : Element.Length -> Table msg columns -> Table msg columns
+withWidth : Element.Length -> Table msg object columns -> Table msg object columns
 withWidth width (Table prop opt_) =
     Table prop { opt_ | width = width }
 
 
-withCellsWidth : OptRow CellWidth columns -> Table msg columns -> Table msg columns
+withCellsWidth : OptRow CellWidth columns -> Table msg object columns -> Table msg object columns
 withCellsWidth row (Table prop opt_) =
     let
         mergeWidth header_ maybeWidth =
@@ -157,7 +172,7 @@ cellWidthEnd =
 -- Render
 
 
-toEl : RenderConfig -> Table msg columns -> Element msg
+toEl : RenderConfig -> Table msg object columns -> Element msg
 toEl cfg (Table { headers } { rows, width }) =
     let
         rowRender row =
@@ -165,22 +180,30 @@ toEl cfg (Table { headers } { rows, width }) =
                 |> NList.map2 (cellRender cfg) headers
                 |> NList.toList
                 |> Element.row [ Element.spacing 4, Element.width fill ]
+
+        desktopTable desktopRows =
+            desktopRows
+                |> List.map rowRender
+                |> (::)
+                    (headers
+                        |> NList.map (headerRender cfg)
+                        |> NList.toList
+                        |> Element.row
+                            [ Element.spacing 4
+                            , Element.width fill
+                            , Element.paddingEach { bottom = 9, top = 0, left = 0, right = 0 }
+                            , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
+                            , Border.color Palette.gray.lightest
+                            ]
+                    )
+                |> Element.column [ Element.spacing 16, Element.width width ]
     in
-    rows
-        |> List.map rowRender
-        |> (::)
-            (headers
-                |> NList.map (headerRender cfg)
-                |> NList.toList
-                |> Element.row
-                    [ Element.spacing 4
-                    , Element.width fill
-                    , Element.paddingEach { bottom = 9, top = 0, left = 0, right = 0 }
-                    , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
-                    , Border.color Palette.gray.lightest
-                    ]
-            )
-        |> Element.column [ Element.spacing 16, Element.width width ]
+    case rows of
+        ResponsiveRows { toRows, items } ->
+            desktopTable (List.map toRows items)
+
+        StaticRows desktopRows ->
+            desktopTable desktopRows
 
 
 
@@ -217,9 +240,9 @@ widthToEl width =
             px int
 
 
-defaultOptions : Options msg columns
+defaultOptions : Options msg object columns
 defaultOptions =
-    { rows = []
+    { rows = StaticRows []
     , width = shrink
     }
 

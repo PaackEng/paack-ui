@@ -1,4 +1,4 @@
-module UI.Internal.ToggableList exposing (Config, Row, view)
+module UI.Internal.ToggableList exposing (Config, view)
 
 import Element exposing (Attribute, Element, fill, px)
 import Element.Background as Background
@@ -7,28 +7,25 @@ import Element.Font as Font
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.Palette as Palette exposing (brightnessDarkest, brightnessLight, brightnessLightest, brightnessMiddle, toneGray, tonePrimary)
-import UI.RenderConfig as RenderConfig exposing (RenderConfig)
+import UI.RenderConfig exposing (RenderConfig)
 import UI.SelectList as SelectList exposing (selectList)
 import UI.Text as Text
 import UI.Utils.Element exposing (zeroPadding)
 
 
-type alias Config =
+type alias Config object msg =
     { detailsShowLabel : String
     , detailsCollapseLabel : String
+    , mainLabel : object -> String
+    , mainContent : object -> Element msg
+    , details : object -> List ( String, Element msg )
+    , selectMsg : object -> msg
+    , isSelected : object -> Bool
     }
 
 
-type alias Row object msg =
-    { details : List ( String, Element msg )
-    , mainLabel : String
-    , mainContent : Element msg
-    , id : object
-    }
-
-
-view : RenderConfig -> Config -> (object -> msg) -> (object -> Bool) -> List (Row object msg) -> Element msg
-view renderConfig config select isSelected items =
+view : RenderConfig -> Config object msg -> List object -> Element msg
+view renderConfig config items =
     let
         itemView parentCfg selected item =
             if selected then
@@ -37,23 +34,23 @@ view renderConfig config select isSelected items =
             else
                 defaultRow parentCfg config selected item
     in
-    selectList (\{ id } -> select id) itemView
+    selectList config.selectMsg itemView
         |> SelectList.withOptions items
-        |> SelectList.withSelected (\{ id } -> isSelected id)
+        |> SelectList.withSelected config.isSelected
         |> SelectList.toEl renderConfig
 
 
-defaultRow : RenderConfig -> Config -> Bool -> Row object msg -> Element msg
-defaultRow renderConfig config selected { mainLabel, mainContent } =
+defaultRow : RenderConfig -> Config object msg -> Bool -> object -> Element msg
+defaultRow renderConfig config selected object =
     Element.row
         [ Element.width fill
         , Element.paddingEach { top = 11, bottom = 11, left = 28, right = 12 }
         ]
-        [ [ Text.body1 mainLabel
+        [ [ Text.body1 (config.mainLabel object)
                 |> Text.withColor (titleColor selected)
                 |> Text.setEllipsis True
                 |> Text.toEl renderConfig
-          , mainContent
+          , config.mainContent object
           ]
             |> Element.column [ Element.width fill, Element.clipX ]
         , ifThenElse selected
@@ -69,11 +66,12 @@ defaultRow renderConfig config selected { mainLabel, mainContent } =
         ]
 
 
-selectedRow : RenderConfig -> Config -> Row object msg -> Element msg
-selectedRow renderConfig config ({ mainLabel, mainContent, details } as item) =
+selectedRow : RenderConfig -> Config object msg -> object -> Element msg
+selectedRow renderConfig config object =
     Element.column [ Element.width fill ]
-        [ defaultRow renderConfig config True item
-        , details
+        [ defaultRow renderConfig config True object
+        , object
+            |> config.details
             |> List.map (someCard renderConfig)
             |> Element.column toggleableCard
         ]
