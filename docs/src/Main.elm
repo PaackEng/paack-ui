@@ -15,6 +15,7 @@ import Msg exposing (Msg(..))
 import Paginators.Stories as Paginators
 import Palette
 import Return as R
+import Sizes
 import Tables
 import TextField
 import Texts
@@ -73,6 +74,7 @@ main =
         , LoadingView.stories
         , Tables.stories renderConfig
         , Paginators.stories renderConfig
+        , Sizes.stories renderConfig
         ]
 
 

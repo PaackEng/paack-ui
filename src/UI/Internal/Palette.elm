@@ -20,7 +20,7 @@ gray : ToneColors
 gray =
     { darkest = rgb255 14 20 32 -- #0E1420
     , middle = rgb255 74 74 74 -- #4A4A4A
-    , light = rgb255 150 150 150 -- #969696
+    , light = rgb255 136 136 136 -- #888888
     , lighter = rgb255 228 228 228 -- #E4E4E4
     , lightest = rgb255 246 246 246 -- #F6F6F6
     }

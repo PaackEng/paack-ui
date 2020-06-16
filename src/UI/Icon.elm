@@ -31,7 +31,7 @@ import Element.Font as Font
 import Html
 import Svg
 import Svg.Attributes as SvgAttrs
-import UI.Internal.ContextualSize as ContextualSize exposing (ContextualSize)
+import UI.Internal.Size as Size exposing (Size)
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Utils.ARIA as ARIA
@@ -45,7 +45,7 @@ type alias Properties =
 
 type alias Options =
     { color : IconColor
-    , size : ContextualSize
+    , size : Size
     }
 
 
@@ -85,7 +85,7 @@ withColor color (Icon prop opt) =
     Icon prop { opt | color = ColorFromPalette color }
 
 
-withSize : ContextualSize -> Icon -> Icon
+withSize : Size -> Icon -> Icon
 withSize size (Icon prop opt) =
     Icon prop { opt | size = size }
 
@@ -212,14 +212,17 @@ toEl _ (Icon { hint, glyph } { color, size }) =
 
         ( width, height ) =
             case size of
-                ContextualSize.ExtraLarge ->
-                    ( 26, 26 )
+                Size.Large ->
+                    ( 24, 24 )
 
-                ContextualSize.Large ->
+                Size.Medium ->
                     ( 20, 20 )
 
-                ContextualSize.Small ->
-                    ( 16, 16 )
+                Size.Small ->
+                    ( 26, 16 )
+
+                Size.ExtraSmall ->
+                    ( 10, 10 )
     in
     Element.el attrs <|
         case glyph of
@@ -293,7 +296,7 @@ getHint (Icon { hint } _) =
 defaultOptions : Options
 defaultOptions =
     { color = ColorInherit
-    , size = ContextualSize.default
+    , size = Size.default
     }
 
 

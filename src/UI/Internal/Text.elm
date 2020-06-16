@@ -152,7 +152,6 @@ deskAttributes size =
 
         SizeHeading5 ->
             [ Font.size 24
-            , Font.letterSpacing 0
             , Font.semiBold
             ]
 
@@ -176,21 +175,18 @@ deskAttributes size =
 
         SizeBody1 ->
             [ Font.size 16
-            , Element.spacing 8
             , Font.letterSpacing 0.2
             , Font.regular
             ]
 
         SizeBody2 ->
             [ Font.size 14
-            , Element.spacing 10
             , Font.letterSpacing 0.25
             , Font.regular
             ]
 
         SizeCaption ->
             [ Font.size 12
-            , Element.spacing 4
             , Font.letterSpacing 0.5
             , Font.medium
             ]
@@ -281,45 +277,49 @@ mobileAttributes size =
             ]
 
 
+lineHeight : Bool -> TextSize -> Int
+lineHeight isMobile size =
+    case size of
+        SizeHeading1 ->
+            ifThenElse isMobile 68 111
+
+        SizeHeading2 ->
+            ifThenElse isMobile 58 77
+
+        SizeHeading3 ->
+            ifThenElse isMobile 48 58
+
+        SizeHeading4 ->
+            40
+
+        SizeHeading5 ->
+            30
+
+        SizeHeading6 ->
+            24
+
+        SizeSubtitle1 ->
+            20
+
+        SizeSubtitle2 ->
+            18
+
+        SizeBody1 ->
+            24
+
+        SizeBody2 ->
+            24
+
+        SizeCaption ->
+            16
+
+        SizeOverline ->
+            12
+
+
 oneLineHeight : Bool -> TextSize -> Attribute msg
 oneLineHeight isMobile size =
-    (Element.px >> Element.height) <|
-        case size of
-            SizeHeading1 ->
-                ifThenElse isMobile 56 92
-
-            SizeHeading2 ->
-                ifThenElse isMobile 48 64
-
-            SizeHeading3 ->
-                ifThenElse isMobile 40 48
-
-            SizeHeading4 ->
-                32
-
-            SizeHeading5 ->
-                24
-
-            SizeHeading6 ->
-                20
-
-            SizeSubtitle1 ->
-                16
-
-            SizeSubtitle2 ->
-                14
-
-            SizeBody1 ->
-                16 + 8
-
-            SizeBody2 ->
-                14 + 10
-
-            SizeCaption ->
-                12 + 4
-
-            SizeOverline ->
-                10 + 6
+    Element.height <| Element.px <| lineHeight isMobile size
 
 
 mapOptions : (Options -> Options) -> Text -> Text
