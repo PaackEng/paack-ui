@@ -16,10 +16,12 @@ module UI.Icon exposing
     , sandwichMenu
     , search
     , seeMore
+    , svgSpriteImport
     , toEl
     , toggle
     , toggleDown
     , toggleUp
+    , warning
     , withColor
     , withSize
     )
@@ -27,7 +29,8 @@ module UI.Icon exposing
 import Element exposing (..)
 import Element.Font as Font
 import Html
-import Html.Attributes as HtmlAttr
+import Svg
+import Svg.Attributes as SvgAttrs
 import UI.Internal.ContextualSize as ContextualSize exposing (ContextualSize)
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
@@ -68,12 +71,13 @@ type IconGlyph
     | SandwichMenu
     | Search
     | Toggle
-    | ToggleDown
     | ToggleUp
+    | ToggleDown
     | BackwardContent
     | LeftArrow
     | RightArrow
     | SeeMore
+    | Warning
 
 
 withColor : Palette.Color -> Icon -> Icon
@@ -101,14 +105,14 @@ toggle hint =
     Icon (Properties hint Toggle) defaultOptions
 
 
-toggleDown : String -> Icon
-toggleDown hint =
-    Icon (Properties hint ToggleDown) defaultOptions
-
-
 toggleUp : String -> Icon
 toggleUp hint =
     Icon (Properties hint ToggleUp) defaultOptions
+
+
+toggleDown : String -> Icon
+toggleDown hint =
+    Icon (Properties hint ToggleDown) defaultOptions
 
 
 add : String -> Icon
@@ -176,6 +180,11 @@ seeMore hint =
     Icon (Properties hint SeeMore) defaultOptions
 
 
+warning : String -> Icon
+warning hint =
+    Icon (Properties hint Warning) defaultOptions
+
+
 toEl : RenderConfig -> Icon -> Element msg
 toEl _ (Icon { hint, glyph } { color, size }) =
     let
@@ -185,6 +194,7 @@ toEl _ (Icon { hint, glyph } { color, size }) =
             , Element.centerX
             , Font.center
             , Element.width <| Element.px width
+            , Element.height <| Element.px height
             , Font.size height
             ]
 
@@ -203,69 +213,72 @@ toEl _ (Icon { hint, glyph } { color, size }) =
         ( width, height ) =
             case size of
                 ContextualSize.ExtraLarge ->
-                    ( 26, 20 )
+                    ( 26, 26 )
 
                 ContextualSize.Large ->
-                    ( 20, 16 )
+                    ( 20, 20 )
 
                 ContextualSize.Small ->
-                    ( 16, 12 )
+                    ( 16, 16 )
     in
     Element.el attrs <|
         case glyph of
             Add ->
-                fasIcon "plus" hint
+                svgIcon "Add1"
 
             Toggle ->
-                fasIcon "map" hint
-
-            ToggleDown ->
-                fasIcon "chevron-down" hint
+                svgIcon "Map1"
 
             ToggleUp ->
-                fasIcon "chevron-up" hint
+                svgIcon "UpArrow1"
+
+            ToggleDown ->
+                svgIcon "DownArrow1"
 
             Close ->
-                fasIcon "times" hint
+                svgIcon "Close1"
 
             SandwichMenu ->
-                fasIcon "bars" hint
+                svgIcon "Hamburger"
 
             Notifications ->
-                fasIcon "bell" hint
+                svgIcon "Bell"
 
             PaackSpaces ->
-                fasIcon "database" hint
+                svgIcon "Shelves1"
 
             Packages ->
-                fasIcon "box-open" hint
+                svgIcon "Map1"
 
             EventLog ->
-                fasIcon "comment" hint
+                svgIcon "Messages1"
 
             Logout ->
-                fasIcon "user-circle" hint
+                svgIcon "Person1"
 
             Search ->
-                fasIcon "search" hint
+                svgIcon "Search1"
 
             Print ->
-                fasIcon "print" hint
+                svgIcon "Print"
 
             Edit ->
-                fasIcon "edit" hint
+                svgIcon "Edit"
 
             BackwardContent ->
-                fasIcon "chevron-left" hint
+                svgIcon "LeftArrow1"
 
             LeftArrow ->
-                fasIcon "chevron-left" hint
+                svgIcon "LeftArrow1"
 
             RightArrow ->
-                fasIcon "chevron-right" hint
+                svgIcon "RightArrow1"
 
             SeeMore ->
-                fasIcon "ellipsis-h" hint
+                svgIcon "More1"
+
+            Warning ->
+                svgIcon "Warning1"
 
 
 getHint : Icon -> String
@@ -284,15 +297,24 @@ defaultOptions =
     }
 
 
-fasIcon : String -> String -> Element msg
-fasIcon icon hintText =
-    faIcon "fas" icon hintText
+svgIcon : String -> Element msg
+svgIcon iconId =
+    Element.html <|
+        Svg.svg
+            [ SvgAttrs.width "100%"
+            , SvgAttrs.height "100%"
+            , SvgAttrs.fill "currentColor"
+            ]
+            [ Svg.use
+                [ SvgAttrs.id iconId
+                , SvgAttrs.xlinkHref ("#" ++ iconId)
+                ]
+                []
+            ]
 
 
-faIcon : String -> String -> String -> Element msg
-faIcon prefix icon _ =
-    html
-        (Html.i
-            [ HtmlAttr.class (prefix ++ " fa-" ++ icon) ]
-            []
-        )
+svgSpriteImport : Html.Html msg
+svgSpriteImport =
+    Html.node "paack-svg-icon-sprite"
+        []
+        []

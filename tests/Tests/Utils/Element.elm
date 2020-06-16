@@ -23,8 +23,7 @@ hasIconInside hintText content =
                     (HtmlAttr.attribute "role" "img")
                 , Selector.attribute
                     (HtmlAttr.attribute "aria-label" hintText)
-                , Selector.containing
-                    [ Selector.tag "i" ]
+                , Selector.tag "div"
                 ]
             ]
 
