@@ -162,7 +162,7 @@ actionBarView cfg actionBar =
                     |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
                     |> Text.toEl cfg
                 , icon title
-                    |> Icon.withSize Size.sizeSmall
+                    |> Icon.withSize Size.small
                     |> Icon.toEl cfg
                     |> Element.el
                         [ Element.alignRight

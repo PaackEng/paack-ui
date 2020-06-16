@@ -96,7 +96,7 @@ viewHead cfg (Menu.Menu prop _) title maybeStack =
     let
         mobileHeadSandwich =
             Icon.sandwichMenu "Expand sidebar"
-                |> Icon.withSize Size.sizeLarge
+                |> Icon.withSize Size.large
                 |> Icon.toEl cfg
                 |> Element.el (headerButtonAttr (prop.toggleMsg True) 48 20)
 
@@ -192,7 +192,7 @@ headerView cfg toggleMsg logo =
 
         closeButton =
             Icon.close "Minimize sidebar"
-                |> Icon.withSize Size.sizeSmall
+                |> Icon.withSize Size.small
                 |> Icon.toEl cfg
                 |> Element.el (headerButtonAttr toggleMsg 40 10)
     in
@@ -206,7 +206,7 @@ slimHeaderView : RenderConfig -> msg -> Maybe (Menu.Logo msg) -> Element msg
 slimHeaderView cfg toggleMsg _ =
     Element.column [ height (px (72 + 48)) ]
         [ Icon.sandwichMenu "Expand sidebar"
-            |> Icon.withSize Size.sizeLarge
+            |> Icon.withSize Size.large
             |> Icon.toEl cfg
             |> Element.el (headerButtonAttr toggleMsg 48 14)
         ]
@@ -324,7 +324,7 @@ pageItem cfg icon link isSelected =
     in
     Element.row attrs
         [ icon
-            |> Icon.withSize Size.sizeSmall
+            |> Icon.withSize Size.small
             |> Icon.withColor textColor
             |> Icon.toEl cfg
             |> Element.el iconAttr
@@ -339,7 +339,7 @@ pageItem cfg icon link isSelected =
 slimPageItem : RenderConfig -> Icon -> Link -> Bool -> Element msg
 slimPageItem cfg icon link isSelected =
     icon
-        |> Icon.withSize Size.sizeLarge
+        |> Icon.withSize Size.large
         |> Icon.withColor (slimIconColor isSelected)
         |> Icon.toEl cfg
         |> Element.el slimIconAttr
@@ -359,7 +359,7 @@ actionItem cfg icon msg =
     in
     Element.row attrs
         [ icon
-            |> Icon.withSize Size.sizeSmall
+            |> Icon.withSize Size.small
             |> Icon.withColor (Palette.color tonePrimary brightnessMiddle)
             |> Icon.toEl cfg
             |> Element.el iconAttr
@@ -373,7 +373,7 @@ actionItem cfg icon msg =
 slimActionItem : RenderConfig -> Icon -> msg -> Element msg
 slimActionItem cfg icon msg =
     icon
-        |> Icon.withSize Size.sizeLarge
+        |> Icon.withSize Size.large
         |> Icon.withColor (slimIconColor True)
         |> Icon.toEl cfg
         |> Element.el

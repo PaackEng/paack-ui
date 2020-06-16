@@ -16,19 +16,19 @@ stories cfg =
         "Sizes"
         [ ( "Large"
           , \_ -> sizeView cfg Size.large
-          , { note = "" }
+          , { note = notes "large" }
           )
         , ( "Medium"
           , \_ -> sizeView cfg Size.medium
-          , { note = "" }
+          , { note = notes "medium" }
           )
         , ( "Small"
           , \_ -> sizeView cfg Size.small
-          , { note = "" }
+          , { note = notes "small" }
           )
         , ( "ExtraSmall"
           , \_ -> sizeView cfg Size.extraSmall
-          , { note = "" }
+          , { note = notes "extraSmall" }
           )
         ]
 
@@ -80,3 +80,22 @@ sizeView cfg size =
             [ Element.spacing 10
             ]
         |> Element.layout []
+
+
+notes suffix =
+    """To achieve this size use:
+
+* Buttons
+```elm
+--...
+    |> Button.withSize Size.""" ++ suffix ++ """
+    -- ...
+```
+
+* Icons
+```elm
+--...
+    |> Icon.withSize Size.""" ++ suffix ++ """
+    -- ...
+```
+  """
