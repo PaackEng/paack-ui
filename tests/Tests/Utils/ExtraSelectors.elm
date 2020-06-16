@@ -26,7 +26,7 @@ isDisabled =
 
 closeIcon : Selector.Selector
 closeIcon =
-    iconSelector "times"
+    iconSelector "Close1"
 
 
 plusIcon : Selector.Selector
@@ -49,7 +49,7 @@ textButton label =
 
 iconSelector : String -> Selector.Selector
 iconSelector icon =
-    Selector.classes [ "fas", "fa-" ++ icon ]
+    Selector.id icon
 
 
 loadingView : Selector.Selector
