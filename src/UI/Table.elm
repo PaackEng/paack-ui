@@ -16,7 +16,8 @@ module UI.Table exposing
     , table
     , toEl
     , withCellsWidth
-    , withRows
+    , withResponsiveRows
+    , withStaticRows
     , withWidth
     )
 
@@ -26,9 +27,10 @@ import UI.Button as Button exposing (Button)
 import UI.Internal.Basics exposing (..)
 import UI.Internal.NList as NList exposing (NList)
 import UI.Internal.Palette as Palette
+import UI.Internal.ToggableList as ToggableList
 import UI.Internal.TypeNumbers as T
 import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
-import UI.RenderConfig exposing (RenderConfig)
+import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Text as Text exposing (Text)
 
 
@@ -124,9 +126,14 @@ table headers =
 -- Options
 
 
-withRows : List (Row msg columns) -> Table msg object columns -> Table msg object columns
-withRows rows (Table prop opt_) =
+withStaticRows : List (Row msg columns) -> Table msg object columns -> Table msg object columns
+withStaticRows rows (Table prop opt_) =
     Table prop { opt_ | rows = StaticRows rows }
+
+
+withResponsiveRows : ResponsiveOptions msg object columns -> Table msg object columns -> Table msg object columns
+withResponsiveRows responsiveOpt (Table prop opt_) =
+    Table prop { opt_ | rows = ResponsiveRows responsiveOpt }
 
 
 withWidth : Element.Length -> Table msg object columns -> Table msg object columns
@@ -199,8 +206,14 @@ toEl cfg (Table { headers } { rows, width }) =
                 |> Element.column [ Element.spacing 16, Element.width width ]
     in
     case rows of
-        ResponsiveRows { toRows, items } ->
-            desktopTable (List.map toRows items)
+        ResponsiveRows responsiveOpt ->
+            if RenderConfig.isMobile cfg then
+                mobileView cfg headers responsiveOpt
+
+            else
+                responsiveOpt.items
+                    |> List.map responsiveOpt.toRows
+                    |> desktopTable
 
         StaticRows desktopRows ->
             desktopTable desktopRows
@@ -208,6 +221,55 @@ toEl cfg (Table { headers } { rows, width }) =
 
 
 -- Internals
+
+
+mobileView : RenderConfig -> HeaderRow columns -> ResponsiveOptions msg object columns -> Element msg
+mobileView renderConfig headers responsiveOpt =
+    let
+        rowMap object =
+            object
+                |> responsiveOpt.toRows
+                |> NList.map2 Tuple.pair headers
+                |> NList.toList
+
+        mainLabel object =
+            case rowMap object of
+                [] ->
+                    ""
+
+                ( { title }, _ ) :: _ ->
+                    title
+
+        mainContent object =
+            case rowMap object of
+                [] ->
+                    Element.none
+
+                ( cellHeader, cell ) :: _ ->
+                    cellRender renderConfig cellHeader cell
+
+        details object =
+            case rowMap object of
+                [] ->
+                    []
+
+                _ :: tail ->
+                    List.map
+                        (\( cellHeader, cell ) ->
+                            ( cellHeader.title, cellRender renderConfig cellHeader cell )
+                        )
+                        tail
+    in
+    ToggableList.view renderConfig
+        { detailsShowLabel = responsiveOpt.detailsShowLabel
+        , detailsCollapseLabel = responsiveOpt.detailsCollapseLabel
+        , mainLabel = mainLabel
+        , mainContent = mainContent
+        , details = details
+        , selectMsg = responsiveOpt.selectMsg
+        , isSelected = responsiveOpt.isSelected
+        }
+        responsiveOpt.items
 
 
 headerRender : RenderConfig -> HeaderCell -> Element msg
