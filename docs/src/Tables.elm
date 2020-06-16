@@ -1,10 +1,13 @@
 module Tables exposing (stories)
 
 import Element exposing (Element, fill)
+import Msg
+import UI.Internal.TypeNumbers as T
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Table as Table
     exposing
-        ( cellWidthEnd
+        ( cellFromText
+        , cellWidthEnd
         , cellWidthPortion
         , cellWidthShrink
         , header
@@ -20,17 +23,18 @@ import Utils exposing (story)
 stories cfg =
     storiesOf
         "Safe Tables"
-        [ example cfg
+        [ staticTableStory cfg
+        , responsiveTableStory cfg
         ]
 
 
-example cfg =
+staticTableStory cfg =
     story
         ( "Simple Table"
-        , simpleTable cfg
+        , staticTable cfg
         , { note = """```elm
-simpleTable : RenderConfig -> Element msg
-simpleTable cfg =
+staticTable : RenderConfig -> Element msg
+staticTable cfg =
     let
         headers =
             header "HEADER A" <| header "HEADER B" <| header "HEADER C" <| header "HEADER D" <| headersEnd
@@ -52,7 +56,7 @@ simpleTable cfg =
             Text.body1 str |> Table.cellFromText
     in
     table headers
-        |> Table.withRows rows
+        |> Table.withStaticRows rows
         |> Table.withWidth fill
         |> Table.withCellsWidth cellsWidth
         |> Table.toEl cfg
@@ -61,8 +65,64 @@ simpleTable cfg =
         )
 
 
-simpleTable : RenderConfig -> Element msg
-simpleTable cfg =
+responsiveTableStory cfg =
+    story
+        ( "Responsive Table"
+        , responsiveTable cfg
+        , { note = """```elm
+responsiveTable : RenderConfig -> Maybe { name : String, birthday: String } -> Element Msg
+responsiveTable cfg selectedSomeone =
+    let
+        headers =
+            header "Name" <| header "Birthday" <| headersEnd
+
+        items =
+            [ {name = "John", birthday = "23/11/2013"}
+            , {name = "Paul", birthday = "04/02/1969"}
+            ]
+
+        cellsWidth =
+            cellWidthPortion 4 <| cellWidthPortion 1 <| cellWidthEnd
+
+        cell str =
+            Text.body1 str |> cellFromText
+
+        rowMap {name, birthday} =
+            cell name <| cell birthday <| rowEnd
+
+        responsiveOpt =
+            { detailsShowLabel = "Show details"
+            , detailsCollapseLabel = "Hide details"
+            , selectMsg = Msg.SelectSomeone
+            , isSelected = isSelected
+            , toRow = rowMap
+            , items = items
+            , coverView = mobileCoverView
+            }
+
+        isSelected { name } =
+            selectedSomeone
+                |> Maybe.map (.name >> (==) name)
+                |> Maybe.withDefault False
+
+
+        mobileCoverView parentCfg textColor { name } selected =
+            Text.body1 name
+                |> Text.withColor textColor
+                |> Text.toEl parentCfg
+
+    in
+    table headers
+        |> Table.withResponsiveRows responsiveOpt
+        |> Table.withWidth fill
+        |> Table.withCellsWidth cellsWidth
+        |> Table.toEl cfg
+```"""
+          }
+        )
+
+
+staticTable cfg =
     let
         headers =
             header "HEADER A" <| header "HEADER B" <| header "HEADER C" <| header "HEADER D" <| headersEnd
@@ -82,10 +142,51 @@ simpleTable cfg =
             cellWidthPortion 2 <| cellWidthShrink <| cellWidthShrink <| cellWidthPortion 2 <| cellWidthEnd
 
         cell str =
-            Text.body1 str |> Table.cellFromText
+            Text.body1 str |> cellFromText
     in
     table headers
-        |> Table.withRows rows
+        |> Table.withStaticRows rows
+        |> Table.withWidth fill
+        |> Table.withCellsWidth cellsWidth
+        |> Table.toEl cfg
+
+
+responsiveTable cfg =
+    let
+        headers =
+            header "Name" <| header "Birthday" <| headersEnd
+
+        items =
+            [ { name = "John", birthday = "23/11/2013" }
+            , { name = "Paul", birthday = "04/02/1969" }
+            ]
+
+        cellsWidth =
+            cellWidthPortion 4 <| cellWidthPortion 1 <| cellWidthEnd
+
+        cell str =
+            Text.body1 str |> cellFromText
+
+        rowMap { name, birthday } =
+            cell name <| cell birthday <| rowEnd
+
+        responsiveOpt =
+            { detailsShowLabel = "Show details"
+            , detailsCollapseLabel = "Hide details"
+            , selectMsg = always Msg.NoOp
+            , isSelected = always False
+            , toRow = rowMap
+            , items = items
+            , coverView = mobileCoverView
+            }
+
+        mobileCoverView parentCfg textColor { name } selected =
+            Text.body1 name
+                |> Text.withColor textColor
+                |> Text.toEl parentCfg
+    in
+    table headers
+        |> Table.withResponsiveRows responsiveOpt
         |> Table.withWidth fill
         |> Table.withCellsWidth cellsWidth
         |> Table.toEl cfg

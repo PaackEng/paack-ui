@@ -2,6 +2,7 @@ module UI.Table exposing
     ( CellWidth
     , HeaderRow
     , OptRow
+    , ResponsiveOptions
     , Row
     , Table
     , cellFromButton
@@ -56,7 +57,7 @@ type alias ResponsiveOptions msg object columns =
     , selectMsg : object -> msg
     , isSelected : object -> Bool
     , coverView : RenderConfig -> Palette.Color -> object -> Bool -> Element msg
-    , toRows : object -> Row msg columns
+    , toRow : object -> Row msg columns
     , items : List object
     }
 
@@ -190,7 +191,7 @@ toEl cfg (Table { headers } { rows, width }) =
 
             else
                 responsiveOpt.items
-                    |> List.map responsiveOpt.toRows
+                    |> List.map responsiveOpt.toRow
                     |> desktopView cfg True headers width
 
         StaticRows desktopRows ->
@@ -239,7 +240,7 @@ mobileView renderConfig headers responsiveOpt =
     let
         rowMap object =
             object
-                |> responsiveOpt.toRows
+                |> responsiveOpt.toRow
                 |> NList.map2 Tuple.pair headers
                 |> NList.toList
 
