@@ -32,6 +32,7 @@ import UI.Internal.TypeNumbers as T
 import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Text as Text exposing (Text)
+import UI.Utils.Element exposing (zeroPadding)
 
 
 type Table msg object columns
@@ -54,6 +55,7 @@ type alias ResponsiveOptions msg object columns =
     , detailsCollapseLabel : String
     , selectMsg : object -> msg
     , isSelected : object -> Bool
+    , coverView : RenderConfig -> Palette.Color -> object -> Bool -> Element msg
     , toRows : object -> Row msg columns
     , items : List object
     }
@@ -181,30 +183,6 @@ cellWidthEnd =
 
 toEl : RenderConfig -> Table msg object columns -> Element msg
 toEl cfg (Table { headers } { rows, width }) =
-    let
-        rowRender row =
-            row
-                |> NList.map2 (cellRender cfg) headers
-                |> NList.toList
-                |> Element.row [ Element.spacing 4, Element.width fill ]
-
-        desktopTable desktopRows =
-            desktopRows
-                |> List.map rowRender
-                |> (::)
-                    (headers
-                        |> NList.map (headerRender cfg)
-                        |> NList.toList
-                        |> Element.row
-                            [ Element.spacing 4
-                            , Element.width fill
-                            , Element.paddingEach { bottom = 9, top = 0, left = 0, right = 0 }
-                            , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
-                            , Border.color Palette.gray.lightest
-                            ]
-                    )
-                |> Element.column [ Element.spacing 16, Element.width width ]
-    in
     case rows of
         ResponsiveRows responsiveOpt ->
             if RenderConfig.isMobile cfg then
@@ -213,14 +191,47 @@ toEl cfg (Table { headers } { rows, width }) =
             else
                 responsiveOpt.items
                     |> List.map responsiveOpt.toRows
-                    |> desktopTable
+                    |> desktopView cfg True headers width
 
         StaticRows desktopRows ->
-            desktopTable desktopRows
+            desktopView cfg False headers width desktopRows
 
 
 
 -- Internals
+
+
+desktopView : RenderConfig -> Bool -> HeaderRow columns -> Element.Length -> List (Row msg columns) -> Element msg
+desktopView cfg responsive headers width desktopRows =
+    let
+        rowRender row =
+            row
+                |> NList.map2 (cellRender cfg) headers
+                |> NList.toList
+                |> Element.row [ Element.spacing 4, Element.width fill ]
+    in
+    desktopRows
+        |> List.map rowRender
+        |> (::)
+            (headers
+                |> NList.map (headerRender cfg)
+                |> NList.toList
+                |> Element.row
+                    [ Element.spacing 4
+                    , Element.width fill
+                    , Element.paddingEach { bottom = 9, top = 0, left = 0, right = 0 }
+                    , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
+                    , Border.color Palette.gray.lightest
+                    ]
+            )
+        |> Element.column
+            [ Element.spacing 16
+            , Element.width width
+            , Element.paddingEach <|
+                ifThenElse responsive
+                    { top = 20, left = 20, right = 20, bottom = 0 }
+                    zeroPadding
+            ]
 
 
 mobileView : RenderConfig -> HeaderRow columns -> ResponsiveOptions msg object columns -> Element msg
@@ -232,22 +243,6 @@ mobileView renderConfig headers responsiveOpt =
                 |> NList.map2 Tuple.pair headers
                 |> NList.toList
 
-        mainLabel object =
-            case rowMap object of
-                [] ->
-                    ""
-
-                ( { title }, _ ) :: _ ->
-                    title
-
-        mainContent object =
-            case rowMap object of
-                [] ->
-                    Element.none
-
-                ( cellHeader, cell ) :: _ ->
-                    cellRender renderConfig cellHeader cell
-
         details object =
             case rowMap object of
                 [] ->
@@ -256,15 +251,16 @@ mobileView renderConfig headers responsiveOpt =
                 _ :: tail ->
                     List.map
                         (\( cellHeader, cell ) ->
-                            ( cellHeader.title, cellRender renderConfig cellHeader cell )
+                            ( cellHeader.title
+                            , cellRender renderConfig cellHeader cell
+                            )
                         )
                         tail
     in
     ToggableList.view renderConfig
         { detailsShowLabel = responsiveOpt.detailsShowLabel
         , detailsCollapseLabel = responsiveOpt.detailsCollapseLabel
-        , mainLabel = mainLabel
-        , mainContent = mainContent
+        , coverView = responsiveOpt.coverView
         , details = details
         , selectMsg = responsiveOpt.selectMsg
         , isSelected = responsiveOpt.isSelected
@@ -284,7 +280,8 @@ cellRender : RenderConfig -> HeaderCell -> Cell msg -> Element msg
 cellRender cfg { width } cell_ =
     case cell_ of
         CellText text ->
-            Text.toEl cfg text
+            text
+                |> Text.toEl cfg
                 |> Element.el [ Element.width (widthToEl width) ]
 
         CellButton button ->

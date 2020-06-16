@@ -9,6 +9,7 @@ import UI.Internal.Basics exposing (ifThenElse)
 import UI.Palette as Palette exposing (brightnessDarkest, brightnessLight, brightnessLightest, brightnessMiddle, toneGray, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.SelectList as SelectList exposing (selectList)
+import UI.Size as Size
 import UI.Text as Text
 import UI.Utils.Element exposing (zeroPadding)
 
@@ -16,8 +17,7 @@ import UI.Utils.Element exposing (zeroPadding)
 type alias Config object msg =
     { detailsShowLabel : String
     , detailsCollapseLabel : String
-    , mainLabel : object -> String
-    , mainContent : object -> Element msg
+    , coverView : RenderConfig -> Palette.Color -> object -> Bool -> Element msg
     , details : object -> List ( String, Element msg )
     , selectMsg : object -> msg
     , isSelected : object -> Bool
@@ -45,23 +45,26 @@ defaultRow renderConfig config selected object =
     Element.row
         [ Element.width fill
         , Element.paddingEach { top = 11, bottom = 11, left = 28, right = 12 }
+        , Element.height Element.shrink
         ]
-        [ [ Text.body1 (config.mainLabel object)
-                |> Text.withColor (titleColor selected)
-                |> Text.setEllipsis True
-                |> Text.toEl renderConfig
-          , config.mainContent object
-          ]
-            |> Element.column [ Element.width fill, Element.clipX ]
+        [ config.coverView renderConfig (titleColor selected) object selected
+            |> Element.el
+                [ Element.width fill
+                , Element.centerY
+                , Element.clipX
+                , Element.paddingXY 0 5
+                ]
         , ifThenElse selected
             (Icon.toggleUp config.detailsCollapseLabel)
             (Icon.toggleDown config.detailsShowLabel)
+            |> Icon.withSize Size.large
             |> Icon.withColor (titleColor selected)
             |> Icon.toEl renderConfig
             |> Element.el
                 [ Font.center
                 , Element.width (px 32)
                 , Element.paddingXY 0 6
+                , Element.centerY
                 ]
         ]
 
