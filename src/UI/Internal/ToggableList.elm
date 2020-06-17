@@ -86,7 +86,7 @@ selectedRow renderConfig config object =
 
 detailItem : RenderConfig -> ( String, Element msg ) -> Element msg
 detailItem renderConfig ( label, content ) =
-    Element.column identDetailItem
+    Element.column indentedDetailItemAttributes
         [ label
             |> Text.overline
             |> Text.withColor (Palette.color toneGray brightnessLight)
@@ -96,8 +96,8 @@ detailItem renderConfig ( label, content ) =
         ]
 
 
-identDetailItem : List (Attribute msg)
-identDetailItem =
+indentedDetailItemAttributes : List (Attribute msg)
+indentedDetailItemAttributes =
     [ Element.paddingEach { zeroPadding | left = 8 }
     , Border.widthEach { zeroPadding | left = 2 }
     , Palette.color tonePrimary brightnessMiddle
