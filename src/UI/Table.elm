@@ -1,11 +1,17 @@
 module UI.Table exposing
     ( CellWidth
     , HeaderRow
+    , MobileCover
     , OptRow
+    , ResponsiveConfig
     , Row
     , Table
     , cellFromButton
     , cellFromText
+    , cellMobileDetailsEnd
+    , cellMobileDetailsHide
+    , cellMobileDetailsShow
+    , cellMobileDetailsShowIf
     , cellWidthEnd
     , cellWidthPixels
     , cellWidthPortion
@@ -15,8 +21,10 @@ module UI.Table exposing
     , rowEnd
     , table
     , toEl
+    , withCellsDetails
     , withCellsWidth
-    , withRows
+    , withResponsiveRows
+    , withStaticRows
     , withWidth
     )
 
@@ -26,14 +34,16 @@ import UI.Button as Button exposing (Button)
 import UI.Internal.Basics exposing (..)
 import UI.Internal.NList as NList exposing (NList)
 import UI.Internal.Palette as Palette
+import UI.Internal.ToggableList as ToggableList
 import UI.Internal.TypeNumbers as T
 import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
-import UI.RenderConfig exposing (RenderConfig)
+import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Text as Text exposing (Text)
+import UI.Utils.Element exposing (zeroPadding)
 
 
-type Table msg columns
-    = Table (Properties columns) (Options msg columns)
+type Table msg object columns
+    = Table (Properties columns) (Options msg object columns)
 
 
 type alias Properties columns =
@@ -41,10 +51,30 @@ type alias Properties columns =
     }
 
 
-type alias Options msg columns =
-    { rows : List (Row msg columns)
+type alias Options msg object columns =
+    { rows : Rows msg object columns
     , width : Element.Length
     }
+
+
+type alias ResponsiveConfig msg object columns =
+    { detailsShowLabel : String
+    , detailsCollapseLabel : String
+    , toRow : object -> Row msg columns
+    , toCover : object -> MobileCover
+    , selectMsg : object -> msg
+    , isSelected : object -> Bool
+    , items : List object
+    }
+
+
+type Rows msg object columns
+    = StaticRows (List (Row msg columns))
+    | ResponsiveRows (ResponsiveConfig msg object columns)
+
+
+type alias MobileCover =
+    ToggableList.Cover
 
 
 type alias Row msg columns =
@@ -62,6 +92,7 @@ type alias OptRow value columns =
 type alias HeaderCell =
     { title : String
     , width : CellWidth
+    , detailsVisible : Bool
     }
 
 
@@ -87,7 +118,7 @@ rowEnd =
 
 header : String -> HeaderRow columns -> HeaderRow (T.Increase columns)
 header head tail =
-    NList.cons { title = head, width = WidthPortion 1 } tail
+    NList.cons { title = head, width = WidthPortion 1, detailsVisible = True } tail
 
 
 cellFromText : Text -> Row msg columns -> Row msg (T.Increase columns)
@@ -100,7 +131,7 @@ cellFromButton btn tail =
     NList.cons (CellButton btn) tail
 
 
-table : HeaderRow columns -> Table msg columns
+table : HeaderRow columns -> Table msg object columns
 table headers =
     Table { headers = headers } defaultOptions
 
@@ -109,28 +140,47 @@ table headers =
 -- Options
 
 
-withRows : List (Row msg columns) -> Table msg columns -> Table msg columns
-withRows rows (Table prop opt_) =
-    Table prop { opt_ | rows = rows }
+withStaticRows : List (Row msg columns) -> Table msg object columns -> Table msg object columns
+withStaticRows rows (Table prop opt_) =
+    Table prop { opt_ | rows = StaticRows rows }
 
 
-withWidth : Element.Length -> Table msg columns -> Table msg columns
+withResponsiveRows : ResponsiveConfig msg object columns -> Table msg object columns -> Table msg object columns
+withResponsiveRows responsiveOpt (Table prop opt_) =
+    Table prop { opt_ | rows = ResponsiveRows responsiveOpt }
+
+
+withWidth : Element.Length -> Table msg object columns -> Table msg object columns
 withWidth width (Table prop opt_) =
     Table prop { opt_ | width = width }
 
 
-withCellsWidth : OptRow CellWidth columns -> Table msg columns -> Table msg columns
+withCellsWidth : OptRow CellWidth columns -> Table msg object columns -> Table msg object columns
 withCellsWidth row (Table prop opt_) =
     let
-        mergeWidth header_ maybeWidth =
+        mergeWidth oldHeader maybeWidth =
             case maybeWidth of
                 Just len ->
-                    { header_ | width = len }
+                    { oldHeader | width = len }
 
                 Nothing ->
-                    header_
+                    oldHeader
     in
     Table { prop | headers = NList.map2 mergeWidth prop.headers row } opt_
+
+
+withCellsDetails : OptRow Bool columns -> Table msg object columns -> Table msg object columns
+withCellsDetails row (Table prop opt_) =
+    let
+        mergeVisibility oldHeader maybeVisibility =
+            case maybeVisibility of
+                Just visibility ->
+                    { oldHeader | detailsVisible = visibility }
+
+                Nothing ->
+                    oldHeader
+    in
+    Table { prop | headers = NList.map2 mergeVisibility prop.headers row } opt_
 
 
 cellWidthPortion : Int -> OptRow CellWidth columns -> OptRow CellWidth (T.Increase columns)
@@ -153,12 +203,52 @@ cellWidthEnd =
     optsEnd
 
 
+cellMobileDetailsEnd : OptRow Bool T.Zero
+cellMobileDetailsEnd =
+    optsEnd
+
+
+cellMobileDetailsShow : OptRow Bool columns -> OptRow Bool (T.Increase columns)
+cellMobileDetailsShow accu =
+    opt True accu
+
+
+cellMobileDetailsHide : OptRow Bool columns -> OptRow Bool (T.Increase columns)
+cellMobileDetailsHide accu =
+    opt False accu
+
+
+cellMobileDetailsShowIf : Bool -> OptRow Bool columns -> OptRow Bool (T.Increase columns)
+cellMobileDetailsShowIf condition accu =
+    opt condition accu
+
+
 
 -- Render
 
 
-toEl : RenderConfig -> Table msg columns -> Element msg
+toEl : RenderConfig -> Table msg object columns -> Element msg
 toEl cfg (Table { headers } { rows, width }) =
+    case rows of
+        ResponsiveRows responsiveOpt ->
+            if RenderConfig.isMobile cfg then
+                mobileView cfg headers responsiveOpt
+
+            else
+                responsiveOpt.items
+                    |> List.map responsiveOpt.toRow
+                    |> desktopView cfg True headers width
+
+        StaticRows desktopRows ->
+            desktopView cfg False headers width desktopRows
+
+
+
+-- Internals
+
+
+desktopView : RenderConfig -> Bool -> HeaderRow columns -> Element.Length -> List (Row msg columns) -> Element msg
+desktopView cfg responsive headers width desktopRows =
     let
         rowRender row =
             row
@@ -166,7 +256,7 @@ toEl cfg (Table { headers } { rows, width }) =
                 |> NList.toList
                 |> Element.row [ Element.spacing 4, Element.width fill ]
     in
-    rows
+    desktopRows
         |> List.map rowRender
         |> (::)
             (headers
@@ -180,11 +270,49 @@ toEl cfg (Table { headers } { rows, width }) =
                     , Border.color Palette.gray.lightest
                     ]
             )
-        |> Element.column [ Element.spacing 16, Element.width width ]
+        |> Element.column
+            [ Element.spacing 16
+            , Element.width width
+            , Element.paddingEach <|
+                ifThenElse responsive
+                    { top = 20, left = 20, right = 20, bottom = 0 }
+                    zeroPadding
+            ]
 
 
+mobileView : RenderConfig -> HeaderRow columns -> ResponsiveConfig msg object columns -> Element msg
+mobileView renderConfig headers responsiveOpt =
+    let
+        rowMap object =
+            object
+                |> responsiveOpt.toRow
+                |> NList.map2 Tuple.pair headers
+                |> NList.toList
 
--- Internals
+        detailApplier ( cellHeader, cell ) =
+            if cellHeader.detailsVisible then
+                Just
+                    ( cellHeader.title
+                    , cellRender renderConfig cellHeader cell
+                    )
+
+            else
+                Nothing
+
+        details object =
+            object
+                |> rowMap
+                |> List.filterMap detailApplier
+    in
+    ToggableList.view renderConfig
+        { detailsShowLabel = responsiveOpt.detailsShowLabel
+        , detailsCollapseLabel = responsiveOpt.detailsCollapseLabel
+        , toCover = responsiveOpt.toCover
+        , toDetails = details
+        , selectMsg = responsiveOpt.selectMsg
+        , isSelected = responsiveOpt.isSelected
+        }
+        responsiveOpt.items
 
 
 headerRender : RenderConfig -> HeaderCell -> Element msg
@@ -195,16 +323,22 @@ headerRender cfg { title, width } =
         |> Element.el [ Element.width (widthToEl width) ]
 
 
-cellRender : RenderConfig -> HeaderCell -> Cell msg -> Element msg
-cellRender cfg { width } cell_ =
+detailRender : RenderConfig -> Cell msg -> Element msg
+detailRender cfg cell_ =
     case cell_ of
         CellText text ->
-            Text.toEl cfg text
-                |> Element.el [ Element.width (widthToEl width) ]
+            text
+                |> Text.toEl cfg
 
         CellButton button ->
             Button.toEl cfg button
-                |> Element.el [ Element.width (widthToEl width) ]
+
+
+cellRender : RenderConfig -> HeaderCell -> Cell msg -> Element msg
+cellRender cfg { width } cell_ =
+    cell_
+        |> detailRender cfg
+        |> Element.el [ Element.width (widthToEl width) ]
 
 
 widthToEl : CellWidth -> Element.Length
@@ -217,9 +351,9 @@ widthToEl width =
             px int
 
 
-defaultOptions : Options msg columns
+defaultOptions : Options msg object columns
 defaultOptions =
-    { rows = []
+    { rows = StaticRows []
     , width = shrink
     }
 

@@ -1,5 +1,6 @@
 module Utils exposing
-    ( story
+    ( iconsSvgSprite
+    , story
     , storyList
     , storyWithModel
     )
@@ -31,3 +32,11 @@ storyWithModel ( title, content, note ) =
     , \{ customModel } -> layout [] <| content customModel
     , note
     )
+
+
+iconsSvgSprite =
+    Element.html
+        (Html.node "paack-svg-icon-sprite"
+            []
+            []
+        )

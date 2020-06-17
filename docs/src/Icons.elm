@@ -7,6 +7,7 @@ import Html
 import UI.Icon as Icon
 import UI.Palette as Palette
 import UIExplorer exposing (storiesOf)
+import Utils exposing (iconsSvgSprite)
 
 
 stories cfg =
@@ -66,7 +67,7 @@ iconView cfg color ( iconFn, label ) =
 iconsGroup cfg color =
     icons
         |> List.map (iconView cfg color)
-        |> (::) svgSprite
+        |> (::) iconsSvgSprite
         |> Element.wrappedRow
             [ Element.spacing 10
             ]
@@ -83,11 +84,3 @@ iconsView cfg =
             , iconsGroup cfg
                 (Palette.color Palette.toneGray Palette.brightnessMiddle)
             ]
-
-
-svgSprite =
-    Element.html
-        (Html.node "paack-svg-icon-sprite"
-            []
-            []
-        )
