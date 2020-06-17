@@ -10,6 +10,9 @@ import UI.Table as Table
         , cellWidthEnd
         , cellWidthPortion
         , cellWidthShrink
+        , detailsEnd
+        , detailsHide
+        , detailsShow
         , header
         , headersEnd
         , rowEnd
@@ -93,11 +96,11 @@ responsiveTable cfg selectedSomeone =
         responsiveOpt =
             { detailsShowLabel = "Show details"
             , detailsCollapseLabel = "Hide details"
+            , toRow = rowMap
+            , toCover = mobileCover
             , selectMsg = Msg.SelectSomeone
             , isSelected = isSelected
-            , toRow = rowMap
             , items = items
-            , coverView = mobileCoverView
             }
 
         isSelected { name } =
@@ -106,16 +109,20 @@ responsiveTable cfg selectedSomeone =
                 |> Maybe.withDefault False
 
 
-        mobileCoverView parentCfg textColor { name } selected =
-            Text.body1 name
-                |> Text.withColor textColor
-                |> Text.toEl parentCfg
+        mobileCover { name } =
+            { title = name, caption = Nothing }
+
+        mobileDetails =
+            detailsEnd
+                |> detailsShow
+                |> detailsHide
 
     in
     table headers
         |> Table.withResponsiveRows responsiveOpt
         |> Table.withWidth fill
         |> Table.withCellsWidth cellsWidth
+        |> Table.withCellsDetails mobileDetails
         |> Table.toEl cfg
 ```"""
           }
@@ -173,20 +180,24 @@ responsiveTable cfg =
         responsiveOpt =
             { detailsShowLabel = "Show details"
             , detailsCollapseLabel = "Hide details"
+            , toRow = rowMap
+            , toCover = mobileCover
             , selectMsg = always Msg.NoOp
             , isSelected = always False
-            , toRow = rowMap
             , items = items
-            , coverView = mobileCoverView
             }
 
-        mobileCoverView parentCfg textColor { name } selected =
-            Text.body1 name
-                |> Text.withColor textColor
-                |> Text.toEl parentCfg
+        mobileCover { name } =
+            { title = name, caption = Nothing }
+
+        mobileDetails =
+            detailsEnd
+                |> detailsShow
+                |> detailsHide
     in
     table headers
         |> Table.withResponsiveRows responsiveOpt
         |> Table.withWidth fill
         |> Table.withCellsWidth cellsWidth
+        |> Table.withCellsDetails mobileDetails
         |> Table.toEl cfg

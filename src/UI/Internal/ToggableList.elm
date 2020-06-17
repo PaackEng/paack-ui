@@ -79,14 +79,14 @@ selectedRow renderConfig config object =
         [ defaultRow renderConfig config True object
         , object
             |> config.toDetails
-            |> List.map (someCard renderConfig)
+            |> List.map (detailItem renderConfig)
             |> Element.column toggleableCard
         ]
 
 
-someCard : RenderConfig -> ( String, Element msg ) -> Element msg
-someCard renderConfig ( label, content ) =
-    Element.column identCard
+detailItem : RenderConfig -> ( String, Element msg ) -> Element msg
+detailItem renderConfig ( label, content ) =
+    Element.column identDetailItem
         [ label
             |> Text.overline
             |> Text.withColor (Palette.color toneGray brightnessLight)
@@ -96,8 +96,8 @@ someCard renderConfig ( label, content ) =
         ]
 
 
-identCard : List (Attribute msg)
-identCard =
+identDetailItem : List (Attribute msg)
+identDetailItem =
     [ Element.paddingEach { zeroPadding | left = 8 }
     , Border.widthEach { zeroPadding | left = 2 }
     , Palette.color tonePrimary brightnessMiddle
