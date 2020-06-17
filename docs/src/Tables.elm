@@ -3,16 +3,16 @@ module Tables exposing (stories)
 import Element exposing (Element, fill)
 import Msg
 import UI.Internal.TypeNumbers as T
-import UI.RenderConfig exposing (RenderConfig)
+import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Table as Table
     exposing
         ( cellFromText
+        , cellMobileDetailsEnd
+        , cellMobileDetailsHide
+        , cellMobileDetailsShow
         , cellWidthEnd
         , cellWidthPortion
         , cellWidthShrink
-        , detailsEnd
-        , detailsHide
-        , detailsShow
         , header
         , headersEnd
         , rowEnd
@@ -27,7 +27,7 @@ stories cfg =
     storiesOf
         "Safe Tables"
         [ staticTableStory cfg
-        , responsiveTableStory cfg
+        , responsiveTableStory mobileCfg
         ]
 
 
@@ -113,9 +113,9 @@ responsiveTable cfg selectedSomeone =
             { title = name, caption = Nothing }
 
         mobileDetails =
-            detailsEnd
-                |> detailsShow
-                |> detailsHide
+            cellMobileDetailsEnd
+                |> cellMobileDetailsShow
+                |> cellMobileDetailsHide
 
     in
     table headers
@@ -191,9 +191,9 @@ responsiveTable cfg =
             { title = name, caption = Nothing }
 
         mobileDetails =
-            detailsEnd
-                |> detailsShow
-                |> detailsHide
+            cellMobileDetailsEnd
+                |> cellMobileDetailsShow
+                |> cellMobileDetailsHide
     in
     table headers
         |> Table.withResponsiveRows responsiveOpt
@@ -201,3 +201,7 @@ responsiveTable cfg =
         |> Table.withCellsWidth cellsWidth
         |> Table.withCellsDetails mobileDetails
         |> Table.toEl cfg
+
+
+mobileCfg =
+    RenderConfig.fromWindow { width = 375, height = 667 }

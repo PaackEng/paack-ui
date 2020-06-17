@@ -8,14 +8,14 @@ module UI.Table exposing
     , Table
     , cellFromButton
     , cellFromText
+    , cellMobileDetailsEnd
+    , cellMobileDetailsHide
+    , cellMobileDetailsShow
+    , cellMobileDetailsShowIf
     , cellWidthEnd
     , cellWidthPixels
     , cellWidthPortion
     , cellWidthShrink
-    , detailsEnd
-    , detailsHide
-    , detailsIf
-    , detailsShow
     , header
     , headersEnd
     , rowEnd
@@ -203,23 +203,23 @@ cellWidthEnd =
     optsEnd
 
 
-detailsEnd : OptRow Bool T.Zero
-detailsEnd =
+cellMobileDetailsEnd : OptRow Bool T.Zero
+cellMobileDetailsEnd =
     optsEnd
 
 
-detailsShow : OptRow Bool columns -> OptRow Bool (T.Increase columns)
-detailsShow accu =
+cellMobileDetailsShow : OptRow Bool columns -> OptRow Bool (T.Increase columns)
+cellMobileDetailsShow accu =
     opt True accu
 
 
-detailsHide : OptRow Bool columns -> OptRow Bool (T.Increase columns)
-detailsHide accu =
+cellMobileDetailsHide : OptRow Bool columns -> OptRow Bool (T.Increase columns)
+cellMobileDetailsHide accu =
     opt False accu
 
 
-detailsIf : Bool -> OptRow Bool columns -> OptRow Bool (T.Increase columns)
-detailsIf condition accu =
+cellMobileDetailsShowIf : Bool -> OptRow Bool columns -> OptRow Bool (T.Increase columns)
+cellMobileDetailsShowIf condition accu =
     opt condition accu
 
 
