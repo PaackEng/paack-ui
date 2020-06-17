@@ -36,11 +36,6 @@ map2 applier (NList xs) (NList ys) =
     NList <| List.map2 applier xs ys
 
 
-map3 : (a -> b -> c -> result) -> NList a n -> NList b n -> NList c n -> NList result n
-map3 applier (NList xs) (NList ys) (NList zs) =
-    NList <| List.map3 applier xs ys zs
-
-
 toList : NList data n -> List data
 toList (NList list) =
     list
