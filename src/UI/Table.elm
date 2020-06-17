@@ -1,8 +1,9 @@
 module UI.Table exposing
     ( CellWidth
     , HeaderRow
+    , MobileCover
     , OptRow
-    , ResponsiveOptions
+    , ResponsiveConfig
     , Row
     , Table
     , cellFromButton
@@ -11,11 +12,16 @@ module UI.Table exposing
     , cellWidthPixels
     , cellWidthPortion
     , cellWidthShrink
+    , detailsEnd
+    , detailsHide
+    , detailsIf
+    , detailsShow
     , header
     , headersEnd
     , rowEnd
     , table
     , toEl
+    , withCellsDetails
     , withCellsWidth
     , withResponsiveRows
     , withStaticRows
@@ -51,20 +57,24 @@ type alias Options msg object columns =
     }
 
 
-type alias ResponsiveOptions msg object columns =
+type alias ResponsiveConfig msg object columns =
     { detailsShowLabel : String
     , detailsCollapseLabel : String
+    , toRow : object -> Row msg columns
+    , toCover : object -> MobileCover
     , selectMsg : object -> msg
     , isSelected : object -> Bool
-    , coverView : RenderConfig -> Palette.Color -> object -> Bool -> Element msg
-    , toRow : object -> Row msg columns
     , items : List object
     }
 
 
 type Rows msg object columns
     = StaticRows (List (Row msg columns))
-    | ResponsiveRows (ResponsiveOptions msg object columns)
+    | ResponsiveRows (ResponsiveConfig msg object columns)
+
+
+type alias MobileCover =
+    ToggableList.Cover
 
 
 type alias Row msg columns =
@@ -82,6 +92,7 @@ type alias OptRow value columns =
 type alias HeaderCell =
     { title : String
     , width : CellWidth
+    , detailsVisible : Bool
     }
 
 
@@ -107,7 +118,7 @@ rowEnd =
 
 header : String -> HeaderRow columns -> HeaderRow (T.Increase columns)
 header head tail =
-    NList.cons { title = head, width = WidthPortion 1 } tail
+    NList.cons { title = head, width = WidthPortion 1, detailsVisible = True } tail
 
 
 cellFromText : Text -> Row msg columns -> Row msg (T.Increase columns)
@@ -134,7 +145,7 @@ withStaticRows rows (Table prop opt_) =
     Table prop { opt_ | rows = StaticRows rows }
 
 
-withResponsiveRows : ResponsiveOptions msg object columns -> Table msg object columns -> Table msg object columns
+withResponsiveRows : ResponsiveConfig msg object columns -> Table msg object columns -> Table msg object columns
 withResponsiveRows responsiveOpt (Table prop opt_) =
     Table prop { opt_ | rows = ResponsiveRows responsiveOpt }
 
@@ -147,15 +158,29 @@ withWidth width (Table prop opt_) =
 withCellsWidth : OptRow CellWidth columns -> Table msg object columns -> Table msg object columns
 withCellsWidth row (Table prop opt_) =
     let
-        mergeWidth header_ maybeWidth =
+        mergeWidth oldHeader maybeWidth =
             case maybeWidth of
                 Just len ->
-                    { header_ | width = len }
+                    { oldHeader | width = len }
 
                 Nothing ->
-                    header_
+                    oldHeader
     in
     Table { prop | headers = NList.map2 mergeWidth prop.headers row } opt_
+
+
+withCellsDetails : OptRow Bool columns -> Table msg object columns -> Table msg object columns
+withCellsDetails row (Table prop opt_) =
+    let
+        mergeVisibility oldHeader maybeVisibility =
+            case maybeVisibility of
+                Just visibility ->
+                    { oldHeader | detailsVisible = visibility }
+
+                Nothing ->
+                    oldHeader
+    in
+    Table { prop | headers = NList.map2 mergeVisibility prop.headers row } opt_
 
 
 cellWidthPortion : Int -> OptRow CellWidth columns -> OptRow CellWidth (T.Increase columns)
@@ -176,6 +201,26 @@ cellWidthShrink accu =
 cellWidthEnd : OptRow CellWidth T.Zero
 cellWidthEnd =
     optsEnd
+
+
+detailsEnd : OptRow Bool T.Zero
+detailsEnd =
+    optsEnd
+
+
+detailsShow : OptRow Bool columns -> OptRow Bool (T.Increase columns)
+detailsShow accu =
+    opt True accu
+
+
+detailsHide : OptRow Bool columns -> OptRow Bool (T.Increase columns)
+detailsHide accu =
+    opt False accu
+
+
+detailsIf : Bool -> OptRow Bool columns -> OptRow Bool (T.Increase columns)
+detailsIf condition accu =
+    opt condition accu
 
 
 
@@ -235,7 +280,7 @@ desktopView cfg responsive headers width desktopRows =
             ]
 
 
-mobileView : RenderConfig -> HeaderRow columns -> ResponsiveOptions msg object columns -> Element msg
+mobileView : RenderConfig -> HeaderRow columns -> ResponsiveConfig msg object columns -> Element msg
 mobileView renderConfig headers responsiveOpt =
     let
         rowMap object =
@@ -244,25 +289,26 @@ mobileView renderConfig headers responsiveOpt =
                 |> NList.map2 Tuple.pair headers
                 |> NList.toList
 
-        details object =
-            case rowMap object of
-                [] ->
-                    []
+        detailApplier ( cellHeader, cell ) =
+            if cellHeader.detailsVisible then
+                Just
+                    ( cellHeader.title
+                    , cellRender renderConfig cellHeader cell
+                    )
 
-                _ :: tail ->
-                    List.map
-                        (\( cellHeader, cell ) ->
-                            ( cellHeader.title
-                            , cellRender renderConfig cellHeader cell
-                            )
-                        )
-                        tail
+            else
+                Nothing
+
+        details object =
+            object
+                |> rowMap
+                |> List.filterMap detailApplier
     in
     ToggableList.view renderConfig
         { detailsShowLabel = responsiveOpt.detailsShowLabel
         , detailsCollapseLabel = responsiveOpt.detailsCollapseLabel
-        , coverView = responsiveOpt.coverView
-        , details = details
+        , toCover = responsiveOpt.toCover
+        , toDetails = details
         , selectMsg = responsiveOpt.selectMsg
         , isSelected = responsiveOpt.isSelected
         }
@@ -277,17 +323,22 @@ headerRender cfg { title, width } =
         |> Element.el [ Element.width (widthToEl width) ]
 
 
-cellRender : RenderConfig -> HeaderCell -> Cell msg -> Element msg
-cellRender cfg { width } cell_ =
+detailRender : RenderConfig -> Cell msg -> Element msg
+detailRender cfg cell_ =
     case cell_ of
         CellText text ->
             text
                 |> Text.toEl cfg
-                |> Element.el [ Element.width (widthToEl width) ]
 
         CellButton button ->
             Button.toEl cfg button
-                |> Element.el [ Element.width (widthToEl width) ]
+
+
+cellRender : RenderConfig -> HeaderCell -> Cell msg -> Element msg
+cellRender cfg { width } cell_ =
+    cell_
+        |> detailRender cfg
+        |> Element.el [ Element.width (widthToEl width) ]
 
 
 widthToEl : CellWidth -> Element.Length

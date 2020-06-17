@@ -1,4 +1,4 @@
-module UI.Internal.ToggableList exposing (Config, view)
+module UI.Internal.ToggableList exposing (Config, Cover, view)
 
 import Element exposing (Attribute, Element, fill, px)
 import Element.Background as Background
@@ -6,7 +6,7 @@ import Element.Border as Border
 import Element.Font as Font
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (ifThenElse)
-import UI.Palette as Palette exposing (brightnessDarkest, brightnessLight, brightnessLightest, brightnessMiddle, toneGray, tonePrimary)
+import UI.Palette as Palette exposing (brightnessDarkest, brightnessLight, brightnessLighter, brightnessLightest, brightnessMiddle, toneGray, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.SelectList as SelectList exposing (selectList)
 import UI.Size as Size
@@ -17,11 +17,15 @@ import UI.Utils.Element exposing (zeroPadding)
 type alias Config object msg =
     { detailsShowLabel : String
     , detailsCollapseLabel : String
-    , coverView : RenderConfig -> Palette.Color -> object -> Bool -> Element msg
-    , details : object -> List ( String, Element msg )
+    , toCover : object -> Cover
+    , toDetails : object -> List ( String, Element msg )
     , selectMsg : object -> msg
     , isSelected : object -> Bool
     }
+
+
+type alias Cover =
+    { title : String, caption : Maybe String }
 
 
 view : RenderConfig -> Config object msg -> List object -> Element msg
@@ -47,7 +51,7 @@ defaultRow renderConfig config selected object =
         , Element.paddingEach { top = 11, bottom = 11, left = 28, right = 12 }
         , Element.height Element.shrink
         ]
-        [ config.coverView renderConfig (titleColor selected) object selected
+        [ coverView renderConfig (config.toCover object) selected
             |> Element.el
                 [ Element.width fill
                 , Element.centerY
@@ -74,7 +78,7 @@ selectedRow renderConfig config object =
     Element.column [ Element.width fill ]
         [ defaultRow renderConfig config True object
         , object
-            |> config.details
+            |> config.toDetails
             |> List.map (someCard renderConfig)
             |> Element.column toggleableCard
         ]
@@ -121,3 +125,37 @@ titleColor selected =
 
     else
         Palette.color toneGray brightnessDarkest
+
+
+captionColor : Bool -> Palette.Color
+captionColor selected =
+    if selected then
+        Palette.color tonePrimary brightnessLighter
+
+    else
+        Palette.color toneGray brightnessLight
+
+
+coverView : RenderConfig -> Cover -> Bool -> Element msg
+coverView cfg { title, caption } selected =
+    let
+        titleComponent =
+            Text.body1 title
+                |> Text.withColor (titleColor selected)
+
+        captionApplied =
+            case caption of
+                Just captionStr ->
+                    Text.combination
+                        [ titleComponent
+                        , Text.caption captionStr
+                            |> Text.withColor (captionColor selected)
+                        ]
+
+                Nothing ->
+                    titleComponent
+    in
+    captionApplied
+        |> Text.setEllipsis True
+        |> Text.toEl cfg
+        |> Element.el [ Element.width fill, Element.clipX ]
