@@ -1,7 +1,10 @@
-module Tables exposing (stories)
+module Tables.Stories exposing (stories, update)
 
 import Element exposing (Element, fill)
 import Msg
+import Return as R exposing (Return)
+import Tables.Model as Tables
+import Tables.Msg as Tables
 import UI.Internal.TypeNumbers as T
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Table as Table
@@ -20,7 +23,14 @@ import UI.Table as Table
         )
 import UI.Text as Text exposing (Text)
 import UIExplorer exposing (storiesOf)
-import Utils exposing (story)
+import Utils exposing (iconsSvgSprite, story, storyWithModel)
+
+
+update : Tables.Msg -> Tables.Model -> Return Tables.Msg Tables.Model
+update msg model =
+    case msg of
+        Tables.Select newValue ->
+            ( { model | selected = Just newValue }, Cmd.none )
 
 
 stories cfg =
@@ -69,9 +79,9 @@ staticTable cfg =
 
 
 responsiveTableStory cfg =
-    story
+    storyWithModel
         ( "Responsive Table"
-        , responsiveTable cfg
+        , \{ tablesStories } -> responsiveTable cfg tablesStories
         , { note = """```elm
 responsiveTable : RenderConfig -> Maybe { name : String, birthday: String } -> Element Msg
 responsiveTable cfg selectedSomeone =
@@ -158,7 +168,7 @@ staticTable cfg =
         |> Table.toEl cfg
 
 
-responsiveTable cfg =
+responsiveTable cfg { selected } =
     let
         headers =
             header "Name" <| header "Birthday" <| headersEnd
@@ -182,10 +192,15 @@ responsiveTable cfg =
             , detailsCollapseLabel = "Hide details"
             , toRow = rowMap
             , toCover = mobileCover
-            , selectMsg = always Msg.NoOp
-            , isSelected = always False
+            , selectMsg = Msg.TablesStoriesMsg << Tables.Select << .name
+            , isSelected = isSelected
             , items = items
             }
+
+        isSelected { name } =
+            selected
+                |> Maybe.map ((==) name)
+                |> Maybe.withDefault False
 
         mobileCover { name } =
             { title = name, caption = Nothing }
@@ -201,6 +216,9 @@ responsiveTable cfg =
         |> Table.withCellsWidth cellsWidth
         |> Table.withCellsDetails mobileDetails
         |> Table.toEl cfg
+        |> List.singleton
+        |> (::) iconsSvgSprite
+        |> Element.wrappedRow [ Element.width fill ]
 
 
 mobileCfg =

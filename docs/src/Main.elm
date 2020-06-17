@@ -16,7 +16,7 @@ import Paginators.Stories as Paginators
 import Palette
 import Return as R
 import Sizes
-import Tables
+import Tables.Stories as Tables
 import TextField
 import Texts
 import UI.NavigationContainer
@@ -103,6 +103,12 @@ updateStories msg ({ customModel } as model) =
         PaginatorsStoriesMsg subMsg ->
             Paginators.update subMsg customModel.paginatorsStories
                 |> R.map (\t -> { customModel | paginatorsStories = t })
+                |> R.map (\newCustomModel -> { model | customModel = newCustomModel })
+                |> Tuple.mapSecond (always Cmd.none)
+
+        TablesStoriesMsg subMsg ->
+            Tables.update subMsg customModel.tablesStories
+                |> R.map (\t -> { customModel | tablesStories = t })
                 |> R.map (\newCustomModel -> { model | customModel = newCustomModel })
                 |> Tuple.mapSecond (always Cmd.none)
 
