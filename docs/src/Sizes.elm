@@ -59,14 +59,14 @@ iconView cfg size ( iconFn, label ) =
 
 
 buttons =
-    [ Button.bodyText "Prompt"
-    , Button.bodyIcon <| Icon.toggle "Toggle"
+    [ Button.fromLabel "Prompt"
+    , Button.fromIcon <| Icon.toggle "Toggle"
     ]
 
 
 buttonView cfg size body =
     body
-        |> Button.button Msg.NoOp
+        |> Button.cmd Msg.NoOp Button.primary
         |> Button.withSize size
         |> Button.renderElement cfg
 

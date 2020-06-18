@@ -38,29 +38,25 @@ stories renderConfig =
 enabledStory renderConfig label tone toneStr =
     storyList
         ( label
-        , [ Button.bodyText "Prompt"
-                |> Button.button Msg.NoOp
-                |> Button.withTone tone
+        , [ Button.fromLabel "Prompt"
+                |> Button.cmd Msg.NoOp tone
                 |> Button.renderElement renderConfig
-          , Button.bodyIcon (Icon.toggle "Toggle")
-                |> Button.button Msg.NoOp
-                |> Button.withTone tone
+          , Button.fromIcon (Icon.toggle "Toggle")
+                |> Button.cmd Msg.NoOp tone
                 |> Button.renderElement renderConfig
           ]
         , { note = """
 ```elm
 -- Text
 
-Button.bodyText "Some Text"
-    |> Button.button YourMessage
-    |> Button.withTone """ ++ toneStr ++ """
+Button.fromLabel "Some Text"
+    |> Button.cmd YourMessage """ ++ toneStr ++ """
     |> Button.renderElement renderConfig
 
 
 -- Icon
-Button.bodyIcon Icon.someIcon
-    |> Button.button YourMessage
-    |> Button.withTone """ ++ toneStr ++ """
+Button.fromIcon Icon.someIcon
+    |> Button.cmd YourMessage """ ++ toneStr ++ """
     |> Button.renderElement renderConfig
 ```
 """
@@ -71,29 +67,27 @@ Button.bodyIcon Icon.someIcon
 disabledButtonStory renderConfig =
     storyList
         ( "Disabled"
-        , [ Button.bodyText "Prompt"
-                |> Button.button Msg.NoOp
-                |> Button.withMode Button.modeDisabled
+        , [ Button.fromLabel "Prompt"
+                |> Button.disabled
                 |> Button.renderElement renderConfig
-          , Button.bodyIcon (Icon.toggle "Toggle")
-                |> Button.button Msg.NoOp
-                |> Button.withMode Button.modeDisabled
+          , Button.fromIcon (Icon.toggle "Toggle")
+                |> Button.cmd Msg.NoOp Button.primary
+                |> Button.withDisabledIf True
                 |> Button.renderElement renderConfig
           ]
         , { note = """
 ```elm
 -- Text
 
-Button.bodyText "Some Text"
-    |> Button.button YourMessage
-    |> Button.withMode Button.modeDisabled
+Button.fromLabel "Some Text"
+    |> Button.disabled
     |> Button.renderElement renderConfig
 
 
 -- Icon
-Button.bodyIcon Icon.someIcon
-    |> Button.button YourMessage
-    |> Button.withMode Button.modeDisabled
+Button.fromIcon Icon.someIcon
+    |> Button.cmd YourMessage
+    |> Button.withDisabledIf True
     |> Button.renderElement renderConfig
 ```
 """
@@ -104,48 +98,72 @@ Button.bodyIcon Icon.someIcon
 primaryStory cfg =
     enabledStory cfg
         "Primary"
-        Button.tonePrimary
-        "Button.tonePrimary"
+        Button.primary
+        "Button.primary"
 
 
 dangerStory cfg =
     enabledStory cfg
         "Danger"
-        Button.toneDanger
-        "Button.toneDanger"
+        Button.danger
+        "Button.danger"
 
 
-successStory cfg =
-    enabledStory cfg
-        "Success"
-        Button.toneSuccess
-        "Button.toneSuccess"
+successStory renderConfig =
+    storyList
+        ( "Success"
+        , [ Button.fromLabel "Prompt"
+                |> Button.success
+                |> Button.renderElement renderConfig
+          , Button.fromIcon (Icon.toggle "Toggle")
+                |> Button.cmd Msg.NoOp Button.primary
+                |> Button.withSuccessIf True
+                |> Button.renderElement renderConfig
+          ]
+        , { note = """
+```elm
+-- Text
+
+Button.fromLabel "Some Text"
+    |> Button.success
+    |> Button.renderElement renderConfig
+
+
+-- Icon
+Button.fromIcon Icon.someIcon
+    |> Button.cmd YourMessage
+    |> Button.withSuccessIf True
+    |> Button.renderElement renderConfig
+```
+"""
+          }
+        )
 
 
 lightStory cfg =
     enabledStory cfg
         "Light"
-        Button.toneLight
-        "Button.toneLight"
+        Button.light
+        "Button.light"
 
 
 clearStory cfg =
     enabledStory cfg
         "Clear"
-        Button.toneClear
-        "Button.toneClear"
+        Button.clear
+        "Button.clear"
 
 
 linkStory renderConfig =
     story
         ( "Link"
-        , Button.bodyText "Go to Blank"
-            |> Button.link (Link.link "about:blank")
+        , Button.fromLabel "Go to Blank"
+            |> Button.redirect (Link.link "about:blank") Button.hyperlink
             |> Button.renderElement renderConfig
         , { note = """
 ```elm
-Button.bodyText "Go to Blank"
-    |> Button.link (Link.link "about:blank")
+Button.fromLabel "Go to Blank"
+    |> Button.redirect (Link.link "about:blank") Button.hyperlink
     |> Button.renderElement renderConfig
 ```
 """ }
@@ -155,15 +173,15 @@ Button.bodyText "Go to Blank"
 fullWidthStory renderConfig =
     story
         ( "Full Width"
-        , Button.bodyText "Super Long Prompt"
-            |> Button.button Msg.NoOp
-            |> Button.withWidth Button.widthFull
+        , Button.fromLabel "Super Long Prompt"
+            |> Button.cmd Msg.NoOp Button.primary
+            |> Button.withWidth Button.full
             |> Button.renderElement renderConfig
         , { note = """
 ```elm
-Button.bodyText "Some Text"
-    |> Button.button YourMessage
-    |> Button.withWidth Button.widthFull
+Button.fromLabel "Some Text"
+    |> Button.cmd YourMessage Button.primary
+    |> Button.withWidth Button.full
     |> Button.renderElement renderConfig
 ```
 """ }
@@ -178,8 +196,7 @@ toggleStory renderConfig =
         body =
             \{ buttonsStories } ->
                 Element.column [ Element.spacing 20 ]
-                    [ Button.bodyIcon (Icon.toggle "Toggle what's there")
-                        |> Button.toggle msg buttonsStories.demoSwitch
+                    [ Button.toggle "Toggle what's there" msg buttonsStories.demoSwitch
                         |> Button.renderElement renderConfig
                     , if buttonsStories.demoSwitch then
                         Element.text "Click this Button!"
@@ -191,8 +208,7 @@ toggleStory renderConfig =
     storyWithModel
         ( "Toggle", body, { note = """
 ```elm
-Button.bodyIcon (Icon.toggle "Some Hint")
-    |> Button.toggle YourMessage TrueOrFalse
+Button.toggle "Some Hint" YourMessage TrueOrFalse
     |> Button.renderElement renderConfig
 ```
 """ } )

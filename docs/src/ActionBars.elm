@@ -49,12 +49,10 @@ withExtraButtonsStory cfg =
                 |> ActionBar.withTitle "Menu title"
                 |> ActionBar.withSubtitle "Cool menu subtitle"
                 |> ActionBar.withButtons
-                    [ Button.bodyIcon (Icons.toggle "Toggle something")
-                        |> Button.button Msg.NoOp
-                        |> Button.withTone Button.tonePrimary
-                    , Button.bodyText "Make something great"
-                        |> Button.button Msg.NoOp
-                        |> Button.withTone Button.tonePrimary
+                    [ Button.fromIcon (Icons.toggle "Toggle something")
+                        |> Button.cmd Msg.NoOp Button.primary
+                    , Button.fromLabel "Make something great"
+                        |> Button.cmd Msg.NoOp Button.primary
                     ]
             )
         , { note =
@@ -64,12 +62,10 @@ ActionBar.actionBar
     |> ActionBar.withTitle "Menu title"
     |> ActionBar.withSubtitle "Cool menu subtitle"
     |> ActionBar.withButtons
-        [ Button.bodyIcon (Icons.toggle "Toggle something")
-            |> Button.button Msg.NoOp
-            |> Button.withTone Button.tonePrimary
-        , Button.bodyText "Make something great"
-            |> Button.button Msg.NoOp
-            |> Button.withTone Button.tonePrimary
+        [ Button.fromIcon (Icons.toggle "Toggle something")
+            |> Button.cmd Msg.NoOp Button.primary
+        , Button.fromLabel "Make something great"
+            |> Button.cmd Msg.NoOp Button.primary
         ]
     |> ActionBar.toEl
 ```
@@ -109,12 +105,10 @@ allFeaturesStory cfg =
                 |> ActionBar.withTitle "Menu title"
                 |> ActionBar.withSubtitle "Cool menu subtitle"
                 |> ActionBar.withButtons
-                    [ Button.bodyIcon (Icons.toggle "Toggle something")
-                        |> Button.button Msg.NoOp
-                        |> Button.withTone Button.tonePrimary
-                    , Button.bodyText "Make something great"
-                        |> Button.button Msg.NoOp
-                        |> Button.withTone Button.tonePrimary
+                    [ Button.fromIcon (Icons.toggle "Toggle something")
+                        |> Button.cmd Msg.NoOp Button.primary
+                    , Button.fromLabel "Make something great"
+                        |> Button.cmd Msg.NoOp Button.primary
                     ]
                 |> ActionBar.withCloseButton Msg.NoOp
             )
@@ -125,12 +119,10 @@ ActionBar.actionBar
     |> ActionBar.withTitle "Menu title"
     |> ActionBar.withSubtitle "Cool menu subtitle"
     |> ActionBar.withButtons
-        [ Button.bodyIcon (Icons.toggle "Toggle something")
-            |> Button.button Msg.NoOp
-            |> Button.withTone Button.tonePrimary
-        , Button.bodyText "Make something great"
-            |> Button.button Msg.NoOp
-            |> Button.withTone Button.tonePrimary
+        [ Button.fromIcon (Icons.toggle "Toggle something")
+            |> Button.cmd Msg.NoOp Button.primary
+        , Button.fromLabel "Make something great"
+            |> Button.cmd Msg.NoOp Button.primary
         ]
     |> ActionBar.withOnCloseMessage Msg.NoOp
     |> ActionBar.toEl
