@@ -10,6 +10,16 @@ prependIf shouldAdd item items =
         items
 
 
+prependMaybe : Maybe a -> List a -> List a
+prependMaybe maybeSomething items =
+    case maybeSomething of
+        Just something ->
+            something :: items
+
+        Nothing ->
+            items
+
+
 lazyMap : (a -> b) -> (c -> a) -> (c -> b)
 lazyMap applier original =
     \whatever -> applier (original whatever)
@@ -27,3 +37,13 @@ ifThenElse condition ifThen ifElse =
 pairUncurry : (a -> b -> c) -> ( a, b ) -> c
 pairUncurry applier ( first, second ) =
     applier first second
+
+
+maybeToList : Maybe a -> List a
+maybeToList maybeSomething =
+    case maybeSomething of
+        Just something ->
+            [ something ]
+
+        Nothing ->
+            []

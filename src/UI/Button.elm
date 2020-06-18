@@ -31,13 +31,13 @@ import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
 import UI.Icon as Icon exposing (Icon)
-import UI.Internal.Basics exposing (lazyMap, pairUncurry)
+import UI.Internal.Basics exposing (lazyMap, maybeToList, pairUncurry, prependMaybe)
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Size as Size exposing (Size)
 import UI.Internal.Text as Text exposing (TextColor)
 import UI.Link as Link exposing (Link)
-import UI.Palette as Palette exposing (brightnessDarkest, brightnessLight, brightnessLighter, brightnessLightest, brightnessMiddle)
+import UI.Palette as Palette exposing (brightnessDarkest, brightnessLight, brightnessLighter, brightnessLightest, brightnessMiddle, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UI.Utils.ARIA as ARIA
@@ -303,8 +303,11 @@ renderElement cfg button =
 
         Button { mode, body } { size, width } ->
             case mode of
-                ButtonWorking action style ->
-                    workingView cfg size width style body action
+                ButtonWorking action StyleHyperlink ->
+                    hyperlinkView cfg size width body action
+
+                ButtonWorking action (StyleEmbossed tone) ->
+                    workingView cfg size width tone body action
 
                 ButtonDisabled ->
                     disabledView cfg size width body disabledTheme
@@ -344,15 +347,50 @@ toggleView cfg size hint toggleMsg current =
         |> Element.el attrs
 
 
+hyperlinkView :
+    RenderConfig
+    -> Size
+    -> ButtonWidth
+    -> ButtonBody
+    -> ButtonAction msg
+    -> Element msg
+hyperlinkView cfg size width body action =
+    let
+        ( paddings, borders ) =
+            bodyLayout body size
+
+        attrs =
+            [ ARIA.roleAttr ARIA.roleButton
+            , Primitives.roundedBorders
+            , buttonWidth width
+            , Palette.color tonePrimary brightnessMiddle
+                |> Palette.toElColor
+                |> Font.color
+            , Font.underline
+            , Element.pointer
+            ]
+    in
+    case action of
+        ActionRedirect link ->
+            body
+                |> elFromBody cfg size
+                |> Link.wrapElement cfg attrs link
+
+        ActionMsg msg ->
+            body
+                |> elFromBody cfg size
+                |> Element.el (Events.onClick msg :: attrs)
+
+
 workingView :
     RenderConfig
     -> Size
     -> ButtonWidth
-    -> ButtonStyle
+    -> EmbossedTone
     -> ButtonBody
     -> ButtonAction msg
     -> Element msg
-workingView cfg size width style body action =
+workingView cfg size width tone body action =
     let
         ( paddings, borders ) =
             bodyLayout body size
@@ -365,7 +403,7 @@ workingView cfg size width style body action =
             , borders
             , Element.pointer
             ]
-                ++ workingTheme style body
+                ++ workingTheme tone
     in
     case action of
         ActionRedirect link ->
@@ -530,20 +568,199 @@ textSize size =
 
 
 
+-- Theme applier
+
+
+type alias ThemeTriple =
+    { background : Maybe Palette.Color
+    , border : Maybe Palette.Color
+    , text : TextColor
+    }
+
+
+type alias ButtonTheme =
+    { normal : ThemeTriple
+    , hover : Maybe ThemeTriple
+    }
+
+
+themeApply : ButtonTheme -> List (Attribute msg)
+themeApply theme =
+    case theme.hover of
+        Just hoverTriple ->
+            [ hoverTriple
+                |> themeToAttributes
+                |> Element.mouseOver
+            ]
+                ++ Element.colorTransition 100
+                ++ themeToAttributes theme.normal
+
+        Nothing ->
+            themeToAttributes theme.normal
+
+
+themeToAttributes : ThemeTriple -> List (Element.Attr decorative msg)
+themeToAttributes { background, border, text } =
+    text
+        |> Text.fontColor
+        |> Maybe.map Font.color
+        |> maybeToList
+        |> prependMaybe (Maybe.map (Palette.toElColor >> Background.color) background)
+        |> prependMaybe (Maybe.map (Palette.toElColor >> Border.color) border)
+
+
+
 -- Themes
 
 
+toggleTheme : Bool -> List (Attribute msg)
 toggleTheme current =
-    []
+    themeApply <|
+        { normal =
+            { background = Nothing
+            , border = Just <| Palette.color Palette.toneGray brightnessMiddle
+            , text =
+                Palette.color Palette.tonePrimary brightnessMiddle
+                    |> Text.ColorPalette
+            }
+        , hover =
+            Just
+                { background = Just <| Palette.color Palette.tonePrimary brightnessLightest
+                , border = Just <| Palette.color Palette.toneGray brightnessMiddle
+                , text =
+                    Palette.color Palette.tonePrimary brightnessDarkest
+                        |> Text.ColorPalette
+                }
+        }
 
 
-workingTheme style body =
-    []
+workingTheme : EmbossedTone -> List (Attribute msg)
+workingTheme tone =
+    themeApply <|
+        case tone of
+            TonePrimary ->
+                { normal =
+                    { background = Just <| Palette.color Palette.tonePrimary brightnessMiddle
+                    , border = Just <| Palette.color Palette.tonePrimary brightnessMiddle
+                    , text =
+                        Palette.color Palette.tonePrimary brightnessMiddle
+                            |> Palette.setContrasting True
+                            |> Text.ColorPalette
+                    }
+                , hover =
+                    Just
+                        { background = Just <| Palette.color Palette.tonePrimary brightnessDarkest
+                        , border = Just <| Palette.color Palette.tonePrimary brightnessDarkest
+                        , text =
+                            Palette.color Palette.tonePrimary brightnessDarkest
+                                |> Palette.setContrasting True
+                                |> Text.ColorPalette
+                        }
+                }
+
+            ToneDanger ->
+                { normal =
+                    { background = Just <| Palette.color Palette.toneDanger brightnessMiddle
+                    , border = Just <| Palette.color Palette.toneDanger brightnessMiddle
+                    , text =
+                        Palette.color Palette.toneDanger brightnessMiddle
+                            |> Palette.setContrasting True
+                            |> Text.ColorPalette
+                    }
+                , hover =
+                    Just
+                        { background = Just <| Palette.color Palette.toneDanger brightnessDarkest
+                        , border = Just <| Palette.color Palette.toneDanger brightnessDarkest
+                        , text =
+                            Palette.color Palette.toneDanger brightnessDarkest
+                                |> Palette.setContrasting True
+                                |> Text.ColorPalette
+                        }
+                }
+
+            ToneLight ->
+                { normal =
+                    { background = Just <| Palette.color Palette.toneGray brightnessLightest
+                    , border = Just <| Palette.color Palette.toneGray brightnessLightest
+                    , text =
+                        Palette.color Palette.tonePrimary brightnessMiddle
+                            |> Text.ColorPalette
+                    }
+                , hover =
+                    Just
+                        { background = Just <| Palette.color Palette.toneGray brightnessLighter
+                        , border = Just <| Palette.color Palette.toneGray brightnessLighter
+                        , text =
+                            Palette.color Palette.tonePrimary brightnessDarkest
+                                |> Text.ColorPalette
+                        }
+                }
+
+            ToneClear ->
+                { normal =
+                    { background = Nothing
+                    , border = Nothing
+                    , text =
+                        Palette.color Palette.tonePrimary brightnessMiddle
+                            |> Text.ColorPalette
+                    }
+                , hover =
+                    Just
+                        { background = Just <| Palette.color Palette.toneGray brightnessLightest
+                        , border = Just <| Palette.color Palette.toneGray brightnessLightest
+                        , text =
+                            Palette.color Palette.tonePrimary brightnessMiddle
+                                |> Text.ColorPalette
+                        }
+                }
 
 
+disabledTheme : ButtonBody -> List (Attribute msg)
 disabledTheme body =
-    []
+    themeApply <|
+        case body of
+            BodyIcon _ ->
+                { normal =
+                    { background = Just <| Palette.color Palette.toneGray brightnessLightest
+                    , border = Just <| Palette.color Palette.toneGray brightnessLightest
+                    , text =
+                        Palette.color Palette.toneGray brightnessLight
+                            |> Text.ColorPalette
+                    }
+                , hover = Nothing
+                }
+
+            BodyText _ ->
+                { normal =
+                    { background = Just <| Palette.color Palette.toneGray brightnessLight
+                    , border = Just <| Palette.color Palette.toneGray brightnessLight
+                    , text =
+                        Palette.color Palette.toneGray brightnessLight
+                            |> Palette.setContrasting True
+                            |> Text.ColorPalette
+                    }
+                , hover = Nothing
+                }
 
 
+successTheme : ButtonBody -> List (Attribute msg)
 successTheme body =
-    []
+    themeApply <|
+        { normal =
+            { background = Just <| Palette.color Palette.toneSuccess brightnessMiddle
+            , border = Just <| Palette.color Palette.toneSuccess brightnessMiddle
+            , text =
+                Palette.color Palette.toneSuccess brightnessMiddle
+                    |> Palette.setContrasting True
+                    |> Text.ColorPalette
+            }
+        , hover =
+            Just
+                { background = Just <| Palette.color Palette.toneSuccess brightnessDarkest
+                , border = Just <| Palette.color Palette.toneSuccess brightnessDarkest
+                , text =
+                    Palette.color Palette.toneSuccess brightnessDarkest
+                        |> Palette.setContrasting True
+                        |> Text.ColorPalette
+                }
+        }
