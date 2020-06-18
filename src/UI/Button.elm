@@ -131,11 +131,6 @@ fromIcon icon =
 -- Body to Button
 
 
-defaultStyle : ButtonStyle
-defaultStyle =
-    StyleEmbossed TonePrimary
-
-
 disabled : ButtonBody -> Button msg
 disabled body =
     Button { mode = ButtonDisabled, body = body } defaultOptions
@@ -356,9 +351,6 @@ hyperlinkView :
     -> Element msg
 hyperlinkView cfg size width body action =
     let
-        ( paddings, borders ) =
-            bodyLayout body size
-
         attrs =
             [ ARIA.roleAttr ARIA.roleButton
             , Primitives.roundedBorders
@@ -590,11 +582,11 @@ themeApply : ButtonTheme -> List (Attribute msg)
 themeApply theme =
     case theme.hover of
         Just hoverTriple ->
-            [ hoverTriple
+            (hoverTriple
                 |> themeToAttributes
                 |> Element.mouseOver
-            ]
-                ++ Element.colorTransition 100
+            )
+                :: Element.colorTransition 100
                 ++ themeToAttributes theme.normal
 
         Nothing ->
@@ -618,22 +610,26 @@ themeToAttributes { background, border, text } =
 toggleTheme : Bool -> List (Attribute msg)
 toggleTheme current =
     themeApply <|
-        { normal =
-            { background = Nothing
-            , border = Just <| Palette.color Palette.tonePrimary brightnessMiddle
-            , text =
-                Palette.color Palette.tonePrimary brightnessMiddle
-                    |> Text.ColorPalette
-            }
-        , hover =
-            Just
-                { background = Just <| Palette.color Palette.tonePrimary brightnessLightest
-                , border = Just <| Palette.color Palette.tonePrimary brightnessDarkest
+        if current then
+            primaryTheme
+
+        else
+            { normal =
+                { background = Nothing
+                , border = Just <| Palette.color Palette.tonePrimary brightnessMiddle
                 , text =
-                    Palette.color Palette.tonePrimary brightnessDarkest
+                    Palette.color Palette.tonePrimary brightnessMiddle
                         |> Text.ColorPalette
                 }
-        }
+            , hover =
+                Just
+                    { background = Just <| Palette.color Palette.tonePrimary brightnessLightest
+                    , border = Just <| Palette.color Palette.tonePrimary brightnessDarkest
+                    , text =
+                        Palette.color Palette.tonePrimary brightnessDarkest
+                            |> Text.ColorPalette
+                    }
+            }
 
 
 workingTheme : EmbossedTone -> List (Attribute msg)
@@ -641,24 +637,7 @@ workingTheme tone =
     themeApply <|
         case tone of
             TonePrimary ->
-                { normal =
-                    { background = Just <| Palette.color Palette.tonePrimary brightnessMiddle
-                    , border = Just <| Palette.color Palette.tonePrimary brightnessMiddle
-                    , text =
-                        Palette.color Palette.tonePrimary brightnessMiddle
-                            |> Palette.setContrasting True
-                            |> Text.ColorPalette
-                    }
-                , hover =
-                    Just
-                        { background = Just <| Palette.color Palette.tonePrimary brightnessDarkest
-                        , border = Just <| Palette.color Palette.tonePrimary brightnessDarkest
-                        , text =
-                            Palette.color Palette.tonePrimary brightnessDarkest
-                                |> Palette.setContrasting True
-                                |> Text.ColorPalette
-                        }
-                }
+                primaryTheme
 
             ToneDanger ->
                 { normal =
@@ -746,7 +725,7 @@ disabledTheme body =
 
 
 successTheme : ButtonBody -> List (Attribute msg)
-successTheme body =
+successTheme _ =
     themeApply <|
         { normal =
             { background = Just <| Palette.color Palette.toneSuccess brightnessMiddle
@@ -766,3 +745,25 @@ successTheme body =
                         |> Text.ColorPalette
                 }
         }
+
+
+primaryTheme : ButtonTheme
+primaryTheme =
+    { normal =
+        { background = Just <| Palette.color Palette.tonePrimary brightnessMiddle
+        , border = Just <| Palette.color Palette.tonePrimary brightnessMiddle
+        , text =
+            Palette.color Palette.tonePrimary brightnessMiddle
+                |> Palette.setContrasting True
+                |> Text.ColorPalette
+        }
+    , hover =
+        Just
+            { background = Just <| Palette.color Palette.tonePrimary brightnessDarkest
+            , border = Just <| Palette.color Palette.tonePrimary brightnessDarkest
+            , text =
+                Palette.color Palette.tonePrimary brightnessDarkest
+                    |> Palette.setContrasting True
+                    |> Text.ColorPalette
+            }
+    }
