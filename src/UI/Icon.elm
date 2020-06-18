@@ -207,7 +207,7 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
             case color of
                 ColorFromPalette realColor ->
                     (realColor
-                        |> Palette.toElColor
+                        |> Palette.toElementColor
                         |> Font.color
                     )
                         :: staticAttrs

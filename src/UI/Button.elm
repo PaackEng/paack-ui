@@ -356,7 +356,7 @@ hyperlinkView cfg size width body action =
             , Primitives.roundedBorders
             , buttonWidth width
             , Palette.color tonePrimary brightnessMiddle
-                |> Palette.toElColor
+                |> Palette.toElementColor
                 |> Font.color
             , Font.regular
             , Font.underline
@@ -599,8 +599,8 @@ themeToAttributes { background, border, text } =
         |> Text.fontColor
         |> Maybe.map Font.color
         |> maybeToList
-        |> prependMaybe (Maybe.map (Palette.toElColor >> Background.color) background)
-        |> prependMaybe (Maybe.map (Palette.toElColor >> Border.color) border)
+        |> prependMaybe (Maybe.map (Palette.toElementColor >> Background.color) background)
+        |> prependMaybe (Maybe.map (Palette.toElementColor >> Border.color) border)
 
 
 

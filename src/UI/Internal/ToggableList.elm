@@ -101,7 +101,7 @@ indentedDetailItemAttributes =
     [ Element.paddingEach { zeroPadding | left = 8 }
     , Border.widthEach { zeroPadding | left = 2 }
     , Palette.color tonePrimary brightnessMiddle
-        |> Palette.toElColor
+        |> Palette.toElementColor
         |> Border.color
     , Element.width fill
     ]
@@ -111,7 +111,7 @@ toggleableCard : List (Attribute msg)
 toggleableCard =
     [ Element.paddingEach { top = 16, bottom = 19, left = 28, right = 20 }
     , Palette.color toneGray brightnessLightest
-        |> Palette.toElColor
+        |> Palette.toElementColor
         |> Background.color
     , Element.width fill
     , Element.spacing 12

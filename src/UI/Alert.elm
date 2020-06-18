@@ -68,7 +68,7 @@ renderElement cfg (Alert { title, tone }) =
             }
         , tone
             |> getBackgroundColor
-            |> Palette.toElColor
+            |> Palette.toElementColor
             |> Background.color
         , Element.alignTop
         ]

@@ -80,7 +80,7 @@ renderElement cfg (Badge { content, tone } { brightness }) =
             [ Element.width shrink
             , Font.center
             , background
-                |> Palette.toElColor
+                |> Palette.toElementColor
                 |> Background.color
             , Element.paddingEach { top = 4, bottom = 4, left = 5, right = 3 }
             , Element.height (px 20)
