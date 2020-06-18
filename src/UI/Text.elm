@@ -13,10 +13,10 @@ module UI.Text exposing
     , heading6
     , multiline
     , overline
+    , renderElement
     , setEllipsis
     , subtitle1
     , subtitle2
-    , toEl
     , withColor
     )
 
@@ -105,8 +105,8 @@ setEllipsis val text =
     Internal.setEllipsis val text
 
 
-toEl : RenderConfig -> Text -> Element msg
-toEl cfg (Internal.Text spans opt) =
+renderElement : RenderConfig -> Text -> Element msg
+renderElement cfg (Internal.Text spans opt) =
     case spans of
         [] ->
             Element.none

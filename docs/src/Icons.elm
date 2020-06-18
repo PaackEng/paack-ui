@@ -20,7 +20,7 @@ stories cfg =
 ```elm
 Icon.seeMore label
     |> Icon.withColor (Palette.color Palette.tonePrimary Palette.brightnessMiddle)
-    |> Icon.toEl cfg
+    |> Icon.renderElement cfg
 ```
 """
             }
@@ -58,7 +58,7 @@ iconView cfg color ( iconFn, label ) =
         ]
         [ iconFn label
             |> Icon.withColor color
-            |> Icon.toEl cfg
+            |> Icon.renderElement cfg
             |> Element.el [ Element.centerX ]
         , Element.el [ Font.size 14 ] <| Element.text label
         ]

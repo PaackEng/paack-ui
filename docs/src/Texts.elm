@@ -16,23 +16,23 @@ stories renderConfig =
 "Wherever You Will Go"
     |> Text.heading5
     |> Text.withColor (Palette.color Palette.toneGray Palette.brightnessDarkest)
-    |> Text.toEl renderConfig
+    |> Text.renderElement renderConfig
 
 " - By The Calling"
     |> Text.caption
-    |> Text.toEl renderConfig
+    |> Text.renderElement renderConfig
 
 \"\"\"
 So lately, been wondering
 Who will be there to take my place?
 \"\"\"
     |> Text.body1
-    |> Text.toEl renderConfig
+    |> Text.renderElement renderConfig
 ```
 
 Futures discussions includes:
 * How we'll add responsives attributes (font-size may variate with device size).
-* * Maybe `Text.toEl <device>`
+* * Maybe `Text.renderElement <device>`
 * is `Text.toEl` really necessary?
 """ }
           )
@@ -61,7 +61,7 @@ styles =
 styleView renderConfig ( component, label ) =
     label
         |> component
-        |> Text.toEl renderConfig
+        |> Text.renderElement renderConfig
 
 
 textsView renderConfig content =

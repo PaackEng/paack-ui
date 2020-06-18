@@ -48,7 +48,7 @@ iconView cfg size ( iconFn, label ) =
         ]
         [ iconFn label
             |> Icon.withSize size
-            |> Icon.toEl cfg
+            |> Icon.renderElement cfg
             |> Element.el
                 [ Font.size 25
                 , Element.centerX
@@ -68,7 +68,7 @@ buttonView cfg size body =
     body
         |> Button.button Msg.NoOp
         |> Button.withSize size
-        |> Button.toEl cfg
+        |> Button.renderElement cfg
 
 
 sizeView cfg size =

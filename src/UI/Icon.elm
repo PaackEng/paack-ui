@@ -12,12 +12,12 @@ module UI.Icon exposing
     , paackSpaces
     , packages
     , print
+    , renderElement
     , rightArrow
     , sandwichMenu
     , search
     , seeMore
     , svgSpriteImport
-    , toEl
     , toggle
     , toggleDown
     , toggleUp
@@ -191,8 +191,8 @@ warning hint =
     Icon (Properties hint Warning) defaultOptions
 
 
-toEl : RenderConfig -> Icon -> Element msg
-toEl _ (Icon { hint, glyph } { color, size }) =
+renderElement : RenderConfig -> Icon -> Element msg
+renderElement _ (Icon { hint, glyph } { color, size }) =
     let
         staticAttrs =
             [ ARIA.roleAttr ARIA.roleImage

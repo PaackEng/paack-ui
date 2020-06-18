@@ -2,8 +2,8 @@ module UI.Alert exposing
     ( Alert
     , danger
     , primary
+    , renderElement
     , success
-    , toEl
     , warning
     )
 
@@ -55,8 +55,8 @@ danger title =
         { title = title, tone = ToneDanger }
 
 
-toEl : RenderConfig -> Alert msg -> Element msg
-toEl cfg (Alert { title, tone }) =
+renderElement : RenderConfig -> Alert msg -> Element msg
+renderElement cfg (Alert { title, tone }) =
     Element.row
         [ Element.width Element.fill
         , Element.height Element.shrink
@@ -74,7 +74,7 @@ toEl cfg (Alert { title, tone }) =
         ]
         [ Text.subtitle2 title
             |> Text.withColor (getTextColor tone)
-            |> Text.toEl cfg
+            |> Text.renderElement cfg
         ]
 
 

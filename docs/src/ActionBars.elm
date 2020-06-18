@@ -142,4 +142,4 @@ ActionBar.actionBar
 
 viewBase cfg content =
     content
-        |> ActionBar.toEl cfg
+        |> ActionBar.renderElement cfg

@@ -15,9 +15,9 @@ module UI.NavigationContainer exposing
     , menuAction
     , menuPage
     , navigator
+    , renderElement
     , stateInit
     , stateUpdate
-    , toEl
     , withMenuActions
     , withMenuLogo
     , withMenuPages
@@ -215,12 +215,12 @@ dialog title onClose body =
 -- Render
 
 
-toEl :
+renderElement :
     RenderConfig
     -> page
     -> Navigator page msg
     -> { body : List (Html msg), title : String }
-toEl cfg page model =
+renderElement cfg page model =
     let
         container =
             model.container page

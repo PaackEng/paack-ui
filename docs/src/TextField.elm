@@ -25,7 +25,7 @@ defaultTextFieldStory cfg =
             "Value"
             |> TextField.withPlaceholder "Enter your info here"
             |> TextField.setLabelVisible True
-            |> TextField.toEl cfg
+            |> TextField.renderElement cfg
         , { note = """
 ```elm
 type Msg
@@ -39,7 +39,7 @@ type Msg
         model.value
     |> TextField.withPlaceholder "Enter your info here"
     |> TextField.setLabelVisible True
-    |> TextField.toEl renderCfg
+    |> TextField.renderElement renderCfg
 ```
 """
           }
@@ -53,7 +53,7 @@ usernameTextFieldStory cfg =
             "Enter your email"
             "Value"
             |> TextField.setLabelVisible True
-            |> TextField.toEl cfg
+            |> TextField.renderElement cfg
         , { note = """
 ```elm
 type Msg
@@ -66,7 +66,7 @@ TextField.email OnTextFieldChanged
         "Enter your email"
         model.emailValue
     |> TextField.setLabelVisible true
-    |> TextField.toEl renderCfg
+    |> TextField.renderElement renderCfg
 ```
 """
           }
@@ -80,7 +80,7 @@ passwordTextFieldStory cfg =
             "Enter your password"
             "Value"
             |> TextField.setLabelVisible True
-            |> TextField.toEl cfg
+            |> TextField.renderElement cfg
         , { note = """
 ```elm
 type Msg
@@ -93,7 +93,7 @@ TextField.currentPassword OnTextFieldChanged
         "Enter your password"
         mode.passwordValue
     |> TextField.setLabelVisible True
-    |> TextField.toEl renderCfg
+    |> TextField.renderElement renderCfg
 ```
 """
           }
@@ -108,7 +108,7 @@ fullWidthStory cfg =
             "Some big text"
             |> TextField.setLabelVisible True
             |> TextField.withWidth TextField.widthFull
-            |> TextField.toEl cfg
+            |> TextField.renderElement cfg
         , { note = """
 ```elm
 type Msg
@@ -122,7 +122,7 @@ TextField.singlelineText OnTextFieldChanged
         model.someFieldValue
     |> TextField.setLabelVisible True
     |> TextField.withWidth TextField.widthFull
-    |> TextField.toEl renderCfg
+    |> TextField.renderElement renderCfg
 ```
 """
           }

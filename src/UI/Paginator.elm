@@ -63,7 +63,7 @@ nonNumeric ({ first, offset, totalCount } as paginator) renderConfig =
                 ++ " of "
                 ++ String.fromInt totalCount
             )
-            |> Text.toEl renderConfig
+            |> Text.renderElement renderConfig
             |> Element.el
                 [ Element.paddingEach
                     { zeroPadding | right = 80 }
@@ -72,7 +72,7 @@ nonNumeric ({ first, offset, totalCount } as paginator) renderConfig =
         , button paginator.onPreviousButtonClicked
             previousStateMode
             (Icon.leftArrow "Previous")
-            |> Button.toEl renderConfig
+            |> Button.renderElement renderConfig
             |> Element.el
                 [ Element.paddingEach
                     { zeroPadding | right = 8 }
@@ -80,7 +80,7 @@ nonNumeric ({ first, offset, totalCount } as paginator) renderConfig =
         , button paginator.onNextButtonClicked
             nextStateMode
             (Icon.rightArrow "Next")
-            |> Button.toEl renderConfig
+            |> Button.renderElement renderConfig
         ]
 
 

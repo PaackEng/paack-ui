@@ -41,7 +41,7 @@ view renderConfig config items =
     selectList config.selectMsg itemView
         |> SelectList.withOptions items
         |> SelectList.withSelected config.isSelected
-        |> SelectList.toEl renderConfig
+        |> SelectList.renderElement renderConfig
 
 
 defaultRow : RenderConfig -> Config object msg -> Bool -> object -> Element msg
@@ -63,7 +63,7 @@ defaultRow renderConfig config selected object =
             (Icon.toggleDown config.detailsShowLabel)
             |> Icon.withSize Size.large
             |> Icon.withColor (titleColor selected)
-            |> Icon.toEl renderConfig
+            |> Icon.renderElement renderConfig
             |> Element.el
                 [ Font.center
                 , Element.width (px 32)
@@ -91,7 +91,7 @@ detailItem renderConfig ( label, content ) =
             |> Text.overline
             |> Text.withColor (Palette.color toneGray brightnessLight)
             |> Text.setEllipsis True
-            |> Text.toEl renderConfig
+            |> Text.renderElement renderConfig
         , content
         ]
 
@@ -157,5 +157,5 @@ coverView cfg { title, caption } selected =
     in
     captionApplied
         |> Text.setEllipsis True
-        |> Text.toEl cfg
+        |> Text.renderElement cfg
         |> Element.el [ Element.width fill, Element.clipX ]

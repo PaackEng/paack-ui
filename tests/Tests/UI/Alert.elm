@@ -31,7 +31,7 @@ testCase alertType alertFn =
         [ fuzz Fuzz.string "shows the title when it is set" <|
             \title ->
                 alertFn title
-                    |> Alert.toEl desktopWindowConfig
+                    |> Alert.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> Query.has [ Selector.text title ]
         ]

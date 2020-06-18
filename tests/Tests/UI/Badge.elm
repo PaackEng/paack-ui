@@ -14,7 +14,7 @@ tests =
         [ fuzz Fuzz.string "sets the text content" <|
             \val ->
                 Badge.primary val
-                    |> Badge.toEl desktopWindowConfig
+                    |> Badge.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> Query.has [ Selector.text val ]
         ]

@@ -42,7 +42,7 @@ labelTests =
     let
         testTextField input attribute labelValue =
             input OnTextFieldChanged labelValue "some text"
-                |> TextField.toEl fakeRenderConfig
+                |> TextField.renderElement fakeRenderConfig
                 |> findTextField
                 |> Query.has [ ExtraSelectors.hasAttribute attribute labelValue ]
     in
@@ -67,7 +67,7 @@ textTests =
     let
         testTextField input value =
             input OnTextFieldChanged "some label" value
-                |> TextField.toEl fakeRenderConfig
+                |> TextField.renderElement fakeRenderConfig
                 |> findTextField
                 |> Query.has [ ExtraSelectors.hasAttribute "value" value ]
     in
@@ -88,7 +88,7 @@ placeholderTests =
             input OnTextFieldChanged "some label" "some text"
                 |> TextField.setLabelVisible True
                 |> TextField.withPlaceholder placeholderValue
-                |> TextField.toEl fakeRenderConfig
+                |> TextField.renderElement fakeRenderConfig
                 |> elementToHtml
                 |> Query.find [ Selector.tag "label" ]
                 |> Query.has [ Selector.text placeholderValue ]
@@ -112,14 +112,14 @@ eventsTests =
 
         testTextFieldForOnEnterPressed input =
             defaultTextField input
-                |> TextField.toEl fakeRenderConfig
+                |> TextField.renderElement fakeRenderConfig
                 |> findTextField
                 |> Event.simulate ExtraEvents.enterKey
                 |> Event.expect OnEnterPressed
 
         testTextFieldForOnTextFieldChanged input =
             defaultTextField input
-                |> TextField.toEl fakeRenderConfig
+                |> TextField.renderElement fakeRenderConfig
                 |> findTextField
                 |> Event.simulate (Event.input "holi")
                 |> Event.expect (OnTextFieldChanged "holi")

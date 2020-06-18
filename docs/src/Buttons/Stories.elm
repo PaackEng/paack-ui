@@ -41,11 +41,11 @@ enabledStory renderConfig label tone toneStr =
         , [ Button.bodyText "Prompt"
                 |> Button.button Msg.NoOp
                 |> Button.withTone tone
-                |> Button.toEl renderConfig
+                |> Button.renderElement renderConfig
           , Button.bodyIcon (Icon.toggle "Toggle")
                 |> Button.button Msg.NoOp
                 |> Button.withTone tone
-                |> Button.toEl renderConfig
+                |> Button.renderElement renderConfig
           ]
         , { note = """
 ```elm
@@ -54,14 +54,14 @@ enabledStory renderConfig label tone toneStr =
 Button.bodyText "Some Text"
     |> Button.button YourMessage
     |> Button.withTone """ ++ toneStr ++ """
-    |> Button.toEl renderConfig
+    |> Button.renderElement renderConfig
 
 
 -- Icon
 Button.bodyIcon Icon.someIcon
     |> Button.button YourMessage
     |> Button.withTone """ ++ toneStr ++ """
-    |> Button.toEl renderConfig
+    |> Button.renderElement renderConfig
 ```
 """
           }
@@ -74,11 +74,11 @@ disabledButtonStory renderConfig =
         , [ Button.bodyText "Prompt"
                 |> Button.button Msg.NoOp
                 |> Button.withMode Button.modeDisabled
-                |> Button.toEl renderConfig
+                |> Button.renderElement renderConfig
           , Button.bodyIcon (Icon.toggle "Toggle")
                 |> Button.button Msg.NoOp
                 |> Button.withMode Button.modeDisabled
-                |> Button.toEl renderConfig
+                |> Button.renderElement renderConfig
           ]
         , { note = """
 ```elm
@@ -87,14 +87,14 @@ disabledButtonStory renderConfig =
 Button.bodyText "Some Text"
     |> Button.button YourMessage
     |> Button.withMode Button.modeDisabled
-    |> Button.toEl renderConfig
+    |> Button.renderElement renderConfig
 
 
 -- Icon
 Button.bodyIcon Icon.someIcon
     |> Button.button YourMessage
     |> Button.withMode Button.modeDisabled
-    |> Button.toEl renderConfig
+    |> Button.renderElement renderConfig
 ```
 """
           }
@@ -141,12 +141,12 @@ linkStory renderConfig =
         ( "Link"
         , Button.bodyText "Go to Blank"
             |> Button.link (Link.link "about:blank")
-            |> Button.toEl renderConfig
+            |> Button.renderElement renderConfig
         , { note = """
 ```elm
 Button.bodyText "Go to Blank"
     |> Button.link (Link.link "about:blank")
-    |> Button.toEl renderConfig
+    |> Button.renderElement renderConfig
 ```
 """ }
         )
@@ -158,13 +158,13 @@ fullWidthStory renderConfig =
         , Button.bodyText "Super Long Prompt"
             |> Button.button Msg.NoOp
             |> Button.withWidth Button.widthFull
-            |> Button.toEl renderConfig
+            |> Button.renderElement renderConfig
         , { note = """
 ```elm
 Button.bodyText "Some Text"
     |> Button.button YourMessage
     |> Button.withWidth Button.widthFull
-    |> Button.toEl renderConfig
+    |> Button.renderElement renderConfig
 ```
 """ }
         )
@@ -180,7 +180,7 @@ toggleStory renderConfig =
                 Element.column [ Element.spacing 20 ]
                     [ Button.bodyIcon (Icon.toggle "Toggle what's there")
                         |> Button.toggle msg buttonsStories.demoSwitch
-                        |> Button.toEl renderConfig
+                        |> Button.renderElement renderConfig
                     , if buttonsStories.demoSwitch then
                         Element.text "Click this Button!"
 
@@ -193,6 +193,6 @@ toggleStory renderConfig =
 ```elm
 Button.bodyIcon (Icon.toggle "Some Hint")
     |> Button.toggle YourMessage TrueOrFalse
-    |> Button.toEl renderConfig
+    |> Button.renderElement renderConfig
 ```
 """ } )

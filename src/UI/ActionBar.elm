@@ -1,7 +1,7 @@
 module UI.ActionBar exposing
     ( ActionBar
     , actionBar
-    , toEl
+    , renderElement
     , withButtons
     , withCloseButton
     , withSubtitle
@@ -74,8 +74,8 @@ withButtons buttons (ActionBar options) =
         }
 
 
-toEl : RenderConfig -> ActionBar msg -> Element msg
-toEl cfg (ActionBar options) =
+renderElement : RenderConfig -> ActionBar msg -> Element msg
+renderElement cfg (ActionBar options) =
     row
         [ width fill
         , paddingEach
@@ -102,9 +102,9 @@ viewTextContainer cfg options =
         , width fill
         ]
         [ Text.heading6 options.title
-            |> Text.toEl cfg
+            |> Text.renderElement cfg
         , Text.caption options.subtitle
-            |> Text.toEl cfg
+            |> Text.renderElement cfg
         ]
 
 
@@ -113,7 +113,7 @@ viewButtonsContainer cfg options =
     let
         closeBtn msg =
             Icon.close "Close"
-                |> Icon.toEl cfg
+                |> Icon.renderElement cfg
                 |> Element.el
                     [ Element.pointer
                     , ARIA.roleAttr ARIA.roleButton
@@ -123,7 +123,7 @@ viewButtonsContainer cfg options =
                     ]
 
         customBtns =
-            List.map (Button.toEl cfg) options.buttons
+            List.map (Button.renderElement cfg) options.buttons
 
         buttons =
             case options.onClose of

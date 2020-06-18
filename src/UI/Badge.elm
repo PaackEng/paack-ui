@@ -1,4 +1,4 @@
-module UI.Badge exposing (Badge, danger, dark, light, primary, success, toEl, warning, withBrightness)
+module UI.Badge exposing (Badge, danger, dark, light, primary, renderElement, success, warning, withBrightness)
 
 import Element exposing (Element, px, shrink)
 import Element.Background as Background
@@ -64,8 +64,8 @@ withBrightness brightness (Badge prop opt) =
 -- Render
 
 
-toEl : RenderConfig -> Badge -> Element msg
-toEl cfg (Badge { content, tone } { brightness }) =
+renderElement : RenderConfig -> Badge -> Element msg
+renderElement cfg (Badge { content, tone } { brightness }) =
     let
         background =
             Palette.color tone brightness
@@ -75,7 +75,7 @@ toEl cfg (Badge { content, tone } { brightness }) =
     in
     Text.overline content
         |> Text.withColor textColor
-        |> Text.toEl cfg
+        |> Text.renderElement cfg
         |> Element.el
             [ Element.width shrink
             , Font.center
