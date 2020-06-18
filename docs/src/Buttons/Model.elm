@@ -8,5 +8,5 @@ type alias Model =
 
 initModel : Model
 initModel =
-    { demoSwitch = True
+    { demoSwitch = False
     }
