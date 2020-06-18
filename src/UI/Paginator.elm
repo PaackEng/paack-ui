@@ -6,6 +6,7 @@ import UI.Icon as Icon exposing (Icon)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UI.Utils.Element exposing (zeroPadding)
+import Utils exposing (iconsSvgSprite)
 
 
 
@@ -48,7 +49,8 @@ nonNumeric ({ first, offset, totalCount } as paginator) renderConfig =
     in
     Element.row
         []
-        [ Text.body2
+        [ iconsSvgSprite
+        , Text.body2
             (firstItemCount
                 ++ "-"
                 ++ lastItemCount

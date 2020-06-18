@@ -7,7 +7,7 @@ import UI.ActionBar as ActionBar exposing (ActionBar)
 import UI.Button as Button
 import UI.Icon as Icons
 import UIExplorer exposing (storiesOf)
-import Utils exposing (story, storyList)
+import Utils exposing (iconsSvgSprite, story, storyList)
 
 
 stories cfg =
@@ -133,5 +133,8 @@ ActionBar.actionBar
 
 
 viewBase cfg content =
-    content
-        |> ActionBar.renderElement cfg
+    Element.column [ Element.width fill ]
+        [ iconsSvgSprite
+        , content
+            |> ActionBar.renderElement cfg
+        ]
