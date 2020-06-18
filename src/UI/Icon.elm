@@ -23,6 +23,7 @@ module UI.Icon exposing
     , toggleUp
     , warning
     , withColor
+    , withCustomSize
     , withSize
     )
 
@@ -45,7 +46,7 @@ type alias Properties =
 
 type alias Options =
     { color : IconColor
-    , size : Size
+    , size : Int
     }
 
 
@@ -86,7 +87,12 @@ withColor color (Icon prop opt) =
 
 
 withSize : Size -> Icon -> Icon
-withSize size (Icon prop opt) =
+withSize size icon =
+    withCustomSize (sizeToInt size) icon
+
+
+withCustomSize : Int -> Icon -> Icon
+withCustomSize size (Icon prop opt) =
     Icon prop { opt | size = size }
 
 
@@ -193,9 +199,8 @@ toEl _ (Icon { hint, glyph } { color, size }) =
             , ARIA.labelAttr hint
             , Element.centerX
             , Font.center
-            , Element.width <| Element.px width
-            , Element.height <| Element.px height
-            , Font.size height
+            , Element.width <| Element.px size
+            , Element.height <| Element.px size
             ]
 
         attrs =
@@ -209,20 +214,6 @@ toEl _ (Icon { hint, glyph } { color, size }) =
 
                 ColorInherit ->
                     staticAttrs
-
-        ( width, height ) =
-            case size of
-                Size.Large ->
-                    ( 24, 24 )
-
-                Size.Medium ->
-                    ( 20, 20 )
-
-                Size.Small ->
-                    ( 26, 16 )
-
-                Size.ExtraSmall ->
-                    ( 10, 10 )
     in
     Element.el attrs <|
         case glyph of
@@ -296,7 +287,7 @@ getHint (Icon { hint } _) =
 defaultOptions : Options
 defaultOptions =
     { color = ColorInherit
-    , size = Size.default
+    , size = sizeToInt Size.default
     }
 
 
@@ -321,3 +312,19 @@ svgSpriteImport =
     Html.node "paack-svg-icon-sprite"
         []
         []
+
+
+sizeToInt : Size -> Int
+sizeToInt size =
+    case size of
+        Size.Large ->
+            24
+
+        Size.Medium ->
+            20
+
+        Size.Small ->
+            16
+
+        Size.ExtraSmall ->
+            10
