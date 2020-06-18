@@ -9,6 +9,7 @@ import UI.Icon as Icon
 import UI.Internal.Palette as Palette
 import UI.Size as Size
 import UIExplorer exposing (storiesOf)
+import Utils exposing (iconsSvgSprite)
 
 
 stories cfg =
@@ -76,6 +77,7 @@ sizeView cfg size =
     , List.map (buttonView cfg size) buttons
     ]
         |> List.concat
+        |> (::) iconsSvgSprite
         |> Element.wrappedRow
             [ Element.spacing 10
             ]

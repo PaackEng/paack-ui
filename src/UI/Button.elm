@@ -143,7 +143,7 @@ disabled body =
 
 success : ButtonBody -> Button msg
 success body =
-    Button { mode = ButtonDisabled, body = body } defaultOptions
+    Button { mode = ButtonSuccess, body = body } defaultOptions
 
 
 cmd : msg -> ButtonStyle -> ButtonBody -> Button msg
@@ -310,10 +310,10 @@ renderElement cfg button =
                     workingView cfg size width tone body action
 
                 ButtonDisabled ->
-                    disabledView cfg size width body disabledTheme
+                    staticView cfg size width body disabledTheme
 
                 ButtonSuccess ->
-                    disabledView cfg size width body successTheme
+                    staticView cfg size width body successTheme
 
 
 
@@ -343,7 +343,7 @@ toggleView cfg size hint toggleMsg current =
     in
     Icon.toggle hint
         |> fromIcon
-        |> elFromBody cfg size
+        |> bodyToElement cfg size
         |> Element.el attrs
 
 
@@ -366,6 +366,7 @@ hyperlinkView cfg size width body action =
             , Palette.color tonePrimary brightnessMiddle
                 |> Palette.toElColor
                 |> Font.color
+            , Font.regular
             , Font.underline
             , Element.pointer
             ]
@@ -373,12 +374,12 @@ hyperlinkView cfg size width body action =
     case action of
         ActionRedirect link ->
             body
-                |> elFromBody cfg size
+                |> bodyToElement cfg size
                 |> Link.wrapElement cfg attrs link
 
         ActionMsg msg ->
             body
-                |> elFromBody cfg size
+                |> bodyToElement cfg size
                 |> Element.el (Events.onClick msg :: attrs)
 
 
@@ -401,6 +402,7 @@ workingView cfg size width tone body action =
             , buttonWidth width
             , paddings
             , borders
+            , Font.semiBold
             , Element.pointer
             ]
                 ++ workingTheme tone
@@ -408,23 +410,23 @@ workingView cfg size width tone body action =
     case action of
         ActionRedirect link ->
             body
-                |> elFromBody cfg size
+                |> bodyToElement cfg size
                 |> Link.wrapElement cfg attrs link
 
         ActionMsg msg ->
             body
-                |> elFromBody cfg size
+                |> bodyToElement cfg size
                 |> Element.el (Events.onClick msg :: attrs)
 
 
-disabledView :
+staticView :
     RenderConfig
     -> Size
     -> ButtonWidth
     -> ButtonBody
     -> (ButtonBody -> List (Attribute msg))
     -> Element msg
-disabledView cfg size width body theme =
+staticView cfg size width body theme =
     let
         ( paddings, borders ) =
             bodyLayout body size
@@ -434,22 +436,22 @@ disabledView cfg size width body theme =
             , buttonWidth width
             , paddings
             , borders
+            , Font.semiBold
             ]
                 ++ Element.disabled
                 ++ theme body
     in
     body
-        |> elFromBody cfg size
+        |> bodyToElement cfg size
         |> Element.el attrs
 
 
-elFromBody : RenderConfig -> Size -> ButtonBody -> Element msg
-elFromBody cfg size body =
+bodyToElement : RenderConfig -> Size -> ButtonBody -> Element msg
+bodyToElement cfg size body =
     case body of
         BodyText str ->
             Element.el
                 [ Font.size <| textSize size
-                , Font.semiBold
                 , Element.centerX
                 , Element.spacing 8
                 ]
@@ -618,7 +620,7 @@ toggleTheme current =
     themeApply <|
         { normal =
             { background = Nothing
-            , border = Just <| Palette.color Palette.toneGray brightnessMiddle
+            , border = Just <| Palette.color Palette.tonePrimary brightnessMiddle
             , text =
                 Palette.color Palette.tonePrimary brightnessMiddle
                     |> Text.ColorPalette
@@ -626,7 +628,7 @@ toggleTheme current =
         , hover =
             Just
                 { background = Just <| Palette.color Palette.tonePrimary brightnessLightest
-                , border = Just <| Palette.color Palette.toneGray brightnessMiddle
+                , border = Just <| Palette.color Palette.tonePrimary brightnessDarkest
                 , text =
                     Palette.color Palette.tonePrimary brightnessDarkest
                         |> Text.ColorPalette

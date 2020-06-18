@@ -10,7 +10,7 @@ import UI.Icon as Icon
 import UI.Link as Link
 import UI.RenderConfig as RenderConfig
 import UIExplorer exposing (storiesOf)
-import Utils exposing (story, storyList, storyWithModel)
+import Utils exposing (iconsSvgSprite, story, storyList, storyWithModel)
 
 
 update : Buttons.Msg -> Buttons.Model -> Return Buttons.Msg Buttons.Model
@@ -38,7 +38,8 @@ stories renderConfig =
 enabledStory renderConfig label tone toneStr =
     storyList
         ( label
-        , [ Button.fromLabel "Prompt"
+        , [ iconsSvgSprite
+          , Button.fromLabel "Prompt"
                 |> Button.cmd Msg.NoOp tone
                 |> Button.renderElement renderConfig
           , Button.fromIcon (Icon.toggle "Toggle")
@@ -67,7 +68,8 @@ Button.fromIcon Icon.someIcon
 disabledButtonStory renderConfig =
     storyList
         ( "Disabled"
-        , [ Button.fromLabel "Prompt"
+        , [ iconsSvgSprite
+          , Button.fromLabel "Prompt"
                 |> Button.disabled
                 |> Button.renderElement renderConfig
           , Button.fromIcon (Icon.toggle "Toggle")
@@ -112,7 +114,8 @@ dangerStory cfg =
 successStory renderConfig =
     storyList
         ( "Success"
-        , [ Button.fromLabel "Prompt"
+        , [ iconsSvgSprite
+          , Button.fromLabel "Prompt"
                 |> Button.success
                 |> Button.renderElement renderConfig
           , Button.fromIcon (Icon.toggle "Toggle")
@@ -196,7 +199,8 @@ toggleStory renderConfig =
         body =
             \{ buttonsStories } ->
                 Element.column [ Element.spacing 20 ]
-                    [ Button.toggle "Toggle what's there" msg buttonsStories.demoSwitch
+                    [ iconsSvgSprite
+                    , Button.toggle "Toggle what's there" msg buttonsStories.demoSwitch
                         |> Button.renderElement renderConfig
                     , if buttonsStories.demoSwitch then
                         Element.text "Click this Button!"
