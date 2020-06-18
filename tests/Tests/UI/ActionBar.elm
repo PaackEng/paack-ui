@@ -36,7 +36,7 @@ tests =
                 in
                 ActionBar.actionBar
                     |> ActionBar.withTitle title
-                    |> ActionBar.toEl fakeRenderConfig
+                    |> ActionBar.renderElement fakeRenderConfig
                     |> elementToHtml
                     |> Query.has [ Selector.text title ]
         , test "show the subtitle when is set" <|
@@ -47,14 +47,14 @@ tests =
                 in
                 ActionBar.actionBar
                     |> ActionBar.withSubtitle subtitle
-                    |> ActionBar.toEl fakeRenderConfig
+                    |> ActionBar.renderElement fakeRenderConfig
                     |> elementToHtml
                     |> Query.has [ Selector.text subtitle ]
         , test "shows the close button when is set" <|
             \_ ->
                 ActionBar.actionBar
                     |> ActionBar.withCloseButton OnCloseButtonClicked
-                    |> ActionBar.toEl fakeRenderConfig
+                    |> ActionBar.renderElement fakeRenderConfig
                     |> elementToHtml
                     |> Query.has
                         [ ExtraSelectors.button
@@ -64,7 +64,7 @@ tests =
             \_ ->
                 ActionBar.actionBar
                     |> ActionBar.withCloseButton OnCloseButtonClicked
-                    |> ActionBar.toEl fakeRenderConfig
+                    |> ActionBar.renderElement fakeRenderConfig
                     |> elementToHtml
                     |> Query.find
                         [ ExtraSelectors.button
@@ -80,11 +80,10 @@ tests =
                 in
                 ActionBar.actionBar
                     |> ActionBar.withButtons
-                        [ Button.bodyText buttonLabel
-                            |> Button.button TheOtherButtonClicked
-                            |> Button.withTone Button.tonePrimary
+                        [ Button.fromLabel buttonLabel
+                            |> Button.cmd TheOtherButtonClicked Button.primary
                         ]
-                    |> ActionBar.toEl fakeRenderConfig
+                    |> ActionBar.renderElement fakeRenderConfig
                     |> elementToHtml
                     |> Query.has (ExtraSelectors.textButton buttonLabel)
         ]
