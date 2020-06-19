@@ -578,23 +578,23 @@ type alias ButtonTheme =
     }
 
 
-themeApply : ButtonTheme -> List (Attribute msg)
-themeApply theme =
+themeToAttributes : ButtonTheme -> List (Attribute msg)
+themeToAttributes theme =
     case theme.hover of
         Just hoverTriple ->
             (hoverTriple
-                |> themeToAttributes
+                |> tripleToAttributes
                 |> Element.mouseOver
             )
                 :: Element.colorTransition 100
-                ++ themeToAttributes theme.normal
+                ++ tripleToAttributes theme.normal
 
         Nothing ->
-            themeToAttributes theme.normal
+            tripleToAttributes theme.normal
 
 
-themeToAttributes : ThemeTriple -> List (Element.Attr decorative msg)
-themeToAttributes { background, border, text } =
+tripleToAttributes : ThemeTriple -> List (Element.Attr decorative msg)
+tripleToAttributes { background, border, text } =
     text
         |> Text.fontColor
         |> Maybe.map Font.color
@@ -609,7 +609,7 @@ themeToAttributes { background, border, text } =
 
 toggleTheme : Bool -> List (Attribute msg)
 toggleTheme current =
-    themeApply <|
+    themeToAttributes <|
         if current then
             primaryTheme
 
@@ -634,7 +634,7 @@ toggleTheme current =
 
 workingTheme : EmbossedTone -> List (Attribute msg)
 workingTheme tone =
-    themeApply <|
+    themeToAttributes <|
         case tone of
             TonePrimary ->
                 primaryTheme
@@ -698,7 +698,7 @@ workingTheme tone =
 
 disabledTheme : ButtonBody -> List (Attribute msg)
 disabledTheme body =
-    themeApply <|
+    themeToAttributes <|
         case body of
             BodyIcon _ ->
                 { normal =
@@ -726,7 +726,7 @@ disabledTheme body =
 
 successTheme : ButtonBody -> List (Attribute msg)
 successTheme _ =
-    themeApply <|
+    themeToAttributes <|
         { normal =
             { background = Just <| Palette.color Palette.toneSuccess brightnessMiddle
             , border = Just <| Palette.color Palette.toneSuccess brightnessMiddle
