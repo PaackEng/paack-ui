@@ -517,16 +517,16 @@ textLayout size =
         paddingXY =
             case size of
                 Size.Large ->
-                    ( (40 // 2) - border, ((60 - 20) // 2) - border )
+                    ( 40 - border, ((60 - 20) // 2) - border )
 
                 Size.Medium ->
-                    ( (32 // 2) - border, ((48 - 16) // 2) - border )
+                    ( 32 - border, ((48 - 16) // 2) - border )
 
                 Size.Small ->
-                    ( (20 // 2) - border, ((36 - 12) // 2) - border )
+                    ( 20 - border, ((36 - 12) // 2) - border )
 
                 Size.ExtraSmall ->
-                    ( (12 // 2) - border, ((24 - 10) // 2) - border )
+                    ( 12 - border, ((24 - 10) // 2) - border )
     in
     ( pairUncurry Element.paddingXY paddingXY
     , Border.width border
