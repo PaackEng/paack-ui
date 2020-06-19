@@ -30,7 +30,7 @@ jobs:
          cmd: install
 
      - name: Run linter
-       run: npx elm-format --validate src/ docs/
+       run: npx elm-format --validate src/ showcase/
 
      - name: Run analyse
        run: npx elm-analyse
@@ -41,8 +41,8 @@ jobs:
      steps:
        - uses: actions/checkout@v2
 
-       - name: Validate docs code
-         working-directory: ./docs
+       - name: Validate showcase code
+         working-directory: ./showcase
          run: npx elm make src/Main.elm --output /dev/null
 
   tests:
