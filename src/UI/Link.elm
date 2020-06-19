@@ -2,10 +2,10 @@ module UI.Link exposing
     ( Link
     , LinkTarget
     , link
-    , packEl
     , targetNew
     , targetRedirect
     , withTarget
+    , wrapElement
     )
 
 import Element exposing (Attribute, Element)
@@ -53,13 +53,13 @@ withTarget target (Link prop _) =
 -- Render
 
 
-packEl :
+wrapElement :
     RenderConfig
     -> List (Attribute msg)
     -> Link
     -> Element msg
     -> Element msg
-packEl _ attrs (Link { href } { target }) subElement =
+wrapElement _ attrs (Link { href } { target }) subElement =
     let
         thisLink =
             case target of

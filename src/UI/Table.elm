@@ -18,9 +18,9 @@ module UI.Table exposing
     , cellWidthShrink
     , header
     , headersEnd
+    , renderElement
     , rowEnd
     , table
-    , toEl
     , withCellsDetails
     , withCellsWidth
     , withResponsiveRows
@@ -227,8 +227,8 @@ cellMobileDetailsShowIf condition accu =
 -- Render
 
 
-toEl : RenderConfig -> Table msg object columns -> Element msg
-toEl cfg (Table { headers } { rows, width }) =
+renderElement : RenderConfig -> Table msg object columns -> Element msg
+renderElement cfg (Table { headers } { rows, width }) =
     case rows of
         ResponsiveRows responsiveOpt ->
             if RenderConfig.isMobile cfg then
@@ -319,7 +319,7 @@ headerRender : RenderConfig -> HeaderCell -> Element msg
 headerRender cfg { title, width } =
     Text.overline title
         |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
-        |> Text.toEl cfg
+        |> Text.renderElement cfg
         |> Element.el [ Element.width (widthToEl width) ]
 
 
@@ -328,10 +328,10 @@ detailRender cfg cell_ =
     case cell_ of
         CellText text ->
             text
-                |> Text.toEl cfg
+                |> Text.renderElement cfg
 
         CellButton button ->
-            Button.toEl cfg button
+            Button.renderElement cfg button
 
 
 cellRender : RenderConfig -> HeaderCell -> Cell msg -> Element msg

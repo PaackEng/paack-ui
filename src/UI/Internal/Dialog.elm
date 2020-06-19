@@ -126,7 +126,7 @@ blackBg =
 titleText : RenderConfig -> RectangleSides -> String -> Element msg
 titleText cfg padding title =
     Text.heading5 title
-        |> Text.toEl cfg
+        |> Text.renderElement cfg
         |> Element.el
             [ Element.width fill
             , Element.paddingEach padding
@@ -137,7 +137,7 @@ titleText cfg padding title =
 closeButton : RenderConfig -> msg -> Element msg
 closeButton cfg close =
     Icon.close "Close dialog"
-        |> Icon.toEl cfg
+        |> Icon.renderElement cfg
         |> Element.el
             [ Events.onClick close
             , Element.pointer

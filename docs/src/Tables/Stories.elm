@@ -72,7 +72,7 @@ staticTable cfg =
         |> Table.withStaticRows rows
         |> Table.withWidth fill
         |> Table.withCellsWidth cellsWidth
-        |> Table.toEl cfg
+        |> Table.renderElement cfg
 ```"""
           }
         )
@@ -133,7 +133,7 @@ responsiveTable cfg selectedSomeone =
         |> Table.withWidth fill
         |> Table.withCellsWidth cellsWidth
         |> Table.withCellsDetails mobileDetails
-        |> Table.toEl cfg
+        |> Table.renderElement cfg
 ```"""
           }
         )
@@ -165,7 +165,7 @@ staticTable cfg =
         |> Table.withStaticRows rows
         |> Table.withWidth fill
         |> Table.withCellsWidth cellsWidth
-        |> Table.toEl cfg
+        |> Table.renderElement cfg
 
 
 responsiveTable cfg { selected } =
@@ -215,7 +215,7 @@ responsiveTable cfg { selected } =
         |> Table.withWidth fill
         |> Table.withCellsWidth cellsWidth
         |> Table.withCellsDetails mobileDetails
-        |> Table.toEl cfg
+        |> Table.renderElement cfg
         |> List.singleton
         |> (::) iconsSvgSprite
         |> Element.wrappedRow [ Element.width fill ]

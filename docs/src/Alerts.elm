@@ -79,4 +79,4 @@ Alert.danger "Hey I just met you"
 
 
 baseView renderConfig content =
-    Alert.toEl renderConfig content
+    Alert.renderElement renderConfig content

@@ -6,13 +6,13 @@ module UI.TextField exposing
     , email
     , multilineText
     , newPassword
+    , renderElement
     , search
     , setLabelVisible
     , setPasswordVisible
     , singlelineText
     , spellChecked
     , static
-    , toEl
     , username
     , widthFull
     , widthRelative
@@ -251,8 +251,8 @@ static label value =
 -- Render
 
 
-toEl : RenderConfig -> TextField msg -> Element msg
-toEl cfg (TextField prop opt) =
+renderElement : RenderConfig -> TextField msg -> Element msg
+renderElement cfg (TextField prop opt) =
     let
         elAttrs =
             attrs cfg prop opt
@@ -288,7 +288,7 @@ toEl cfg (TextField prop opt) =
 
         whenStatic value =
             Text.subtitle2 value
-                |> Text.toEl cfg
+                |> Text.renderElement cfg
                 |> Element.el elAttrs
 
         whenPassword msg { isVisible, isCurrent } =
@@ -524,7 +524,7 @@ inputLabel cfg label labelVisible =
         Text.caption label
             |> Text.withColor
                 (Palette.color toneGray brightnessMiddle)
-            |> Text.toEl cfg
+            |> Text.renderElement cfg
             |> Input.labelAbove
                 [ Element.paddingEach
                     { top = 0, left = 0, right = 0, bottom = 3 }

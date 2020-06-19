@@ -7,7 +7,7 @@ import Paginators.Msg as Paginators
 import Return as R exposing (Return)
 import UI.Paginator as Paginator
 import UIExplorer exposing (storiesOf)
-import Utils exposing (story, storyWithModel)
+import Utils exposing (iconsSvgSprite, story, storyWithModel)
 
 
 defaultPageSize : Int
@@ -38,7 +38,8 @@ nonNumericPaginator cfg =
         , \{ paginatorsStories } ->
             Element.column
                 [ Element.spacing 20 ]
-                [ Paginator.nonNumeric
+                [ iconsSvgSprite
+                , Paginator.nonNumeric
                     { onNextButtonClicked = Msg.PaginatorsStoriesMsg Paginators.NextPage
                     , onPreviousButtonClicked = Msg.PaginatorsStoriesMsg Paginators.PreviousPage
                     , totalCount = List.length paginatorsStories.items

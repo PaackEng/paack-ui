@@ -1,28 +1,27 @@
 module UI.Button exposing
     ( Button
-    , ButtonClick
-    , ButtonMode
-    , ButtonTone
+    , ButtonBody
+    , ButtonStyle
     , ButtonWidth
-    , bodyIcon
-    , bodyText
-    , button
-    , link
+    , clear
+    , cmd
+    , danger
+    , disabled
+    , fromIcon
+    , fromLabel
+    , full
+    , hyperlink
+    , light
     , map
-    , modeDisabled
-    , modeEnabled
-    , toEl
+    , primary
+    , redirect
+    , renderElement
+    , shrink
+    , success
     , toggle
-    , toneClear
-    , toneDanger
-    , toneLight
-    , tonePrimary
-    , toneSuccess
-    , widthFull
-    , widthRelative
-    , withMode
+    , withDisabledIf
     , withSize
-    , withTone
+    , withSuccessIf
     , withWidth
     )
 
@@ -32,13 +31,13 @@ import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
 import UI.Icon as Icon exposing (Icon)
-import UI.Internal.Basics exposing (lazyMap, pairUncurry)
+import UI.Internal.Basics exposing (lazyMap, maybeToList, pairUncurry, prependMaybe)
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Size as Size exposing (Size)
 import UI.Internal.Text as Text exposing (TextColor)
 import UI.Link as Link exposing (Link)
-import UI.Palette as Palette exposing (brightnessDarkest, brightnessLight, brightnessLighter, brightnessLightest, brightnessMiddle)
+import UI.Palette as Palette exposing (brightnessDarkest, brightnessLight, brightnessLighter, brightnessLightest, brightnessMiddle, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UI.Utils.ARIA as ARIA
@@ -46,21 +45,20 @@ import UI.Utils.Element as Element
 
 
 type alias Options =
-    { mode : ButtonMode
-    , tone : ButtonTone
-    , width : ButtonWidth
+    { width : ButtonWidth
     , size : Size
     }
 
 
 type alias Properties msg =
     { body : ButtonBody
-    , click : ButtonClick msg
+    , mode : ButtonMode msg
     }
 
 
 type Button msg
     = Button (Properties msg) Options
+    | Toggle (ToggleProperties msg) Options
 
 
 type ButtonBody
@@ -68,247 +66,471 @@ type ButtonBody
     | BodyIcon Icon
 
 
-type ButtonClick msg
-    = ClickMsg msg
-    | ClickLink Link
-    | ClickToggle (Bool -> msg) Bool
+type ButtonAction msg
+    = ActionMsg msg
+    | ActionRedirect Link
 
 
-type ButtonMode
-    = ModeEnabled
-    | ModeDisabled
+type ButtonMode msg
+    = ButtonActive (ButtonAction msg) ButtonStyle
+    | ButtonDisabled
+    | ButtonSuccess
 
 
-type ButtonTone
-    = ToneDanger
+type EmbossedTone
+    = TonePrimary
+    | ToneDanger
     | ToneLight
-    | TonePrimary
-    | ToneSuccess
     | ToneClear
+
+
+type ButtonStyle
+    = StyleEmbossed EmbossedTone
+    | StyleHyperlink
 
 
 type ButtonWidth
     = WidthFull
-    | WidthRelative
+    | WidthShrink
+
+
+type alias ToggleProperties msg =
+    { current : Bool
+    , toggleMsg : Bool -> msg
+    , hint : String
+    }
 
 
 
--- Create
+-- Default
 
 
 defaultOptions : Options
 defaultOptions =
-    { mode = ModeEnabled
-    , tone = TonePrimary
-    , width = WidthRelative
+    { width = WidthShrink
     , size = Size.default
     }
 
 
-buttonAny : ButtonClick msg -> ButtonBody -> Button msg
-buttonAny click body =
-    Button (Properties body click) defaultOptions
+
+-- Builders
 
 
-button : msg -> ButtonBody -> Button msg
-button msg =
-    buttonAny (ClickMsg msg)
+toggle : String -> (Bool -> msg) -> Bool -> Button msg
+toggle hint msg isEnabled =
+    Toggle { toggleMsg = msg, current = isEnabled, hint = hint } defaultOptions
 
 
-toggle : (Bool -> msg) -> Bool -> ButtonBody -> Button msg
-toggle msg isEnabled =
-    buttonAny (ClickToggle msg isEnabled)
+disabled : ButtonBody -> Button msg
+disabled body =
+    Button { mode = ButtonDisabled, body = body } defaultOptions
 
 
-link : Link -> ButtonBody -> Button msg
-link realLink =
-    buttonAny (ClickLink realLink)
+success : ButtonBody -> Button msg
+success body =
+    Button { mode = ButtonSuccess, body = body } defaultOptions
+
+
+cmd : msg -> ButtonStyle -> ButtonBody -> Button msg
+cmd msg style body =
+    Button
+        { mode = ButtonActive (ActionMsg msg) style
+        , body = body
+        }
+        defaultOptions
+
+
+redirect : Link -> ButtonStyle -> ButtonBody -> Button msg
+redirect link style body =
+    Button
+        { mode = ButtonActive (ActionRedirect link) style
+        , body = body
+        }
+        defaultOptions
+
+
+
+-- Body builders
+
+
+fromLabel : String -> ButtonBody
+fromLabel label =
+    BodyText label
+
+
+fromIcon : Icon -> ButtonBody
+fromIcon icon =
+    BodyIcon icon
 
 
 
 -- Options
 
 
-withMode : ButtonMode -> Button msg -> Button msg
-withMode mode (Button prop opt) =
-    Button prop { opt | mode = mode }
+withSuccessIf : Bool -> Button msg -> Button msg
+withSuccessIf condition button =
+    if condition then
+        case button of
+            Toggle _ _ ->
+                button
+
+            Button { body } opt ->
+                Button { mode = ButtonSuccess, body = body } opt
+
+    else
+        button
 
 
-withTone : ButtonTone -> Button msg -> Button msg
-withTone tone (Button prop opt) =
-    Button prop { opt | tone = tone }
+withDisabledIf : Bool -> Button msg -> Button msg
+withDisabledIf condition button =
+    if condition then
+        case button of
+            Toggle _ _ ->
+                button
+
+            Button { body } opt ->
+                Button { mode = ButtonDisabled, body = body } opt
+
+    else
+        button
 
 
 withWidth : ButtonWidth -> Button msg -> Button msg
-withWidth width (Button prop opt) =
-    Button prop { opt | width = width }
+withWidth width button =
+    case button of
+        Toggle prop opt ->
+            Toggle prop { opt | width = width }
+
+        Button prop opt ->
+            Button prop { opt | width = width }
 
 
 withSize : Size -> Button msg -> Button msg
-withSize size (Button prop opt) =
-    Button prop { opt | size = size }
+withSize size button =
+    case button of
+        Toggle prop opt ->
+            Toggle prop { opt | size = size }
+
+        Button prop opt ->
+            Button prop { opt | size = size }
 
 
 
--- Expose all properties
+-- Properties
 
 
-bodyIcon : Icon -> ButtonBody
-bodyIcon icon =
-    BodyIcon icon
+danger : ButtonStyle
+danger =
+    StyleEmbossed ToneDanger
 
 
-bodyText : String -> ButtonBody
-bodyText text =
-    BodyText text
+light : ButtonStyle
+light =
+    StyleEmbossed ToneLight
 
 
-modeDisabled : ButtonMode
-modeDisabled =
-    ModeDisabled
+clear : ButtonStyle
+clear =
+    StyleEmbossed ToneClear
 
 
-modeEnabled : ButtonMode
-modeEnabled =
-    ModeEnabled
+primary : ButtonStyle
+primary =
+    StyleEmbossed TonePrimary
 
 
-toneDanger : ButtonTone
-toneDanger =
-    ToneDanger
+hyperlink : ButtonStyle
+hyperlink =
+    StyleHyperlink
 
 
-toneLight : ButtonTone
-toneLight =
-    ToneLight
-
-
-toneClear : ButtonTone
-toneClear =
-    ToneClear
-
-
-tonePrimary : ButtonTone
-tonePrimary =
-    TonePrimary
-
-
-toneSuccess : ButtonTone
-toneSuccess =
-    ToneSuccess
-
-
-widthFull : ButtonWidth
-widthFull =
+full : ButtonWidth
+full =
     WidthFull
 
 
-widthRelative : ButtonWidth
-widthRelative =
-    WidthRelative
+shrink : ButtonWidth
+shrink =
+    WidthShrink
+
+
+
+-- Etc
 
 
 map : (a -> b) -> Button a -> Button b
-map applier (Button prop opt) =
+map applier button =
     let
-        newClick =
-            case prop.click of
-                ClickMsg msg ->
-                    ClickMsg (applier msg)
+        newAction oldAction =
+            case oldAction of
+                ActionMsg msg ->
+                    ActionMsg (applier msg)
 
-                ClickLink realLink ->
-                    ClickLink realLink
-
-                ClickToggle lambda state ->
-                    ClickToggle (lazyMap applier lambda) state
+                ActionRedirect realLink ->
+                    ActionRedirect realLink
     in
-    Button (Properties prop.body newClick) opt
+    case button of
+        Button { mode, body } opt ->
+            case mode of
+                ButtonActive action style ->
+                    Button { mode = ButtonActive (newAction action) style, body = body } opt
+
+                ButtonDisabled ->
+                    Button { mode = ButtonDisabled, body = body } opt
+
+                ButtonSuccess ->
+                    Button { mode = ButtonSuccess, body = body } opt
+
+        Toggle { current, toggleMsg, hint } opt ->
+            Toggle
+                { current = current
+                , toggleMsg = lazyMap applier toggleMsg
+                , hint = hint
+                }
+                opt
 
 
 
 -- Render
 
 
-toEl : RenderConfig -> Button msg -> Element msg
-toEl cfg ((Button { click, body } { size }) as btn) =
+renderElement : RenderConfig -> Button msg -> Element msg
+renderElement cfg button =
+    case button of
+        Toggle { hint, current, toggleMsg } { size } ->
+            toggleView cfg size hint toggleMsg current
+
+        Button { mode, body } { size, width } ->
+            case mode of
+                ButtonActive action StyleHyperlink ->
+                    hyperlinkView cfg size width body action
+
+                ButtonActive action (StyleEmbossed tone) ->
+                    workingView cfg size width tone body action
+
+                ButtonDisabled ->
+                    staticView cfg size width body disabledTheme
+
+                ButtonSuccess ->
+                    staticView cfg size width body successTheme
+
+
+
+-- Modes' renders
+
+
+toggleView :
+    RenderConfig
+    -> Size
+    -> String
+    -> (Bool -> msg)
+    -> Bool
+    -> Element msg
+toggleView cfg size hint toggleMsg current =
+    let
+        ( paddings, borders ) =
+            iconLayout size
+
+        attrs =
+            [ ARIA.roleAttr ARIA.roleButton
+            , Primitives.roundedBorders
+            , paddings
+            , borders
+            , Events.onClick <| toggleMsg (not current)
+            ]
+                ++ toggleTheme current
+    in
+    Icon.toggle hint
+        |> fromIcon
+        |> bodyToElement cfg size
+        |> Element.el attrs
+
+
+hyperlinkView :
+    RenderConfig
+    -> Size
+    -> ButtonWidth
+    -> ButtonBody
+    -> ButtonAction msg
+    -> Element msg
+hyperlinkView cfg size width body action =
     let
         attrs =
-            baseAttrs cfg btn
-                ++ styleAttrs btn
-                ++ disabledAttrs btn
-                ++ clickAttrs btn
-                ++ ariaAttrs
+            [ ARIA.roleAttr ARIA.roleButton
+            , Primitives.roundedBorders
+            , buttonWidth width
+            , Palette.color tonePrimary brightnessMiddle
+                |> Palette.toElementColor
+                |> Font.color
+            , Font.regular
+            , Font.underline
+            , Element.pointer
+            ]
     in
-    case click of
-        ClickLink linkMeta ->
+    case action of
+        ActionRedirect link ->
             body
-                |> elFromBody cfg size
-                |> Link.packEl cfg attrs linkMeta
+                |> bodyToElement cfg size
+                |> Link.wrapElement cfg attrs link
 
-        _ ->
-            Element.el attrs <|
-                elFromBody cfg size body
-
-
-baseAttrs : RenderConfig -> Button msg -> List (Attribute msg)
-baseAttrs cfg btn =
-    [ Primitives.roundedBorders
-    , buttonWidth btn
-    , buttonPadding cfg btn
-    ]
+        ActionMsg msg ->
+            body
+                |> bodyToElement cfg size
+                |> Element.el (Events.onClick msg :: attrs)
 
 
-buttonWidth : Button msg -> Attribute msg
-buttonWidth (Button _ { width }) =
-    if width == WidthFull then
-        Element.width Element.fill
+workingView :
+    RenderConfig
+    -> Size
+    -> ButtonWidth
+    -> EmbossedTone
+    -> ButtonBody
+    -> ButtonAction msg
+    -> Element msg
+workingView cfg size width tone body action =
+    let
+        ( paddings, borders ) =
+            bodyLayout body size
 
-    else
-        Element.width Element.shrink
+        attrs =
+            [ ARIA.roleAttr ARIA.roleButton
+            , Primitives.roundedBorders
+            , buttonWidth width
+            , paddings
+            , borders
+            , Font.semiBold
+            , Element.pointer
+            ]
+                ++ workingTheme tone
+    in
+    case action of
+        ActionRedirect link ->
+            body
+                |> bodyToElement cfg size
+                |> Link.wrapElement cfg attrs link
+
+        ActionMsg msg ->
+            body
+                |> bodyToElement cfg size
+                |> Element.el (Events.onClick msg :: attrs)
 
 
-buttonPadding : RenderConfig -> Button msg -> Attribute msg
-buttonPadding _ (Button { body } { size }) =
+staticView :
+    RenderConfig
+    -> Size
+    -> ButtonWidth
+    -> ButtonBody
+    -> (ButtonBody -> List (Attribute msg))
+    -> Element msg
+staticView cfg size width body theme =
+    let
+        ( paddings, borders ) =
+            bodyLayout body size
+
+        attrs =
+            [ Primitives.roundedBorders
+            , buttonWidth width
+            , paddings
+            , borders
+            , Font.semiBold
+            ]
+                ++ Element.disabled
+                ++ theme body
+    in
+    body
+        |> bodyToElement cfg size
+        |> Element.el attrs
+
+
+bodyToElement : RenderConfig -> Size -> ButtonBody -> Element msg
+bodyToElement cfg size body =
+    case body of
+        BodyText str ->
+            Element.el
+                [ Font.size <| textSize size
+                , Element.centerX
+                , Element.spacing 8
+                ]
+                (Element.text str)
+
+        BodyIcon icon ->
+            icon
+                |> Icon.withSize size
+                |> Icon.renderElement cfg
+
+
+
+-- Attributes
+
+
+buttonWidth : ButtonWidth -> Attribute msg
+buttonWidth width =
+    case width of
+        WidthFull ->
+            Element.width Element.fill
+
+        WidthShrink ->
+            Element.width Element.shrink
+
+
+bodyLayout : ButtonBody -> Size -> ( Attribute msg, Attribute msg )
+bodyLayout body size =
+    case body of
+        BodyText _ ->
+            textLayout size
+
+        BodyIcon _ ->
+            iconLayout size
+
+
+iconLayout : Size -> ( Attribute msg, Attribute msg )
+iconLayout size =
     let
         border =
             borderWidth size
 
         paddingXY =
-            case body of
-                BodyText _ ->
-                    case size of
-                        Size.Large ->
-                            ( (40 // 2) - border, ((60 - 20) // 2) - border )
+            case size of
+                Size.Large ->
+                    ( (60 - 24) // 2 - border, (60 - 24) // 2 - border )
 
-                        Size.Medium ->
-                            ( (32 // 2) - border, ((48 - 16) // 2) - border )
+                Size.Medium ->
+                    ( (48 - 20) // 2 - border, (48 - 20) // 2 - border )
 
-                        Size.Small ->
-                            ( (20 // 2) - border, ((36 - 12) // 2) - border )
+                Size.Small ->
+                    ( (36 - 16) // 2 - border, (36 - 16) // 2 - border )
 
-                        Size.ExtraSmall ->
-                            ( (12 // 2) - border, ((24 - 10) // 2) - border )
-
-                BodyIcon _ ->
-                    case size of
-                        Size.Large ->
-                            ( (60 - 24) // 2 - border, (60 - 24) // 2 - border )
-
-                        Size.Medium ->
-                            ( (48 - 20) // 2 - border, (48 - 20) // 2 - border )
-
-                        Size.Small ->
-                            ( (36 - 16) // 2 - border, (36 - 16) // 2 - border )
-
-                        Size.ExtraSmall ->
-                            ( (24 - 10) // 2 - border, (24 - 10) // 2 - border )
+                Size.ExtraSmall ->
+                    ( (24 - 10) // 2 - border, (24 - 10) // 2 - border )
     in
-    pairUncurry Element.paddingXY paddingXY
+    ( pairUncurry Element.paddingXY paddingXY
+    , Border.width border
+    )
 
 
-ariaAttrs : List (Attribute msg)
-ariaAttrs =
-    [ ARIA.roleAttr ARIA.roleButton ]
+textLayout : Size -> ( Attribute msg, Attribute msg )
+textLayout size =
+    let
+        border =
+            borderWidth size
+
+        paddingXY =
+            case size of
+                Size.Large ->
+                    ( (40 // 2) - border, ((60 - 20) // 2) - border )
+
+                Size.Medium ->
+                    ( (32 // 2) - border, ((48 - 16) // 2) - border )
+
+                Size.Small ->
+                    ( (20 // 2) - border, ((36 - 12) // 2) - border )
+
+                Size.ExtraSmall ->
+                    ( (12 // 2) - border, ((24 - 10) // 2) - border )
+    in
+    ( pairUncurry Element.paddingXY paddingXY
+    , Border.width border
+    )
 
 
 borderWidth : Size -> Int
@@ -327,253 +549,6 @@ borderWidth size =
             1
 
 
-type alias ThemeTriple =
-    { primary : Palette.Color
-    , text : TextColor
-    , outlinedBg : Palette.Color
-    }
-
-
-type alias ButtonTheme =
-    { normal : ThemeTriple
-    , hover : Maybe ThemeTriple
-    }
-
-
-styleAttrs : Button msg -> List (Attribute msg)
-styleAttrs ((Button _ opt) as btn) =
-    let
-        theme =
-            colorHelper btn
-
-        hover ( bg, border, text ) =
-            Element.mouseOver
-                [ Background.color bg
-                , Border.color border
-                , Font.color text
-                ]
-                :: Element.colorTransition 100
-
-        normal ( bg, border, text ) =
-            [ Background.color bg
-            , Border.color border
-            , Border.width <| borderWidth opt.size
-            , Font.color text
-            ]
-
-        colors { primary, text, outlinedBg } =
-            if isOutlined btn then
-                ( Palette.toElColor outlinedBg
-                , Palette.toElColor primary
-                , Text.ColorPalette primary
-                    |> Text.fontColor
-                    |> Maybe.withDefault
-                        Palette.gray.middle
-                )
-
-            else
-                ( Palette.toElColor primary
-                , Palette.toElColor primary
-                , text
-                    |> Text.fontColor
-                    |> Maybe.withDefault
-                        Palette.gray.middle
-                )
-    in
-    case theme.hover of
-        Just hoverTriple ->
-            normal (colors theme.normal)
-                ++ hover (colors hoverTriple)
-
-        Nothing ->
-            normal (colors theme.normal)
-
-
-isOutlined : Button msg -> Bool
-isOutlined (Button { click } _) =
-    case click of
-        ClickToggle _ False ->
-            True
-
-        _ ->
-            False
-
-
-colorHelper : Button msg -> ButtonTheme
-colorHelper (Button { body } { mode, tone }) =
-    if mode == ModeDisabled then
-        colorHelperWhenDisabled body tone
-
-    else
-        colorHelperWhenEnabled tone
-
-
-colorHelperWhenDisabled : ButtonBody -> ButtonTone -> ButtonTheme
-colorHelperWhenDisabled body tone =
-    case ( body, tone ) of
-        ( BodyIcon _, _ ) ->
-            { normal =
-                { primary = Palette.color Palette.toneGray brightnessLightest
-                , text =
-                    Palette.color Palette.toneGray brightnessLight
-                        |> Text.ColorPalette
-                , outlinedBg = Palette.color Palette.toneGray brightnessLight
-                }
-            , hover = Nothing
-            }
-
-        ( BodyText _, ToneLight ) ->
-            { normal =
-                { primary = Palette.color Palette.toneGray brightnessLightest
-                , text = Text.ColorForLightButtonDisabled
-                , outlinedBg = Palette.color Palette.toneGray brightnessLight
-                }
-            , hover = Nothing
-            }
-
-        _ ->
-            { normal =
-                { primary = Palette.color Palette.toneGray brightnessLight
-                , text =
-                    Palette.color Palette.toneGray brightnessLight
-                        |> Palette.setContrasting True
-                        |> Text.ColorPalette
-                , outlinedBg = Palette.color Palette.toneGray brightnessLight
-                }
-            , hover = Nothing
-            }
-
-
-colorHelperWhenEnabled : ButtonTone -> ButtonTheme
-colorHelperWhenEnabled tone =
-    case tone of
-        TonePrimary ->
-            { normal =
-                { primary = Palette.color Palette.tonePrimary brightnessMiddle
-                , text =
-                    Palette.color Palette.tonePrimary brightnessMiddle
-                        |> Palette.setContrasting True
-                        |> Text.ColorPalette
-                , outlinedBg = Palette.color Palette.toneGray brightnessLightest
-                }
-            , hover =
-                Just
-                    { primary = Palette.color Palette.tonePrimary brightnessDarkest
-                    , text =
-                        Palette.color Palette.tonePrimary brightnessDarkest
-                            |> Palette.setContrasting True
-                            |> Text.ColorPalette
-                    , outlinedBg = Palette.color Palette.tonePrimary brightnessLightest
-                    }
-            }
-
-        ToneSuccess ->
-            { normal =
-                { primary = Palette.color Palette.toneSuccess brightnessMiddle
-                , text =
-                    Palette.color Palette.toneSuccess brightnessMiddle
-                        |> Palette.setContrasting True
-                        |> Text.ColorPalette
-                , outlinedBg = Palette.color Palette.toneGray brightnessLightest
-                }
-            , hover =
-                Just
-                    { primary = Palette.color Palette.toneSuccess brightnessDarkest
-                    , text =
-                        Palette.color Palette.toneSuccess brightnessDarkest
-                            |> Palette.setContrasting True
-                            |> Text.ColorPalette
-                    , outlinedBg = Palette.color Palette.toneGray brightnessLightest
-                    }
-            }
-
-        ToneDanger ->
-            { normal =
-                { primary = Palette.color Palette.toneDanger brightnessMiddle
-                , text =
-                    Palette.color Palette.toneDanger brightnessMiddle
-                        |> Palette.setContrasting True
-                        |> Text.ColorPalette
-                , outlinedBg = Palette.color Palette.toneGray brightnessLightest
-                }
-            , hover =
-                Just
-                    { primary = Palette.color Palette.toneDanger brightnessDarkest
-                    , text =
-                        Palette.color Palette.toneDanger brightnessDarkest
-                            |> Palette.setContrasting True
-                            |> Text.ColorPalette
-                    , outlinedBg = Palette.color Palette.toneGray brightnessLightest
-                    }
-            }
-
-        ToneLight ->
-            { normal =
-                { primary = Palette.color Palette.toneGray brightnessLightest
-                , text =
-                    Palette.color Palette.tonePrimary brightnessMiddle
-                        |> Text.ColorPalette
-                , outlinedBg = Palette.color Palette.toneGray brightnessLightest
-                }
-            , hover =
-                Just
-                    { primary = Palette.color Palette.toneGray brightnessLighter
-                    , text =
-                        Palette.color Palette.tonePrimary brightnessDarkest
-                            |> Text.ColorPalette
-                    , outlinedBg = Palette.color Palette.toneGray brightnessLighter
-                    }
-            }
-
-        ToneClear ->
-            { normal =
-                { primary =
-                    Palette.color Palette.toneGray brightnessLightest
-                        |> Palette.withAlpha 0
-                , text =
-                    Palette.color Palette.tonePrimary brightnessMiddle
-                        |> Text.ColorPalette
-                , outlinedBg =
-                    Palette.color Palette.toneGray brightnessLightest
-                        |> Palette.withAlpha 0
-                }
-            , hover =
-                Just
-                    { primary =
-                        Palette.color Palette.toneGray brightnessLightest
-                    , text =
-                        Palette.color Palette.tonePrimary brightnessMiddle
-                            |> Text.ColorPalette
-                    , outlinedBg = Palette.color Palette.toneGray brightnessLightest
-                    }
-            }
-
-
-disabledAttrs : Button msg -> List (Attribute msg)
-disabledAttrs (Button _ { mode }) =
-    if mode == ModeDisabled then
-        Element.disabled
-
-    else
-        [ Element.pointer ]
-
-
-clickAttrs : Button msg -> List (Attribute msg)
-clickAttrs (Button { click } { mode }) =
-    case ( mode, click ) of
-        ( ModeEnabled, ClickMsg msg ) ->
-            [ Events.onClick msg ]
-
-        ( ModeEnabled, ClickToggle msg isEnabled ) ->
-            [ Events.onClick (msg (not isEnabled)) ]
-
-        ( ModeEnabled, ClickLink _ ) ->
-            []
-
-        ( ModeDisabled, _ ) ->
-            []
-
-
 textSize : Size -> Int
 textSize size =
     case size of
@@ -590,19 +565,209 @@ textSize size =
             10
 
 
-elFromBody : RenderConfig -> Size -> ButtonBody -> Element msg
-elFromBody cfg size body =
-    case body of
-        BodyText str ->
-            Element.el
-                [ Font.size <| textSize size
-                , Font.semiBold
-                , Element.centerX
-                , Element.spacing 8
-                ]
-                (Element.text str)
 
-        BodyIcon icon ->
-            icon
-                |> Icon.withSize size
-                |> Icon.toEl cfg
+-- Theme applier
+
+
+type alias ThemeTriple =
+    { background : Maybe Palette.Color
+    , border : Maybe Palette.Color
+    , text : TextColor
+    }
+
+
+type alias ButtonTheme =
+    { normal : ThemeTriple
+    , hover : Maybe ThemeTriple
+    }
+
+
+themeToAttributes : ButtonTheme -> List (Attribute msg)
+themeToAttributes theme =
+    case theme.hover of
+        Just hoverTriple ->
+            (hoverTriple
+                |> tripleToAttributes
+                |> Element.mouseOver
+            )
+                :: Element.colorTransition 100
+                ++ tripleToAttributes theme.normal
+
+        Nothing ->
+            tripleToAttributes theme.normal
+
+
+tripleToAttributes : ThemeTriple -> List (Element.Attr decorative msg)
+tripleToAttributes { background, border, text } =
+    text
+        |> Text.fontColor
+        |> Maybe.map Font.color
+        |> maybeToList
+        |> prependMaybe (Maybe.map (Palette.toElementColor >> Background.color) background)
+        |> prependMaybe (Maybe.map (Palette.toElementColor >> Border.color) border)
+
+
+
+-- Themes
+
+
+toggleTheme : Bool -> List (Attribute msg)
+toggleTheme current =
+    themeToAttributes <|
+        if current then
+            primaryTheme
+
+        else
+            { normal =
+                { background = Nothing
+                , border = Just <| Palette.color Palette.tonePrimary brightnessMiddle
+                , text =
+                    Palette.color Palette.tonePrimary brightnessMiddle
+                        |> Text.ColorPalette
+                }
+            , hover =
+                Just
+                    { background = Just <| Palette.color Palette.tonePrimary brightnessLightest
+                    , border = Just <| Palette.color Palette.tonePrimary brightnessDarkest
+                    , text =
+                        Palette.color Palette.tonePrimary brightnessDarkest
+                            |> Text.ColorPalette
+                    }
+            }
+
+
+workingTheme : EmbossedTone -> List (Attribute msg)
+workingTheme tone =
+    themeToAttributes <|
+        case tone of
+            TonePrimary ->
+                primaryTheme
+
+            ToneDanger ->
+                { normal =
+                    { background = Just <| Palette.color Palette.toneDanger brightnessMiddle
+                    , border = Just <| Palette.color Palette.toneDanger brightnessMiddle
+                    , text =
+                        Palette.color Palette.toneDanger brightnessMiddle
+                            |> Palette.setContrasting True
+                            |> Text.ColorPalette
+                    }
+                , hover =
+                    Just
+                        { background = Just <| Palette.color Palette.toneDanger brightnessDarkest
+                        , border = Just <| Palette.color Palette.toneDanger brightnessDarkest
+                        , text =
+                            Palette.color Palette.toneDanger brightnessDarkest
+                                |> Palette.setContrasting True
+                                |> Text.ColorPalette
+                        }
+                }
+
+            ToneLight ->
+                { normal =
+                    { background = Just <| Palette.color Palette.toneGray brightnessLightest
+                    , border = Just <| Palette.color Palette.toneGray brightnessLightest
+                    , text =
+                        Palette.color Palette.tonePrimary brightnessMiddle
+                            |> Text.ColorPalette
+                    }
+                , hover =
+                    Just
+                        { background = Just <| Palette.color Palette.toneGray brightnessLighter
+                        , border = Just <| Palette.color Palette.toneGray brightnessLighter
+                        , text =
+                            Palette.color Palette.tonePrimary brightnessDarkest
+                                |> Text.ColorPalette
+                        }
+                }
+
+            ToneClear ->
+                { normal =
+                    { background = Nothing
+                    , border = Nothing
+                    , text =
+                        Palette.color Palette.tonePrimary brightnessMiddle
+                            |> Text.ColorPalette
+                    }
+                , hover =
+                    Just
+                        { background = Just <| Palette.color Palette.toneGray brightnessLightest
+                        , border = Just <| Palette.color Palette.toneGray brightnessLightest
+                        , text =
+                            Palette.color Palette.tonePrimary brightnessMiddle
+                                |> Text.ColorPalette
+                        }
+                }
+
+
+disabledTheme : ButtonBody -> List (Attribute msg)
+disabledTheme body =
+    themeToAttributes <|
+        case body of
+            BodyIcon _ ->
+                { normal =
+                    { background = Just <| Palette.color Palette.toneGray brightnessLightest
+                    , border = Just <| Palette.color Palette.toneGray brightnessLightest
+                    , text =
+                        Palette.color Palette.toneGray brightnessLight
+                            |> Text.ColorPalette
+                    }
+                , hover = Nothing
+                }
+
+            BodyText _ ->
+                { normal =
+                    { background = Just <| Palette.color Palette.toneGray brightnessLight
+                    , border = Just <| Palette.color Palette.toneGray brightnessLight
+                    , text =
+                        Palette.color Palette.toneGray brightnessLight
+                            |> Palette.setContrasting True
+                            |> Text.ColorPalette
+                    }
+                , hover = Nothing
+                }
+
+
+successTheme : ButtonBody -> List (Attribute msg)
+successTheme _ =
+    themeToAttributes <|
+        { normal =
+            { background = Just <| Palette.color Palette.toneSuccess brightnessMiddle
+            , border = Just <| Palette.color Palette.toneSuccess brightnessMiddle
+            , text =
+                Palette.color Palette.toneSuccess brightnessMiddle
+                    |> Palette.setContrasting True
+                    |> Text.ColorPalette
+            }
+        , hover =
+            Just
+                { background = Just <| Palette.color Palette.toneSuccess brightnessDarkest
+                , border = Just <| Palette.color Palette.toneSuccess brightnessDarkest
+                , text =
+                    Palette.color Palette.toneSuccess brightnessDarkest
+                        |> Palette.setContrasting True
+                        |> Text.ColorPalette
+                }
+        }
+
+
+primaryTheme : ButtonTheme
+primaryTheme =
+    { normal =
+        { background = Just <| Palette.color Palette.tonePrimary brightnessMiddle
+        , border = Just <| Palette.color Palette.tonePrimary brightnessMiddle
+        , text =
+            Palette.color Palette.tonePrimary brightnessMiddle
+                |> Palette.setContrasting True
+                |> Text.ColorPalette
+        }
+    , hover =
+        Just
+            { background = Just <| Palette.color Palette.tonePrimary brightnessDarkest
+            , border = Just <| Palette.color Palette.tonePrimary brightnessDarkest
+            , text =
+                Palette.color Palette.tonePrimary brightnessDarkest
+                    |> Palette.setContrasting True
+                    |> Text.ColorPalette
+            }
+    }

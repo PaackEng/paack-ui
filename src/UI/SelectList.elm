@@ -1,7 +1,7 @@
 module UI.SelectList exposing
     ( SelectList
+    , renderElement
     , selectList
-    , toEl
     , withActionBar
     , withOptions
     , withSearchField
@@ -102,8 +102,8 @@ withWidth width (SelectList prop opt) =
 -- Render
 
 
-toEl : RenderConfig -> SelectList object msg -> Element msg
-toEl cfg (SelectList prop opt) =
+renderElement : RenderConfig -> SelectList object msg -> Element msg
+renderElement cfg (SelectList prop opt) =
     let
         isSelected obj =
             case opt.isSelected of
@@ -160,10 +160,10 @@ actionBarView cfg actionBar =
                 ]
                 [ Text.body2 title
                     |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
-                    |> Text.toEl cfg
+                    |> Text.renderElement cfg
                 , icon title
                     |> Icon.withSize Size.small
-                    |> Icon.toEl cfg
+                    |> Icon.renderElement cfg
                     |> Element.el
                         [ Element.alignRight
                         ]
@@ -188,7 +188,7 @@ searchFieldView cfg searchField =
                     |> TextField.withWidth TextField.widthFull
                     |> TextField.withPlaceholder label
                     |> TextField.withIcon (Icon.search "Search")
-                    |> TextField.toEl cfg
+                    |> TextField.renderElement cfg
                 ]
 
         Nothing ->

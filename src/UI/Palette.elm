@@ -10,7 +10,7 @@ module UI.Palette exposing
     , color
     , setContrasting
     , toCssColor
-    , toElColor
+    , toElementColor
     , toneDanger
     , toneGray
     , tonePrimary
@@ -60,8 +60,8 @@ color tone brightness =
     Color (Properties tone brightness) defaultOptions
 
 
-toElColor : Color -> Element.Color
-toElColor (Color { tone, brightness } { alpha, contrast }) =
+toElementColor : Color -> Element.Color
+toElementColor (Color { tone, brightness } { alpha, contrast }) =
     tone
         |> ifThenElse contrast contrastColors toColors
         |> getBrightness brightness
@@ -80,7 +80,7 @@ withAlpha alpha (Color prop opt) =
 
 toCssColor : Color -> String
 toCssColor data =
-    toElColor data
+    toElementColor data
         |> Element.toRgb
         |> (\{ red, green, blue, alpha } ->
                 "rgba("

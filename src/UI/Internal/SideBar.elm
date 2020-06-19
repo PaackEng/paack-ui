@@ -97,12 +97,12 @@ viewHead cfg (Menu.Menu prop _) title maybeStack =
         mobileHeadSandwich =
             Icon.sandwichMenu "Expand sidebar"
                 |> Icon.withSize Size.large
-                |> Icon.toEl cfg
+                |> Icon.renderElement cfg
                 |> Element.el (headerButtonAttr (prop.toggleMsg True) 48 20)
 
         mobileHeadGoBack msg =
             Icon.backwardContent "Go back"
-                |> Icon.toEl cfg
+                |> Icon.renderElement cfg
                 |> Element.el (headerButtonAttr msg 48 20)
     in
     case maybeStack of
@@ -113,7 +113,7 @@ viewHead cfg (Menu.Menu prop _) title maybeStack =
                 ]
                 [ Element.el
                     [ Element.width fill, Font.center, padding 20 ]
-                    (Text.heading5 title |> Text.toEl cfg)
+                    (Text.heading5 title |> Text.renderElement cfg)
                 ]
 
         Just ( goBackMsg, stackButtons ) ->
@@ -121,9 +121,9 @@ viewHead cfg (Menu.Menu prop _) title maybeStack =
                 [ mobileHeadGoBack goBackMsg
                 , Element.el
                     [ Element.width fill, Element.centerY ]
-                    (Text.heading5 title |> Text.toEl cfg)
+                    (Text.heading5 title |> Text.renderElement cfg)
                 ]
-                    ++ List.map (Button.toEl cfg) stackButtons
+                    ++ List.map (Button.renderElement cfg) stackButtons
 
 
 viewSide : RenderConfig -> Bool -> Menu msg -> Element msg
@@ -193,7 +193,7 @@ headerView cfg toggleMsg logo =
         closeButton =
             Icon.close "Minimize sidebar"
                 |> Icon.withSize Size.small
-                |> Icon.toEl cfg
+                |> Icon.renderElement cfg
                 |> Element.el (headerButtonAttr toggleMsg 40 10)
     in
     Element.row attr
@@ -207,7 +207,7 @@ slimHeaderView cfg toggleMsg _ =
     Element.column [ height (px (72 + 48)) ]
         [ Icon.sandwichMenu "Expand sidebar"
             |> Icon.withSize Size.large
-            |> Icon.toEl cfg
+            |> Icon.renderElement cfg
             |> Element.el (headerButtonAttr toggleMsg 48 14)
         ]
 
@@ -326,14 +326,14 @@ pageItem cfg icon link isSelected =
         [ icon
             |> Icon.withSize Size.small
             |> Icon.withColor textColor
-            |> Icon.toEl cfg
+            |> Icon.renderElement cfg
             |> Element.el iconAttr
         , Icon.getHint icon
             |> Text.body1
             |> Text.withColor textColor
-            |> Text.toEl cfg
+            |> Text.renderElement cfg
         ]
-        |> Link.packEl cfg [ width fill ] link
+        |> Link.wrapElement cfg [ width fill ] link
 
 
 slimPageItem : RenderConfig -> Icon -> Link -> Bool -> Element msg
@@ -341,9 +341,9 @@ slimPageItem cfg icon link isSelected =
     icon
         |> Icon.withSize Size.large
         |> Icon.withColor (slimIconColor isSelected)
-        |> Icon.toEl cfg
+        |> Icon.renderElement cfg
         |> Element.el slimIconAttr
-        |> Link.packEl cfg [] link
+        |> Link.wrapElement cfg [] link
 
 
 actionItem : RenderConfig -> Icon -> msg -> Element msg
@@ -361,12 +361,12 @@ actionItem cfg icon msg =
         [ icon
             |> Icon.withSize Size.small
             |> Icon.withColor (Palette.color tonePrimary brightnessMiddle)
-            |> Icon.toEl cfg
+            |> Icon.renderElement cfg
             |> Element.el iconAttr
         , Icon.getHint icon
             |> Text.body1
             |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
-            |> Text.toEl cfg
+            |> Text.renderElement cfg
         ]
 
 
@@ -375,7 +375,7 @@ slimActionItem cfg icon msg =
     icon
         |> Icon.withSize Size.large
         |> Icon.withColor (slimIconColor True)
-        |> Icon.toEl cfg
+        |> Icon.renderElement cfg
         |> Element.el
             (slimIconAttr
                 ++ [ Element.pointer

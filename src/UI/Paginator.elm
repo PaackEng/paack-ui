@@ -1,7 +1,7 @@
 module UI.Paginator exposing (PaginatorConfig, nonNumeric)
 
 import Element exposing (Element, fill)
-import UI.Button as Button exposing (Button, ButtonMode)
+import UI.Button as Button exposing (Button)
 import UI.Icon as Icon exposing (Icon)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
@@ -40,19 +40,11 @@ nonNumeric ({ first, offset, totalCount } as paginator) renderConfig =
                 else
                     offset + first
 
-        previousStateMode =
-            if offset > 0 then
-                Button.modeEnabled
+        noPrevious =
+            offset == 0
 
-            else
-                Button.modeDisabled
-
-        nextStateMode =
-            if first + offset < totalCount then
-                Button.modeEnabled
-
-            else
-                Button.modeDisabled
+        noNext =
+            first + offset >= totalCount
     in
     Element.row
         []
@@ -63,31 +55,29 @@ nonNumeric ({ first, offset, totalCount } as paginator) renderConfig =
                 ++ " of "
                 ++ String.fromInt totalCount
             )
-            |> Text.toEl renderConfig
+            |> Text.renderElement renderConfig
             |> Element.el
                 [ Element.paddingEach
                     { zeroPadding | right = 80 }
                 , Element.width fill
                 ]
         , button paginator.onPreviousButtonClicked
-            previousStateMode
+            noPrevious
             (Icon.leftArrow "Previous")
-            |> Button.toEl renderConfig
+            |> Button.renderElement renderConfig
             |> Element.el
                 [ Element.paddingEach
                     { zeroPadding | right = 8 }
                 ]
         , button paginator.onNextButtonClicked
-            nextStateMode
+            noNext
             (Icon.rightArrow "Next")
-            |> Button.toEl renderConfig
+            |> Button.renderElement renderConfig
         ]
 
 
-button : msg -> ButtonMode -> Icon -> Button msg
-button msg buttonMode icon =
-    Button.bodyIcon icon
-        |> Button.button msg
-        |> Button.withTone Button.toneLight
-        |> Button.withMode buttonMode
-        |> Button.withTone Button.toneLight
+button : msg -> Bool -> Icon -> Button msg
+button msg isDisabled icon =
+    Button.fromIcon icon
+        |> Button.cmd msg Button.light
+        |> Button.withDisabledIf isDisabled

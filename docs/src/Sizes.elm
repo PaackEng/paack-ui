@@ -9,6 +9,7 @@ import UI.Icon as Icon
 import UI.Internal.Palette as Palette
 import UI.Size as Size
 import UIExplorer exposing (storiesOf)
+import Utils exposing (iconsSvgSprite)
 
 
 stories cfg =
@@ -48,7 +49,7 @@ iconView cfg size ( iconFn, label ) =
         ]
         [ iconFn label
             |> Icon.withSize size
-            |> Icon.toEl cfg
+            |> Icon.renderElement cfg
             |> Element.el
                 [ Font.size 25
                 , Element.centerX
@@ -59,16 +60,16 @@ iconView cfg size ( iconFn, label ) =
 
 
 buttons =
-    [ Button.bodyText "Prompt"
-    , Button.bodyIcon <| Icon.toggle "Toggle"
+    [ Button.fromLabel "Prompt"
+    , Button.fromIcon <| Icon.toggle "Toggle"
     ]
 
 
 buttonView cfg size body =
     body
-        |> Button.button Msg.NoOp
+        |> Button.cmd Msg.NoOp Button.primary
         |> Button.withSize size
-        |> Button.toEl cfg
+        |> Button.renderElement cfg
 
 
 sizeView cfg size =
@@ -76,6 +77,7 @@ sizeView cfg size =
     , List.map (buttonView cfg size) buttons
     ]
         |> List.concat
+        |> (::) iconsSvgSprite
         |> Element.wrappedRow
             [ Element.spacing 10
             ]

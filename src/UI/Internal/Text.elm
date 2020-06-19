@@ -81,7 +81,7 @@ fontColor : TextColor -> Maybe Element.Color
 fontColor color =
     case color of
         ColorPalette paletteColor ->
-            Just <| Palette.toElColor paletteColor
+            Just <| Palette.toElementColor paletteColor
 
         ColorForLightButtonDisabled ->
             Just <| Palette.textLightButtonDisabled

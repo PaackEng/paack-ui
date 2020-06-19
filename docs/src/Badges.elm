@@ -20,12 +20,12 @@ stories cfg =
 oneBadge cfg constructor str =
     story
         ( "Badge " ++ str
-        , Badge.toEl cfg <| constructor "123"
+        , Badge.renderElement cfg <| constructor "123"
         , { note =
                 """
 ```elm
 Badge.""" ++ str ++ """ "123"
-  |> Badge.toEl renderCfg
+  |> Badge.renderElement renderCfg
 
 ```
 """
