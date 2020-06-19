@@ -102,7 +102,7 @@ type alias ToggleProperties msg =
 
 
 
--- Init
+-- Default
 
 
 defaultOptions : Options
@@ -112,23 +112,13 @@ defaultOptions =
     }
 
 
+
+-- Builders
+
+
 toggle : String -> (Bool -> msg) -> Bool -> Button msg
 toggle hint msg isEnabled =
     Toggle { toggleMsg = msg, current = isEnabled, hint = hint } defaultOptions
-
-
-fromLabel : String -> ButtonBody
-fromLabel label =
-    BodyText label
-
-
-fromIcon : Icon -> ButtonBody
-fromIcon icon =
-    BodyIcon icon
-
-
-
--- Body to Button
 
 
 disabled : ButtonBody -> Button msg
@@ -157,6 +147,20 @@ redirect link style body =
         , body = body
         }
         defaultOptions
+
+
+
+-- Body builders
+
+
+fromLabel : String -> ButtonBody
+fromLabel label =
+    BodyText label
+
+
+fromIcon : Icon -> ButtonBody
+fromIcon icon =
+    BodyIcon icon
 
 
 
@@ -212,7 +216,7 @@ withSize size button =
 
 
 
--- Expose all properties
+-- Properties
 
 
 danger : ButtonStyle
