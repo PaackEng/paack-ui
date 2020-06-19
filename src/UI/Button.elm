@@ -72,7 +72,7 @@ type ButtonAction msg
 
 
 type ButtonMode msg
-    = ButtonWorking (ButtonAction msg) ButtonStyle
+    = ButtonActive (ButtonAction msg) ButtonStyle
     | ButtonDisabled
     | ButtonSuccess
 
@@ -144,7 +144,7 @@ success body =
 cmd : msg -> ButtonStyle -> ButtonBody -> Button msg
 cmd msg style body =
     Button
-        { mode = ButtonWorking (ActionMsg msg) style
+        { mode = ButtonActive (ActionMsg msg) style
         , body = body
         }
         defaultOptions
@@ -153,7 +153,7 @@ cmd msg style body =
 redirect : Link -> ButtonStyle -> ButtonBody -> Button msg
 redirect link style body =
     Button
-        { mode = ButtonWorking (ActionRedirect link) style
+        { mode = ButtonActive (ActionRedirect link) style
         , body = body
         }
         defaultOptions
@@ -268,8 +268,8 @@ map applier button =
     case button of
         Button { mode, body } opt ->
             case mode of
-                ButtonWorking action style ->
-                    Button { mode = ButtonWorking (newAction action) style, body = body } opt
+                ButtonActive action style ->
+                    Button { mode = ButtonActive (newAction action) style, body = body } opt
 
                 ButtonDisabled ->
                     Button { mode = ButtonDisabled, body = body } opt
@@ -298,10 +298,10 @@ renderElement cfg button =
 
         Button { mode, body } { size, width } ->
             case mode of
-                ButtonWorking action StyleHyperlink ->
+                ButtonActive action StyleHyperlink ->
                     hyperlinkView cfg size width body action
 
-                ButtonWorking action (StyleEmbossed tone) ->
+                ButtonActive action (StyleEmbossed tone) ->
                     workingView cfg size width tone body action
 
                 ButtonDisabled ->
