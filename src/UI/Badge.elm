@@ -1,4 +1,39 @@
-module UI.Badge exposing (Badge, danger, dark, light, primary, renderElement, success, warning, withBrightness)
+module UI.Badge exposing
+    ( Badge, primary, success, warning, danger, light, dark
+    , withBrightness
+    , renderElement
+    )
+
+{-| Badges are small elements displayed, usually on the right of texts or top-right corner of the view, serving as counters, tags, or labels.
+
+Six color schemes are available: Primary, Warning, Danger, Success, Light, and Dark.
+But, brightness can also variate using the palette's brightness values with [`Badge.withBrightness`](UI-Palette#withBrightness).
+
+A badge can be created and rendered as in the following pipeline:
+
+    Element.row []
+        [ -- Some cool content
+        , Badge.dark (String.fromInt (List.length someList))
+            |> Badge.renderElement renderConfig
+            |> Element.el [ Element.alignTop ]
+        ]
+
+
+# Building
+
+@docs Badge, primary, success, warning, danger, light, dark
+
+
+# Custom brightness
+
+@docs withBrightness
+
+
+# Rendering
+
+@docs renderElement
+
+-}
 
 import Element exposing (Element, px, shrink)
 import Element.Background as Background
