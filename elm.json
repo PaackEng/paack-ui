@@ -5,7 +5,6 @@
     "license": "BSD-3-Clause",
     "version": "1.0.0",
     "exposed-modules": [
-        "UI.ActionBar",
         "UI.Alert",
         "UI.Badge",
         "UI.Button",
