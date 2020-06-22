@@ -1,7 +1,7 @@
 {
   "name": "paack-ui",
   "version": "1.0.0",
-  "description": "Ready-to-use components for Elm UI",
+  "description": "Paack's Design System applied over Elm UI",
   "main": "index.js",
   "directories": {
     "doc": "docs"

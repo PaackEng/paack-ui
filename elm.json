@@ -1,7 +1,7 @@
 {
     "type": "package",
     "name": "PaackEng/paack-ui",
-    "summary": "Paack's Design System applied in components for Elm UI",
+    "summary": "Paack's Design System applied over Elm UI",
     "license": "BSD-3-Clause",
     "version": "1.0.0",
     "exposed-modules": [
