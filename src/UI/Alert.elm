@@ -54,6 +54,9 @@ type AlertTone
 
 
 {-| The primary color scheme applied to the alert background.
+
+    Alert.primary "Proceed to login..."
+
 -}
 primary : String -> Alert msg
 primary title =
@@ -62,6 +65,9 @@ primary title =
 
 
 {-| The success color scheme applied to the alert background.
+
+    Alert.success "Category created with success."
+
 -}
 success : String -> Alert msg
 success title =
@@ -70,6 +76,9 @@ success title =
 
 
 {-| The warning color scheme applied to the alert background.
+
+    Alert.warning "Proceed with caution!"
+
 -}
 warning : String -> Alert msg
 warning title =
@@ -78,6 +87,9 @@ warning title =
 
 
 {-| The danger color scheme applied to the alert background.
+
+    Alert.danger "Failed to apply changes!"
+
 -}
 danger : String -> Alert msg
 danger title =

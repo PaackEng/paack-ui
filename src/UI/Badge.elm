@@ -60,36 +60,74 @@ type alias Options =
     }
 
 
+{-| A light grayish variation of the badge.
+
+    Badge.light "EMPTY"
+
+-}
 light : String -> Badge
 light content =
     Badge { content = content, tone = toneGray } { defaultOptions | brightness = brightnessLighter }
 
 
+{-| A dark grayish variation of the badge.
+
+    Badge.dark "EMPTY"
+
+-}
 dark : String -> Badge
 dark content =
     Badge { content = content, tone = toneGray } { defaultOptions | brightness = brightnessDarkest }
 
 
+{-| A primary-color variation of the badge.
+
+    Badge.primary "NEW"
+
+-}
 primary : String -> Badge
 primary content =
     Badge { content = content, tone = tonePrimary } defaultOptions
 
 
+{-| A variation of the badge with warning-tone.
+
+    Badge.warning "0"
+
+-}
 warning : String -> Badge
 warning content =
     Badge { content = content, tone = toneWarning } defaultOptions
 
 
+{-| A variation of the badge with danger-tone.
+
+    Badge.danger "ERROR"
+
+-}
 danger : String -> Badge
 danger content =
     Badge { content = content, tone = toneDanger } defaultOptions
 
 
+{-| A variation of the badge with success-tone.
+
+    Badge.success "SENT"
+
+-}
 success : String -> Badge
 success content =
     Badge { content = content, tone = toneSuccess } defaultOptions
 
 
+{-| With `Badge.withBrightness`, you'll be able to apply a different brightness for any badge.
+See [`Palette.brightness*`](UI-Palette#brightnessMiddle) for acceptable values.
+
+    Badge.success "SENT"
+        |> Badge.withBrightness Palette.brightnessLight
+        |> Badge.renderElement renderConfig
+
+-}
 withBrightness : Palette.Brightness -> Badge -> Badge
 withBrightness brightness (Badge prop opt) =
     Badge prop { opt | brightness = brightness }
@@ -99,6 +137,9 @@ withBrightness brightness (Badge prop opt) =
 -- Render
 
 
+{-| End of the builder's life.
+The result of this function is a ready-to-insert Elm UI's Element.
+-}
 renderElement : RenderConfig -> Badge -> Element msg
 renderElement cfg (Badge { content, tone } { brightness }) =
     let
