@@ -7,10 +7,11 @@
     "doc": "docs"
   },
   "scripts": {
-    "showcase": "parcel showcase/public/index.html",
+    "analyse": "elm-analyse",
+    "docs": "elm make --docs=dist/docs.json",
     "build-showcase": "parcel build showcase/public/index.html",
-    "test": "elm-test",
-    "analyse": "elm-analyse"
+    "showcase": "parcel showcase/public/index.html",
+    "test": "elm-test"
   },
 
   "repository": {
