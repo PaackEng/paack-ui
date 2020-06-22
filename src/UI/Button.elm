@@ -9,10 +9,7 @@ module UI.Button exposing
     , map
     )
 
-{-| The `UI.Button` is a component that can render as a hyperlink, an embossed button, or a padded-icon.
-
-The embossed-styled button has four tones: Primary, Danger, Light, Clear.
-And it can also be in one of the states: Active, Disabled, and Success.
+{-| The `UI.Button` is a component that can render as a hyperlink, a togglable button, a stylized button, or a clear padded-icon.
 
 Following Elm-UI standards, this component is accessible.
 
