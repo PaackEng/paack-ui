@@ -1,29 +1,72 @@
 module UI.Button exposing
-    ( Button
-    , ButtonBody
-    , ButtonStyle
-    , ButtonWidth
-    , clear
-    , cmd
-    , danger
-    , disabled
-    , fromIcon
-    , fromLabel
-    , full
-    , hyperlink
-    , light
-    , map
-    , primary
-    , redirect
-    , renderElement
-    , shrink
-    , success
-    , toggle
-    , withDisabledIf
+    ( Button, toggle, success, disabled, cmd, redirect
+    , ButtonBody, fromLabel, fromIcon
+    , ButtonStyle, hyperlink, primary, danger, light, clear
+    , ButtonWidth, withWidth, full, shrink
     , withSize
-    , withSuccessIf
-    , withWidth
+    , withDisabledIf, withSuccessIf
+    , renderElement
+    , map
     )
+
+{-| The button is the unified aggregation of all the standardized clickable elements.
+The same component can render as a hyperlink, an embossed button, or a padded-icon.
+
+The embossed-styled button has four tones: Primary, Danger, Light, Clear.
+And it can also be in one of the states: Active, Disabled, and Success.
+
+Following Elm-UI standards, this component is accessible.
+
+A button can be created and rendered as in the following pipeline:
+
+    Element.column []
+        [ -- Some UI.TextFields (...)
+        , Button.fromLabel "Submit"
+            |> Button.cmd FormSend Button.primary
+            |> Button.renderElement renderConfig
+        ]
+
+
+# Building
+
+@docs Button, toggle, success, disabled, cmd, redirect
+
+
+# Content
+
+@docs ButtonBody, fromLabel, fromIcon
+
+
+# Style
+
+@docs ButtonStyle, hyperlink, primary, danger, light, clear
+
+
+# Width
+
+@docs ButtonWidth, withWidth, full, shrink
+
+
+# Size
+
+@docs withSize
+
+
+# Conditional states
+
+@docs withDisabledIf, withSuccessIf
+
+
+# Rendering
+
+@docs renderElement
+
+
+# Component handling
+
+@docs map
+
+-}
 
 import Element exposing (Attribute, Element)
 import Element.Background as Background
@@ -56,11 +99,16 @@ type alias Properties msg =
     }
 
 
+{-| The `Button msg` type is used for describing the component for later rendering.
+-}
 type Button msg
     = Button (Properties msg) Options
     | Toggle (ToggleProperties msg) Options
 
 
+{-| The `ButtonBody` is required when assembling the most-basic `Button msg` type.
+It indicates the contents inside of the desired button, like its label or icon.
+-}
 type ButtonBody
     = BodyText String
     | BodyIcon Icon
@@ -84,11 +132,24 @@ type EmbossedTone
     | ToneClear
 
 
+{-| Non-toggle buttons must-be styled. The currently available styles are Hyperlink and Embossed.
+
+A hyperlink-styled: See [`Button.hyperlink`](UI-Button#hyperlink).
+
+An embossed-styled button has paddings and hovering-effects.
+It's available through its sub-themes: Primary, Danger, Light, and Clear.
+These only change background and text color.
+
+-}
 type ButtonStyle
     = StyleEmbossed EmbossedTone
     | StyleHyperlink
 
 
+{-| To maintain fewer variations of similar-looking content, we opted to have only two sizes of buttons:
+One with the minimum to fit its contents, and the other filling the container.
+The `ButtonWidth` type describes these two values.
+-}
 type ButtonWidth
     = WidthFull
     | WidthShrink
@@ -116,21 +177,57 @@ defaultOptions =
 -- Builders
 
 
+{-| Toggle is a kind-of button that always contains a toggle-icon and visually looks like an embossed-primary button.
+The purpose of this button is to toggle between showing/hiding some spammed-content.
+
+    Button.toggle "Some Hint for Accessibility" TheTogglingMessage model.isSomethingVisible
+
+-}
 toggle : String -> (Bool -> msg) -> Bool -> Button msg
 toggle hint msg isEnabled =
     Toggle { toggleMsg = msg, current = isEnabled, hint = hint } defaultOptions
 
 
+{-| This `Button.disabled` builds an embossed-looking, without-message, grayish-colored button.
+It's another approach for [`Button.withDisabledIf`](UI-Button#withDisabledIf), helping when you can't compose a message for the desired action at the occasion.
+
+    case event of
+        Just id ->
+            Button.cmd (TriggerEvent id) Button.primary body
+
+        Nothing ->
+            Button.disabled body
+
+-}
 disabled : ButtonBody -> Button msg
 disabled body =
     Button { mode = ButtonDisabled, body = body } defaultOptions
 
 
+{-| This `Button.success` builds an embossed-looking, without-message, greenish-colored button.
+It's another approach for [`Button.withSuccessIf`](UI-Button#withSuccessIf), helping when you can't compose a message for the desired action at the occasion.
+
+    case event of
+        Just id ->
+            Button.cmd (TriggerEvent id) Button.primary body
+
+        Nothing ->
+            Button.success body
+
+-}
 success : ButtonBody -> Button msg
 success body =
     Button { mode = ButtonSuccess, body = body } defaultOptions
 
 
+{-| This is the most common builder.
+It uses a simple message that is triggered on a click and renders as an embossed and themed button.
+
+    Button.fromLabel "Click this Button"
+        |> Button.cmd SomeSimpleMessage Button.primary
+        |> Button.renderElement renderConfig
+
+-}
 cmd : msg -> ButtonStyle -> ButtonBody -> Button msg
 cmd msg style body =
     Button
@@ -140,6 +237,13 @@ cmd msg style body =
         defaultOptions
 
 
+{-| Similar to [`Button.cmd`](UI-Button#cmd), but instead of a message, it redirects to some path.
+
+    Button.fromLabel "Click this Link"
+        |> Button.redirect "https://elm-lang.org/" Button.hyperlink
+        |> Button.renderElement renderConfig
+
+-}
 redirect : Link -> ButtonStyle -> ButtonBody -> Button msg
 redirect link style body =
     Button
@@ -153,11 +257,21 @@ redirect link style body =
 -- Body builders
 
 
+{-| `Button.fromLabel` initiates a button's body with text-content inside it.
+
+    Button.fromLabel "Click here"
+
+-}
 fromLabel : String -> ButtonBody
 fromLabel label =
     BodyText label
 
 
+{-| `Button.fromIcon` initiates a button's body with icon-content inside it.
+
+    Button.fromIcon (Icon.map "Go to maps")
+
+-}
 fromIcon : Icon -> ButtonBody
 fromIcon icon =
     BodyIcon icon
@@ -167,6 +281,16 @@ fromIcon icon =
 -- Options
 
 
+{-| After asserting some condition, `Button.withSuccessIf` will attempt to set the button to a visually-noticeable success state (a greenish button where the action can no longer be triggered).
+
+    Button.fromLabel "Send Someting"
+        |> Button.cmd (QuerySend "Something") Button.primary
+        |> Button.withSuccessIf (model.queryResult == QueryOkay)
+        |> Button.renderElement renderConfig
+
+**NOTE**: In case the button is a toggle or the condition resolves as False, nothing will happen.
+
+-}
 withSuccessIf : Bool -> Button msg -> Button msg
 withSuccessIf condition button =
     if condition then
@@ -181,6 +305,16 @@ withSuccessIf condition button =
         button
 
 
+{-| After asserting some condition, `Button.withDisabledIf` will attempt to set the button to a visually-noticeable disabled state (a grayish button where the action can no longer be triggered).
+
+    Button.fromLabel "Send Someting"
+        |> Button.cmd (QuerySend "Something") Button.primary
+        |> Button.withDisabledIf (model.queryResult != QueryNotAsked)
+        |> Button.renderElement renderConfig
+
+**NOTE**: In case the button is a toggle or the condition resolves as False, nothing will happen.
+
+-}
 withDisabledIf : Bool -> Button msg -> Button msg
 withDisabledIf condition button =
     if condition then
@@ -195,6 +329,13 @@ withDisabledIf condition button =
         button
 
 
+{-| With `Button.withWidth`, you'll be able to set one of the available values for width.
+
+    Button.withWidth Button.fill someButton
+
+**NOTE**: Default value is [`Button.shrink`](UI-Button#shrink)
+
+-}
 withWidth : ButtonWidth -> Button msg -> Button msg
 withWidth width button =
     case button of
@@ -205,6 +346,15 @@ withWidth width button =
             Button prop { opt | width = width }
 
 
+{-| With `Button.withSize`, you'll be able to scale the button between the [standard sizes][size].
+
+[size]: UI-Size
+
+    Button.withSize Size.large someButton
+
+**NOTE**: Default value is [`Button.shrink`](UI-Button#shrink)
+
+-}
 withSize : Size -> Button msg -> Button msg
 withSize size button =
     case button of
@@ -216,48 +366,69 @@ withSize size button =
 
 
 
--- Properties
+-- Style
 
 
+{-| This is the danger-theme, and it's reddish for enforcing the user's attention.
+-}
 danger : ButtonStyle
 danger =
     StyleEmbossed ToneDanger
 
 
+{-| This is the light-theme, mostly used for less-important actions.
+-}
 light : ButtonStyle
 light =
     StyleEmbossed ToneLight
 
 
+{-| This is the clear-theme, mostly used on icons where the background color isn't needed.
+-}
 clear : ButtonStyle
 clear =
     StyleEmbossed ToneClear
 
 
+{-| The primary action's theme.
+This button usually commits the main task.
+-}
 primary : ButtonStyle
 primary =
     StyleEmbossed TonePrimary
 
 
+{-| A hyperlink-styled button looks like classical web links: Blue with an underline.
+-}
 hyperlink : ButtonStyle
 hyperlink =
     StyleHyperlink
 
 
+
+-- Width
+
+
+{-| The button's width will fill its container
+-}
 full : ButtonWidth
 full =
     WidthFull
 
 
+{-| The button will have the exact width to fit its contents.
+-}
 shrink : ButtonWidth
 shrink =
     WidthShrink
 
 
 
--- Etc
+-- Component Handling
 
 
+{-| Transform the messages produced by the component.
+-}
 map : (a -> b) -> Button a -> Button b
 map applier button =
     let
@@ -294,6 +465,9 @@ map applier button =
 -- Render
 
 
+{-| End of the builder's life.
+The result of this function is a ready-to-insert Elm UI's Element.
+-}
 renderElement : RenderConfig -> Button msg -> Element msg
 renderElement cfg button =
     case button of
