@@ -1,6 +1,5 @@
 module Main exposing (main)
 
-import ActionBars
 import Alerts
 import Badges
 import Buttons.Stories as Buttons
@@ -67,7 +66,6 @@ main =
         , Icons.stories renderConfig
         , Palette.stories
         , Buttons.stories renderConfig
-        , ActionBars.stories renderConfig
         , Alerts.stories renderConfig
         , Badges.stories renderConfig
         , TextField.stories renderConfig
