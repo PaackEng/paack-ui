@@ -45,6 +45,8 @@ import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 
 
+{-| The `Badge` type is used for describing the component for later rendering.
+-}
 type Badge
     = Badge Properties Options
 
