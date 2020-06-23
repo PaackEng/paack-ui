@@ -43,9 +43,8 @@ icons =
     , ( Icon.toggle, "Icon.toggle" )
     , ( Icon.toggleUp, "Icon.toggleUp" )
     , ( Icon.toggleDown, "Icon.toggleDown" )
-    , ( Icon.backwardContent, "Icon.backwardContent" )
-    , ( Icon.leftArrow, "Icon.leftArrow" )
-    , ( Icon.rightArrow, "Icon.rightArrow" )
+    , ( Icon.previousContent, "Icon.previousContent" )
+    , ( Icon.nextContent, "Icon.nextContent" )
     , ( Icon.seeMore, "Icon.seeMore" )
     , ( Icon.warning, "Icon.warning" )
     ]
