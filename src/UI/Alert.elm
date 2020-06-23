@@ -1,11 +1,31 @@
 module UI.Alert exposing
-    ( Alert
-    , danger
-    , primary
+    ( Alert, primary, success, warning, danger
     , renderElement
-    , success
-    , warning
     )
+
+{-| The `UI.Alert` is a component for displaying feedback in a full-width banner.
+
+It can have different background colors depending on the type of feedback.
+
+An alert can be created and render as in the following pipeline:
+
+    Element.column []
+        [ Alert.danger "Failed to login."
+            |> Alert.renderElement renderConfig
+        , -- The rest of the screen (...)
+        ]
+
+
+# Building
+
+@docs Alert, primary, success, warning, danger
+
+
+# Rendering
+
+@docs renderElement
+
+-}
 
 import Element exposing (Element)
 import Element.Background as Background
@@ -20,6 +40,8 @@ type alias Properties =
     }
 
 
+{-| The `Alert msg` type is used for describing the component for later rendering.
+-}
 type Alert msg
     = Alert Properties
 
@@ -31,30 +53,53 @@ type AlertTone
     | ToneSuccess
 
 
+{-| The primary color scheme applied to the alert background.
+
+    Alert.primary "Proceed to login..."
+
+-}
 primary : String -> Alert msg
 primary title =
     Alert
         { title = title, tone = TonePrimary }
 
 
+{-| The success color scheme applied to the alert background.
+
+    Alert.success "Category created with success."
+
+-}
 success : String -> Alert msg
 success title =
     Alert
         { title = title, tone = ToneSuccess }
 
 
+{-| The warning color scheme applied to the alert background.
+
+    Alert.warning "Proceed with caution!"
+
+-}
 warning : String -> Alert msg
 warning title =
     Alert
         { title = title, tone = ToneWarning }
 
 
+{-| The danger color scheme applied to the alert background.
+
+    Alert.danger "Failed to apply changes!"
+
+-}
 danger : String -> Alert msg
 danger title =
     Alert
         { title = title, tone = ToneDanger }
 
 
+{-| End of the builder's life.
+The result of this function is a ready-to-insert Elm UI's Element.
+-}
 renderElement : RenderConfig -> Alert msg -> Element msg
 renderElement cfg (Alert { title, tone }) =
     Element.row
