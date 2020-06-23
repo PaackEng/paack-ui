@@ -329,7 +329,7 @@ withDisabledIf condition button =
 
     Button.withWidth Button.fill someButton
 
-**NOTE**: Default value is [`Size.medium`](UI-Size#medium)
+**NOTE**: Default value is [`Button.shrink`](UI-Button#shrink)
 
 -}
 withWidth : ButtonWidth -> Button msg -> Button msg
@@ -348,7 +348,7 @@ withWidth width button =
 
     Button.withSize Size.large someButton
 
-**NOTE**: Default value is [`Button.shrink`](UI-Button#shrink)
+**NOTE**: Default value is [`Size.medium`](UI-Size#medium)
 
 -}
 withSize : Size -> Button msg -> Button msg
