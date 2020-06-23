@@ -339,7 +339,7 @@ seeMore hint =
 
 {-| A warning sign (a triangle with an exclamation mark).
 
-    Icon.seeMore "Read more about this article"
+    Icon.warning "Warning"
 
 -}
 warning : String -> Icon

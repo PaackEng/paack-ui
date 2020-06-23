@@ -10,8 +10,8 @@ stories =
     storiesOf
         "Loading"
         [ smallStory
-        , defaultStory
-        , bigStory
+        , mediumStory
+        , largeStory
         ]
 
 
@@ -30,30 +30,30 @@ smallStory =
         )
 
 
-defaultStory =
+mediumStory =
     story
-        ( "Default"
+        ( "Medium"
         , viewBase
-            UI.LoadingView.default
+            UI.LoadingView.medium
         , { note =
                 """
 ```elm
-    LoadingView.default
+    LoadingView.medium
 ```
 """
           }
         )
 
 
-bigStory =
+largeStory =
     story
-        ( "Big"
+        ( "Large"
         , viewBase
-            UI.LoadingView.big
+            UI.LoadingView.large
         , { note =
                 """
 ```elm
-    LoadingView.big
+    LoadingView.large
 ```
 """
           }
