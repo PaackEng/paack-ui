@@ -1,27 +1,85 @@
 module UI.NavigationContainer exposing
-    ( Container
-    , Content
-    , Dialog
-    , MenuAction
-    , MenuPage
-    , Msg
-    , Navigator
-    , StackChild
-    , State
-    , containerMap
-    , contentSingle
-    , contentStackChild
-    , dialog
-    , menuAction
-    , menuPage
-    , navigator
+    ( Msg, State, stateInit, stateUpdate
+    , Navigator, navigator
+    , Container, containerMap
+    , Content, contentSingle, StackChild, contentStackChild
+    , withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages, MenuPage, menuPage
+    , Dialog, dialog
     , renderElement
-    , stateInit
-    , stateUpdate
-    , withMenuActions
-    , withMenuLogo
-    , withMenuPages
     )
+
+{-| The `UI.NavigationContainer` (abbreviated as `Nav`) is a page presenter.
+Depending on the situation, it applies the sidebar menu, dialogs, and mobile's navbar over the current page.
+
+For this, a page must provide some required data through the [`Nav.Container`](UI-NavigationContainer#Container) record.
+That aggregated with the current rendering configuration provided by [`UI.RenderConfig`](UI-RenderConfig#RenderConfig) and the [`Nav.State`](UI-NavigationContainer#State), multiplex between possible viewing layouts.
+
+Example of usage:
+
+    view : RenderConfig -> Model.Model -> { body : List (Html Msg.Msg), title : String }
+    view renderConfig { navState, currentPage } =
+        Nav.navigator Msg.NavMsg
+            navState
+            (getPageContainer >> Nav.containerMap Msg.PageMsg)
+            |> Nav.withMenuPages
+                [ Nav.menuPage (Icon.packages "Packages")
+                    (Link.link "/packages")
+                    (currentPage == Page.Packages)
+                ]
+            |> Nav.withMenuActions
+                [ Nav.menuAction
+                    (Icon.logout "Logout")
+                    Msg.SessionLogout
+                ]
+            |> Nav.withMenuLogo "My company's logo" someLogoElement
+            |> Nav.renderElement renderConfig currentPage
+
+    getPageContainer : Page.Page -> Nav.Container Page.Msg
+    getPageContainer page =
+        case page of
+            Page.Packages ->
+                { title = "Pacakges"
+                , content = Nav.contentSingle Packages.view
+                , dialog = Nothing
+                , hasMenu = False
+                }
+
+
+# Model & Update
+
+@docs Msg, State, stateInit, stateUpdate
+
+
+# Building
+
+@docs Navigator, navigator
+
+
+# Page
+
+@docs Container, containerMap
+
+
+# Content
+
+@docs Content, contentSingle, StackChild, contentStackChild
+
+
+# Menu
+
+@docs withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages, MenuPage, menuPage
+
+
+# Dialog
+
+@docs Dialog, dialog
+
+
+# Rendering
+
+@docs renderElement
+
+-}
 
 import Element exposing (Element)
 import Html exposing (Html)
@@ -39,40 +97,64 @@ import UI.Utils.Element as Element
 -- Expose
 
 
+{-| This record must be generated with [`Nav.menuPage`](UI-NavigationContainer#menuPage)
+-}
 type alias MenuPage =
     Menu.Page
 
 
+{-| This record must be generated with [`Nav.menuAction`](UI-NavigationContainer#menuAction)
+-}
 type alias MenuAction msg =
     Menu.Action msg
-
-
-type alias Menu msg =
-    Menu.Menu msg
 
 
 
 -- Types
 
 
+{-| Keep this one in your Model, it holds the current navigation state.
+-}
 type alias State =
-    -- Keep this one in MODEL
     { menuExpanded : Bool }
 
 
+{-| The `Nav.Msg` handles menu related messages transparently.
+-}
 type Msg
     = ToggleMenu Bool
 
 
+{-| The `Nav.Content msg` manages different kinds of pages' body.
+By now, the content is either a typical single page or a stacked child of mobile's views.
+
+The typical single page renders the way they come.
+The stacked child has a different header on mobile, where a back button replaces the sandwich button.
+
+-}
 type Content msg
     = ContentSingle (Element msg)
     | ContentStackChild (StackChild msg) (Element msg)
 
 
+{-| The `Nav.Dialog msg` is a record holding the description of a dialog.
+See [`Nav.dialog`](UI-NavigationContainer#dialog) to see how to create a dialog.
+-}
 type alias Dialog msg =
     Dialog.Dialog msg
 
 
+{-| The `Nav.Container msg` describes the current page in its current state.
+
+The `title` field is exposed as to the browser and reused on the mobile's navbar.
+
+When it is `Just someElement`, the `dialog` field is shown over the page.
+
+The `hasMenu` field can hide the menu when undesired, e.g., login page.
+
+The `content` field must be the element holding the page's view.
+
+-}
 type alias Container msg =
     { content : Content msg
     , title : String
@@ -83,7 +165,7 @@ type alias Container msg =
 
 type alias Navigator page msg =
     { container : page -> Container msg
-    , menu : Menu msg
+    , menu : Menu.Menu msg
     }
 
 
@@ -278,7 +360,7 @@ renderElement cfg page model =
 -- Internals
 
 
-menu : (Msg -> msg) -> State -> Menu msg
+menu : (Msg -> msg) -> State -> Menu.Menu msg
 menu applier { menuExpanded } =
     Menu.default (ToggleMenu >> applier) menuExpanded
 
