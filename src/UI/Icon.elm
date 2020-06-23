@@ -7,13 +7,15 @@ module UI.Icon exposing
     , renderElement
     )
 
-{-| `UI.Icon` is an implementation of icons using an SVG-spreadsheet.
+{-| `UI.Icon` is an implementation of icons using an SVG-spritesheet.
 
 Icons' names are after their proposed action/symbolism instead of describing its shape.
 Consequently, we don't use the same icon for different operations as these would confuse the end-users.
 
-To use these icons, first, you must insert this spreadsheet once (and only once) in the layout.
-See [`Icon.svgSpriteImport`](UI-Icon#svgSpriteImport).
+To use these icons, first, you must insert the spritesheet once (and only once) in the layout.
+The sprite sheet injection uses a custom `Html` component that later populates using a parcel's import.
+See [`Icon.svgSpriteImport`](UI-Icon#svgSpriteImport) to know what to do on the Elm's side.
+Parcel's instructions are in [README](https://github.com/PaackEng/paack-ui/blob/master/README.md).
 
 An icon can be created and rendered as in the following pipeline:
 
@@ -463,7 +465,7 @@ getHint (Icon { hint } _) =
 -- Layout
 
 
-{-| Imports the SVG-spreadsheet with all icons into the rendered HTML.
+{-| Imports the SVG-spritesheet with all icons into the rendered HTML.
 
 There is no need for using this function when you're using [`UI.NavigationContainer`][nav], and you should be using it.
 But, in case you aren't, you need to insert this function on the most top component, which probably is the [`Element.layout`][layout], like this:
