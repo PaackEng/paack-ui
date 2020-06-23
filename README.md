@@ -2,10 +2,11 @@
 
 The paack-ui package provides ready-to-use components using Elm UI, based on the design sketches elaborated for Paack's apps.
 
-The API is strict in the send that's hard to achieve non-elaborated appearance or undesired behavior.
-While the purpose of Elm UI as the backend is to keep components accessible.
+The components' API strikes to be strict. That means it pragmatically stops the developer from performing undesired options combinations. Thus, producing unexpected behaviors or non-planned visuals artifacts.
 
-The usage of this library is mostly internal, but we're open to suggestions and feedback.
+The purpose of Elm UI as the backend is to keep components accessible.
+
+The usage of this library is mostly internal, but we are open to suggestions and feedback.
 
 ## Example
 
