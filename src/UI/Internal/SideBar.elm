@@ -101,7 +101,7 @@ viewHead cfg (Menu.Menu prop _) title maybeStack =
                 |> Element.el (headerButtonAttr (prop.toggleMsg True) 48 20)
 
         mobileHeadGoBack msg =
-            Icon.backwardContent "Go back"
+            Icon.previousContent "Go back"
                 |> Icon.renderElement cfg
                 |> Element.el (headerButtonAttr msg 48 20)
     in

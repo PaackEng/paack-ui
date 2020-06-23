@@ -63,7 +63,7 @@ nonNumeric ({ first, offset, totalCount } as paginator) renderConfig =
                 ]
         , button paginator.onPreviousButtonClicked
             noPrevious
-            (Icon.leftArrow "Previous")
+            (Icon.previousContent "Previous")
             |> Button.renderElement renderConfig
             |> Element.el
                 [ Element.paddingEach
@@ -71,7 +71,7 @@ nonNumeric ({ first, offset, totalCount } as paginator) renderConfig =
                 ]
         , button paginator.onNextButtonClicked
             noNext
-            (Icon.rightArrow "Next")
+            (Icon.nextContent "Next")
             |> Button.renderElement renderConfig
         ]
 
