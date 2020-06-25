@@ -1,4 +1,43 @@
-module UI.Paginator exposing (PaginatorConfig, nonNumeric)
+module UI.Paginator exposing
+    ( PaginatorConfig
+    , nonNumeric
+    )
+
+{-| `UI.Paginator` is a component for helping navigation in a large sample of elements.
+
+    Element.column
+        [ Element.width fill
+        , Element.height (px 600)
+        ]
+        [ model.options
+            |> List.drop model.pageOffset
+            |> List.take 20
+            |> List.map itemView
+            |> Element.column
+                [ Element.width fill
+                , Element.height fill
+                ]
+        , Paginator.nonNumeric
+            { onNextButtonClicked = Msg.NextPage
+            , onPreviousButtonClicked = Msg.PreviousPage
+            , totalCount = List.length model.options
+            , offset = model.pageOffset
+            , first = 0
+            }
+            renderConfig
+        ]
+
+
+# Building
+
+@docs PaginatorConfig
+
+
+# Rendering
+
+@docs nonNumeric
+
+-}
 
 import Element exposing (Element, fill)
 import UI.Button as Button exposing (Button)
@@ -8,13 +47,16 @@ import UI.Text as Text
 import UI.Utils.Element exposing (zeroPadding)
 
 
+{-| `PaginatorConfig` holds the configuration required to present a Paginator.
 
-{-
-   first: N Return only the first N results
-   offset: N Skip the first N results
+    { onNextButtonClicked = Msg.NextPage
+    , onPreviousButtonClicked = Msg.PreviousPage
+    , totalCount = List.length model.options
+    , offset = model.pageOffset
+    , first = 0
+    }
+
 -}
-
-
 type alias PaginatorConfig msg =
     { onNextButtonClicked : msg
     , onPreviousButtonClicked : msg
@@ -24,6 +66,14 @@ type alias PaginatorConfig msg =
     }
 
 
+{-| Given a [`PaginatorConfig`](UI-Paginator#PaginatorConfig), renders paginator.
+This paginator style (non-numeric) has only the next and previous buttons. In between those, it presents the current offset.
+
+    Paginator.nonNumeric
+        paginatorConfig
+        renderConfig
+
+-}
 nonNumeric : PaginatorConfig msg -> RenderConfig -> Element msg
 nonNumeric ({ first, offset, totalCount } as paginator) renderConfig =
     let
