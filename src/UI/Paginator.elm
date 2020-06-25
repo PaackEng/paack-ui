@@ -4,6 +4,10 @@ module UI.Paginator exposing
     )
 
 {-| `UI.Paginator` is a component for helping navigation in a large sample of elements.
+It provides navigation buttons and current location information.
+
+A paginator does not include the logic required for taking/dropping the source of elements, and neither does the rendering of these elements.
+The following code applies the paginator to some simple list, and also applies paginating logic on it:
 
     Element.column
         [ Element.width fill
