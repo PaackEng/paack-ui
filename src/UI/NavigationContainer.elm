@@ -154,6 +154,12 @@ The `hasMenu` field can hide the menu when undesired, e.g., login page.
 
 The `content` field must be the element holding the page's view.
 
+    { content = Nav.contentSingle <| Element.el [] [ Element.text "Element body" ]
+    , title = "Example page"
+    , dialog = Nothing -- or Just <| Nav.dialog <| ...
+    , hasMenu = True
+    }
+
 -}
 type alias Container msg =
     { content : Content msg
@@ -163,12 +169,32 @@ type alias Container msg =
     }
 
 
+{-| The `Nav.Navigator` handles menu, dialogs and page viewing.
+It must be initialized using [`Nav.navigator`](UI-NavigationContainer#navigator).
+-}
 type alias Navigator page msg =
     { container : page -> Container msg
     , menu : Menu.Menu msg
     }
 
 
+{-| Stacked children are typical on mobile.
+The most significant difference is they have a customizable navbar where a back button replaces the sandwich menu, allowing the user to return to a higher scope.
+Besides that, they can add custom buttons to the right side of the title.
+
+This record holds a stack child's configuration.
+That includes the back button's message, a title which overwrites the main page's title, and the customized buttons.
+
+    { title = "Edit: Card " ++ selectedCard.number
+    , buttons =
+        [ Icon.print "Print card"
+            |> Button.fromIcon
+            |> Button.cmd (Msg.PrintCard selectedCard) Button.light
+        ]
+    , goBackMsg = Msg.DiscardCardChanges
+    }
+
+-}
 type alias StackChild msg =
     { title : String
     , buttons : List (Button msg)
@@ -180,6 +206,20 @@ type alias StackChild msg =
 -- Options
 
 
+{-| `Nav.withMenuPages` replaces the list of the menu's navigable pages.
+Therefore changing the list of items showed at the top of the sidebar.
+
+    Nav.withMenuPages
+        [ Nav.menuPage (Icon.edit "Manage cards")
+            (Link.link "/edit-cards")
+            (currentPage == Page.CardsEdit)
+        , Nav.menuPage (Icon.add "New manager")
+            (Link.link "/add-manager")
+            (currentPage == Page.ManagerAdd)
+        ]
+        someNav
+
+-}
 withMenuPages : List MenuPage -> Navigator page msg -> Navigator page msg
 withMenuPages pages nav =
     let
@@ -189,6 +229,20 @@ withMenuPages pages nav =
     { nav | menu = menuWithPages nav.menu }
 
 
+{-| `Nav.withMenuActions` replaces the list of the menu's actions.
+Therefore changing the list of items showed at the bottom of the sidebar.
+
+    Nav.withMenuActions
+        [ Nav.menuAction
+            (Icon.language "Change to English")
+            (Msg.SetLanguage Lang.English)
+        , Nav.menuAction
+            (Icon.logout "Logout")
+            Msg.SessionLogout
+        ]
+        someNav
+
+-}
 withMenuActions : List (MenuAction msg) -> Navigator page msg -> Navigator page msg
 withMenuActions actions nav =
     let
@@ -198,6 +252,16 @@ withMenuActions actions nav =
     { nav | menu = menuWithActions nav.menu }
 
 
+{-| `Nav.withMenuLogo` replaces the logo shown on the menu.
+By now, this logo is only visible at the desktop's sidebar.
+
+The first parameter is a hint that exists for accessibility reasons.
+
+    Nav.withMenuLogo "Paack - Time Matters"
+        Vectors.paackLogoWhite
+        someNav
+
+-}
 withMenuLogo : String -> Element msg -> Navigator page msg -> Navigator page msg
 withMenuLogo hint body nav =
     let
@@ -212,6 +276,8 @@ withMenuLogo hint body nav =
 -- Helpers
 
 
+{-| Transform the messages produced by a container.
+-}
 containerMap : (a -> b) -> Container a -> Container b
 containerMap applier data =
     { title = data.title
@@ -239,6 +305,8 @@ contentMap applier data =
                     }
 
 
+{-| Given a message, apply an update to the [`Nav.State`](UI-NavigationContainer#State).
+-}
 stateUpdate : Msg -> State -> ( State, Cmd Msg )
 stateUpdate msg state =
     case msg of
@@ -250,31 +318,92 @@ stateUpdate msg state =
 -- Constructors
 
 
+{-| The correct way of instantiating a [`Nav.State`](UI-NavigationContainer#State).
+
+    Nav.stateInit renderConfig
+
+-}
 stateInit : RenderConfig -> State
 stateInit cfg =
     { menuExpanded = not <| RenderConfig.isMobile cfg }
 
 
+{-| `Nav.contentSingle` indicates that the current page is a simple single page.
+It expects the final page's view in the only parameter.
+
+    Nav.contentSingle <| view renderConfig model
+
+-}
 contentSingle : Element msg -> Content msg
 contentSingle body =
     ContentSingle body
 
 
+{-| `Nav.contentStackChild` indicates that the current page is a stack child's page.
+It expects the child's configuration and the final page's view as its parameters.
+
+    Nav.contentStackChild
+        { title = "Edit: Card " ++ selectedCard.number
+        , buttons =
+            [ Icon.print "Print card"
+                |> Button.fromIcon
+                |> Button.cmd (Msg.PrintCard selectedCard) Button.light
+            ]
+        , goBackMsg = Msg.DiscardCardChanges
+        }
+    <|
+        cardEditView renderConfig selectedCard
+
+-}
 contentStackChild : StackChild msg -> Element msg -> Content msg
 contentStackChild prop body =
     ContentStackChild prop body
 
 
+{-| `Nav.menuPage` describes a page to [`Nav.withMenuPages`](UI-NavigationContainer#withMenuPages).
+
+    Nav.menuPage (Icon.edit "Edit cards")
+        (Link.link "/edit-cards")
+        (currentPage == Pages.CardsEdit)
+
+-}
 menuPage : Icon -> Link -> Bool -> MenuPage
 menuPage icon link isCurrent =
     Menu.Page icon link isCurrent
 
 
+{-| `Nav.menuPage` describes an action to [`Nav.withMenuActions`](UI-NavigationContainer#withMenuActions).
+
+    Nav.menuAction
+        (Icon.logout "Logout")
+        Msg.SessionLogout
+
+-}
 menuAction : Icon -> msg -> MenuAction msg
 menuAction icon msg =
     Menu.Action icon msg
 
 
+{-| `Nav.navigator` holds the minimum amount of information required for all the features (menu, dialogs, and page's layout) to work.
+
+The first parameter is a lambda that should transform [`Nav.Msg`](UI-NavigationContainer#Msg) in a message type controlled by the user.
+
+The second is the current [`Nav.State`](UI-NavigationContainer#State), do not initialize this on view, hold it on the app's model, and then pass it to this function.
+
+The third (and last) parameter is a lambda used to obtain the current page's container.
+
+    Nav.Navigator Msg.FromNav
+        model.navState
+        (\page ->
+            case page of
+                Page.CardsEdit ->
+                    Pages.CardsEdit.View.container
+
+                Page.AccountProfile ->
+                    Pages.AcountProfile.View.container
+        )
+
+-}
 navigator :
     (Msg -> msg)
     -> State
@@ -285,6 +414,18 @@ navigator applier state pagesContainers =
         (menu applier state)
 
 
+{-| `Nav.dialog` constructs a [`Nav.Dialog`](UI-NavigationContainer#Dialog) from a title, a close message, and the dialog's view.
+Note that the title renders inside the dialog's decoration, with a close button on the opposite side.
+
+This dialog and its decoration render over the current page's view, adding a transparent black layer between them.
+Clicking on the black layer also activates the closing message.
+
+    Nav.dialog
+        "Create a new card"
+        Msg.NewCardDiscard
+        (cardNewView model)
+
+-}
 dialog : String -> msg -> Element msg -> Dialog msg
 dialog title onClose body =
     { title = title
@@ -297,6 +438,14 @@ dialog title onClose body =
 -- Render
 
 
+{-| End of the builder's life.
+The result of this function is a ready-to-insert Elm UI's Element.
+
+There is an additional parameter that is the page identifier, used to obtain the current container.
+
+    Nav.renderElement renderConfig currentPage navigator
+
+-}
 renderElement :
     RenderConfig
     -> page
