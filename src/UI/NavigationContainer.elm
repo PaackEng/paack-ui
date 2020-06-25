@@ -5,7 +5,7 @@ module UI.NavigationContainer exposing
     , Content, contentSingle, StackChild, contentStackChild
     , withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages, MenuPage, menuPage
     , Dialog, dialog
-    , renderElement
+    , toBrowserDocument
     )
 
 {-| The `UI.NavigationContainer` (abbreviated as `Nav`) is a page presenter.
@@ -32,7 +32,7 @@ Example of usage:
                     Msg.SessionLogout
                 ]
             |> Nav.withMenuLogo "My company's logo" someLogoElement
-            |> Nav.renderElement renderConfig currentPage
+            |> Nav.toBrowserDocument renderConfig currentPage
 
     getPageContainer : Page.Page -> Nav.Container Page.Msg
     getPageContainer page =
@@ -77,7 +77,7 @@ Example of usage:
 
 # Rendering
 
-@docs renderElement
+@docs toBrowserDocument
 
 -}
 
@@ -439,19 +439,19 @@ dialog title onClose body =
 
 
 {-| End of the builder's life.
-The result of this function is a ready-to-insert Elm UI's Element.
+The result of this function is a ready-to-use [`Browser.Document`](/packages/elm/browser/latest/Browser#Document).
 
 There is an additional parameter that is the page identifier, used to obtain the current container.
 
-    Nav.renderElement renderConfig currentPage navigator
+    Nav.toBrowserDocument renderConfig currentPage navigator
 
 -}
-renderElement :
+toBrowserDocument :
     RenderConfig
     -> page
     -> Navigator page msg
     -> { body : List (Html msg), title : String }
-renderElement cfg page model =
+toBrowserDocument cfg page model =
     let
         container =
             model.container page
