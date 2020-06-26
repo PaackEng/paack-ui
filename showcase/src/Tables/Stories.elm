@@ -15,7 +15,6 @@ import UI.Table as Table
         , cellMobileDetailsShow
         , cellWidthEnd
         , cellWidthPortion
-        , cellWidthShrink
         , header
         , headersEnd
         , rowEnd
@@ -63,7 +62,7 @@ staticTable cfg =
             ]
 
         cellsWidth =
-            cellWidthPortion 2 <| cellWidthShrink <| cellWidthShrink <| cellWidthPortion 2 <| cellWidthEnd
+            cellWidthPortion 2 <| cellWidthPortion 1 <| cellWidthPortion 1 <| cellWidthPortion 2 <| cellWidthEnd
 
         cell str =
             Text.body1 str |> Table.cellFromText
@@ -156,7 +155,7 @@ staticTable cfg =
             ]
 
         cellsWidth =
-            cellWidthPortion 2 <| cellWidthShrink <| cellWidthShrink <| cellWidthPortion 2 <| cellWidthEnd
+            cellWidthPortion 2 <| cellWidthPortion 1 <| cellWidthPortion 1 <| cellWidthPortion 2 <| cellWidthEnd
 
         cell str =
             Text.body1 str |> cellFromText
