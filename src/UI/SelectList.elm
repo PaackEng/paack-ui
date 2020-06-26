@@ -1,13 +1,66 @@
 module UI.SelectList exposing
-    ( SelectList
-    , renderElement
-    , selectList
-    , withActionBar
-    , withOptions
-    , withSearchField
-    , withSelected
+    ( SelectList, selectList
+    , withOptions, withSelected
+    , withSearchField, withActionBar
     , withWidth
+    , renderElement
     )
+
+{-| `RenderConfig.SelectList` is a styled row list, with the capability of having one of the rows selected.
+
+The developer does the rendering of the row elements.
+While this component then applies the borders and the click event.
+Also, it can optionally filter when having a search bar, and add an action bar.
+
+    view : RenderConfig -> Model -> Element Msg
+    view renderConfig model =
+        RenderConfig.selectList Msg.SelectElement elementView
+            |> SelectList.withOptions model.myListElements
+            |> SelectList.withSearchField
+                "Search for elements matching name.."
+                FilterSet
+                (Maybe.map (\str -> ( str, elementHasString )) model.currentFilter)
+            |> SelectList.withActionBar "Create new Element"
+                Icon.add
+                (Msg.UuidGen (Msg.ForDialog << DialogMsg.OpenElementCreation))
+            |> SelectList.withSelected
+                (\{ id } ->
+                    Maybe.map (.id >> (==) id) model.selectedElement
+                        |> Maybe.withDefault False
+                )
+            |> SelectList.withWidth Element.fill
+            |> SelectList.renderElement renderConfig
+
+    elementHasString : String -> Element -> Bool
+    elementHasString str { name } =
+        String.contains str name
+
+
+# Building
+
+@docs SelectList, selectList
+
+
+# Options
+
+@docs withOptions, withSelected
+
+
+# Extra elements
+
+@docs withSearchField, withActionBar
+
+
+# Width
+
+@docs withWidth
+
+
+# Rendering
+
+@docs renderElement
+
+-}
 
 import Element exposing (Element, fill)
 import Element.Background as Background
@@ -49,6 +102,8 @@ type alias Properties object msg =
     }
 
 
+{-| The `SelectList object msg` type is used for describing the component for later rendering.
+-}
 type SelectList object msg
     = SelectList (Properties object msg) (Options object msg)
 
