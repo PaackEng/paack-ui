@@ -1,14 +1,11 @@
-module UI.Size exposing
-    ( extraSmall, small, medium, large
-    , Size
-    )
+module UI.Size exposing (Size, extraSmall, small, medium, large)
 
 {-| Contextual size for buttons and icons, as described in the design system.
 
 
 # Sizes
 
-@docs extraSmall, small, medium, large
+@docs Size, extraSmall, small, medium, large
 
 -}
 
