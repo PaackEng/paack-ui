@@ -597,11 +597,6 @@ optsEnd =
     NList.empty
 
 
-optKeep : OptRow value columns -> OptRow value (T.Increase columns)
-optKeep tail =
-    NList.cons Nothing tail
-
-
 opt : value -> OptRow value columns -> OptRow value (T.Increase columns)
 opt head tail =
     NList.cons (Just head) tail
