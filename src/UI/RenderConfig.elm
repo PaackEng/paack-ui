@@ -32,7 +32,7 @@ The recommended approach is storing it in the app's Model, gathering the require
 
 # Layout
 
-@export elLayoutAttributes
+@docs elLayoutAttributes
 
 -}
 

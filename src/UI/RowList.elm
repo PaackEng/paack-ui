@@ -371,10 +371,10 @@ renderElement cfg (SelectList prop opt) =
 -- Internal
 
 
-actionBarView : RenderConfig -> Maybe ( String, String -> Icon, msg ) -> Element msg
+actionBarView : RenderConfig -> Maybe (ActionConfig msg) -> Element msg
 actionBarView cfg actionBar =
     case actionBar of
-        Just ( title, icon, onClick ) ->
+        Just { label, icon, onClick } ->
             Element.row
                 [ Element.width fill
                 , Element.paddingEach
@@ -386,14 +386,14 @@ actionBarView cfg actionBar =
                 , Background.color Palette.primary.lightest
                 , Font.color Palette.primary.middle
                 , ARIA.roleAttr ARIA.roleButton
-                , ARIA.labelAttr title
+                , ARIA.labelAttr label
                 , Element.pointer
                 , Events.onClick onClick
                 ]
-                [ Text.body2 title
+                [ Text.body2 label
                     |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
                     |> Text.renderElement cfg
-                , icon title
+                , icon label
                     |> Icon.withSize Size.small
                     |> Icon.renderElement cfg
                     |> Element.el

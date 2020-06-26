@@ -39,9 +39,10 @@ withActionBar =
         component =
             RowList.selectList Select mockView
                 |> RowList.withActionBar
-                    actionBarTitle
-                    Icon.toggle
-                    SomeButtonClicked
+                    { label = actionBarTitle
+                    , icon = Icon.toggle
+                    , onClick = SomeButtonClicked
+                    }
     in
     describe "#withActionBar"
         [ test "has ActionBar" <|
@@ -107,7 +108,11 @@ withSearchField =
 
         component filterState =
             RowList.selectList Select mockView
-                |> RowList.withSearchField searchLabel FilterSet filterState
+                |> RowList.withSearchField
+                    { label = searchLabel
+                    , searchMsg = FilterSet
+                    , currentFilter = filterState
+                    }
 
         theField =
             [ Selector.tag "input"
