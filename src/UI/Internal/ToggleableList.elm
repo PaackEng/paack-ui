@@ -1,4 +1,4 @@
-module UI.Internal.ToggableList exposing (Config, Cover, defaultRow, selectedRow)
+module UI.Internal.ToggleableList exposing (Config, Cover, defaultRow, selectedRow)
 
 import Element exposing (Attribute, Element, fill, px)
 import Element.Background as Background

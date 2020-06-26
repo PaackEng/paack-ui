@@ -1,5 +1,6 @@
 module UI.RowList exposing
-    ( RowList, selectList, ToggableConfig, toggableList, ToggableCover
+    ( RowList, selectList
+    , ToggleableConfig, ToggleableCover, toggleableList
     , withOptions, withSelected
     , withSearchField, withActionBar
     , withWidth
@@ -7,7 +8,7 @@ module UI.RowList exposing
     )
 
 {-| `UI.RowList` is a styled searchable row list.
-The main variation (SelectList) has the capability of having one of its rows selected.
+The main variation (select-lists) has the capability of having one of its rows selected.
 
 The developer does the rendering of the row elements.
 While this component then applies the borders and the click event.
@@ -39,7 +40,14 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
 # Building
 
-@docs RowList, selectList, ToggableConfig, toggableList, ToggableCover
+@docs RowList, selectList
+
+
+# Toggleable variation
+
+Toggleable-lists are a variation of select-lists where the selected element expands with
+
+@docs ToggleableConfig, ToggleableCover, toggleableList
 
 
 # Options
@@ -71,7 +79,7 @@ import Element.Font as Font
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Basics exposing (prependIf)
 import UI.Internal.Palette as Palette
-import UI.Internal.ToggableList as ToggableList
+import UI.Internal.ToggleableList as ToggleableList
 import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
@@ -114,12 +122,13 @@ type RowList object msg
 -- Expose
 
 
-type alias ToggableConfig object msg =
-    ToggableList.Config object msg
+{-| -}
+type alias ToggleableConfig object msg =
+    ToggleableList.Config object msg
 
 
-type alias ToggableCover =
-    ToggableList.Cover
+type alias ToggleableCover =
+    ToggleableList.Cover
 
 
 
@@ -132,17 +141,17 @@ selectList selectMsg renderItem =
         defaultOptions
 
 
-toggableList : ToggableConfig object msg -> RowList object msg
-toggableList config =
+toggleableList : ToggleableConfig object msg -> RowList object msg
+toggleableList config =
     let
-        toggableItemView parentCfg selected item =
+        toggleableItemView parentCfg selected item =
             if selected then
-                ToggableList.selectedRow parentCfg config item
+                ToggleableList.selectedRow parentCfg config item
 
             else
-                ToggableList.defaultRow parentCfg config selected item
+                ToggleableList.defaultRow parentCfg config selected item
     in
-    selectList config.selectMsg toggableItemView
+    selectList config.selectMsg toggleableItemView
 
 
 

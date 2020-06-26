@@ -74,7 +74,7 @@ type Rows msg object columns
 
 
 type alias MobileCover =
-    RowList.ToggableCover
+    RowList.ToggleableCover
 
 
 type alias Row msg columns =
@@ -304,7 +304,7 @@ mobileView renderConfig headers responsiveOpt =
                 |> rowMap
                 |> List.filterMap detailApplier
     in
-    RowList.toggableList
+    RowList.toggleableList
         { detailsShowLabel = responsiveOpt.detailsShowLabel
         , detailsCollapseLabel = responsiveOpt.detailsCollapseLabel
         , toCover = responsiveOpt.toCover
