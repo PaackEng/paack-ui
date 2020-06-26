@@ -1,12 +1,13 @@
-module UI.SelectList exposing
-    ( SelectList, selectList
+module UI.RowList exposing
+    ( RowList, selectList
     , withOptions, withSelected
     , withSearchField, withActionBar
     , withWidth
     , renderElement
     )
 
-{-| `RenderConfig.SelectList` is a styled row list, with the capability of having one of the rows selected.
+{-| `RenderConfig.List` is a styled row list.
+The main variation (SelectList) has the capability of having one of the rows selected.
 
 The developer does the rendering of the row elements.
 While this component then applies the borders and the click event.
@@ -14,22 +15,22 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
     view : RenderConfig -> Model -> Element Msg
     view renderConfig model =
-        RenderConfig.selectList Msg.SelectElement elementView
-            |> SelectList.withOptions model.myListElements
-            |> SelectList.withSearchField
+        RowList.selectList Msg.SelectElement elementView
+            |> RowList.withOptions model.myListElements
+            |> RowList.withSearchField
                 "Search for elements matching name.."
                 FilterSet
                 (Maybe.map (\str -> ( str, elementHasString )) model.currentFilter)
-            |> SelectList.withActionBar "Create new Element"
+            |> RowList.withActionBar "Create new Element"
                 Icon.add
                 (Msg.UuidGen (Msg.ForDialog << DialogMsg.OpenElementCreation))
-            |> SelectList.withSelected
+            |> RowList.withSelected
                 (\{ id } ->
                     Maybe.map (.id >> (==) id) model.selectedElement
                         |> Maybe.withDefault False
                 )
-            |> SelectList.withWidth Element.fill
-            |> SelectList.renderElement renderConfig
+            |> RowList.withWidth Element.fill
+            |> RowList.renderElement renderConfig
 
     elementHasString : String -> Element -> Bool
     elementHasString str { name } =
@@ -38,7 +39,7 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
 # Building
 
-@docs SelectList, selectList
+@docs RowList, selectList
 
 
 # Options
@@ -102,9 +103,9 @@ type alias Properties object msg =
     }
 
 
-{-| The `SelectList object msg` type is used for describing the component for later rendering.
+{-| The `RowList object msg` type is used for describing the component for later rendering.
 -}
-type SelectList object msg
+type RowList object msg
     = SelectList (Properties object msg) (Options object msg)
 
 
@@ -112,7 +113,7 @@ type SelectList object msg
 -- Constructor
 
 
-selectList : (object -> msg) -> (RenderConfig -> Bool -> object -> Element msg) -> SelectList object msg
+selectList : (object -> msg) -> (RenderConfig -> Bool -> object -> Element msg) -> RowList object msg
 selectList selectMsg renderItem =
     SelectList (Properties selectMsg renderItem)
         defaultOptions
@@ -122,12 +123,12 @@ selectList selectMsg renderItem =
 -- Options
 
 
-withActionBar : String -> (String -> Icon) -> msg -> SelectList object msg -> SelectList object msg
+withActionBar : String -> (String -> Icon) -> msg -> RowList object msg -> RowList object msg
 withActionBar label icon onIconClick (SelectList prop opt) =
     SelectList prop { opt | actionBar = Just ( label, icon, onIconClick ) }
 
 
-withOptions : List object -> SelectList object msg -> SelectList object msg
+withOptions : List object -> RowList object msg -> RowList object msg
 withOptions items (SelectList prop opt) =
     SelectList prop { opt | items = items }
 
@@ -136,19 +137,19 @@ withSearchField :
     String
     -> (String -> msg)
     -> Maybe ( String, String -> object -> Bool )
-    -> SelectList object msg
-    -> SelectList object msg
+    -> RowList object msg
+    -> RowList object msg
 withSearchField label searchMsg filter (SelectList prop opt) =
     { opt | searchField = Just <| SearchOptions label searchMsg filter }
         |> SelectList prop
 
 
-withSelected : (object -> Bool) -> SelectList object msg -> SelectList object msg
+withSelected : (object -> Bool) -> RowList object msg -> RowList object msg
 withSelected isSelected (SelectList prop opt) =
     SelectList prop { opt | isSelected = Just isSelected }
 
 
-withWidth : Element.Length -> SelectList object msg -> SelectList object msg
+withWidth : Element.Length -> RowList object msg -> RowList object msg
 withWidth width (SelectList prop opt) =
     SelectList prop { opt | width = width }
 
@@ -157,7 +158,7 @@ withWidth width (SelectList prop opt) =
 -- Render
 
 
-renderElement : RenderConfig -> SelectList object msg -> Element msg
+renderElement : RenderConfig -> RowList object msg -> Element msg
 renderElement cfg (SelectList prop opt) =
     let
         isSelected obj =

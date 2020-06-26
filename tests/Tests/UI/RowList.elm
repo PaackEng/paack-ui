@@ -1,4 +1,4 @@
-module Tests.UI.SelectList exposing (tests)
+module Tests.UI.RowList exposing (tests)
 
 import Element as Element exposing (Element)
 import Expect
@@ -12,7 +12,7 @@ import Tests.Utils.RenderConfig exposing (desktopWindowConfig)
 import UI.Icon as Icon
 import UI.Link as Link
 import UI.RenderConfig exposing (RenderConfig)
-import UI.SelectList as SelectList
+import UI.RowList as RowList
 
 
 type Msg
@@ -37,8 +37,8 @@ withActionBar =
             "Some Title"
 
         component =
-            SelectList.selectList Select mockView
-                |> SelectList.withActionBar
+            RowList.selectList Select mockView
+                |> RowList.withActionBar
                     actionBarTitle
                     Icon.toggle
                     SomeButtonClicked
@@ -47,13 +47,13 @@ withActionBar =
         [ test "has ActionBar" <|
             \_ ->
                 component
-                    |> SelectList.renderElement desktopWindowConfig
+                    |> RowList.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> Query.has [ Selector.text actionBarTitle ]
         , test "the button works" <|
             \_ ->
                 component
-                    |> SelectList.renderElement desktopWindowConfig
+                    |> RowList.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> findBtnQuery
                     |> Event.simulate Event.click
@@ -71,20 +71,20 @@ withOptions =
             [ Whatever 111 "Bear", lonewolf, Whatever 333 "Fox" ]
 
         component =
-            SelectList.selectList Select mockView
-                |> SelectList.withOptions options
+            RowList.selectList Select mockView
+                |> RowList.withOptions options
     in
     describe "#withOptions"
         [ test "Options are visible" <|
             \_ ->
                 component
-                    |> SelectList.renderElement desktopWindowConfig
+                    |> RowList.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> Query.has [ Selector.text "Bear", Selector.text "Wolf", Selector.text "Fox" ]
         , test "Options are selectable" <|
             \_ ->
                 component
-                    |> SelectList.renderElement desktopWindowConfig
+                    |> RowList.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> Query.find [ cursorPointer, Selector.containing [ Selector.text "Wolf" ] ]
                     |> Event.simulate Event.click
@@ -92,8 +92,8 @@ withOptions =
         , test "Selected is correctly applied" <|
             \_ ->
                 component
-                    |> SelectList.withSelected (\{ id } -> id == 222)
-                    |> SelectList.renderElement desktopWindowConfig
+                    |> RowList.withSelected (\{ id } -> id == 222)
+                    |> RowList.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> Query.has [ cursorPointer, Selector.containing [ Selector.text "Wolf", Selector.text selectedPseudoTag ] ]
         ]
@@ -106,8 +106,8 @@ withSearchField =
             "Searching for..."
 
         component filterState =
-            SelectList.selectList Select mockView
-                |> SelectList.withSearchField searchLabel FilterSet filterState
+            RowList.selectList Select mockView
+                |> RowList.withSearchField searchLabel FilterSet filterState
 
         theField =
             [ Selector.tag "input"
@@ -127,13 +127,13 @@ withSearchField =
         [ test "Field has label" <|
             \_ ->
                 component Nothing
-                    |> SelectList.renderElement desktopWindowConfig
+                    |> RowList.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> Query.has theField
         , test "Field triggers message" <|
             \_ ->
                 component Nothing
-                    |> SelectList.renderElement desktopWindowConfig
+                    |> RowList.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> Query.find theField
                     |> Event.simulate (Event.input "Dog")
@@ -141,8 +141,8 @@ withSearchField =
         , test "Having a filter does filter" <|
             \_ ->
                 component (Just ( "Dog", filter ))
-                    |> SelectList.withOptions exampleOpt
-                    |> SelectList.renderElement desktopWindowConfig
+                    |> RowList.withOptions exampleOpt
+                    |> RowList.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> Query.find [ Selector.text "OPT" ]
                     |> Query.has [ Selector.text exampleDog ]

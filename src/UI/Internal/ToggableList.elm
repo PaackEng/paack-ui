@@ -8,7 +8,7 @@ import UI.Icon as Icon
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.Palette as Palette exposing (brightnessDarkest, brightnessLight, brightnessLighter, brightnessLightest, brightnessMiddle, toneGray, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
-import UI.SelectList as SelectList exposing (selectList)
+import UI.RowList as RowList exposing (selectList)
 import UI.Size as Size
 import UI.Text as Text
 import UI.Utils.Element exposing (zeroPadding)
@@ -39,9 +39,9 @@ view renderConfig config items =
                 defaultRow parentCfg config selected item
     in
     selectList config.selectMsg itemView
-        |> SelectList.withOptions items
-        |> SelectList.withSelected config.isSelected
-        |> SelectList.renderElement renderConfig
+        |> RowList.withOptions items
+        |> RowList.withSelected config.isSelected
+        |> RowList.renderElement renderConfig
 
 
 defaultRow : RenderConfig -> Config object msg -> Bool -> object -> Element msg

@@ -15,7 +15,7 @@
         "UI.Paginator",
         "UI.Palette",
         "UI.RenderConfig",
-        "UI.SelectList",
+        "UI.RowList",
         "UI.Size",
         "UI.Text",
         "UI.Table",
