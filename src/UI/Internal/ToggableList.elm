@@ -1,4 +1,4 @@
-module UI.Internal.ToggableList exposing (Config, Cover, view)
+module UI.Internal.ToggableList exposing (Config, Cover, defaultRow, selectedRow)
 
 import Element exposing (Attribute, Element, fill, px)
 import Element.Background as Background
@@ -8,7 +8,6 @@ import UI.Icon as Icon
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.Palette as Palette exposing (brightnessDarkest, brightnessLight, brightnessLighter, brightnessLightest, brightnessMiddle, toneGray, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
-import UI.RowList as RowList exposing (selectList)
 import UI.Size as Size
 import UI.Text as Text
 import UI.Utils.Element exposing (zeroPadding)
@@ -20,28 +19,11 @@ type alias Config object msg =
     , toCover : object -> Cover
     , toDetails : object -> List ( String, Element msg )
     , selectMsg : object -> msg
-    , isSelected : object -> Bool
     }
 
 
 type alias Cover =
     { title : String, caption : Maybe String }
-
-
-view : RenderConfig -> Config object msg -> List object -> Element msg
-view renderConfig config items =
-    let
-        itemView parentCfg selected item =
-            if selected then
-                selectedRow parentCfg config item
-
-            else
-                defaultRow parentCfg config selected item
-    in
-    selectList config.selectMsg itemView
-        |> RowList.withOptions items
-        |> RowList.withSelected config.isSelected
-        |> RowList.renderElement renderConfig
 
 
 defaultRow : RenderConfig -> Config object msg -> Bool -> object -> Element msg

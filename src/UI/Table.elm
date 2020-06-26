@@ -34,10 +34,10 @@ import UI.Button as Button exposing (Button)
 import UI.Internal.Basics exposing (..)
 import UI.Internal.NList as NList exposing (NList)
 import UI.Internal.Palette as Palette
-import UI.Internal.ToggableList as ToggableList
 import UI.Internal.TypeNumbers as T
 import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
+import UI.RowList as RowList
 import UI.Text as Text exposing (Text)
 import UI.Utils.Element exposing (zeroPadding)
 
@@ -74,7 +74,7 @@ type Rows msg object columns
 
 
 type alias MobileCover =
-    ToggableList.Cover
+    RowList.ToggableCover
 
 
 type alias Row msg columns =
@@ -304,15 +304,16 @@ mobileView renderConfig headers responsiveOpt =
                 |> rowMap
                 |> List.filterMap detailApplier
     in
-    ToggableList.view renderConfig
+    RowList.toggableList
         { detailsShowLabel = responsiveOpt.detailsShowLabel
         , detailsCollapseLabel = responsiveOpt.detailsCollapseLabel
         , toCover = responsiveOpt.toCover
         , toDetails = details
         , selectMsg = responsiveOpt.selectMsg
-        , isSelected = responsiveOpt.isSelected
         }
-        responsiveOpt.items
+        |> RowList.withOptions responsiveOpt.items
+        |> RowList.withSelected responsiveOpt.isSelected
+        |> RowList.renderElement renderConfig
 
 
 headerRender : RenderConfig -> HeaderCell -> Element msg

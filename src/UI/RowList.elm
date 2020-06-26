@@ -1,13 +1,13 @@
 module UI.RowList exposing
-    ( RowList, selectList
+    ( RowList, selectList, ToggableConfig, toggableList, ToggableCover
     , withOptions, withSelected
     , withSearchField, withActionBar
     , withWidth
     , renderElement
     )
 
-{-| `RenderConfig.List` is a styled row list.
-The main variation (SelectList) has the capability of having one of the rows selected.
+{-| `UI.RowList` is a styled searchable row list.
+The main variation (SelectList) has the capability of having one of its rows selected.
 
 The developer does the rendering of the row elements.
 While this component then applies the borders and the click event.
@@ -39,7 +39,7 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
 # Building
 
-@docs RowList, selectList
+@docs RowList, selectList, ToggableConfig, toggableList, ToggableCover
 
 
 # Options
@@ -71,6 +71,7 @@ import Element.Font as Font
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Basics exposing (prependIf)
 import UI.Internal.Palette as Palette
+import UI.Internal.ToggableList as ToggableList
 import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
@@ -110,6 +111,18 @@ type RowList object msg
 
 
 
+-- Expose
+
+
+type alias ToggableConfig object msg =
+    ToggableList.Config object msg
+
+
+type alias ToggableCover =
+    ToggableList.Cover
+
+
+
 -- Constructor
 
 
@@ -117,6 +130,19 @@ selectList : (object -> msg) -> (RenderConfig -> Bool -> object -> Element msg) 
 selectList selectMsg renderItem =
     SelectList (Properties selectMsg renderItem)
         defaultOptions
+
+
+toggableList : ToggableConfig object msg -> RowList object msg
+toggableList config =
+    let
+        toggableItemView parentCfg selected item =
+            if selected then
+                ToggableList.selectedRow parentCfg config item
+
+            else
+                ToggableList.defaultRow parentCfg config selected item
+    in
+    selectList config.selectMsg toggableItemView
 
 
 
