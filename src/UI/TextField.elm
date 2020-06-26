@@ -1,34 +1,74 @@
 module UI.TextField exposing
     ( TextField
-    , TextFieldContent
-    , TextFieldWidth
-    , currentPassword
-    , email
-    , multilineText
-    , newPassword
-    , renderElement
+    , singlelineText, multilineText, spellChecked
+    , newPassword, currentPassword, setPasswordVisible
+    , username, email
     , search
-    , setLabelVisible
-    , setPasswordVisible
-    , singlelineText
-    , spellChecked
     , static
-    , username
-    , widthFull
-    , widthRelative
-    , withError
-    , withFocus
-    , withIcon
-    , withOnEnterPressed
-    , withPlaceholder
-    , withWidth
+    , TextFieldWidth, withWidth, widthFull, widthRelative
+    , setLabelVisible, withPlaceholder, withIcon
+    , withFocus, withOnEnterPressed, withError
+    , renderElement
     )
 
-{-
-   Notes about decisions taken on the development process:
-   * Every input must have a label value, even if hidden, for accessibility purposes.
-   * Username, email, current password, and search activates in-browser autocomplete capabilities.
-   * Username and Email content-types may have the same use case scenario (e.g., login, sign up), but the email has an in-browser mask checking.
+{-| `UI.TextField` is an accessible and customizable interface for text inputs.
+
+
+# Building
+
+@docs TextField
+
+
+## Text
+
+@docs singlelineText, multilineText, spellChecked
+
+
+## Password
+
+@docs newPassword, currentPassword, setPasswordVisible
+
+
+## Login
+
+@docs username, email
+
+
+## Search
+
+@docs search
+
+
+## Static
+
+@docs static
+
+
+# Width
+
+@docs TextFieldWidth, withWidth, widthFull, widthRelative
+
+
+# Accessibility
+
+@docs setLabelVisible, withPlaceholder, withIcon
+
+
+# Interactive
+
+@docs withFocus, withOnEnterPressed, withError
+
+
+# Rendering
+
+@docs renderElement
+
+**Notes**:
+
+  - Every input must have a label value, even if hidden, for accessibility purposes.
+  - Username, email, current password, and search activates in-browser autocomplete capabilities.
+  - Username and email content-types may have the same use case scenario (e.g., login, sign up), but the email has an in-browser mask checking.
+
 -}
 
 import Element exposing (Attribute, Element)
