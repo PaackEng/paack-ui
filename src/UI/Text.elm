@@ -12,6 +12,8 @@ module UI.Text exposing
 
 {-| `UI.Text` is a component to specify how text to display text. It applies font size, weight, letter-spacing, and color.
 
+**We discourage the usage of `Element.text` and recommend you to pursuie always using this one instead.**
+
 A text can be created and rendered as in the following pipeline:
 
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
