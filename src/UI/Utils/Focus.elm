@@ -1,6 +1,6 @@
 module UI.Utils.Focus exposing
     ( Focus
-    , focusAttributes
+    , toElementAttributes
     )
 
 {-| Unified configuration for managing focus on components.
@@ -13,7 +13,7 @@ module UI.Utils.Focus exposing
 
 # Element Attributes
 
-@docs focusAttributes
+@docs toElementAttributes
 
 -}
 
@@ -46,8 +46,8 @@ type alias Focus msg =
         Element.text "Some content"
 
 -}
-focusAttributes : Focus msg -> List (Attribute msg)
-focusAttributes { onEnter, tabIndex, hasFocus } =
+toElementAttributes : Focus msg -> List (Attribute msg)
+toElementAttributes { onEnter, tabIndex, hasFocus } =
     let
         any =
             [ Events.onFocus onEnter

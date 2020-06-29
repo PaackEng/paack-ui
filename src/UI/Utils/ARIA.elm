@@ -1,19 +1,19 @@
 module UI.Utils.ARIA exposing
-    ( Role, roleButton, roleImage, roleAttr
-    , labelAttr
+    ( ElementSemantics, roleButton, roleImage
+    , toElementAttributes
     )
 
 {-| Interface for [HTML's ARIA](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA).
 
 
-# Role
+# Building
 
-@docs Role, roleButton, roleImage, roleAttr
+@docs ElementSemantics, roleButton, roleImage
 
 
-# Label
+# Rendering
 
-@docs labelAttr
+@docs toElementAttributes
 
 -}
 
@@ -26,21 +26,19 @@ import Html.Attributes as HtmlAttrs
 See [MDN article](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques#Roles).
 
 -}
-type Role
+type ElementSemantics
     = RoleButton
-    | RoleImage
+    | RoleImage String
 
 
 {-| "The button role should be used for clickable elements that trigger a response when activated by the user." - MDN
 
     Element.el
-        [ ARIA.roleAttr ARIA.roleButton
-        , Events.onClick Msg.SomeEvent
-        ]
+        (Events.onClick Msg.SomeEvent :: (ARIA.toElementAttributes <| ARIA.roleButton))
         someChildElement
 
 -}
-roleButton : Role
+roleButton : ElementSemantics
 roleButton =
     RoleButton
 
@@ -48,32 +46,55 @@ roleButton =
 {-| "Can be used to identify multiple elements inside page content that should be considered as a single image." - MDN
 
     Element.el
-        [ ARIA.roleAttr ARIA.roleImage
-        ]
+        (ARIA.toElementAttributes <| ARIA.roleImage altText)
         [ Element.text "😺 Meow" ]
 
 -}
-roleImage : Role
-roleImage =
-    RoleImage
+roleImage : String -> ElementSemantics
+roleImage label =
+    RoleImage label
 
 
-{-| Transform a [`Role`](#Role) in a valid [`Element.Attribute`](/packages/mdgriffith/elm-ui/latest/Element#Attribute)
+{-| Transform a [`ElementSemantics`](#ElementSemantics) in a list of [`Element.Attribute`](/packages/mdgriffith/elm-ui/latest/Element#Attribute).
 -}
-roleAttr : Role -> Attribute msg
-roleAttr role =
-    Element.htmlAttribute <|
-        HtmlAttrs.attribute "role" <|
-            case role of
-                RoleButton ->
-                    "button"
+toElementAttributes : ElementSemantics -> List (Attribute msg)
+toElementAttributes role =
+    case role of
+        RoleButton ->
+            [ roleAttr "button"
+            , pressedAttr "false"
+            , expandedAttr "undefined"
+            ]
 
-                RoleImage ->
-                    "img"
+        RoleImage label ->
+            [ roleAttr "img"
+            , labelAttr label
+            ]
+
+
+roleAttr : String -> Attribute msg
+roleAttr role =
+    role
+        |> HtmlAttrs.attribute "role"
+        |> Element.htmlAttribute
 
 
 labelAttr : String -> Attribute msg
 labelAttr value =
     value
         |> HtmlAttrs.attribute "aria-label"
+        |> Element.htmlAttribute
+
+
+pressedAttr : String -> Attribute msg
+pressedAttr value =
+    value
+        |> HtmlAttrs.attribute "aria-pressed"
+        |> Element.htmlAttribute
+
+
+expandedAttr : String -> Attribute msg
+expandedAttr value =
+    value
+        |> HtmlAttrs.attribute "aria-expanded"
         |> Element.htmlAttribute

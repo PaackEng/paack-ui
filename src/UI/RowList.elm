@@ -376,20 +376,20 @@ actionBarView cfg actionBar =
     case actionBar of
         Just { label, icon, onClick } ->
             Element.row
-                [ Element.width fill
-                , Element.paddingEach
-                    { bottom = 17
-                    , left = 20
-                    , right = 12
-                    , top = 17
-                    }
-                , Background.color Palette.primary.lightest
-                , Font.color Palette.primary.middle
-                , ARIA.roleAttr ARIA.roleButton
-                , ARIA.labelAttr label
-                , Element.pointer
-                , Events.onClick onClick
-                ]
+                (ARIA.toElementAttributes ARIA.roleButton
+                    ++ [ Element.width fill
+                       , Element.paddingEach
+                            { bottom = 17
+                            , left = 20
+                            , right = 12
+                            , top = 17
+                            }
+                       , Background.color Palette.primary.lightest
+                       , Font.color Palette.primary.middle
+                       , Element.pointer
+                       , Events.onClick onClick
+                       ]
+                )
                 [ Text.body2 label
                     |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
                     |> Text.renderElement cfg

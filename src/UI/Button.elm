@@ -505,12 +505,12 @@ toggleView cfg size hint toggleMsg current =
             iconLayout size
 
         attrs =
-            [ ARIA.roleAttr ARIA.roleButton
-            , Primitives.roundedBorders
+            [ Primitives.roundedBorders
             , paddings
             , borders
             , Events.onClick <| toggleMsg (not current)
             ]
+                ++ ARIA.toElementAttributes ARIA.roleButton
                 ++ toggleTheme current
     in
     Icon.toggle hint
@@ -529,8 +529,7 @@ hyperlinkView :
 hyperlinkView cfg size width body action =
     let
         attrs =
-            [ ARIA.roleAttr ARIA.roleButton
-            , Primitives.roundedBorders
+            [ Primitives.roundedBorders
             , buttonWidth width
             , Palette.color tonePrimary brightnessMiddle
                 |> Palette.toElementColor
@@ -539,6 +538,7 @@ hyperlinkView cfg size width body action =
             , Font.underline
             , Element.pointer
             ]
+                ++ (ARIA.toElementAttributes <| ARIA.roleButton)
     in
     case action of
         ActionRedirect link ->
@@ -566,14 +566,14 @@ workingView cfg size width tone body action =
             bodyLayout body size
 
         attrs =
-            [ ARIA.roleAttr ARIA.roleButton
-            , Primitives.roundedBorders
+            [ Primitives.roundedBorders
             , buttonWidth width
             , paddings
             , borders
             , Font.semiBold
             , Element.pointer
             ]
+                ++ (ARIA.toElementAttributes <| ARIA.roleButton)
                 ++ workingTheme tone
     in
     case action of

@@ -358,13 +358,12 @@ renderElement : RenderConfig -> Icon -> Element msg
 renderElement _ (Icon { hint, glyph } { color, size }) =
     let
         staticAttrs =
-            [ ARIA.roleAttr ARIA.roleImage
-            , ARIA.labelAttr hint
-            , Element.centerX
-            , Font.center
-            , Element.width <| Element.px size
-            , Element.height <| Element.px size
-            ]
+            (ARIA.toElementAttributes <| ARIA.roleImage hint)
+                ++ [ Element.centerX
+                   , Font.center
+                   , Element.width <| Element.px size
+                   , Element.height <| Element.px size
+                   ]
 
         attrs =
             case color of

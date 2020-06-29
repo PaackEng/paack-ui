@@ -94,9 +94,8 @@ import UI.Internal.Text as Text
 import UI.Palette as Palette exposing (brightnessMiddle, toneGray)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
-import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element
-import UI.Utils.Focus exposing (Focus, focusAttributes)
+import UI.Utils.Focus as Focus exposing (Focus)
 
 
 type alias Options msg =
@@ -645,7 +644,7 @@ attrs cfg prop opt =
         focustAttr acu =
             case opt.focus of
                 Just details ->
-                    focusAttributes details
+                    Focus.toElementAttributes details
                         ++ acu
 
                 Nothing ->
@@ -699,7 +698,6 @@ genericAttr label isPlaceholder hasError width =
 
         else
             Palette.gray.light
-    , ARIA.labelAttr label
     , Element.title label
     ]
 

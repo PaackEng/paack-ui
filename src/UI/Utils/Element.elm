@@ -64,7 +64,7 @@ svg altText attrs children =
     children
         |> Svg.svg attrs
         |> Element.html
-        |> Element.el [ ARIA.roleAttr ARIA.roleImage, ARIA.labelAttr altText ]
+        |> Element.el (ARIA.toElementAttributes <| ARIA.roleImage altText)
 
 
 {-| All the attributes that define an element as disabled for modifying.
