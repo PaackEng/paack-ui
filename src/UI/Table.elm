@@ -74,9 +74,9 @@ import UI.Internal.Basics exposing (..)
 import UI.Internal.NList as NList exposing (NList)
 import UI.Internal.Palette as Palette
 import UI.Internal.TypeNumbers as T
+import UI.ListView as ListView
 import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
-import UI.RowList as RowList
 import UI.Text as Text exposing (Text)
 import UI.Utils.Element exposing (zeroPadding)
 
@@ -126,10 +126,10 @@ type Rows msg object columns
     | ResponsiveRows (ResponsiveConfig msg object columns)
 
 
-{-| Alias to [`UI.RowList.ToggleableCover`](UI-RowList#ToggleableCover).
+{-| Alias to [`UI.ListView.ToggleableCover`](UI-ListView#ToggleableCover).
 -}
 type alias MobileCover =
-    RowList.ToggleableCover
+    ListView.ToggleableCover
 
 
 {-| `Row msg columns` upholds every cell from a table's row.
@@ -537,16 +537,16 @@ mobileView renderConfig headers responsiveOpt =
                 |> rowMap
                 |> List.filterMap detailApplier
     in
-    RowList.toggleableList
+    ListView.toggleableList
         { detailsShowLabel = responsiveOpt.detailsShowLabel
         , detailsCollapseLabel = responsiveOpt.detailsCollapseLabel
         , toCover = responsiveOpt.toCover
         , toDetails = details
         , selectMsg = responsiveOpt.selectMsg
         }
-        |> RowList.withItems responsiveOpt.items
-        |> RowList.withSelected responsiveOpt.isSelected
-        |> RowList.renderElement renderConfig
+        |> ListView.withItems responsiveOpt.items
+        |> ListView.withSelected responsiveOpt.isSelected
+        |> ListView.renderElement renderConfig
 
 
 headerRender : RenderConfig -> HeaderCell -> Element msg

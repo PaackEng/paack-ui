@@ -1,4 +1,4 @@
-module Tests.UI.RowList exposing (tests)
+module Tests.UI.ListView exposing (tests)
 
 import Element as Element exposing (Element)
 import Expect
@@ -11,8 +11,8 @@ import Tests.Utils.Element exposing (cursorPointer, elementToHtml, hasIconInside
 import Tests.Utils.RenderConfig exposing (desktopWindowConfig)
 import UI.Icon as Icon
 import UI.Link as Link
+import UI.ListView as ListView
 import UI.RenderConfig exposing (RenderConfig)
-import UI.RowList as RowList
 
 
 type Msg
@@ -37,8 +37,8 @@ withActionBar =
             "Some Title"
 
         component =
-            RowList.selectList Select mockView
-                |> RowList.withActionBar
+            ListView.selectList Select mockView
+                |> ListView.withActionBar
                     { label = actionBarTitle
                     , icon = Icon.toggle
                     , onClick = SomeButtonClicked
@@ -48,13 +48,13 @@ withActionBar =
         [ test "has ActionBar" <|
             \_ ->
                 component
-                    |> RowList.renderElement desktopWindowConfig
+                    |> ListView.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> Query.has [ Selector.text actionBarTitle ]
         , test "the button works" <|
             \_ ->
                 component
-                    |> RowList.renderElement desktopWindowConfig
+                    |> ListView.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> findBtnQuery
                     |> Event.simulate Event.click
@@ -72,20 +72,20 @@ withItems =
             [ Whatever 111 "Bear", lonewolf, Whatever 333 "Fox" ]
 
         component =
-            RowList.selectList Select mockView
-                |> RowList.withItems options
+            ListView.selectList Select mockView
+                |> ListView.withItems options
     in
     describe "#withItems"
         [ test "Options are visible" <|
             \_ ->
                 component
-                    |> RowList.renderElement desktopWindowConfig
+                    |> ListView.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> Query.has [ Selector.text "Bear", Selector.text "Wolf", Selector.text "Fox" ]
         , test "Options are selectable" <|
             \_ ->
                 component
-                    |> RowList.renderElement desktopWindowConfig
+                    |> ListView.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> Query.find [ cursorPointer, Selector.containing [ Selector.text "Wolf" ] ]
                     |> Event.simulate Event.click
@@ -93,8 +93,8 @@ withItems =
         , test "Selected is correctly applied" <|
             \_ ->
                 component
-                    |> RowList.withSelected (\{ id } -> id == 222)
-                    |> RowList.renderElement desktopWindowConfig
+                    |> ListView.withSelected (\{ id } -> id == 222)
+                    |> ListView.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> Query.has [ cursorPointer, Selector.containing [ Selector.text "Wolf", Selector.text selectedPseudoTag ] ]
         ]
@@ -107,8 +107,8 @@ withSearchField =
             "Searching for..."
 
         component filterState =
-            RowList.selectList Select mockView
-                |> RowList.withSearchField
+            ListView.selectList Select mockView
+                |> ListView.withSearchField
                     { label = searchLabel
                     , searchMsg = FilterSet
                     , currentFilter = filterState
@@ -132,13 +132,13 @@ withSearchField =
         [ test "Field has label" <|
             \_ ->
                 component Nothing
-                    |> RowList.renderElement desktopWindowConfig
+                    |> ListView.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> Query.has theField
         , test "Field triggers message" <|
             \_ ->
                 component Nothing
-                    |> RowList.renderElement desktopWindowConfig
+                    |> ListView.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> Query.find theField
                     |> Event.simulate (Event.input "Dog")
@@ -146,8 +146,8 @@ withSearchField =
         , test "Having a filter does filter" <|
             \_ ->
                 component (Just ( "Dog", filter ))
-                    |> RowList.withItems exampleOpt
-                    |> RowList.renderElement desktopWindowConfig
+                    |> ListView.withItems exampleOpt
+                    |> ListView.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> Query.find [ Selector.text "OPT" ]
                     |> Query.has [ Selector.text exampleDog ]

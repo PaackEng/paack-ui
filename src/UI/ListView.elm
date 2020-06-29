@@ -1,5 +1,5 @@
-module UI.RowList exposing
-    ( RowList, selectList
+module UI.ListView exposing
+    ( ListView, selectList
     , ToggleableConfig, ToggleableCover, toggleableList
     , withItems, withSelected
     , SearchConfig, withSearchField, ActionConfig, withActionBar
@@ -7,7 +7,7 @@ module UI.RowList exposing
     , renderElement
     )
 
-{-| `UI.RowList` is a styled searchable row list.
+{-| `UI.ListView` is a styled searchable row list.
 The main variation (select-lists) has the capability of having one of its rows selected.
 
 The developer is responsible for coding the row's view.
@@ -16,9 +16,9 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
     view : RenderConfig -> Model -> Element Msg
     view renderConfig model =
-        RowList.selectList Msg.SelectElement elementView
-            |> RowList.withItems model.myListElements
-            |> RowList.withSearchField
+        ListView.selectList Msg.SelectElement elementView
+            |> ListView.withItems model.myListElements
+            |> ListView.withSearchField
                 { label = "Search for elements matching name.."
                 , searchMsg = Msg.FilterSet
                 , currentFilter =
@@ -26,19 +26,19 @@ Also, it can optionally filter when having a search bar, and add an action bar.
                         (\str -> ( str, elementHasString ))
                         model.currentFilter
                 }
-            |> RowList.withActionBar
+            |> ListView.withActionBar
                 { label = "Create new element"
                 , icon = Icon.add
                 , onClick =
                     Msg.UuidGen (Msg.ForDialog << DialogMsg.OpenElementCreation)
                 }
-            |> RowList.withSelected
+            |> ListView.withSelected
                 (\{ id } ->
                     Maybe.map (.id >> (==) id) model.selectedElement
                         |> Maybe.withDefault False
                 )
-            |> RowList.withWidth Element.fill
-            |> RowList.renderElement renderConfig
+            |> ListView.withWidth Element.fill
+            |> ListView.renderElement renderConfig
 
     elementHasString : String -> Element -> Bool
     elementHasString str { name } =
@@ -47,7 +47,7 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
 # Building
 
-@docs RowList, selectList
+@docs ListView, selectList
 
 
 # Toggleable variation
@@ -109,9 +109,9 @@ type alias Properties object msg =
     }
 
 
-{-| The `RowList object msg` type is used for describing the component for later rendering.
+{-| The `ListView object msg` type is used for describing the component for later rendering.
 -}
-type RowList object msg
+type ListView object msg
     = SelectList (Properties object msg) (Options object msg)
 
 
@@ -159,7 +159,7 @@ type alias ActionConfig msg =
     , detailsCollapseLabel = "Hide details" -- For accessibility only
     , toCover =
         \{ name } ->
-            -- RowList.ToggleableCover
+            -- ListView.ToggleableCover
             { title = name, caption = Nothing }
     , toDetails =
         \{ age } ->
@@ -185,10 +185,10 @@ type alias ToggleableCover =
 -- Constructor
 
 
-{-| The main variation of `UI.RowList`.
+{-| The main variation of `UI.ListView`.
 Click an element, and it will be selected.
 
-    RowList.selectList Msg.SelectElement
+    ListView.selectList Msg.SelectElement
         (\{ name } ->
             Element.el [ Element.padding 8 ]
                 (Element.text name)
@@ -198,7 +198,7 @@ Click an element, and it will be selected.
 selectList :
     (object -> msg)
     -> (RenderConfig -> Bool -> object -> Element msg)
-    -> RowList object msg
+    -> ListView object msg
 selectList selectMsg renderItem =
     SelectList (Properties selectMsg renderItem)
         defaultOptions
@@ -208,7 +208,7 @@ selectList selectMsg renderItem =
 
 We recommend using `UI.Table` instead, as it uses toggleable-lists for its responsive mode.
 
-    RowList.toggleableList
+    ListView.toggleableList
         { detailsShowLabel = "Show details" -- For accessibility only
         , detailsCollapseLabel = "Hide details" -- For accessibility only
         , toCover =
@@ -219,14 +219,14 @@ We recommend using `UI.Table` instead, as it uses toggleable-lists for its respo
                 [ ( "Age", Element.text age ) ]
         , selectMsg = Msg.ElementSelect
         }
-        |> RowList.withItems model.items
-        |> RowList.withSelected isElementSelected
-        |> RowList.renderElement renderConfig
+        |> ListView.withItems model.items
+        |> ListView.withSelected isElementSelected
+        |> ListView.renderElement renderConfig
 
 **NOTE**: Toggleable-list elements' view is not codable.
 
 -}
-toggleableList : ToggleableConfig object msg -> RowList object msg
+toggleableList : ToggleableConfig object msg -> ListView object msg
 toggleableList config =
     let
         toggleableItemView parentCfg selected item =
@@ -246,58 +246,58 @@ toggleableList config =
 {-| Replaces the component's action-bar.
 An action-bar is an additional pre-styled stick row that, when clicked, triggers an action.
 
-    RowList.withActionBar
+    ListView.withActionBar
         { label = "Create new element"
         , icon = Icon.add
         , onClick =
             Msg.UuidGen (Msg.ForDialog << DialogMsg.OpenElementCreation)
         }
-        someRowList
+        someListView
 
 -}
 withActionBar :
     ActionConfig msg
-    -> RowList object msg
-    -> RowList object msg
+    -> ListView object msg
+    -> ListView object msg
 withActionBar config (SelectList prop opt) =
     SelectList prop { opt | actionBar = Just config }
 
 
 {-| Replaces the component's list of elements.
 
-    RowList.withItems
+    ListView.withItems
         [ { id = 0, name = "Catarina" }
         , { id = 1, name = "Gabriel" }
         ]
-        someRowList
+        someListView
 
 -}
-withItems : List object -> RowList object msg -> RowList object msg
+withItems : List object -> ListView object msg -> ListView object msg
 withItems items (SelectList prop opt) =
     SelectList prop { opt | items = items }
 
 
 {-| Replaces the component's search-field and allow filtering the elements.
 
-    RowList.withSearchFied
+    ListView.withSearchFied
         { detailsShowLabel = "Show details" -- For accessibility only
         , detailsCollapseLabel = "Hide details" -- For accessibility only
         , toCover =
             \{ name } ->
-                -- RowList.ToggleableCover
+                -- ListView.ToggleableCover
                 { title = name, caption = Nothing }
         , toDetails =
             \{ age } ->
                 [ ( "Age", Element.text age ) ]
         , selectMsg = Msg.ElementSelect
         }
-        someRowList
+        someListView
 
 -}
 withSearchField :
     SearchConfig object msg
-    -> RowList object msg
-    -> RowList object msg
+    -> ListView object msg
+    -> ListView object msg
 withSearchField options (SelectList prop opt) =
     { opt | searchField = Just options }
         |> SelectList prop
@@ -305,24 +305,24 @@ withSearchField options (SelectList prop opt) =
 
 {-| Marks every element as selected or not using a boolean-resulted lambda.
 
-    RowList.withSelected
+    ListView.withSelected
         (\{ id } -> id == model.selectedId)
-        someRowList
+        someListView
 
 -}
-withSelected : (object -> Bool) -> RowList object msg -> RowList object msg
+withSelected : (object -> Bool) -> ListView object msg -> ListView object msg
 withSelected isSelected (SelectList prop opt) =
     SelectList prop { opt | isSelected = Just isSelected }
 
 
 {-| Applies [`Element.width`](/packages/mdgriffith/elm-ui/latest/Element#width) to the component.
 
-    RowList.withWidth
+    ListView.withWidth
         (Element.fill |> Element.minimum 220)
-        someRowList
+        someListView
 
 -}
-withWidth : Element.Length -> RowList object msg -> RowList object msg
+withWidth : Element.Length -> ListView object msg -> ListView object msg
 withWidth width (SelectList prop opt) =
     SelectList prop { opt | width = width }
 
@@ -334,7 +334,7 @@ withWidth width (SelectList prop opt) =
 {-| End of the builder's life.
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
-renderElement : RenderConfig -> RowList object msg -> Element msg
+renderElement : RenderConfig -> ListView object msg -> Element msg
 renderElement cfg (SelectList prop opt) =
     let
         isSelected obj =
