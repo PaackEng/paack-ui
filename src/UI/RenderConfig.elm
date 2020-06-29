@@ -108,12 +108,12 @@ isMobile (RenderConfig { deviceClass }) =
     deviceClass == Element.Phone
 
 
-{-| `True` when the browser is in portrait size and not landscape.
+{-| `True` when the browser is in portrait orientation and not landscape.
 
-    if RenderConfig.isMobile renderConfig then
-        -- Mobile view
+    if RenderConfig.isPortrait renderConfig then
+        -- Portrait view
     else
-        -- Desktop view
+        -- Landscape view
 
 -}
 isPortrait : RenderConfig -> Bool

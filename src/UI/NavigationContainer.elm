@@ -123,7 +123,7 @@ type alias StateRecord =
     { menuExpanded : Bool }
 
 
-{-| The `Nav.Msg` handles menu related messages transparently.
+{-| The `Nav.Msg` handles menu related messages.
 -}
 type Msg
     = ToggleMenu Bool
@@ -394,7 +394,7 @@ menuAction icon msg =
 
 {-| `Nav.navigator` holds the minimum amount of information required for all the features (menu, dialogs, and page's layout) to work.
 
-The first parameter is a lambda that should transform [`Nav.Msg`](UI-NavigationContainer#Msg) in a message type controlled by the user.
+The first parameter is a function that should transform [`Nav.Msg`](UI-NavigationContainer#Msg) in a message type controlled by the user.
 
 The second is the current [`Nav.State`](UI-NavigationContainer#State), do not initialize this on view, hold it on the app's model, and then pass it to this function.
 
