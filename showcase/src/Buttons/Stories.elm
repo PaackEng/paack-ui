@@ -178,13 +178,13 @@ fullWidthStory renderConfig =
         ( "Full Width"
         , Button.fromLabel "Super Long Prompt"
             |> Button.cmd Msg.NoOp Button.primary
-            |> Button.withWidth Button.full
+            |> Button.withWidth Button.widthFull
             |> Button.renderElement renderConfig
         , { note = """
 ```elm
 Button.fromLabel "Some Text"
     |> Button.cmd YourMessage Button.primary
-    |> Button.withWidth Button.full
+    |> Button.withWidth Button.widthFull
     |> Button.renderElement renderConfig
 ```
 """ }

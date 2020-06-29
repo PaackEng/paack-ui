@@ -2,7 +2,7 @@ module UI.Button exposing
     ( Button, toggle, success, disabled, cmd, redirect
     , ButtonBody, fromLabel, fromIcon
     , ButtonStyle, hyperlink, primary, danger, light, clear
-    , ButtonWidth, withWidth, full, shrink
+    , ButtonWidth, withWidth, widthFull, widthRelative
     , withSize
     , withDisabledIf, withSuccessIf
     , renderElement
@@ -40,7 +40,7 @@ A button can be created and rendered as in the following pipeline:
 
 # Width
 
-@docs ButtonWidth, withWidth, full, shrink
+@docs ButtonWidth, withWidth, widthFull, widthRelative
 
 
 # Size
@@ -142,9 +142,7 @@ type ButtonStyle
     | StyleHyperlink
 
 
-{-| To maintain fewer variations of similar-looking content, we opted to have only two sizes of buttons:
-One with the minimum to fit its contents, and the other filling the container.
-The `ButtonWidth` type work with these two values.
+{-| Describes a compatible width.
 -}
 type ButtonWidth
     = WidthFull
@@ -325,11 +323,9 @@ withDisabledIf condition button =
         button
 
 
-{-| `Button.withWidth` changes the width of the button to either have the minimum required for its contents or fill the parent horizontally.
+{-| `Button.withWidth` changes the width of the button.
 
-    Button.withWidth Button.full someButton
-
-**NOTE**: Default value is [`Button.shrink`](#shrink)
+    Button.withWidth Button.widthFull someButton
 
 -}
 withWidth : ButtonWidth -> Button msg -> Button msg
@@ -348,7 +344,7 @@ withWidth width button =
 
     Button.withSize Size.large someButton
 
-**NOTE**: Default value is [`Size.medium`](UI-Size#medium)
+**NOTE**: Button's default size is [`Size.medium`](UI-Size#medium)
 
 -}
 withSize : Size -> Button msg -> Button msg
@@ -405,10 +401,10 @@ hyperlink =
 -- Width
 
 
-{-| The button's width will fill its container
+{-| The button's width will fill its container.
 -}
-full : ButtonWidth
-full =
+widthFull : ButtonWidth
+widthFull =
     WidthFull
 
 
@@ -417,8 +413,8 @@ full =
 **NOTE**: Default behaviour.
 
 -}
-shrink : ButtonWidth
-shrink =
+widthRelative : ButtonWidth
+widthRelative =
     WidthShrink
 
 

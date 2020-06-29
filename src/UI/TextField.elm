@@ -5,7 +5,7 @@ module UI.TextField exposing
     , username, email
     , search
     , static
-    , TextFieldWidth, withWidth, full, shrink
+    , TextFieldWidth, withWidth, widthFull, widthRelative
     , setLabelVisible, withPlaceholder, withIcon
     , withFocus, withOnEnterPressed, withError
     , renderElement
@@ -63,7 +63,7 @@ Different from [`Element.Input`](/packages/mdgriffith/elm-ui/latest/Element-Inpu
 
 # Width
 
-@docs TextFieldWidth, withWidth, full, shrink
+@docs TextFieldWidth, withWidth, widthFull, widthRelative
 
 
 # Accessibility
@@ -139,9 +139,7 @@ type alias PasswordOptions =
     }
 
 
-{-| To maintain fewer variations of similar-looking content, we opted to have only two sizes of text fields:
-One with the minimum to fit its contents, and the other filling the container.
-The `TextFieldWidth` type work with these two values.
+{-| Describes a compatible width.
 -}
 type TextFieldWidth
     = WidthFull
@@ -198,11 +196,9 @@ withPlaceholder placeholder (TextField prop opt) =
         { opt | placeholder = placeholder }
 
 
-{-| `TextField.withWidth` changes the width of the button to either have the minimum required for its contents or fill the parent horizontally.
+{-| `TextField.withWidth` changes the width of the field.
 
-    TextField.withWidth TextField.full someTextField
-
-**NOTE**: Default value is [`TextField.shrink`](#shrink)
+    TextField.withWidth TextField.widthFull someTextField
 
 -}
 withWidth : TextFieldWidth -> TextField msg -> TextField msg
@@ -269,10 +265,10 @@ setPasswordVisible isVisible ((TextField prop opt) as original) =
             original
 
 
-{-| The field's width will fill its container
+{-| The field's width will fill its container.
 -}
-full : TextFieldWidth
-full =
+widthFull : TextFieldWidth
+widthFull =
     WidthFull
 
 
@@ -281,8 +277,8 @@ full =
 **NOTE**: Default behaviour.
 
 -}
-shrink : TextFieldWidth
-shrink =
+widthRelative : TextFieldWidth
+widthRelative =
     WidthRelative
 
 

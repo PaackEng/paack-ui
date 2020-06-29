@@ -107,7 +107,7 @@ fullWidthStory cfg =
             "My TextField"
             "Some big text"
             |> TextField.setLabelVisible True
-            |> TextField.withWidth TextField.full
+            |> TextField.withWidth TextField.widthFull
             |> TextField.renderElement cfg
         , { note = """
 ```elm
@@ -121,7 +121,7 @@ TextField.singlelineText OnTextFieldChanged
         "My TextField"
         model.someFieldValue
     |> TextField.setLabelVisible True
-    |> TextField.withWidth TextField.full
+    |> TextField.withWidth TextField.widthFull
     |> TextField.renderElement renderCfg
 ```
 """
