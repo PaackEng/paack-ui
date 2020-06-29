@@ -75,7 +75,7 @@ import UI.Internal.NList as NList exposing (NList)
 import UI.Internal.Palette as Palette
 import UI.Internal.TypeNumbers as T
 import UI.ListView as ListView
-import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
+import UI.Palette as Palette exposing (brightnessMiddle, toneGray)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Text as Text exposing (Text)
 import UI.Utils.Element exposing (zeroPadding)
@@ -552,7 +552,7 @@ mobileView renderConfig headers responsiveOpt =
 headerRender : RenderConfig -> HeaderCell -> Element msg
 headerRender cfg { title, width } =
     Text.overline title
-        |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
+        |> Text.withColor (Palette.color toneGray brightnessMiddle)
         |> Text.renderElement cfg
         |> Element.el [ Element.width (widthToEl width) ]
 
