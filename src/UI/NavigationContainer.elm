@@ -38,7 +38,7 @@ Example of usage:
     getPageContainer page =
         case page of
             Page.Packages ->
-                { title = "Pacakges"
+                { title = "Packages"
                 , content = Nav.contentSingle Packages.view
                 , dialog = Nothing
                 , hasMenu = False
@@ -85,7 +85,7 @@ import Element exposing (Element)
 import Html exposing (Html)
 import UI.Button as Button exposing (Button)
 import UI.Icon as Icon exposing (Icon)
-import UI.Internal.Dialog as Dialog exposing (dialogMap)
+import UI.Internal.Dialog as Dialog
 import UI.Internal.Menu as Menu
 import UI.Internal.SideBar as SideBar
 import UI.Link exposing (Link)
@@ -99,14 +99,14 @@ import UI.Utils.Element as Element
 
 {-| This record must be generated with [`Nav.menuPage`](UI-NavigationContainer#menuPage)
 -}
-type alias MenuPage =
-    Menu.Page
+type MenuPage
+    = MenuPage Menu.Page
 
 
 {-| This record must be generated with [`Nav.menuAction`](UI-NavigationContainer#menuAction)
 -}
-type alias MenuAction msg =
-    Menu.Action msg
+type MenuAction msg
+    = MenuAction (Menu.Action msg)
 
 
 
@@ -115,7 +115,11 @@ type alias MenuAction msg =
 
 {-| Keep this one in your Model, it holds the current navigation state.
 -}
-type alias State =
+type State
+    = State StateRecord
+
+
+type alias StateRecord =
     { menuExpanded : Bool }
 
 
@@ -140,8 +144,8 @@ type Content msg
 {-| The `Nav.Dialog msg` is a record holding the description of a dialog.
 See [`Nav.dialog`](UI-NavigationContainer#dialog) to see how to create a dialog.
 -}
-type alias Dialog msg =
-    Dialog.Dialog msg
+type Dialog msg
+    = Dialog (Dialog.Dialog msg)
 
 
 {-| The `Nav.Container msg` describes the current page in its current state.
@@ -172,7 +176,11 @@ type alias Container msg =
 {-| The `Nav.Navigator` handles menu, dialogs and page viewing.
 It must be initialized using [`Nav.navigator`](UI-NavigationContainer#navigator).
 -}
-type alias Navigator page msg =
+type Navigator page msg
+    = Navigator (NavigatorRecord page msg)
+
+
+type alias NavigatorRecord page msg =
     { container : page -> Container msg
     , menu : Menu.Menu msg
     }
@@ -221,12 +229,12 @@ Therefore changing the list of items showed at the top of the sidebar.
 
 -}
 withMenuPages : List MenuPage -> Navigator page msg -> Navigator page msg
-withMenuPages pages nav =
+withMenuPages pages (Navigator nav) =
     let
         menuWithPages (Menu.Menu prop opt) =
-            Menu.Menu prop { opt | pages = pages }
+            Menu.Menu prop { opt | pages = List.map (\(MenuPage p) -> p) pages }
     in
-    { nav | menu = menuWithPages nav.menu }
+    Navigator { nav | menu = menuWithPages nav.menu }
 
 
 {-| `Nav.withMenuActions` replaces the list of the menu's actions.
@@ -244,12 +252,12 @@ Therefore changing the list of items showed at the bottom of the sidebar.
 
 -}
 withMenuActions : List (MenuAction msg) -> Navigator page msg -> Navigator page msg
-withMenuActions actions nav =
+withMenuActions actions (Navigator nav) =
     let
         menuWithActions (Menu.Menu prop opt) =
-            Menu.Menu prop { opt | actions = actions }
+            Menu.Menu prop { opt | actions = List.map (\(MenuAction a) -> a) actions }
     in
-    { nav | menu = menuWithActions nav.menu }
+    Navigator { nav | menu = menuWithActions nav.menu }
 
 
 {-| `Nav.withMenuLogo` replaces the logo shown on the menu.
@@ -263,13 +271,13 @@ The first parameter is a hint that exists for accessibility reasons.
 
 -}
 withMenuLogo : String -> Element msg -> Navigator page msg -> Navigator page msg
-withMenuLogo hint body nav =
+withMenuLogo hint body (Navigator nav) =
     let
         menuWithLogo (Menu.Menu prop opt) =
             Menu.Menu prop
                 { opt | logo = Just <| Menu.Logo hint body }
     in
-    { nav | menu = menuWithLogo nav.menu }
+    Navigator { nav | menu = menuWithLogo nav.menu }
 
 
 
@@ -308,10 +316,10 @@ contentMap applier data =
 {-| Given a message, apply an update to the [`Nav.State`](UI-NavigationContainer#State).
 -}
 stateUpdate : Msg -> State -> ( State, Cmd Msg )
-stateUpdate msg state =
+stateUpdate msg (State state) =
     case msg of
         ToggleMenu newVal ->
-            ( { state | menuExpanded = newVal }, Cmd.none )
+            ( State { state | menuExpanded = newVal }, Cmd.none )
 
 
 
@@ -325,7 +333,7 @@ stateUpdate msg state =
 -}
 stateInit : RenderConfig -> State
 stateInit cfg =
-    { menuExpanded = not <| RenderConfig.isMobile cfg }
+    State { menuExpanded = not <| RenderConfig.isMobile cfg }
 
 
 {-| `Nav.contentSingle` indicates that the current page is a simple single page.
@@ -369,7 +377,7 @@ contentStackChild prop body =
 -}
 menuPage : Icon -> Link -> Bool -> MenuPage
 menuPage icon link isCurrent =
-    Menu.Page icon link isCurrent
+    MenuPage <| Menu.Page icon link isCurrent
 
 
 {-| `Nav.menuPage` describes an action to [`Nav.withMenuActions`](UI-NavigationContainer#withMenuActions).
@@ -381,7 +389,7 @@ menuPage icon link isCurrent =
 -}
 menuAction : Icon -> msg -> MenuAction msg
 menuAction icon msg =
-    Menu.Action icon msg
+    MenuAction <| Menu.Action icon msg
 
 
 {-| `Nav.navigator` holds the minimum amount of information required for all the features (menu, dialogs, and page's layout) to work.
@@ -409,9 +417,10 @@ navigator :
     -> State
     -> (page -> Container msg)
     -> Navigator page msg
-navigator applier state pagesContainers =
-    Navigator pagesContainers
-        (menu applier state)
+navigator applier (State state) pagesContainers =
+    Navigator <|
+        NavigatorRecord pagesContainers
+            (menu applier state)
 
 
 {-| `Nav.dialog` constructs a [`Nav.Dialog`](UI-NavigationContainer#Dialog) from a title, a close message, and the dialog's view.
@@ -428,10 +437,11 @@ Clicking on the black layer also activates the closing message.
 -}
 dialog : String -> msg -> Element msg -> Dialog msg
 dialog title onClose body =
-    { title = title
-    , close = onClose
-    , body = body
-    }
+    Dialog
+        { title = title
+        , close = onClose
+        , body = body
+        }
 
 
 
@@ -451,7 +461,7 @@ toBrowserDocument :
     -> page
     -> Navigator page msg
     -> { body : List (Html msg), title : String }
-toBrowserDocument cfg page model =
+toBrowserDocument cfg page (Navigator model) =
     let
         container =
             model.container page
@@ -479,8 +489,8 @@ toBrowserDocument cfg page model =
 
         dialogView =
             case container.dialog of
-                Just state ->
-                    Dialog.view cfg state
+                Just (Dialog dialogState) ->
+                    Dialog.view cfg dialogState
 
                 Nothing ->
                     Element.none
@@ -509,7 +519,7 @@ toBrowserDocument cfg page model =
 -- Internals
 
 
-menu : (Msg -> msg) -> State -> Menu.Menu msg
+menu : (Msg -> msg) -> StateRecord -> Menu.Menu msg
 menu applier { menuExpanded } =
     Menu.default (ToggleMenu >> applier) menuExpanded
 
@@ -522,3 +532,8 @@ contentProps mainTitle content =
 
         ContentStackChild { title, goBackMsg, buttons } body ->
             ( body, Just ( goBackMsg, buttons ), title )
+
+
+dialogMap : (a -> b) -> Dialog a -> Dialog b
+dialogMap applier (Dialog dialogState) =
+    Dialog <| Dialog.dialogMap applier dialogState

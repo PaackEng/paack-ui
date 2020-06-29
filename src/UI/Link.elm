@@ -37,7 +37,7 @@ type alias Properties =
     { href : String }
 
 
-{-| The `Button msg` type is used for describing the component for later rendering.
+{-| The `Link msg` type is used for describing the component for later rendering.
 -}
 type Link
     = Link Properties Options
