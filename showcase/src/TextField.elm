@@ -50,7 +50,7 @@ usernameTextFieldStory cfg =
     story
         ( "Username"
         , TextField.username (always RootMsg.NoOp)
-            "Enter your email"
+            "Enter your username"
             "Value"
             |> TextField.setLabelVisible True
             |> TextField.renderElement cfg
@@ -61,10 +61,10 @@ type Msg
     | ...
 
 
--- Email
-TextField.email OnTextFieldChanged
-        "Enter your email"
-        model.emailValue
+-- Username
+TextField.username OnTextFieldChanged
+        "Enter your username"
+        model.usernameValue
     |> TextField.setLabelVisible true
     |> TextField.renderElement renderCfg
 ```
@@ -107,7 +107,7 @@ fullWidthStory cfg =
             "My TextField"
             "Some big text"
             |> TextField.setLabelVisible True
-            |> TextField.withWidth TextField.widthFull
+            |> TextField.withWidth TextField.full
             |> TextField.renderElement cfg
         , { note = """
 ```elm
@@ -121,7 +121,7 @@ TextField.singlelineText OnTextFieldChanged
         "My TextField"
         model.someFieldValue
     |> TextField.setLabelVisible True
-    |> TextField.withWidth TextField.widthFull
+    |> TextField.withWidth TextField.full
     |> TextField.renderElement renderCfg
 ```
 """

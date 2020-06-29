@@ -417,7 +417,7 @@ searchFieldView cfg searchField =
                     |> Maybe.map Tuple.first
                     |> Maybe.withDefault ""
                     |> TextField.search searchMsg label
-                    |> TextField.withWidth TextField.widthFull
+                    |> TextField.withWidth TextField.full
                     |> TextField.withPlaceholder label
                     |> TextField.withIcon (Icon.search "Search")
                     |> TextField.renderElement cfg

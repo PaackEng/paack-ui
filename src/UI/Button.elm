@@ -130,7 +130,7 @@ type EmbossedTone
 
 {-| Non-toggle buttons must-be styled. The currently available styles are Hyperlink and Embossed.
 
-A hyperlink-styled: See [`Button.hyperlink`](UI-Button#hyperlink).
+A hyperlink-styled: See [`Button.hyperlink`](#hyperlink).
 
 An embossed-styled button has paddings and hovering-effects.
 It's available through its sub-themes: Primary, Danger, Light, and Clear.
@@ -144,7 +144,7 @@ type ButtonStyle
 
 {-| To maintain fewer variations of similar-looking content, we opted to have only two sizes of buttons:
 One with the minimum to fit its contents, and the other filling the container.
-The `ButtonWidth` type describes these two values.
+The `ButtonWidth` type work with these two values.
 -}
 type ButtonWidth
     = WidthFull
@@ -185,7 +185,7 @@ toggle hint msg isEnabled =
 
 
 {-| This `Button.disabled` builds an embossed-looking, without-message, grayish-colored button.
-It's another approach for [`Button.withDisabledIf`](UI-Button#withDisabledIf), helping when you can't compose a message for the desired action at the occasion.
+It's another approach for [`Button.withDisabledIf`](#withDisabledIf), helping when you can't compose a message for the desired action at the occasion.
 
     case event of
         Just id ->
@@ -201,7 +201,7 @@ disabled body =
 
 
 {-| This `Button.success` builds an embossed-looking, without-message, greenish-colored button.
-It's another approach for [`Button.withSuccessIf`](UI-Button#withSuccessIf), helping when you can't compose a message for the desired action at the occasion.
+It's another approach for [`Button.withSuccessIf`](#withSuccessIf), helping when you can't compose a message for the desired action at the occasion.
 
     case event of
         Just id ->
@@ -233,7 +233,7 @@ cmd msg style body =
         defaultOptions
 
 
-{-| Similar to [`Button.cmd`](UI-Button#cmd), but instead of a message, it redirects to some path.
+{-| Similar to [`Button.cmd`](#cmd), but instead of a message, it redirects to some path.
 
     Button.fromLabel "Click this Link"
         |> Button.redirect "https://elm-lang.org/" Button.hyperlink
@@ -325,11 +325,11 @@ withDisabledIf condition button =
         button
 
 
-{-| With `Button.withWidth`, you'll be able to set one of the available values for width.
+{-| `Button.withWidth` changes the width of the button to either have the minimum required for its contents or fill the parent horizontally.
 
-    Button.withWidth Button.fill someButton
+    Button.withWidth Button.full someButton
 
-**NOTE**: Default value is [`Button.shrink`](UI-Button#shrink)
+**NOTE**: Default value is [`Button.shrink`](#shrink)
 
 -}
 withWidth : ButtonWidth -> Button msg -> Button msg
