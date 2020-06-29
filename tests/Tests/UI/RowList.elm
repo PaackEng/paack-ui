@@ -25,7 +25,7 @@ tests : Test
 tests =
     describe "UI.Button tests"
         [ withActionBar
-        , withOptions
+        , withItems
         , withSearchField
         ]
 
@@ -62,8 +62,8 @@ withActionBar =
         ]
 
 
-withOptions : Test
-withOptions =
+withItems : Test
+withItems =
     let
         lonewolf =
             Whatever 222 "Wolf"
@@ -73,9 +73,9 @@ withOptions =
 
         component =
             RowList.selectList Select mockView
-                |> RowList.withOptions options
+                |> RowList.withItems options
     in
-    describe "#withOptions"
+    describe "#withItems"
         [ test "Options are visible" <|
             \_ ->
                 component
@@ -146,7 +146,7 @@ withSearchField =
         , test "Having a filter does filter" <|
             \_ ->
                 component (Just ( "Dog", filter ))
-                    |> RowList.withOptions exampleOpt
+                    |> RowList.withItems exampleOpt
                     |> RowList.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> Query.find [ Selector.text "OPT" ]

@@ -1,7 +1,7 @@
 module UI.RowList exposing
     ( RowList, selectList
     , ToggleableConfig, ToggleableCover, toggleableList
-    , withOptions, withSelected
+    , withItems, withSelected
     , SearchConfig, withSearchField, ActionConfig, withActionBar
     , withWidth
     , renderElement
@@ -10,14 +10,14 @@ module UI.RowList exposing
 {-| `UI.RowList` is a styled searchable row list.
 The main variation (select-lists) has the capability of having one of its rows selected.
 
-The developer does the rendering of the row elements.
+The developer is responsible for coding the row's view.
 While this component then applies the borders and the click event.
 Also, it can optionally filter when having a search bar, and add an action bar.
 
     view : RenderConfig -> Model -> Element Msg
     view renderConfig model =
         RowList.selectList Msg.SelectElement elementView
-            |> RowList.withOptions model.myListElements
+            |> RowList.withItems model.myListElements
             |> RowList.withSearchField
                 { label = "Search for elements matching name.."
                 , searchMsg = Msg.FilterSet
@@ -57,7 +57,7 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
 # Options
 
-@docs withOptions, withSelected
+@docs withItems, withSelected
 
 
 # Extra elements
@@ -219,7 +219,7 @@ We recommend using `UI.Table` instead, as it uses toggleable-lists for its respo
                 [ ( "Age", Element.text age ) ]
         , selectMsg = Msg.ElementSelect
         }
-        |> RowList.withOptions model.items
+        |> RowList.withItems model.items
         |> RowList.withSelected isElementSelected
         |> RowList.renderElement renderConfig
 
@@ -265,15 +265,15 @@ withActionBar config (SelectList prop opt) =
 
 {-| Replaces the component's list of elements.
 
-    RowList.withOptions
+    RowList.withItems
         [ { id = 0, name = "Catarina" }
         , { id = 1, name = "Gabriel" }
         ]
         someRowList
 
 -}
-withOptions : List object -> RowList object msg -> RowList object msg
-withOptions items (SelectList prop opt) =
+withItems : List object -> RowList object msg -> RowList object msg
+withItems items (SelectList prop opt) =
     SelectList prop { opt | items = items }
 
 

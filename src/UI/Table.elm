@@ -544,7 +544,7 @@ mobileView renderConfig headers responsiveOpt =
         , toDetails = details
         , selectMsg = responsiveOpt.selectMsg
         }
-        |> RowList.withOptions responsiveOpt.items
+        |> RowList.withItems responsiveOpt.items
         |> RowList.withSelected responsiveOpt.isSelected
         |> RowList.renderElement renderConfig
 
