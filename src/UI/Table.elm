@@ -2,10 +2,12 @@ module UI.Table exposing
     ( Table, table
     , HeaderRow, headersEnd, header
     , Row, withStaticRows, rowEnd, cellFromText, cellFromButton
-    , OptRow
-    , CellWidth, withWidth, withCellsWidth, cellWidthEnd, cellWidthPixels, cellWidthPortion
     , withResponsiveRows, ResponsiveConfig, MobileCover
-    , withCellsDetails, cellMobileDetailsEnd, cellMobileDetailsHide, cellMobileDetailsShow, cellMobileDetailsShowIf
+    , OptRow
+    , ColumnWidth, withColumnsWidth, columnsWidthEnd, columnWidthPixels, columnWidthPortion
+    , withColumnsDetails, columnsMobileDetailsEnd, columnMobileDetailsHide, columnMobileDetailsShow, columnMobileDetailsShowIf
+    , ColumnFilter, withColumnsFilter, columnsFilterEnd, columnFiltering, FilterEditConfig, columnFilterEditing, columnFilterEmpty
+    , withWidth
     , renderElement
     )
 
@@ -41,24 +43,34 @@ module UI.Table exposing
 @docs Row, withStaticRows, rowEnd, cellFromText, cellFromButton
 
 
-# Columns parameteres
-
-@docs OptRow
-
-
-## Cell's width
-
-@docs CellWidth, withWidth, withCellsWidth, cellWidthEnd, cellWidthPixels, cellWidthPortion
-
-
-# Mobile
+## Mobile's Rows
 
 @docs withResponsiveRows, ResponsiveConfig, MobileCover
 
 
-## Cell's details
+# Columns' parameters
 
-@docs withCellsDetails, cellMobileDetailsEnd, cellMobileDetailsHide, cellMobileDetailsShow, cellMobileDetailsShowIf
+@docs OptRow
+
+
+## Columns' width
+
+@docs ColumnWidth, withColumnsWidth, columnsWidthEnd, columnWidthPixels, columnWidthPortion
+
+
+## Mobile's details
+
+@docs withColumnsDetails, columnsMobileDetailsEnd, columnMobileDetailsHide, columnMobileDetailsShow, columnMobileDetailsShowIf
+
+
+## Filterable Row
+
+@docs ColumnFilter, withColumnsFilter, columnsFilterEnd, columnFiltering, FilterEditConfig, columnFilterEditing, columnFilterEmpty
+
+
+# Table's width
+
+@docs withWidth
 
 
 # Rendering
@@ -67,28 +79,34 @@ module UI.Table exposing
 
 -}
 
-import Element exposing (Element, fill, fillPortion, px, shrink)
+import Element exposing (Attribute, Element, fill, fillPortion, minimum, px, shrink)
 import Element.Border as Border
+import Element.Events as Events
+import Html.Attributes as HtmlAttrs
 import UI.Button as Button exposing (Button)
+import UI.Icon as Icon
 import UI.Internal.Basics exposing (..)
 import UI.Internal.NList as NList exposing (NList)
 import UI.Internal.Palette as Palette
+import UI.Internal.Primitives as Primitives
 import UI.Internal.TypeNumbers as T
 import UI.ListView as ListView
 import UI.Palette as Palette exposing (brightnessMiddle, toneGray)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
+import UI.Size as Size
 import UI.Text as Text exposing (Text)
+import UI.TextField as TextField
 import UI.Utils.Element exposing (zeroPadding)
 
 
 {-| The `Table msg object columns` type is used for describing the component for later rendering.
 -}
 type Table msg object columns
-    = Table (Properties columns) (Options msg object columns)
+    = Table (Properties msg columns) (Options msg object columns)
 
 
-type alias Properties columns =
-    { headers : HeaderRow columns
+type alias Properties msg columns =
+    { headers : HeaderRow msg columns
     }
 
 
@@ -142,27 +160,58 @@ type alias Row msg columns =
     NList (Cell msg) columns
 
 
-{-| `HeaderRow columns` upholds every label from a table's header.
+{-| `HeaderRow msg columns` upholds every label from a table's header.
 This is a type-safe sized-array.
 
 Use [`Table.headersEnd`](UI-Table#headersEnd) and [`Table.header`](UI-table#header) to build it.
 
 -}
-type alias HeaderRow columns =
-    NList HeaderCell columns
+type alias HeaderRow msg columns =
+    NList (HeaderCell msg) columns
 
 
 {-| `OptRow value columns` upholds option-applying rows.
-E.g., `value` is replaced with [`CellWidth`](UI-Table#CellWidth) for [`Table.withCellsWidth`](UI-Table#withCellsWidth).
+E.g., `value` is replaced with [`ColumnWidth`](UI-Table#ColumnWidth) for [`Table.withColumnsWidth`](UI-Table#withColumnsWidth).
 -}
 type alias OptRow value columns =
     NList (Maybe value) columns
 
 
-type alias HeaderCell =
+type alias HeaderCell msg =
     { title : String
-    , width : CellWidth
+    , width : ColumnWidth
     , detailsVisible : Bool
+    , filter : ColumnFilter msg
+    }
+
+
+{-| `ColumnFilter` specifies how filters are applied in a column basis.
+-}
+type ColumnFilter msg
+    = FilterUnavailable
+    | FilterEmpty msg -- msg: Toggle
+    | FilterEditing (FilterEditConfig msg)
+    | FilterSet msg String -- msg: Clear
+
+
+{-| This record aggregates all required rendering information and possible actions when the user is editing some column's filtering field.
+
+    { edited = Just "Bookshelf"
+    , applyMsg = Msg.SomeColumnApply
+    , clearMsg = Msg.SomeColumnClear
+    , discardMsg = Msg.SomeColumnDiscard
+    , editMsg = Msg.SomeColumnEdit column
+    , current = Just "Book"
+    }
+
+-}
+type alias FilterEditConfig msg =
+    { edited : Maybe String
+    , applyMsg : msg
+    , clearMsg : msg
+    , discardMsg : msg
+    , editMsg : String -> msg
+    , current : Maybe String
     }
 
 
@@ -171,9 +220,9 @@ type Cell msg
     | CellButton (Button msg)
 
 
-{-| `CellWidth` specifies a cell's width.
+{-| `ColumnWidth` specifies a cell's width.
 -}
-type CellWidth
+type ColumnWidth
     = WidthPixels Int
     | WidthPortion Int
 
@@ -183,7 +232,7 @@ type CellWidth
     Table.header "Barcode" <| Table.header "Brand" <| Table.header "Manage" <| Table.headersEnd
 
 -}
-headersEnd : HeaderRow T.Zero
+headersEnd : HeaderRow msg T.Zero
 headersEnd =
     NList.empty
 
@@ -207,9 +256,15 @@ rowEnd =
     Table.header "Name" <| Table.header "Age" <| Table.header "Country" <| Table.headersEnd
 
 -}
-header : String -> HeaderRow columns -> HeaderRow (T.Increase columns)
+header : String -> HeaderRow msg columns -> HeaderRow msg (T.Increase columns)
 header head tail =
-    NList.cons { title = head, width = WidthPortion 1, detailsVisible = True } tail
+    NList.cons
+        { title = head
+        , width = WidthPortion 1
+        , detailsVisible = True
+        , filter = FilterUnavailable
+        }
+        tail
 
 
 {-| Transforms a `UI.Text` into a cell prepending it to a row.
@@ -249,7 +304,7 @@ So, here the building of tables start.
     Table.table (header "Name" <| header "Age" <| headersEnd)
 
 -}
-table : HeaderRow columns -> Table msg object columns
+table : HeaderRow msg columns -> Table msg object columns
 table headers =
     Table { headers = headers } defaultOptions
 
@@ -318,13 +373,13 @@ withWidth width (Table prop opt_) =
 
 {-| Applies a different width for each column in the table.
 
-    Table.withCellsWidth
-        (cellWidthPortion 4 <| cellWidthPortion 5 <| cellWidthEnd)
+    Table.withColumnsWidth
+        (columnWidthPortion 4 <| columnWidthPortion 5 <| columnsWidthEnd)
         someTwoColumnsTable
 
 -}
-withCellsWidth : OptRow CellWidth columns -> Table msg object columns -> Table msg object columns
-withCellsWidth row (Table prop opt_) =
+withColumnsWidth : OptRow ColumnWidth columns -> Table msg object columns -> Table msg object columns
+withColumnsWidth row (Table prop opt_) =
     let
         mergeWidth oldHeader maybeWidth =
             case maybeWidth of
@@ -339,20 +394,20 @@ withCellsWidth row (Table prop opt_) =
 
 {-| Selects which columns should show or hide when toggling the mobile's details.
 
-    Table.withCellsDetails
-        (cellMobileDetailsEnd
-            |> cellMobileDetailsShow
+    Table.withColumnsDetails
+        (columnsMobileDetailsEnd
+            |> columnMobileDetailsShow
             -- THIRD COLUMN
-            |> cellMobileDetailsShow
+            |> columnMobileDetailsShow
             -- SECOND COLUMN
-            |> cellMobileDetailsHide
+            |> columnMobileDetailsHide
          -- FIRST COLUMN
         )
         someThreeColumnsTable
 
 -}
-withCellsDetails : OptRow Bool columns -> Table msg object columns -> Table msg object columns
-withCellsDetails row (Table prop opt_) =
+withColumnsDetails : OptRow Bool columns -> Table msg object columns -> Table msg object columns
+withColumnsDetails row (Table prop opt_) =
     let
         mergeVisibility oldHeader maybeVisibility =
             case maybeVisibility of
@@ -365,92 +420,180 @@ withCellsDetails row (Table prop opt_) =
     Table { prop | headers = NList.map2 mergeVisibility prop.headers row } opt_
 
 
-{-| Similar to [`Element.fillPortion`](/packages/mdgriffith/elm-ui/latest/Element#fillPortion) but applied to an entire Table's column.
+{-| Allows the user to edit filters per column.
 
-    cellWidthEnd
-        |> cellWidthPortion 20 -- THIRD COLUMN
-        |> cellWidthPortion 31 -- SECOND COLUMN
-        |> cellWidthPortion 17 -- FIRST COLUMN
+    Table.withColumnsFilter
+        (columnsFilterEnd
+            |> columnFilterEditing
+                { edited = Just "Bookshelf"
+                , applyMsg = Msg.ColumnCApply
+                , clearMsg = Msg.ColumnCClear
+                , discardMsg = Msg.ColumnCDiscard
+                , editMsg = Msg.ColumnCEdit
+                , current = Just "Book"
+                }
+            |> columnFiltering Msg.ColumnBClear "Dan Brown"
+            |> columnFilterEmpty Msg.FilterColumnA
+        )
+        someThreeColumnsTable
 
 -}
-cellWidthPortion : Int -> OptRow CellWidth columns -> OptRow CellWidth (T.Increase columns)
-cellWidthPortion int accu =
+withColumnsFilter : OptRow (ColumnFilter msg) columns -> Table msg object columns -> Table msg object columns
+withColumnsFilter row (Table prop opt_) =
+    let
+        mergeFilter oldHeader maybeVisibility =
+            case maybeVisibility of
+                Just filter ->
+                    { oldHeader | filter = filter }
+
+                Nothing ->
+                    oldHeader
+    in
+    Table { prop | headers = NList.map2 mergeFilter prop.headers row } opt_
+
+
+{-| Similar to [`Element.fillPortion`](/packages/mdgriffith/elm-ui/latest/Element#fillPortion) but applied to an entire Table's column.
+
+    columnsWidthEnd
+        |> columnWidthPortion 20 -- THIRD COLUMN
+        |> columnWidthPortion 31 -- SECOND COLUMN
+        |> columnWidthPortion 17 -- FIRST COLUMN
+
+-}
+columnWidthPortion : Int -> OptRow ColumnWidth columns -> OptRow ColumnWidth (T.Increase columns)
+columnWidthPortion int accu =
     opt (WidthPortion int) accu
 
 
 {-| Similar to [`Element.px`](/packages/mdgriffith/elm-ui/latest/Element#px) but applied to an entire Table's column.
 
-    cellWidthEnd
-        |> cellWidthPixels 320 -- THIRD COLUMN
-        |> cellWidthPixels 240 -- SECOND COLUMN
-        |> cellWidthPixels 480 -- FIRST COLUMN
+    columnsWidthEnd
+        |> columnWidthPixels 320 -- THIRD COLUMN
+        |> columnWidthPixels 240 -- SECOND COLUMN
+        |> columnWidthPixels 480 -- FIRST COLUMN
 
 -}
-cellWidthPixels : Int -> OptRow CellWidth columns -> OptRow CellWidth (T.Increase columns)
-cellWidthPixels int accu =
+columnWidthPixels : Int -> OptRow ColumnWidth columns -> OptRow ColumnWidth (T.Increase columns)
+columnWidthPixels int accu =
     opt (WidthPixels int) accu
 
 
-{-| Marks the end of a [`OptRow CellWidth`](UI-Table#CellWidth).
+{-| Marks the end of a [`OptRow ColumnWidth`](UI-Table#ColumnWidth).
 
-    cellWidthPortion 3 <| cellWidthPixels 240 <| cellWidthPortion 2 <| cellWidthEnd
+    columnWidthPortion 3 <| columnWidthPixels 240 <| columnWidthPortion 2 <| columnsWidthEnd
 
 -}
-cellWidthEnd : OptRow CellWidth T.Zero
-cellWidthEnd =
+columnsWidthEnd : OptRow ColumnWidth T.Zero
+columnsWidthEnd =
     optsEnd
 
 
-{-| Marks the end of a [`OptRow CellWidth`](UI-Table#CellWidth).
+{-| Marks the end of a [`OptRow ColumnWidth`](UI-Table#ColumnWidth).
 
-    cellWidthEnd
-        |> cellWidthPortion 2 -- THIRD COLUMN
-        |> cellWidthPixels 240 -- SECOND COLUMN
-        |> cellWidthPortion 3 -- FIRST COLUMN
+    columnsWidthEnd
+        |> columnWidthPortion 2 -- THIRD COLUMN
+        |> columnWidthPixels 240 -- SECOND COLUMN
+        |> columnWidthPortion 3 -- FIRST COLUMN
 
 -}
-cellMobileDetailsEnd : OptRow Bool T.Zero
-cellMobileDetailsEnd =
+columnsMobileDetailsEnd : OptRow Bool T.Zero
+columnsMobileDetailsEnd =
     optsEnd
 
 
 {-| Defines that an entire column is to show in the mobile's details of the selected row.
 
-    cellMobileDetailsEnd
-        |> cellMobileDetailsShow -- SHOW THE THIRD COLUMN
-        |> cellMobileDetailsHide -- HIDE THE SECOND COLUMN
-        |> cellMobileDetailsHide -- HIDE THE FIRST COLUMN
+    columnsMobileDetailsEnd
+        |> columnMobileDetailsShow -- SHOW THE THIRD COLUMN
+        |> columnMobileDetailsHide -- HIDE THE SECOND COLUMN
+        |> columnMobileDetailsHide -- HIDE THE FIRST COLUMN
 
 -}
-cellMobileDetailsShow : OptRow Bool columns -> OptRow Bool (T.Increase columns)
-cellMobileDetailsShow accu =
+columnMobileDetailsShow : OptRow Bool columns -> OptRow Bool (T.Increase columns)
+columnMobileDetailsShow accu =
     opt True accu
 
 
 {-| Defines that an entire column won't appear in the mobile's details of the selected row.
 
-    cellMobileDetailsEnd
-        |> cellMobileDetailsShow -- SHOW THE THIRD COLUMN
-        |> cellMobileDetailsHide -- HIDE THE SECOND COLUMN
-        |> cellMobileDetailsHide -- HIDE THE FIRST COLUMN
+    columnsMobileDetailsEnd
+        |> columnMobileDetailsShow -- SHOW THE THIRD COLUMN
+        |> columnMobileDetailsHide -- HIDE THE SECOND COLUMN
+        |> columnMobileDetailsHide -- HIDE THE FIRST COLUMN
 
 -}
-cellMobileDetailsHide : OptRow Bool columns -> OptRow Bool (T.Increase columns)
-cellMobileDetailsHide accu =
+columnMobileDetailsHide : OptRow Bool columns -> OptRow Bool (T.Increase columns)
+columnMobileDetailsHide accu =
     opt False accu
 
 
 {-| Given a condition, defines that an entire column appears or not in the mobile's details of the selected row.
 
-    cellMobileDetailsEnd
-        |> cellMobileDetailsShow -- SHOW THE THIRD COLUMN
-        |> cellMobileDetailsShowIf (isRainingInNewYork model) -- MAYBE HIDE THE SECOND COLUMN
-        |> cellMobileDetailsHide -- HIDE THE FIRST COLUMN
+    columnsMobileDetailsEnd
+        |> columnMobileDetailsShow -- SHOW THE THIRD COLUMN
+        |> columnMobileDetailsShowIf (isRainingInNewYork model) -- MAYBE HIDE THE SECOND COLUMN
+        |> columnMobileDetailsHide -- HIDE THE FIRST COLUMN
 
 -}
-cellMobileDetailsShowIf : Bool -> OptRow Bool columns -> OptRow Bool (T.Increase columns)
-cellMobileDetailsShowIf condition accu =
+columnMobileDetailsShowIf : Bool -> OptRow Bool columns -> OptRow Bool (T.Increase columns)
+columnMobileDetailsShowIf condition accu =
     opt condition accu
+
+
+{-| Marks the end of a [`OptRow ColumnFilter`](UI-Table#ColumnFilter).
+
+    columnFilterEmpty Msg.FilterColumnB <| columnFilterEmpty Msg.FilterColumnA <| columnsFilterEnd
+
+-}
+columnsFilterEnd : OptRow (ColumnFilter msg) T.Zero
+columnsFilterEnd =
+    optsEnd
+
+
+{-| This column can be filtered, but currently no filter was applied.
+
+    columnsFilterEnd
+        |> columnFilterEmpty Msg.FilterColumnC
+        |> columnFilterEmpty Msg.FilterColumnB
+        |> columnFilterEmpty Msg.FilterColumnA
+
+-}
+columnFilterEmpty : msg -> OptRow (ColumnFilter msg) columns -> OptRow (ColumnFilter msg) (T.Increase columns)
+columnFilterEmpty toggleMsg accu =
+    opt (FilterEmpty toggleMsg) accu
+
+
+{-| The user is currently editing the value used to filter this column.
+
+    columnsFilterEnd
+        |> columnFilterEditing
+            { edited = Just "Bookshelf"
+            , applyMsg = Msg.ColumnCApply
+            , clearMsg = Msg.ColumnCClear
+            , discardMsg = Msg.ColumnCDiscard
+            , editMsg = Msg.ColumnCEdit
+            , current = Just "Book"
+            }
+        |> columnFilterEmpty Msg.FilterColumnB
+        |> columnFilterEmpty Msg.FilterColumnA
+
+-}
+columnFilterEditing : FilterEditConfig msg -> OptRow (ColumnFilter msg) columns -> OptRow (ColumnFilter msg) (T.Increase columns)
+columnFilterEditing config accu =
+    opt (FilterEditing config) accu
+
+
+{-| This column is currently being filtered.
+
+    columnsFilterEnd
+        |> columnFilterEmpty Msg.FilterColumnC
+        |> columnFiltering Msg.ColumnBClear "Dan Brown"
+        |> columnFilterEmpty Msg.FilterColumnA
+
+-}
+columnFiltering : msg -> String -> OptRow (ColumnFilter msg) columns -> OptRow (ColumnFilter msg) (T.Increase columns)
+columnFiltering clearMsg current accu =
+    opt (FilterSet clearMsg current) accu
 
 
 
@@ -480,14 +623,17 @@ renderElement cfg (Table { headers } { rows, width }) =
 -- Internals
 
 
-desktopView : RenderConfig -> Bool -> HeaderRow columns -> Element.Length -> List (Row msg columns) -> Element msg
+desktopView : RenderConfig -> Bool -> HeaderRow msg columns -> Element.Length -> List (Row msg columns) -> Element msg
 desktopView cfg responsive headers width desktopRows =
     let
         rowRender row =
             row
                 |> NList.map2 (cellRender cfg) headers
                 |> NList.toList
-                |> Element.row [ Element.spacing 4, Element.width fill ]
+                |> Element.row
+                    [ Element.spacing 16
+                    , Element.width fill
+                    ]
     in
     desktopRows
         |> List.map rowRender
@@ -496,15 +642,15 @@ desktopView cfg responsive headers width desktopRows =
                 |> NList.map (headerRender cfg)
                 |> NList.toList
                 |> Element.row
-                    [ Element.spacing 4
+                    [ Element.spacing 16
                     , Element.width fill
-                    , Element.paddingEach { bottom = 9, top = 0, left = 0, right = 0 }
+                    , Element.paddingEach { bottom = 7, top = 0, left = 0, right = 0 }
                     , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
                     , Border.color Palette.gray.lightest
                     ]
             )
         |> Element.column
-            [ Element.spacing 16
+            [ Element.spacing 14
             , Element.width width
             , Element.paddingEach <|
                 ifThenElse responsive
@@ -513,7 +659,7 @@ desktopView cfg responsive headers width desktopRows =
             ]
 
 
-mobileView : RenderConfig -> HeaderRow columns -> ResponsiveConfig msg object columns -> Element msg
+mobileView : RenderConfig -> HeaderRow msg columns -> ResponsiveConfig msg object columns -> Element msg
 mobileView renderConfig headers responsiveOpt =
     let
         rowMap object =
@@ -549,33 +695,156 @@ mobileView renderConfig headers responsiveOpt =
         |> ListView.renderElement renderConfig
 
 
-headerRender : RenderConfig -> HeaderCell -> Element msg
-headerRender cfg { title, width } =
+headerRender : RenderConfig -> HeaderCell msg -> Element msg
+headerRender cfg { title, width, filter } =
+    cellCrop width <|
+        case filter of
+            FilterUnavailable ->
+                simpleHeaderRender cfg title
+
+            FilterEmpty toggleMsg ->
+                Button.fromNested title Icon.add
+                    |> Button.cmd toggleMsg Button.light
+                    |> Button.withWidth Button.widthFull
+                    |> Button.withSize Size.small
+                    |> Button.renderElement cfg
+
+            FilterEditing filterConfig ->
+                filterEditing cfg width title filterConfig
+
+            FilterSet clearMsg _ ->
+                Button.fromNested title Icon.close
+                    |> Button.cmd clearMsg Button.primary
+                    |> Button.withWidth Button.widthFull
+                    |> Button.withSize Size.small
+                    |> Button.renderElement cfg
+
+
+simpleHeaderRender : RenderConfig -> String -> Element msg
+simpleHeaderRender cfg title =
     Text.overline title
         |> Text.withColor (Palette.color toneGray brightnessMiddle)
         |> Text.renderElement cfg
-        |> Element.el [ Element.width (widthToEl width) ]
+
+
+cellCrop : ColumnWidth -> Element msg -> Element msg
+cellCrop width =
+    Element.el
+        [ Element.width (widthToEl width)
+        , Element.height (shrink |> minimum 1)
+        , Element.clipX
+        , Element.paddingEach { zeroPadding | bottom = 2 } -- Remove unwanted scrollbars, why tough IDK...
+        , Element.alignTop
+        ]
+
+
+filterEditing : RenderConfig -> ColumnWidth -> String -> FilterEditConfig msg -> Element msg
+filterEditing cfg width title { clearMsg, applyMsg, editMsg, discardMsg, current, edited } =
+    Element.column []
+        [ overlayBackground discardMsg
+        , Element.column
+            [ positionFixed
+            , zIndex 9
+            , Element.width (widthToEl width)
+            , Element.alignTop
+            , Palette.mainBackground
+            , Primitives.roundedBorders
+            ]
+            [ Element.row
+                [ Element.paddingEach { top = 10, left = 12, right = 10, bottom = 7 }
+                , Element.width fill
+                , Border.color Palette.gray.lighter
+                , Border.widthEach { zeroPadding | bottom = 1 }
+                ]
+                [ Text.overline title
+                    |> Text.renderElement cfg
+                , Button.fromIcon (Icon.close "Close")
+                    |> Button.cmd discardMsg Button.clear
+                    |> Button.withSize Size.extraSmall
+                    |> Button.renderElement cfg
+                ]
+            , Element.column
+                [ Element.width fill
+                , Element.padding 12
+                , Element.spacing 20
+                ]
+                [ edited
+                    |> maybeNotThen current
+                    |> Maybe.withDefault ""
+                    |> TextField.singlelineText editMsg title
+                    |> TextField.withWidth TextField.widthFull
+                    |> TextField.renderElement cfg
+                , filterEditingButton cfg applyMsg clearMsg edited
+                ]
+            ]
+        ]
+
+
+filterEditingButton : RenderConfig -> msg -> msg -> Maybe String -> Element msg
+filterEditingButton cfg applyMsg clearMsg edited =
+    let
+        clearBtn =
+            Button.fromLabel "Clear"
+                |> Button.cmd clearMsg Button.danger
+                |> Button.withSize Size.extraSmall
+                |> Button.renderElement cfg
+
+        applyBtn =
+            Button.fromLabel "Apply"
+                |> Button.cmd applyMsg Button.primary
+                |> Button.withSize Size.extraSmall
+                |> Button.renderElement cfg
+
+        disabledBtn =
+            Button.fromLabel "Apply"
+                |> Button.disabled
+                |> Button.withSize Size.extraSmall
+                |> Button.renderElement cfg
+    in
+    case edited of
+        Just "" ->
+            clearBtn
+
+        Just _ ->
+            Element.row [ Element.spacing 8 ] [ applyBtn, clearBtn ]
+
+        Nothing ->
+            disabledBtn
+
+
+overlayBackground : msg -> Element msg
+overlayBackground onClickMsg =
+    Element.el
+        [ positionFixed
+        , zIndex 8
+        , Palette.overlayBackground
+        , Element.htmlAttribute <| HtmlAttrs.style "top" "0"
+        , Element.htmlAttribute <| HtmlAttrs.style "left" "0"
+        , Element.htmlAttribute <| HtmlAttrs.style "width" "100vw"
+        , Element.htmlAttribute <| HtmlAttrs.style "height" "100vh"
+        , Events.onClick onClickMsg
+        ]
+        Element.none
 
 
 detailRender : RenderConfig -> Cell msg -> Element msg
 detailRender cfg cell_ =
     case cell_ of
         CellText text ->
-            text
-                |> Text.renderElement cfg
+            Text.renderElement cfg text
 
         CellButton button ->
             Button.renderElement cfg button
 
 
-cellRender : RenderConfig -> HeaderCell -> Cell msg -> Element msg
+cellRender : RenderConfig -> HeaderCell msg -> Cell msg -> Element msg
 cellRender cfg { width } cell_ =
     cell_
         |> detailRender cfg
-        |> Element.el [ Element.width (widthToEl width) ]
+        |> cellCrop width
 
 
-widthToEl : CellWidth -> Element.Length
+widthToEl : ColumnWidth -> Element.Length
 widthToEl width =
     case width of
         WidthPortion int ->
@@ -600,3 +869,13 @@ optsEnd =
 opt : value -> OptRow value columns -> OptRow value (T.Increase columns)
 opt head tail =
     NList.cons (Just head) tail
+
+
+positionFixed : Attribute msg
+positionFixed =
+    Element.htmlAttribute <| HtmlAttrs.style "position" "fixed"
+
+
+zIndex : Int -> Attribute msg
+zIndex val =
+    Element.htmlAttribute <| HtmlAttrs.style "z-index" (String.fromInt val)

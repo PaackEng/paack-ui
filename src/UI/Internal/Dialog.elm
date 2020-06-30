@@ -1,7 +1,6 @@
 module UI.Internal.Dialog exposing (Dialog, dialogMap, view)
 
-import Element exposing (Attribute, Element, fill, px, rgb255, shrink)
-import Element.Background as Background
+import Element exposing (Element, fill, px, shrink)
 import Element.Events as Events
 import UI.Icon as Icon
 import UI.Internal.Palette as Palette
@@ -53,7 +52,7 @@ desktopDialogView cfg { title, body, close } =
         , Element.centerY
         , Element.centerX
         , Element.spacing 8
-        , whiteBg
+        , Palette.mainBackground
         ]
         [ desktopHeaderRow cfg close title
         , body
@@ -85,7 +84,7 @@ mobileView cfg { title, body, close } =
         , Element.height fill
         , Element.alignTop
         , Element.spacing 8
-        , whiteBg
+        , Palette.mainBackground
         ]
         [ mobileHeaderRow cfg close title
         , body
@@ -108,19 +107,6 @@ mobileHeaderRow cfg close title =
             title
         , closeButton cfg close
         ]
-
-
-whiteBg : Attribute msg
-whiteBg =
-    -- NOTE: MAIN LAYOUT'S BACKGROUND COLOR
-    Background.color <| rgb255 255 255 255
-
-
-blackBg : Attribute msg
-blackBg =
-    Palette.gray.darkest
-        |> Element.colorSetOpacity 0.85
-        |> Background.color
 
 
 titleText : RenderConfig -> RectangleSides -> String -> Element msg
@@ -155,7 +141,7 @@ blackBlock close =
     Element.el
         [ Element.width fill
         , Element.height fill
-        , blackBg
+        , Palette.overlayBackground
         , Events.onClick close
         ]
         Element.none

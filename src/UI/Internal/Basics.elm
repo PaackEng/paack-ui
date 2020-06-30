@@ -47,3 +47,13 @@ maybeToList maybeSomething =
 
         Nothing ->
             []
+
+
+maybeNotThen : Maybe a -> Maybe a -> Maybe a
+maybeNotThen replacement primary =
+    case primary of
+        Just sth ->
+            Just sth
+
+        Nothing ->
+            replacement
