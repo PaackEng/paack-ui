@@ -179,13 +179,13 @@ headerView cfg toggleMsg logo =
         logoEl =
             case logo of
                 Just { hint, body } ->
-                    [ body ]
-                        |> Element.column
-                            [ paddingEach { top = 12, left = 0, right = 20, bottom = 0 }
-                            , width fill
-                            , ARIA.roleAttr ARIA.roleImage
-                            , ARIA.labelAttr hint
-                            ]
+                    Element.column
+                        ((ARIA.toElementAttributes <| ARIA.roleImage hint)
+                            ++ [ paddingEach { top = 12, left = 0, right = 20, bottom = 0 }
+                               , width fill
+                               ]
+                        )
+                        [ body ]
 
                 Nothing ->
                     Element.none
@@ -219,8 +219,8 @@ headerButtonAttr toggleMsg boxWidth padY =
     , Font.center
     , Events.onClick toggleMsg
     , Element.pointer
-    , ARIA.roleAttr ARIA.roleButton -- TODO: Add to tests
     ]
+        ++ ARIA.toElementAttributes ARIA.roleButton
 
 
 pagesView : RenderConfig -> List Menu.Page -> Bool -> Element msg
@@ -353,9 +353,9 @@ actionItem cfg icon msg =
             [ width fill
             , spacing 4
             , Element.pointer
-            , ARIA.roleAttr ARIA.roleButton -- TODO: Add to tests
             , Events.onClick msg
             ]
+                ++ ARIA.toElementAttributes ARIA.roleButton
     in
     Element.row attrs
         [ icon
@@ -379,9 +379,9 @@ slimActionItem cfg icon msg =
         |> Element.el
             (slimIconAttr
                 ++ [ Element.pointer
-                   , ARIA.roleAttr ARIA.roleButton -- TODO: Check on tests
                    , Events.onClick msg
                    ]
+                ++ ARIA.toElementAttributes ARIA.roleButton
             )
 
 

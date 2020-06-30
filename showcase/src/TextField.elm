@@ -50,7 +50,7 @@ usernameTextFieldStory cfg =
     story
         ( "Username"
         , TextField.username (always RootMsg.NoOp)
-            "Enter your email"
+            "Enter your username"
             "Value"
             |> TextField.setLabelVisible True
             |> TextField.renderElement cfg
@@ -61,10 +61,10 @@ type Msg
     | ...
 
 
--- Email
-TextField.email OnTextFieldChanged
-        "Enter your email"
-        model.emailValue
+-- Username
+TextField.username OnTextFieldChanged
+        "Enter your username"
+        model.usernameValue
     |> TextField.setLabelVisible true
     |> TextField.renderElement renderCfg
 ```

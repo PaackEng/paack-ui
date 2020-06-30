@@ -2,7 +2,7 @@ module UI.Button exposing
     ( Button, toggle, success, disabled, cmd, redirect
     , ButtonBody, fromLabel, fromIcon
     , ButtonStyle, hyperlink, primary, danger, light, clear
-    , ButtonWidth, withWidth, full, shrink
+    , ButtonWidth, withWidth, widthFull, widthRelative
     , withSize
     , withDisabledIf, withSuccessIf
     , renderElement
@@ -40,7 +40,7 @@ A button can be created and rendered as in the following pipeline:
 
 # Width
 
-@docs ButtonWidth, withWidth, full, shrink
+@docs ButtonWidth, withWidth, widthFull, widthRelative
 
 
 # Size
@@ -130,7 +130,7 @@ type EmbossedTone
 
 {-| Non-toggle buttons must-be styled. The currently available styles are Hyperlink and Embossed.
 
-A hyperlink-styled: See [`Button.hyperlink`](UI-Button#hyperlink).
+A hyperlink-styled: See [`Button.hyperlink`](#hyperlink).
 
 An embossed-styled button has paddings and hovering-effects.
 It's available through its sub-themes: Primary, Danger, Light, and Clear.
@@ -142,9 +142,7 @@ type ButtonStyle
     | StyleHyperlink
 
 
-{-| To maintain fewer variations of similar-looking content, we opted to have only two sizes of buttons:
-One with the minimum to fit its contents, and the other filling the container.
-The `ButtonWidth` type describes these two values.
+{-| Describes a compatible width.
 -}
 type ButtonWidth
     = WidthFull
@@ -185,7 +183,7 @@ toggle hint msg isEnabled =
 
 
 {-| This `Button.disabled` builds an embossed-looking, without-message, grayish-colored button.
-It's another approach for [`Button.withDisabledIf`](UI-Button#withDisabledIf), helping when you can't compose a message for the desired action at the occasion.
+It's another approach for [`Button.withDisabledIf`](#withDisabledIf), helping when you can't compose a message for the desired action at the occasion.
 
     case event of
         Just id ->
@@ -201,7 +199,7 @@ disabled body =
 
 
 {-| This `Button.success` builds an embossed-looking, without-message, greenish-colored button.
-It's another approach for [`Button.withSuccessIf`](UI-Button#withSuccessIf), helping when you can't compose a message for the desired action at the occasion.
+It's another approach for [`Button.withSuccessIf`](#withSuccessIf), helping when you can't compose a message for the desired action at the occasion.
 
     case event of
         Just id ->
@@ -233,7 +231,7 @@ cmd msg style body =
         defaultOptions
 
 
-{-| Similar to [`Button.cmd`](UI-Button#cmd), but instead of a message, it redirects to some path.
+{-| Similar to [`Button.cmd`](#cmd), but instead of a message, it redirects to some path.
 
     Button.fromLabel "Click this Link"
         |> Button.redirect "https://elm-lang.org/" Button.hyperlink
@@ -325,11 +323,9 @@ withDisabledIf condition button =
         button
 
 
-{-| With `Button.withWidth`, you'll be able to set one of the available values for width.
+{-| `Button.withWidth` changes the width of the button.
 
-    Button.withWidth Button.fill someButton
-
-**NOTE**: Default value is [`Button.shrink`](UI-Button#shrink)
+    Button.withWidth Button.widthFull someButton
 
 -}
 withWidth : ButtonWidth -> Button msg -> Button msg
@@ -348,7 +344,7 @@ withWidth width button =
 
     Button.withSize Size.large someButton
 
-**NOTE**: Default value is [`Size.medium`](UI-Size#medium)
+**NOTE**: Button's default size is [`Size.medium`](UI-Size#medium)
 
 -}
 withSize : Size -> Button msg -> Button msg
@@ -405,10 +401,10 @@ hyperlink =
 -- Width
 
 
-{-| The button's width will fill its container
+{-| The button's width will fill its container.
 -}
-full : ButtonWidth
-full =
+widthFull : ButtonWidth
+widthFull =
     WidthFull
 
 
@@ -417,8 +413,8 @@ full =
 **NOTE**: Default behaviour.
 
 -}
-shrink : ButtonWidth
-shrink =
+widthRelative : ButtonWidth
+widthRelative =
     WidthShrink
 
 
@@ -505,12 +501,12 @@ toggleView cfg size hint toggleMsg current =
             iconLayout size
 
         attrs =
-            [ ARIA.roleAttr ARIA.roleButton
-            , Primitives.roundedBorders
+            [ Primitives.roundedBorders
             , paddings
             , borders
             , Events.onClick <| toggleMsg (not current)
             ]
+                ++ ARIA.toElementAttributes ARIA.roleButton
                 ++ toggleTheme current
     in
     Icon.toggle hint
@@ -529,8 +525,7 @@ hyperlinkView :
 hyperlinkView cfg size width body action =
     let
         attrs =
-            [ ARIA.roleAttr ARIA.roleButton
-            , Primitives.roundedBorders
+            [ Primitives.roundedBorders
             , buttonWidth width
             , Palette.color tonePrimary brightnessMiddle
                 |> Palette.toElementColor
@@ -539,6 +534,7 @@ hyperlinkView cfg size width body action =
             , Font.underline
             , Element.pointer
             ]
+                ++ (ARIA.toElementAttributes <| ARIA.roleButton)
     in
     case action of
         ActionRedirect link ->
@@ -566,14 +562,14 @@ workingView cfg size width tone body action =
             bodyLayout body size
 
         attrs =
-            [ ARIA.roleAttr ARIA.roleButton
-            , Primitives.roundedBorders
+            [ Primitives.roundedBorders
             , buttonWidth width
             , paddings
             , borders
             , Font.semiBold
             , Element.pointer
             ]
+                ++ (ARIA.toElementAttributes <| ARIA.roleButton)
                 ++ workingTheme tone
     in
     case action of

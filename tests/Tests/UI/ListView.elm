@@ -1,4 +1,4 @@
-module Tests.UI.SelectList exposing (tests)
+module Tests.UI.ListView exposing (tests)
 
 import Element as Element exposing (Element)
 import Expect
@@ -11,8 +11,8 @@ import Tests.Utils.Element exposing (cursorPointer, elementToHtml, hasIconInside
 import Tests.Utils.RenderConfig exposing (desktopWindowConfig)
 import UI.Icon as Icon
 import UI.Link as Link
+import UI.ListView as ListView
 import UI.RenderConfig exposing (RenderConfig)
-import UI.SelectList as SelectList
 
 
 type Msg
@@ -25,7 +25,7 @@ tests : Test
 tests =
     describe "UI.Button tests"
         [ withActionBar
-        , withOptions
+        , withItems
         , withSearchField
         ]
 
@@ -37,23 +37,24 @@ withActionBar =
             "Some Title"
 
         component =
-            SelectList.selectList Select mockView
-                |> SelectList.withActionBar
-                    actionBarTitle
-                    Icon.toggle
-                    SomeButtonClicked
+            ListView.selectList Select mockView
+                |> ListView.withActionBar
+                    { label = actionBarTitle
+                    , icon = Icon.toggle
+                    , onClick = SomeButtonClicked
+                    }
     in
     describe "#withActionBar"
         [ test "has ActionBar" <|
             \_ ->
                 component
-                    |> SelectList.renderElement desktopWindowConfig
+                    |> ListView.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> Query.has [ Selector.text actionBarTitle ]
         , test "the button works" <|
             \_ ->
                 component
-                    |> SelectList.renderElement desktopWindowConfig
+                    |> ListView.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> findBtnQuery
                     |> Event.simulate Event.click
@@ -61,8 +62,8 @@ withActionBar =
         ]
 
 
-withOptions : Test
-withOptions =
+withItems : Test
+withItems =
     let
         lonewolf =
             Whatever 222 "Wolf"
@@ -71,20 +72,20 @@ withOptions =
             [ Whatever 111 "Bear", lonewolf, Whatever 333 "Fox" ]
 
         component =
-            SelectList.selectList Select mockView
-                |> SelectList.withOptions options
+            ListView.selectList Select mockView
+                |> ListView.withItems options
     in
-    describe "#withOptions"
+    describe "#withItems"
         [ test "Options are visible" <|
             \_ ->
                 component
-                    |> SelectList.renderElement desktopWindowConfig
+                    |> ListView.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> Query.has [ Selector.text "Bear", Selector.text "Wolf", Selector.text "Fox" ]
         , test "Options are selectable" <|
             \_ ->
                 component
-                    |> SelectList.renderElement desktopWindowConfig
+                    |> ListView.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> Query.find [ cursorPointer, Selector.containing [ Selector.text "Wolf" ] ]
                     |> Event.simulate Event.click
@@ -92,8 +93,8 @@ withOptions =
         , test "Selected is correctly applied" <|
             \_ ->
                 component
-                    |> SelectList.withSelected (\{ id } -> id == 222)
-                    |> SelectList.renderElement desktopWindowConfig
+                    |> ListView.withSelected (\{ id } -> id == 222)
+                    |> ListView.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> Query.has [ cursorPointer, Selector.containing [ Selector.text "Wolf", Selector.text selectedPseudoTag ] ]
         ]
@@ -106,8 +107,12 @@ withSearchField =
             "Searching for..."
 
         component filterState =
-            SelectList.selectList Select mockView
-                |> SelectList.withSearchField searchLabel FilterSet filterState
+            ListView.selectList Select mockView
+                |> ListView.withSearchField
+                    { label = searchLabel
+                    , searchMsg = FilterSet
+                    , currentFilter = filterState
+                    }
 
         theField =
             [ Selector.tag "input"
@@ -127,13 +132,13 @@ withSearchField =
         [ test "Field has label" <|
             \_ ->
                 component Nothing
-                    |> SelectList.renderElement desktopWindowConfig
+                    |> ListView.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> Query.has theField
         , test "Field triggers message" <|
             \_ ->
                 component Nothing
-                    |> SelectList.renderElement desktopWindowConfig
+                    |> ListView.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> Query.find theField
                     |> Event.simulate (Event.input "Dog")
@@ -141,8 +146,8 @@ withSearchField =
         , test "Having a filter does filter" <|
             \_ ->
                 component (Just ( "Dog", filter ))
-                    |> SelectList.withOptions exampleOpt
-                    |> SelectList.renderElement desktopWindowConfig
+                    |> ListView.withItems exampleOpt
+                    |> ListView.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> Query.find [ Selector.text "OPT" ]
                     |> Query.has [ Selector.text exampleDog ]

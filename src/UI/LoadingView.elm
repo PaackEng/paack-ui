@@ -1,4 +1,14 @@
-module UI.LoadingView exposing (big, default, small)
+module UI.LoadingView exposing (medium, small, large)
+
+{-| The `UI.LoadingView` is a view with a loading spinner and nothing else.
+It is pretty useful when a view depends on external content fetching.
+
+
+# Different sizes
+
+@docs medium, small, large
+
+-}
 
 import Element exposing (Element)
 import Html exposing (Html)
@@ -6,18 +16,24 @@ import Svg exposing (..)
 import Svg.Attributes exposing (..)
 
 
+{-| The version with a small (18x18px) spinner.
+-}
 small : Element msg
 small =
     generic 18
 
 
-default : Element msg
-default =
+{-| The version with a medium (36x36px) spinner.
+-}
+medium : Element msg
+medium =
     generic 36
 
 
-big : Element msg
-big =
+{-| The version with a large (72x72px) spinner.
+-}
+large : Element msg
+large =
     generic 72
 
 

@@ -1,17 +1,39 @@
 module UI.Utils.Element exposing
-    ( RectangleSides
-    , colorSetOpacity
-    , colorTransition
+    ( colorSetOpacity, colorTransition
     , desktopMaximum
-    , disabled
-    , ellipsis
-    , maxHeightPct
-    , maxHeightVH
-    , onEnterPressed
-    , svg
-    , title
-    , zeroPadding
+    , svg, title, ellipsis, maxHeightVH, maxHeightPct
+    , disabled, onEnterPressed
+    , RectangleSides, zeroPadding
     )
+
+{-| Utilities and functionality that are not covered by Elm UI.
+
+
+# Color
+
+@docs colorSetOpacity, colorTransition
+
+
+# Responsiveness
+
+@docs desktopMaximum
+
+
+# HTML features
+
+@docs svg, title, ellipsis, maxHeightVH, maxHeightPct
+
+
+# Input
+
+@docs disabled, onEnterPressed
+
+
+# Padding, borders and size
+
+@docs RectangleSides, zeroPadding
+
+-}
 
 import Element exposing (Attribute, Element)
 import Html.Attributes as HtmlAttrs
@@ -22,6 +44,8 @@ import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Utils.ARIA as ARIA
 
 
+{-| The classic top, left, right and bottom as integers record.
+-}
 type alias RectangleSides =
     { top : Int
     , left : Int
@@ -30,14 +54,24 @@ type alias RectangleSides =
     }
 
 
+{-| The SVG element, with ARIA attributes applied.
+
+    svg "Alt text" svgAttributes svgContent
+
+-}
 svg : String -> List (Svg.Attribute msg) -> List (Svg.Svg msg) -> Element msg
 svg altText attrs children =
     children
         |> Svg.svg attrs
         |> Element.html
-        |> Element.el [ ARIA.roleAttr ARIA.roleImage, ARIA.labelAttr altText ]
+        |> Element.el (ARIA.toElementAttributes <| ARIA.roleImage altText)
 
 
+{-| All the attributes that define an element as disabled for modifying.
+
+    Element.el Element.disabled <| Element.text "Some content"
+
+-}
 disabled : List (Attribute msg)
 disabled =
     [ HtmlAttrs.attribute "disabled" "true"
@@ -49,6 +83,14 @@ disabled =
         |> List.map Element.htmlAttribute
 
 
+{-| Enable CSS transition for HTML's `color, background-color, border-color`.
+Time is set in miliseconds.
+
+    Element.el
+        (Background.color someVariatingColor :: Element.colorTransition 200)
+        someChildElement
+
+-}
 colorTransition : Int -> List (Attribute msg)
 colorTransition time =
     [ ( "transition-property", "color, background-color, border-color" )
@@ -58,6 +100,11 @@ colorTransition time =
         |> List.map stylePair
 
 
+{-| Trigger message when the users press return-key while element is on-focus.
+
+    Element.el [ Element.onEnterPressed Msg.ActivateSomething ] someChildElement
+
+-}
 onEnterPressed : msg -> Attribute msg
 onEnterPressed msg =
     Element.htmlAttribute
@@ -75,6 +122,13 @@ onEnterPressed msg =
         )
 
 
+{-| "The title attribute specifies extra information about an element.
+
+The information is most often shown as a tooltip text when the mouse moves over the element." - W3Schools
+
+    Element.el [ Element.title "Some text" ] someChildElement
+
+-}
 title : String -> Attribute msg
 title value =
     value
@@ -82,16 +136,28 @@ title value =
         |> Element.htmlAttribute
 
 
+{-| Wrapper for CSS's `max-height: {{vaue}}vh`.
+
+    Element.el [ Element.maxHeightVH 100 ] someChildElement
+
+-}
 maxHeightVH : Int -> Attribute msg
 maxHeightVH value =
     style "max-height" (String.fromInt value ++ "vh")
 
 
+{-| Wrapper for CSS's `max-height: {{vaue}}%`.
+
+    Element.el [ Element.maxHeightPct 100 ] someChildElement
+
+-}
 maxHeightPct : Float -> Attribute msg
 maxHeightPct value =
     style "max-height" (String.fromFloat value ++ "%")
 
 
+{-| Overwrite alpha value in an [`Element.Color`](/packages/mdgriffith/elm-ui/latest/Element#Color).
+-}
 colorSetOpacity : Float -> Element.Color -> Element.Color
 colorSetOpacity alpha color =
     color
@@ -102,6 +168,13 @@ colorSetOpacity alpha color =
         |> Element.fromRgb
 
 
+{-| Applies required CSS values to have ellipsis on an element's text when width is not enough for displaying the whole content.
+
+    Element.el
+        (Element.width (px 200) :: Element.ellipsis)
+        (Element.text "Lorem ipsum dolor sit amet, consectetur adipiscing elit")
+
+-}
 ellipsis : List (Attribute msg)
 ellipsis =
     [ ( "text-overflow", "ellipsis" )
@@ -111,6 +184,11 @@ ellipsis =
         |> (::) Element.clip
 
 
+{-| Limit [`Element.fill`](/packages/mdgriffith/elm-ui/latest/Element#fill) only when on desktop.
+
+    Element.width (Element.desktopMaximum 640)
+
+-}
 desktopMaximum : RenderConfig -> Int -> Element.Length
 desktopMaximum cfg maxSize =
     if RenderConfig.isMobile cfg then
@@ -120,6 +198,12 @@ desktopMaximum cfg maxSize =
         Element.fill |> Element.maximum maxSize
 
 
+{-| Zero-initialized record for paddings and borders.
+
+    Element.paddingEach
+        { zeroPadding | bottom = 20 }
+
+-}
 zeroPadding : RectangleSides
 zeroPadding =
     { top = 0

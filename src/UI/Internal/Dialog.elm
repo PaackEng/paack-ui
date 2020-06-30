@@ -139,14 +139,15 @@ closeButton cfg close =
     Icon.close "Close dialog"
         |> Icon.renderElement cfg
         |> Element.el
-            [ Events.onClick close
-            , Element.pointer
-            , Element.width (px 20)
-            , Element.paddingXY 20 10
-            , Element.height shrink
-            , Element.alignTop
-            , ARIA.roleAttr ARIA.roleButton
-            ]
+            (ARIA.toElementAttributes ARIA.roleButton
+                ++ [ Events.onClick close
+                   , Element.pointer
+                   , Element.width (px 20)
+                   , Element.paddingXY 20 10
+                   , Element.height shrink
+                   , Element.alignTop
+                   ]
+            )
 
 
 blackBlock : msg -> Element msg
