@@ -287,7 +287,17 @@ filteredTable cfg =
             columnWidthPixels 145 <| columnWidthPixels 130 <| columnWidthPixels 120 <| columnWidthPixels 145 <| columnsWidthEnd
 
         columnsFilter =
-            columnFilterEmpty Msg.NoOp <| columnFilterEditing Msg.NoOp (\_ -> Msg.NoOp) "Test" <| columnFiltering Msg.NoOp "Whatever" <| columnFilterEmpty Msg.NoOp <| columnsFilterEnd
+            columnsFilterEnd
+                |> columnFilterEmpty Msg.NoOp
+                |> columnFiltering Msg.NoOp "Whatever"
+                |> columnFilterEditing
+                    { edited = True
+                    , applyMsg = Msg.NoOp
+                    , clearMsg = Msg.NoOp
+                    , editMsg = always Msg.NoOp
+                    , current = "Whatever"
+                    }
+                |> columnFilterEmpty Msg.NoOp
 
         cell str =
             Text.body1 str |> cellFromText
@@ -297,3 +307,6 @@ filteredTable cfg =
         |> Table.withColumnsWidth columnsWidth
         |> Table.withColumnsFilter columnsFilter
         |> Table.renderElement cfg
+        |> List.singleton
+        |> (::) iconsSvgSprite
+        |> Element.wrappedRow [ Element.width fill ]

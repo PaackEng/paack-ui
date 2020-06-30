@@ -1,6 +1,6 @@
 module UI.Button exposing
     ( Button, toggle, success, disabled, cmd, redirect
-    , ButtonBody, fromLabel, fromIcon
+    , ButtonBody, fromLabel, fromIcon, fromNested
     , ButtonStyle, hyperlink, primary, danger, light, clear
     , ButtonWidth, withWidth, widthFull, widthRelative
     , withSize
@@ -30,7 +30,7 @@ A button can be created and rendered as in the following pipeline:
 
 # Content
 
-@docs ButtonBody, fromLabel, fromIcon
+@docs ButtonBody, fromLabel, fromIcon, fromNested
 
 
 # Style
@@ -108,6 +108,7 @@ It indicates the contents inside of the desired button, like its label or icon.
 type ButtonBody
     = BodyText String
     | BodyIcon Icon
+    | BodyNested String (String -> Icon)
 
 
 type ButtonAction msg
@@ -269,6 +270,13 @@ fromLabel label =
 fromIcon : Icon -> ButtonBody
 fromIcon icon =
     BodyIcon icon
+
+
+{-| `Button.fromIcon` initiates a button's body with an icon-button nested inside another labeled-button.
+-}
+fromNested : String -> (String -> Icon) -> ButtonBody
+fromNested label icon =
+    BodyNested label icon
 
 
 
@@ -628,6 +636,19 @@ bodyToElement cfg size body =
                 |> Icon.withSize size
                 |> Icon.renderElement cfg
 
+        BodyNested str icon ->
+            Element.row
+                [ Font.size <| textSize size
+                , Element.spacing 8
+                , Element.width Element.fill
+                ]
+                [ Element.text str
+                , icon str
+                    |> Icon.withSize size
+                    |> Icon.renderElement cfg
+                    |> Element.el [ Element.alignRight ]
+                ]
+
 
 
 -- Attributes
@@ -650,6 +671,10 @@ bodyLayout body size =
             textLayout size
 
         BodyIcon _ ->
+            iconLayout size
+
+        BodyNested _ _ ->
+            -- TODO
             iconLayout size
 
 
@@ -885,7 +910,7 @@ disabledTheme body =
                 , hover = Nothing
                 }
 
-            BodyText _ ->
+            _ ->
                 { normal =
                     { background = Just <| Palette.color Palette.toneGray brightnessLight
                     , border = Just <| Palette.color Palette.toneGray brightnessLight
