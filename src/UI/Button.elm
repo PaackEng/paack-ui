@@ -342,6 +342,8 @@ withWidth width button =
 
 [size]: UI-Size
 
+The sizes (in height) are: Large - 60px; Medium - 48px; Small - 36px; Extra Small - 24px.
+
     Button.withSize Size.large someButton
 
 **NOTE**: Button's default size is [`Size.medium`](UI-Size#medium)
@@ -501,7 +503,7 @@ toggleView cfg size hint toggleMsg current =
             iconLayout size
 
         attrs =
-            [ Primitives.roundedBorders
+            [ Primitives.relativeRoundedBorders size
             , paddings
             , borders
             , Events.onClick <| toggleMsg (not current)
@@ -525,8 +527,7 @@ hyperlinkView :
 hyperlinkView cfg size width body action =
     let
         attrs =
-            [ Primitives.roundedBorders
-            , buttonWidth width
+            [ buttonWidth width
             , Palette.color tonePrimary brightnessMiddle
                 |> Palette.toElementColor
                 |> Font.color
@@ -562,7 +563,7 @@ workingView cfg size width tone body action =
             bodyLayout body size
 
         attrs =
-            [ Primitives.roundedBorders
+            [ Primitives.relativeRoundedBorders size
             , buttonWidth width
             , paddings
             , borders
@@ -597,7 +598,7 @@ staticView cfg size width body theme =
             bodyLayout body size
 
         attrs =
-            [ Primitives.roundedBorders
+            [ Primitives.relativeRoundedBorders size
             , buttonWidth width
             , paddings
             , borders

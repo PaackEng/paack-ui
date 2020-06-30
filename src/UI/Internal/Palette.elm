@@ -1,6 +1,7 @@
 module UI.Internal.Palette exposing (..)
 
-import Element exposing (rgb255)
+import Element exposing (Attribute, rgb255)
+import Element.Background as Background
 
 
 
@@ -113,3 +114,17 @@ textLightButtonDisabled : Element.Color
 textLightButtonDisabled =
     -- #666666
     rgb255 102 102 102
+
+
+
+-- Background
+
+
+mainBackground : Attribute msg
+mainBackground =
+    Background.color (rgb255 255 255 255)
+
+
+overlayBackground : Attribute msg
+overlayBackground =
+    Background.color (Element.rgba255 0 0 0 0.5)
