@@ -1,6 +1,6 @@
 module UI.Button exposing
     ( Button, toggle, success, disabled, cmd, redirect
-    , ButtonBody, fromLabel, fromIcon
+    , ButtonBody, fromLabel, fromIcon, fromNested
     , ButtonStyle, hyperlink, primary, danger, light, clear
     , ButtonWidth, withWidth, widthFull, widthRelative
     , withSize
@@ -30,7 +30,7 @@ A button can be created and rendered as in the following pipeline:
 
 # Content
 
-@docs ButtonBody, fromLabel, fromIcon
+@docs ButtonBody, fromLabel, fromIcon, fromNested
 
 
 # Style
@@ -108,6 +108,7 @@ It indicates the contents inside of the desired button, like its label or icon.
 type ButtonBody
     = BodyText String
     | BodyIcon Icon
+    | BodyNested String (String -> Icon)
 
 
 type ButtonAction msg
@@ -271,6 +272,13 @@ fromIcon icon =
     BodyIcon icon
 
 
+{-| `Button.fromIcon` initiates a button's body with an icon-button nested inside another labeled-button.
+-}
+fromNested : String -> (String -> Icon) -> ButtonBody
+fromNested label icon =
+    BodyNested label icon
+
+
 
 -- Options
 
@@ -341,6 +349,8 @@ withWidth width button =
 {-| With `Button.withSize`, you'll be able to scale the button between the [standard sizes][size].
 
 [size]: UI-Size
+
+The sizes (in height) are: Large - 60px; Medium - 48px; Small - 36px; Extra Small - 24px.
 
     Button.withSize Size.large someButton
 
@@ -501,7 +511,7 @@ toggleView cfg size hint toggleMsg current =
             iconLayout size
 
         attrs =
-            [ Primitives.roundedBorders
+            [ Primitives.relativeRoundedBorders size
             , paddings
             , borders
             , Events.onClick <| toggleMsg (not current)
@@ -525,8 +535,7 @@ hyperlinkView :
 hyperlinkView cfg size width body action =
     let
         attrs =
-            [ Primitives.roundedBorders
-            , buttonWidth width
+            [ buttonWidth width
             , Palette.color tonePrimary brightnessMiddle
                 |> Palette.toElementColor
                 |> Font.color
@@ -562,7 +571,7 @@ workingView cfg size width tone body action =
             bodyLayout body size
 
         attrs =
-            [ Primitives.roundedBorders
+            [ Primitives.relativeRoundedBorders size
             , buttonWidth width
             , paddings
             , borders
@@ -597,7 +606,7 @@ staticView cfg size width body theme =
             bodyLayout body size
 
         attrs =
-            [ Primitives.roundedBorders
+            [ Primitives.relativeRoundedBorders size
             , buttonWidth width
             , paddings
             , borders
@@ -627,6 +636,19 @@ bodyToElement cfg size body =
                 |> Icon.withSize size
                 |> Icon.renderElement cfg
 
+        BodyNested str icon ->
+            Element.row
+                [ Font.size <| textSize size
+                , Element.spacing 8
+                , Element.width Element.fill
+                ]
+                [ Element.text str
+                , icon str
+                    |> Icon.withSize size
+                    |> Icon.renderElement cfg
+                    |> Element.el [ Element.alignRight ]
+                ]
+
 
 
 -- Attributes
@@ -649,6 +671,10 @@ bodyLayout body size =
             textLayout size
 
         BodyIcon _ ->
+            iconLayout size
+
+        BodyNested _ _ ->
+            -- TODO
             iconLayout size
 
 
@@ -884,7 +910,7 @@ disabledTheme body =
                 , hover = Nothing
                 }
 
-            BodyText _ ->
+            _ ->
                 { normal =
                     { background = Just <| Palette.color Palette.toneGray brightnessLight
                     , border = Just <| Palette.color Palette.toneGray brightnessLight

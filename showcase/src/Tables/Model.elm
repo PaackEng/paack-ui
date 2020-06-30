@@ -1,12 +1,5 @@
-module Tables.Model exposing (Model, initModel)
+module Tables.Model exposing (Column(..), Model, ModelFilters, getColumnFilter, initModel)
 
 
 type alias Model =
-    { selected : Maybe String
-    }
-
-
-initModel : Model
-initModel =
-    { selected = Nothing
-    }
+    ()
