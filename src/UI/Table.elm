@@ -6,7 +6,8 @@ module UI.Table exposing
     , OptRow
     , ColumnWidth, withColumnsWidth, columnsWidthEnd, columnWidthPixels, columnWidthPortion
     , withColumnsDetails, columnsMobileDetailsEnd, columnMobileDetailsHide, columnMobileDetailsShow, columnMobileDetailsShowIf
-    , ColumnFilter, withColumnsFilter, columnsFilterEnd, columnFiltering, FilterEditConfig, columnFilterEditing, columnFilterEmpty
+    , ColumnFilter, withColumnsFilter, columnsFilterEnd, columnFilterEmpty, columnFiltering, columnFilterEditing
+    , FilterEditConfig, FilterField, filterText
     , withWidth
     , renderElement
     )
@@ -65,7 +66,12 @@ module UI.Table exposing
 
 ## Filterable Row
 
-@docs ColumnFilter, withColumnsFilter, columnsFilterEnd, columnFiltering, FilterEditConfig, columnFilterEditing, columnFilterEmpty
+@docs ColumnFilter, withColumnsFilter, columnsFilterEnd, columnFilterEmpty, columnFiltering, columnFilterEditing
+
+
+### Filter fields
+
+@docs FilterEditConfig, FilterField, filterText
 
 
 # Table's width
@@ -95,7 +101,7 @@ import UI.Palette as Palette exposing (brightnessMiddle, toneGray)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text exposing (Text)
-import UI.TextField as TextField
+import UI.TextField as TextField exposing (TextField)
 import UI.Utils.Element exposing (zeroPadding)
 
 
@@ -191,7 +197,7 @@ type ColumnFilter msg
     = FilterUnavailable
     | FilterEmpty msg -- msg: Toggle
     | FilterEditing (FilterEditConfig msg)
-    | FilterSet msg String -- msg: Clear
+    | FilterSet msg -- msg: Clear
 
 
 {-| This record aggregates all required rendering information and possible actions when the user is editing some column's filtering field.
@@ -199,20 +205,22 @@ type ColumnFilter msg
     { edited = Just "Bookshelf"
     , applyMsg = Msg.SomeColumnApply
     , clearMsg = Msg.SomeColumnClear
-    , discardMsg = Msg.SomeColumnDiscard
+    , closeMsg = Msg.SomeColumnDiscard
     , editMsg = Msg.SomeColumnEdit column
     , current = Just "Book"
     }
 
 -}
 type alias FilterEditConfig msg =
-    { edited : Maybe String
-    , applyMsg : msg
-    , clearMsg : msg
-    , discardMsg : msg
-    , editMsg : String -> msg
-    , current : Maybe String
+    { applyMsg : Maybe msg
+    , clearMsg : Maybe msg
+    , closeMsg : msg
+    , fields : List (FilterField msg)
     }
+
+
+type FilterField msg
+    = FilterText (TextField msg)
 
 
 type Cell msg
@@ -307,6 +315,11 @@ So, here the building of tables start.
 table : HeaderRow msg columns -> Table msg object columns
 table headers =
     Table { headers = headers } defaultOptions
+
+
+filterText : TextField msg -> FilterField msg
+filterText field =
+    FilterText field
 
 
 
@@ -428,7 +441,7 @@ withColumnsDetails row (Table prop opt_) =
                 { edited = Just "Bookshelf"
                 , applyMsg = Msg.ColumnCApply
                 , clearMsg = Msg.ColumnCClear
-                , discardMsg = Msg.ColumnCDiscard
+                , closeMsg = Msg.ColumnCDiscard
                 , editMsg = Msg.ColumnCEdit
                 , current = Just "Book"
                 }
@@ -570,7 +583,7 @@ columnFilterEmpty toggleMsg accu =
             { edited = Just "Bookshelf"
             , applyMsg = Msg.ColumnCApply
             , clearMsg = Msg.ColumnCClear
-            , discardMsg = Msg.ColumnCDiscard
+            , closeMsg = Msg.ColumnCDiscard
             , editMsg = Msg.ColumnCEdit
             , current = Just "Book"
             }
@@ -587,13 +600,13 @@ columnFilterEditing config accu =
 
     columnsFilterEnd
         |> columnFilterEmpty Msg.FilterColumnC
-        |> columnFiltering Msg.ColumnBClear "Dan Brown"
+        |> columnFiltering Msg.ColumnBClear
         |> columnFilterEmpty Msg.FilterColumnA
 
 -}
-columnFiltering : msg -> String -> OptRow (ColumnFilter msg) columns -> OptRow (ColumnFilter msg) (T.Increase columns)
-columnFiltering clearMsg current accu =
-    opt (FilterSet clearMsg current) accu
+columnFiltering : msg -> OptRow (ColumnFilter msg) columns -> OptRow (ColumnFilter msg) (T.Increase columns)
+columnFiltering clearMsg accu =
+    opt (FilterSet clearMsg) accu
 
 
 
@@ -712,7 +725,7 @@ headerRender cfg { title, width, filter } =
             FilterEditing filterConfig ->
                 filterEditing cfg width title filterConfig
 
-            FilterSet clearMsg _ ->
+            FilterSet clearMsg ->
                 Button.fromNested title Icon.close
                     |> Button.cmd clearMsg Button.primary
                     |> Button.withWidth Button.widthFull
@@ -739,9 +752,9 @@ cellCrop width =
 
 
 filterEditing : RenderConfig -> ColumnWidth -> String -> FilterEditConfig msg -> Element msg
-filterEditing cfg width title { clearMsg, applyMsg, editMsg, discardMsg, current, edited } =
+filterEditing cfg width title { clearMsg, applyMsg, closeMsg, fields } =
     Element.column []
-        [ overlayBackground discardMsg
+        [ overlayBackground closeMsg
         , Element.column
             [ positionFixed
             , zIndex 9
@@ -759,7 +772,7 @@ filterEditing cfg width title { clearMsg, applyMsg, editMsg, discardMsg, current
                 [ Text.overline title
                     |> Text.renderElement cfg
                 , Button.fromIcon (Icon.close "Close")
-                    |> Button.cmd discardMsg Button.clear
+                    |> Button.cmd closeMsg Button.clear
                     |> Button.withSize Size.extraSmall
                     |> Button.renderElement cfg
                 ]
@@ -768,30 +781,39 @@ filterEditing cfg width title { clearMsg, applyMsg, editMsg, discardMsg, current
                 , Element.padding 12
                 , Element.spacing 20
                 ]
-                [ edited
-                    |> maybeNotThen current
-                    |> Maybe.withDefault ""
-                    |> TextField.singlelineText editMsg title
-                    |> TextField.withWidth TextField.widthFull
-                    |> TextField.renderElement cfg
-                , filterEditingButton cfg applyMsg clearMsg edited
+                [ fields
+                    |> List.map (filterFieldView cfg)
+                    |> Element.column
+                        [ Element.width fill
+                        , Element.spacing 8
+                        ]
+                , filterEditingButton cfg applyMsg clearMsg
                 ]
             ]
         ]
 
 
-filterEditingButton : RenderConfig -> msg -> msg -> Maybe String -> Element msg
-filterEditingButton cfg applyMsg clearMsg edited =
+filterFieldView : RenderConfig -> FilterField msg -> Element msg
+filterFieldView cfg field =
+    case field of
+        FilterText textField ->
+            textField
+                |> TextField.withWidth TextField.widthFull
+                |> TextField.renderElement cfg
+
+
+filterEditingButton : RenderConfig -> Maybe msg -> Maybe msg -> Element msg
+filterEditingButton cfg applyMsg clearMsg =
     let
-        clearBtn =
+        clearBtn msg =
             Button.fromLabel "Clear"
-                |> Button.cmd clearMsg Button.danger
+                |> Button.cmd msg Button.danger
                 |> Button.withSize Size.extraSmall
                 |> Button.renderElement cfg
 
-        applyBtn =
+        applyBtn msg =
             Button.fromLabel "Apply"
-                |> Button.cmd applyMsg Button.primary
+                |> Button.cmd msg Button.primary
                 |> Button.withSize Size.extraSmall
                 |> Button.renderElement cfg
 
@@ -801,15 +823,18 @@ filterEditingButton cfg applyMsg clearMsg edited =
                 |> Button.withSize Size.extraSmall
                 |> Button.renderElement cfg
     in
-    case edited of
-        Just "" ->
-            clearBtn
-
-        Just _ ->
-            Element.row [ Element.spacing 8 ] [ applyBtn, clearBtn ]
-
-        Nothing ->
+    case ( applyMsg, clearMsg ) of
+        ( Nothing, Nothing ) ->
             disabledBtn
+
+        ( Nothing, Just msg ) ->
+            clearBtn msg
+
+        ( Just msg, Nothing ) ->
+            applyBtn msg
+
+        ( Just apply, Just clear ) ->
+            Element.row [ Element.spacing 8 ] [ applyBtn apply, clearBtn clear ]
 
 
 overlayBackground : msg -> Element msg

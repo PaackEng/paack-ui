@@ -5,6 +5,7 @@ import Msg
 import Return as R exposing (Return)
 import Tables.Model as Tables
 import Tables.Msg as Tables
+import UI.Internal.Basics exposing (maybeNotThen)
 import UI.Internal.TypeNumbers as T
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Table as Table
@@ -26,6 +27,7 @@ import UI.Table as Table
         , table
         )
 import UI.Text as Text exposing (Text)
+import UI.TextField as TextField
 import UIExplorer exposing (storiesOf)
 import Utils exposing (iconsSvgSprite, story, storyWithModel)
 
@@ -356,33 +358,41 @@ filteredTable cfg model =
         columnsWidth =
             columnWidthPixels 145 <| columnWidthPixels 130 <| columnWidthPixels 130 <| columnWidthPixels 145 <| columnsWidthEnd
 
-        filterEdit column current edited =
-            { edited = edited
-            , applyMsg = Tables.FilterApply |> Msg.TablesStoriesMsg
-            , clearMsg = Tables.FilterClear column |> Msg.TablesStoriesMsg
-            , discardMsg = Tables.FilterDiscard |> Msg.TablesStoriesMsg
-            , editMsg = Just >> Tables.FilterEdit column >> Msg.TablesStoriesMsg
-            , current = current
+        filterEdit column edited current =
+            { applyMsg =
+                Maybe.map
+                    (always <| Msg.TablesStoriesMsg <| Tables.FilterApply)
+                    edited
+            , clearMsg =
+                if current /= Nothing || edited /= Nothing then
+                    Just <| Msg.TablesStoriesMsg <| Tables.FilterClear column
+
+                else
+                    Nothing
+            , closeMsg =
+                Msg.TablesStoriesMsg <| Tables.FilterDiscard
+            , fields =
+                [ TextField.singlelineText
+                    (Just >> Tables.FilterEdit column >> Msg.TablesStoriesMsg)
+                    "Some text field"
+                    (edited |> maybeNotThen current |> Maybe.withDefault "")
+                    |> Table.filterText
+                ]
             }
 
         columnFilter column =
             case grapColumn column model of
                 Just edited ->
-                    columnFilterEditing
-                        { edited = edited
-                        , applyMsg = Tables.FilterApply |> Msg.TablesStoriesMsg
-                        , clearMsg = Tables.FilterClear column |> Msg.TablesStoriesMsg
-                        , discardMsg = Tables.FilterDiscard |> Msg.TablesStoriesMsg
-                        , editMsg = Just >> Tables.FilterEdit column >> Msg.TablesStoriesMsg
-                        , current = Tables.getColumnFilter column model
-                        }
+                    Tables.getColumnFilter column model
+                        |> filterEdit column edited
+                        |> columnFilterEditing
 
                 Nothing ->
                     case Tables.getColumnFilter column model of
                         Just current ->
-                            columnFiltering
-                                (Msg.TablesStoriesMsg <| Tables.FilterClear column)
-                                current
+                            Tables.FilterClear column
+                                |> Msg.TablesStoriesMsg
+                                |> columnFiltering
 
                         Nothing ->
                             columnFilterEmpty (Msg.TablesStoriesMsg <| Tables.FilterEdit column Nothing)
