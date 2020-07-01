@@ -202,12 +202,10 @@ type ColumnFilter msg
 
 {-| This record aggregates all required rendering information and possible actions when the user is editing some column's filtering field.
 
-    { edited = Just "Bookshelf"
-    , applyMsg = Msg.SomeColumnApply
-    , clearMsg = Msg.SomeColumnClear
-    , closeMsg = Msg.SomeColumnDiscard
-    , editMsg = Msg.SomeColumnEdit column
-    , current = Just "Book"
+    { applyMsg = Just Msg.SomeColumnApply
+    , clearMsg = Just Msg.SomeColumnClear
+    , closeMsg = Just Msg.SomeColumnDiscard
+    , fields = [ Table.filterText someTextField ]
     }
 
 -}
@@ -219,6 +217,7 @@ type alias FilterEditConfig msg =
     }
 
 
+{-| -}
 type FilterField msg
     = FilterText (TextField msg)
 
@@ -317,6 +316,11 @@ table headers =
     Table { headers = headers } defaultOptions
 
 
+{-| Converts a `UI.TextField`(UI-TextField#TextField) into a filter field.
+
+    Table.filterText (TextField.singlelineText Msg.FilterUpdate "Some text" model.filter)
+
+-}
 filterText : TextField msg -> FilterField msg
 filterText field =
     FilterText field
@@ -580,12 +584,10 @@ columnFilterEmpty toggleMsg accu =
 
     columnsFilterEnd
         |> columnFilterEditing
-            { edited = Just "Bookshelf"
-            , applyMsg = Msg.ColumnCApply
-            , clearMsg = Msg.ColumnCClear
-            , closeMsg = Msg.ColumnCDiscard
-            , editMsg = Msg.ColumnCEdit
-            , current = Just "Book"
+            { applyMsg = Just Msg.ColumnCApply
+            , clearMsg = Just Msg.ColumnCClear
+            , closeMsg = Just Msg.ColumnCDiscard
+            , fields = [ Table.filterText (someTextField model.columnCFiter) ]
             }
         |> columnFilterEmpty Msg.FilterColumnB
         |> columnFilterEmpty Msg.FilterColumnA

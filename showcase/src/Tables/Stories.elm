@@ -229,14 +229,18 @@ filteredTableStory cfg =
             (columnsFilterEnd
                 |> columnFilterEmpty Msg.FilterColumnD
                 |> columnFilterEditing
-                    { edited = Just "Bookshelf"
-                    , applyMsg = Msg.ColumnCApply
-                    , clearMsg = Msg.ColumnCClear
+                    { applyMsg = Just Msg.ColumnCApply
+                    , clearMsg = Just Msg.ColumnCClear
                     , discardMsg = Msg.ColumnCDiscard
-                    , editMsg = Msg.ColumnCEdit
-                    , current = Just "Book"
+                    , fields =
+                        [ model.currentCFilter
+                            |>TextField.singlelineText
+                                Msg.ColumnCSet
+                                "Some text field"
+                            |> Table.filterText
+                        ]
                     }
-                |> columnFiltering Msg.ColumnBClear "Dan Brown"
+                |> columnFiltering Msg.ColumnBClear
                 |> columnFilterEmpty Msg.FilterColumnA
             )
     in
