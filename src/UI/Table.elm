@@ -81,6 +81,7 @@ module UI.Table exposing
 
 import Element exposing (Attribute, Element, fill, fillPortion, minimum, px, shrink)
 import Element.Border as Border
+import Element.Events as Events
 import Html.Attributes as HtmlAttrs
 import UI.Button as Button exposing (Button)
 import UI.Icon as Icon
@@ -192,11 +193,12 @@ type ColumnFilter msg
 
 
 type alias FilterEditConfig msg =
-    { edited : Bool
+    { edited : Maybe String
     , applyMsg : msg
     , clearMsg : msg
+    , discardMsg : msg
     , editMsg : String -> msg
-    , current : String
+    , current : Maybe String
     }
 
 
@@ -675,9 +677,9 @@ cellCrop width =
 
 
 filterEditing : RenderConfig -> ColumnWidth -> String -> FilterEditConfig msg -> Element msg
-filterEditing cfg width title { clearMsg, applyMsg, editMsg, current, edited } =
+filterEditing cfg width title { clearMsg, applyMsg, editMsg, discardMsg, current, edited } =
     Element.column []
-        [ overlayBackground
+        [ overlayBackground discardMsg
         , Element.column
             [ positionFixed
             , zIndex 9
@@ -694,13 +696,20 @@ filterEditing cfg width title { clearMsg, applyMsg, editMsg, current, edited } =
                 ]
                 [ Text.overline title
                     |> Text.renderElement cfg
+                , Button.fromIcon (Icon.close "Close")
+                    |> Button.cmd discardMsg Button.clear
+                    |> Button.withSize Size.extraSmall
+                    |> Button.renderElement cfg
                 ]
             , Element.column
                 [ Element.width fill
                 , Element.padding 12
                 , Element.spacing 20
                 ]
-                [ TextField.singlelineText editMsg title current
+                [ edited
+                    |> maybeNotThen current
+                    |> Maybe.withDefault ""
+                    |> TextField.singlelineText editMsg title
                     |> TextField.withWidth TextField.widthFull
                     |> TextField.renderElement cfg
                 , filterEditingButton cfg applyMsg clearMsg edited current
@@ -709,7 +718,7 @@ filterEditing cfg width title { clearMsg, applyMsg, editMsg, current, edited } =
         ]
 
 
-filterEditingButton : RenderConfig -> msg -> msg -> Bool -> String -> Element msg
+filterEditingButton : RenderConfig -> msg -> msg -> Maybe String -> Maybe String -> Element msg
 filterEditingButton cfg applyMsg clearMsg edited current =
     let
         clearBtn =
@@ -730,18 +739,19 @@ filterEditingButton cfg applyMsg clearMsg edited current =
                 |> Button.withSize Size.extraSmall
                 |> Button.renderElement cfg
     in
-    if current == "" then
-        disabledBtn
+    case edited of
+        Just "" ->
+            clearBtn
 
-    else if edited then
-        Element.row [ Element.spacing 8 ] [ applyBtn, clearBtn ]
+        Just _ ->
+            Element.row [ Element.spacing 8 ] [ applyBtn, clearBtn ]
 
-    else
-        clearBtn
+        Nothing ->
+            disabledBtn
 
 
-overlayBackground : Element msg
-overlayBackground =
+overlayBackground : msg -> Element msg
+overlayBackground onClickMsg =
     Element.el
         [ positionFixed
         , zIndex 8
@@ -750,6 +760,7 @@ overlayBackground =
         , Element.htmlAttribute <| HtmlAttrs.style "left" "0"
         , Element.htmlAttribute <| HtmlAttrs.style "width" "100vw"
         , Element.htmlAttribute <| HtmlAttrs.style "height" "100vh"
+        , Events.onClick onClickMsg
         ]
         Element.none
 

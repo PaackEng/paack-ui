@@ -36,6 +36,79 @@ update msg model =
         Tables.Select newValue ->
             ( { model | selected = Just newValue }, Cmd.none )
 
+        Tables.FilterApply ->
+            case model.editing of
+                Just ( column, Just value ) ->
+                    apply column (Just value) model
+
+                _ ->
+                    ( model, Cmd.none )
+
+        Tables.FilterClear column ->
+            apply column Nothing model
+
+        Tables.FilterEdit column value ->
+            ( { model | editing = Just ( column, value ) }
+            , Cmd.none
+            )
+
+        Tables.FilterDiscard ->
+            ( { model | editing = Nothing }
+            , Cmd.none
+            )
+
+
+apply : Tables.Column -> Maybe String -> Tables.Model -> Return Tables.Msg Tables.Model
+apply column value model =
+    case column of
+        Tables.ColumnA ->
+            let
+                oldFilters =
+                    model.filters
+
+                newFilters =
+                    { oldFilters | columnA = value }
+            in
+            ( { model | filters = newFilters, editing = Nothing }
+            , Cmd.none
+            )
+
+        Tables.ColumnB ->
+            let
+                oldFilters =
+                    model.filters
+
+                newFilters =
+                    { oldFilters | columnB = value }
+            in
+            ( { model | filters = newFilters, editing = Nothing }
+            , Cmd.none
+            )
+
+        Tables.ColumnC ->
+            let
+                oldFilters =
+                    model.filters
+
+                newFilters =
+                    { oldFilters | columnC = value }
+            in
+            ( { model | filters = newFilters, editing = Nothing }
+            , Cmd.none
+            )
+
+        Tables.ColumnD ->
+            let
+                oldFilters =
+                    model.filters
+
+                newFilters =
+                    { oldFilters | columnD = value }
+            in
+            ( { model | filters = newFilters, editing = Nothing }
+            , Cmd.none
+            )
+
 
 stories cfg =
     storiesOf
@@ -145,9 +218,9 @@ responsiveTable cfg selectedSomeone =
 
 
 filteredTableStory cfg =
-    story
+    storyWithModel
         ( "Filtered Table"
-        , filteredTable cfg
+        , \{ tablesStories } -> filteredTable cfg tablesStories
         , { note = """```elm
 filteredTable : RenderConfig -> Element msg
 filteredTable cfg =
@@ -267,7 +340,7 @@ mobileCfg =
     RenderConfig.fromWindow { width = 375, height = 667 }
 
 
-filteredTable cfg =
+filteredTable cfg model =
     let
         headers =
             header "HEADER A" <| header "HEADER B" <| header "HEADER C" <| header "HEADER D" <| headersEnd
@@ -281,23 +354,46 @@ filteredTable cfg =
                 |> cell "CELL C3"
                 |> cell "CELL B3"
                 |> cell "FIRST-CELL A3"
+            , cell "FIRST-CELL A4" <| cell "CELL B4" <| cell "CELL C4" <| cell "LAST-CELL D4" <| rowEnd
+            , cell "FIRST-CELL A5" <| cell "CELL B5" <| cell "CELL C5" <| cell "LAST-CELL D5" <| rowEnd
             ]
 
         columnsWidth =
             columnWidthPixels 145 <| columnWidthPixels 130 <| columnWidthPixels 120 <| columnWidthPixels 145 <| columnsWidthEnd
 
+        filterEdit column current edited =
+            { edited = edited
+            , applyMsg = Tables.FilterApply |> Msg.TablesStoriesMsg
+            , clearMsg = Tables.FilterClear column |> Msg.TablesStoriesMsg
+            , discardMsg = Tables.FilterDiscard |> Msg.TablesStoriesMsg
+            , editMsg = Just >> Tables.FilterEdit column >> Msg.TablesStoriesMsg
+            , current = current
+            }
+
+        columnFilter column =
+            case grapColumn column model of
+                Just edited ->
+                    edited
+                        |> filterEdit column
+                            (Tables.getColumnFilter column model)
+                        |> columnFilterEditing
+
+                Nothing ->
+                    case Tables.getColumnFilter column model of
+                        Just current ->
+                            columnFiltering
+                                (Msg.TablesStoriesMsg <| Tables.FilterClear column)
+                                current
+
+                        Nothing ->
+                            columnFilterEmpty (Msg.TablesStoriesMsg <| Tables.FilterEdit column Nothing)
+
         columnsFilter =
             columnsFilterEnd
-                |> columnFilterEmpty Msg.NoOp
-                |> columnFiltering Msg.NoOp "Whatever"
-                |> columnFilterEditing
-                    { edited = True
-                    , applyMsg = Msg.NoOp
-                    , clearMsg = Msg.NoOp
-                    , editMsg = always Msg.NoOp
-                    , current = "Whatever"
-                    }
-                |> columnFilterEmpty Msg.NoOp
+                |> columnFilter Tables.ColumnD
+                |> columnFilter Tables.ColumnC
+                |> columnFilter Tables.ColumnB
+                |> columnFilter Tables.ColumnA
 
         cell str =
             Text.body1 str |> cellFromText
@@ -310,3 +406,16 @@ filteredTable cfg =
         |> List.singleton
         |> (::) iconsSvgSprite
         |> Element.wrappedRow [ Element.width fill ]
+
+
+grapColumn column { editing } =
+    case editing of
+        Just ( editingColumn, edited ) ->
+            if editingColumn == column then
+                Just edited
+
+            else
+                Nothing
+
+        Nothing ->
+            Nothing
