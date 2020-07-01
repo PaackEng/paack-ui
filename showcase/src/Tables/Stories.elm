@@ -221,35 +221,7 @@ filteredTableStory cfg =
     storyWithModel
         ( "Filtered Table"
         , \{ tablesStories } -> filteredTable cfg tablesStories
-        , { note = """```elm
-filteredTable : RenderConfig -> Element msg
-filteredTable cfg =
-    let
-        headers =
-            header "HEADER A" <| header "HEADER B" <| header "HEADER C" <| header "HEADER D" <| headersEnd
-
-        rows =
-            [ cell "FIRST-CELL A1" <| cell "CELL B1" <| cell "CELL C1" <| cell "LAST-CELL D1" <| rowEnd
-            , cell "FIRST-CELL A2" <| cell "CELL B2" <| cell "CELL C2" <| cell "LAST-CELL D2" <| rowEnd
-            , rowEnd -- Always in reverse so it's O(1) and not O(N)
-                |> cell "LAST-CELL D3"
-                |> cell "CELL C3"
-                |> cell "CELL B3"
-                |> cell "FIRST-CELL A3"
-            ]
-
-        columnsWidth =
-            columnWidthPortion 2 <| columnWidthPortion 1 <| columnWidthPortion 1 <| columnWidthPortion 2 <| columnsWidthEnd
-
-        cell str =
-            Text.body1 str |> Table.cellFromText
-    in
-    table headers
-        |> Table.withStaticRows rows
-        |> Table.withWidth fill
-        |> Table.withColumnsWidth columnsWidth
-        |> Table.renderElement cfg
-```"""
+        , { note = "" -- TODO
           }
         )
 
@@ -359,7 +331,7 @@ filteredTable cfg model =
             ]
 
         columnsWidth =
-            columnWidthPixels 145 <| columnWidthPixels 130 <| columnWidthPixels 120 <| columnWidthPixels 145 <| columnsWidthEnd
+            columnWidthPixels 145 <| columnWidthPixels 130 <| columnWidthPixels 130 <| columnWidthPixels 145 <| columnsWidthEnd
 
         filterEdit column current edited =
             { edited = edited
@@ -373,10 +345,14 @@ filteredTable cfg model =
         columnFilter column =
             case grapColumn column model of
                 Just edited ->
-                    edited
-                        |> filterEdit column
-                            (Tables.getColumnFilter column model)
-                        |> columnFilterEditing
+                    columnFilterEditing
+                        { edited = edited
+                        , applyMsg = Tables.FilterApply |> Msg.TablesStoriesMsg
+                        , clearMsg = Tables.FilterClear column |> Msg.TablesStoriesMsg
+                        , discardMsg = Tables.FilterDiscard |> Msg.TablesStoriesMsg
+                        , editMsg = Just >> Tables.FilterEdit column >> Msg.TablesStoriesMsg
+                        , current = Tables.getColumnFilter column model
+                        }
 
                 Nothing ->
                     case Tables.getColumnFilter column model of
