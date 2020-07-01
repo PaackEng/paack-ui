@@ -185,6 +185,8 @@ type alias HeaderCell msg =
     }
 
 
+{-| `ColumnFilter` specifies how filters are applied in a column basis.
+-}
 type ColumnFilter msg
     = FilterUnavailable
     | FilterEmpty msg -- msg: Toggle
@@ -192,6 +194,17 @@ type ColumnFilter msg
     | FilterSet msg String -- msg: Clear
 
 
+{-| This record aggregates all required rendering information and possible actions when the user is editing some column's filtering field.
+
+    { edited = Just "Bookshelf"
+    , applyMsg = Msg.SomeColumnApply
+    , clearMsg = Msg.SomeColumnClear
+    , discardMsg = Msg.SomeColumnDiscard
+    , editMsg = Msg.SomeColumnEdit column
+    , current = Just "Book"
+    }
+
+-}
 type alias FilterEditConfig msg =
     { edited : Maybe String
     , applyMsg : msg
@@ -407,6 +420,24 @@ withColumnsDetails row (Table prop opt_) =
     Table { prop | headers = NList.map2 mergeVisibility prop.headers row } opt_
 
 
+{-| Allows the user to edit filters per column.
+
+    Table.withColumnsFilter
+        (columnsFilterEnd
+            |> columnFilterEditing
+                { edited = Just "Bookshelf"
+                , applyMsg = Msg.ColumnCApply
+                , clearMsg = Msg.ColumnCClear
+                , discardMsg = Msg.ColumnCDiscard
+                , editMsg = Msg.ColumnCEdit
+                , current = Just "Book"
+                }
+            |> columnFiltering Msg.ColumnBClear "Dan Brown"
+            |> columnFilterEmpty Msg.FilterColumnA
+        )
+        someThreeColumnsTable
+
+-}
 withColumnsFilter : OptRow (ColumnFilter msg) columns -> Table msg object columns -> Table msg object columns
 withColumnsFilter row (Table prop opt_) =
     let
@@ -509,9 +540,9 @@ columnMobileDetailsShowIf condition accu =
     opt condition accu
 
 
-{-| Marks the end of a [`OptRow ColumnWidth`](UI-Table#ColumnWidth).
+{-| Marks the end of a [`OptRow ColumnFilter`](UI-Table#ColumnFilter).
 
-    columnWidthPortion 3 <| columnWidthPixels 240 <| columnWidthPortion 2 <| columnsWidthEnd
+    columnFilterEmpty Msg.FilterColumnB <| columnFilterEmpty Msg.FilterColumnA <| columnsFilterEnd
 
 -}
 columnsFilterEnd : OptRow (ColumnFilter msg) T.Zero
@@ -519,16 +550,47 @@ columnsFilterEnd =
     optsEnd
 
 
+{-| This column can be filtered, but currently no filter was applied.
+
+    columnsFilterEnd
+        |> columnFilterEmpty Msg.FilterColumnC
+        |> columnFilterEmpty Msg.FilterColumnB
+        |> columnFilterEmpty Msg.FilterColumnA
+
+-}
 columnFilterEmpty : msg -> OptRow (ColumnFilter msg) columns -> OptRow (ColumnFilter msg) (T.Increase columns)
 columnFilterEmpty toggleMsg accu =
     opt (FilterEmpty toggleMsg) accu
 
 
+{-| The user is currently editing the value used to filter this column.
+
+    columnsFilterEnd
+        |> columnFilterEditing
+            { edited = Just "Bookshelf"
+            , applyMsg = Msg.ColumnCApply
+            , clearMsg = Msg.ColumnCClear
+            , discardMsg = Msg.ColumnCDiscard
+            , editMsg = Msg.ColumnCEdit
+            , current = Just "Book"
+            }
+        |> columnFilterEmpty Msg.FilterColumnB
+        |> columnFilterEmpty Msg.FilterColumnA
+
+-}
 columnFilterEditing : FilterEditConfig msg -> OptRow (ColumnFilter msg) columns -> OptRow (ColumnFilter msg) (T.Increase columns)
 columnFilterEditing config accu =
     opt (FilterEditing config) accu
 
 
+{-| This column is currently being filtered.
+
+    columnsFilterEnd
+        |> columnFilterEmpty Msg.FilterColumnC
+        |> columnFiltering Msg.ColumnBClear "Dan Brown"
+        |> columnFilterEmpty Msg.FilterColumnA
+
+-}
 columnFiltering : msg -> String -> OptRow (ColumnFilter msg) columns -> OptRow (ColumnFilter msg) (T.Increase columns)
 columnFiltering clearMsg current accu =
     opt (FilterSet clearMsg current) accu
@@ -712,14 +774,14 @@ filterEditing cfg width title { clearMsg, applyMsg, editMsg, discardMsg, current
                     |> TextField.singlelineText editMsg title
                     |> TextField.withWidth TextField.widthFull
                     |> TextField.renderElement cfg
-                , filterEditingButton cfg applyMsg clearMsg edited current
+                , filterEditingButton cfg applyMsg clearMsg edited
                 ]
             ]
         ]
 
 
-filterEditingButton : RenderConfig -> msg -> msg -> Maybe String -> Maybe String -> Element msg
-filterEditingButton cfg applyMsg clearMsg edited current =
+filterEditingButton : RenderConfig -> msg -> msg -> Maybe String -> Element msg
+filterEditingButton cfg applyMsg clearMsg edited =
     let
         clearBtn =
             Button.fromLabel "Clear"
