@@ -221,7 +221,30 @@ filteredTableStory cfg =
     storyWithModel
         ( "Filtered Table"
         , \{ tablesStories } -> filteredTable cfg tablesStories
-        , { note = "" -- TODO
+        , { note = """```elm
+        -- There are many ways to implement this in your model, so here it's a generic example:
+        columnsFilters =
+            (columnsFilterEnd
+                |> columnFilterEmpty Msg.FilterColumnD
+                |> columnFilterEditing
+                    { edited = Just "Bookshelf"
+                    , applyMsg = Msg.ColumnCApply
+                    , clearMsg = Msg.ColumnCClear
+                    , discardMsg = Msg.ColumnCDiscard
+                    , editMsg = Msg.ColumnCEdit
+                    , current = Just "Book"
+                    }
+                |> columnFiltering Msg.ColumnBClear "Dan Brown"
+                |> columnFilterEmpty Msg.FilterColumnA
+            )
+    in
+    table headers
+        |> Table.withStaticRows rows
+        |> Table.withWidth fill
+        |> Table.withColumnsWidth columnsWidth
+        |> Table.withColumnsFilter columnsFilters
+        |> Table.renderElement cfg
+```"""
           }
         )
 
