@@ -1,7 +1,7 @@
 module UI.Table exposing
-    ( Table, State, Msg, table, withItems
+    ( Table, State, Msg, Cell, table, withItems
     , Columns, Column, columnsEmpty, columnsPushHeader, columnsPush
-    , Row, Cell, rowEmpty
+    , Row, rowEmpty, rowPushText, rowPushButton
     , Responsive, Cover, Details, Detail, withResponsive
     , withFilters
     , withWidth
@@ -30,7 +30,7 @@ module UI.Table exposing
 
 # Table
 
-@docs Table, State, Msg, table, withItems
+@docs Table, State, Msg, Cell, table, withItems
 
 
 ## Desktop
@@ -40,7 +40,7 @@ module UI.Table exposing
 
 ## Desktop Rows
 
-@docs Row, Cell, rowEmpty
+@docs Row, rowEmpty, rowPushText, rowPushButton
 
 
 ## Mobile
@@ -161,7 +161,7 @@ columnsEmpty =
 
 columnsPushHeader : String -> Columns columns -> Columns (T.Increase columns)
 columnsPushHeader header accu =
-    NArray.append (Column header defaultColumnConfig) accu
+    NArray.append (headerToColumn header) accu
 
 
 columnsPush : Column -> Columns columns -> Columns (T.Increase columns)
@@ -172,6 +172,37 @@ columnsPush header config accu =
 defaultColumnWidth : ColumnWidth
 defaultColumnWidth =
     WidthPortion 1
+
+
+headerToColumn : String -> Column
+headerToColumn header =
+    Column header defaultColumnConfig
+
+
+{-| Similar to [`Element.fillPortion`](/packages/mdgriffith/elm-ui/latest/Element#fillPortion) but applied to an entire Table's column.
+
+    columnEmpty
+        |> columnsPush (headerToColumn "Title" |> columnWidthPortion 3)
+        |> columnsPush (headerToColumn "Author" |> columnWidthPortion 3)
+        |> columnsPush (headerToColumn "Year" |> columnWidthPortion 2)
+
+-}
+columnWidthPortion : Int -> Column -> Column
+columnWidthPortion int (Column header opt) =
+    Column header { opt | width = WidthPortion value }
+
+
+{-| Similar to [`Element.px`](/packages/mdgriffith/elm-ui/latest/Element#px) but applied to an entire Table's column.
+
+    columnEmpty
+        |> columnsPush (headerToColumn "Title" |> columnWidthPixels 320)
+        |> columnsPush (headerToColumn "Author" |> columnWidthPixels 320)
+        |> columnsPush (headerToColumn "Year" |> columnWidthPixels 240)
+
+-}
+columnWidthPixels : Int -> Column -> Column
+columnWidthPixels value (Column header opt) =
+    Column header { opt | width = WidthPixels value }
 
 
 
@@ -213,7 +244,7 @@ rowPushButton btn accu =
 
 
 
--- Mobile
+-- Responsive
 
 
 type alias Cover =

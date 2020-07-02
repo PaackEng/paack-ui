@@ -1,5 +1,10 @@
-module Tables.Model exposing (Column(..), Model, ModelFilters, getColumnFilter, initModel)
+module Tables.Model exposing (..)
 
 
 type alias Model =
+    ()
+
+
+initModel : Model
+initModel =
     ()
