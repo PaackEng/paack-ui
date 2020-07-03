@@ -1,7 +1,13 @@
 module UI.Internal.Filters exposing (..)
 
 import Dict exposing (Dict)
+import UI.Internal.Basics exposing (swap)
 import UI.Internal.NArray as NArray exposing (NArray)
+
+
+type Msg
+    = EditSingleTextFilter { column : Int, value : String }
+    | EditMultiTextFilter { column : Int, field : Int, value : String }
 
 
 type alias Filters msg item columns =
@@ -15,6 +21,10 @@ type Filter msg item
     | RangeDateFilter (RangeDateFilterConfig msg item)
     | PeriodDateFilter (PeriodDateFilterConfig msg item)
     | SelectFilter (SelectFilterConfig msg item)
+
+
+type alias Model =
+    Dict Int FilterModel
 
 
 type FilterModel
@@ -39,6 +49,16 @@ type TimePeriod
 type Strategy msgs value item
     = Local (item -> value -> Bool)
     | Remote msgs
+
+
+init : Model
+init =
+    Dict.empty
+
+
+editableEmpty : Editable something
+editableEmpty =
+    { current = Nothing, applied = Nothing }
 
 
 
@@ -165,3 +185,64 @@ type alias SelectFilterStrategy msg item =
 type alias SelectFilterRemote msg =
     { selectMsg : Int -> msg
     }
+
+
+
+-- Update
+
+
+update : Msg -> Model -> Model
+update msg model =
+    case msg of
+        EditSingleTextFilter { column, value } ->
+            model
+                |> getSingleTextEditable column
+                |> updateEditable value
+                |> SingleTextModel
+                |> swap (Dict.insert column) model
+
+        EditMultiTextFilter { column, field, value } ->
+            editMultiTextFilter column field value model
+
+
+updateEditable : value -> Editable value -> Editable value
+updateEditable new old =
+    { old | current = Just new }
+
+
+getSingleTextEditable : Int -> Model -> Editable String
+getSingleTextEditable column model =
+    case Dict.get column model of
+        Just (SingleTextModel data) ->
+            data
+
+        _ ->
+            editableEmpty
+
+
+editMultiTextFilter : Int -> Int -> String -> Model -> Model
+editMultiTextFilter column field value model =
+    let
+        oldDict =
+            getMultiTextDict column model
+
+        oldEditable =
+            oldDict
+                |> Dict.get field
+                |> Maybe.withDefault editableEmpty
+    in
+    oldEditable
+        |> updateEditable value
+        |> swap (Dict.insert field) oldDict
+        |> MultiTextModel
+        |> swap (Dict.insert column) model
+
+
+getMultiTextDict : Int -> Model -> Dict Int (Editable String)
+getMultiTextDict column model =
+    case Dict.get column model of
+        Just (MultiTextModel data) ->
+            data
+
+        _ ->
+            Dict.empty

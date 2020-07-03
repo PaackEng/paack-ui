@@ -1,8 +1,10 @@
 module UI.Table exposing
-    ( Table, State, Msg, Cell, table, stateInit, withItems
+    ( Table, table, withItems
+    , State, Msg, stateInit, stateUpdate
     , Columns, Column, columnsEmpty, columnsPushHeader, columnsPush
     , Row, rowEmpty, rowPushText, rowPushButton
     , Responsive, Cover, Details, Detail, withResponsive, detailsEmpty, detailsPush, detailsPushHidden
+    , Cell, cellFromText, cellFromButton
     , Filters, withFilters, filtersEmpty, filtersPushSingleText
     , Strategy, filterLocal, filterRemote
     , withWidth
@@ -55,7 +57,12 @@ Where:
 
 # Table
 
-@docs Table, State, Msg, Cell, table, stateInit, withItems
+@docs Table, table, withItems
+
+
+## State
+
+@docs State, Msg, stateInit, stateUpdate
 
 
 ## Desktop
@@ -71,6 +78,11 @@ Where:
 ## Mobile
 
 @docs Responsive, Cover, Details, Detail, withResponsive, detailsEmpty, detailsPush, detailsPushHidden
+
+
+## Exposed cell
+
+@docs Cell, cellFromText, cellFromButton
 
 
 # Filters
@@ -94,7 +106,6 @@ Where:
 
 -}
 
-import Dict exposing (Dict)
 import Element exposing (Attribute, Element, fill, fillPortion, minimum, px, shrink)
 import UI.Button as Button exposing (Button)
 import UI.Internal.Basics exposing (swap)
@@ -128,24 +139,6 @@ type alias Options msg item columns =
     }
 
 
-type Msg
-    = Msg
-
-
-type State
-    = State StateModel
-
-
-type alias StateModel =
-    { filters : Dict Int Filters.FilterModel
-    , mobileSelected : Maybe Int
-    }
-
-
-type alias ToRow msg item columns =
-    item -> Row msg columns
-
-
 table : (Msg -> msg) -> Columns columns -> ToRow msg item columns -> Table msg item columns
 table toExtern columns toRow =
     Table { columns = columns, toRow = toRow, toExtern = toExtern } defaultOptions
@@ -161,14 +154,47 @@ defaultOptions =
     }
 
 
-stateInit : State
-stateInit =
-    State { filters = Dict.empty, mobileSelected = Nothing }
-
-
 withItems : List item -> Table msg item columns -> Table msg item columns
 withItems items (Table prop opt) =
     Table prop { opt | items = items }
+
+
+
+-- State
+
+
+type Msg
+    = MobileExpand Int
+    | MobileCollapse
+    | ForFilters Filters.Msg
+
+
+type State
+    = State StateModel
+
+
+type alias StateModel =
+    { filters : Filters.Model
+    , mobileSelected : Maybe Int
+    }
+
+
+stateInit : State
+stateInit =
+    State { filters = Filters.init, mobileSelected = Nothing }
+
+
+stateUpdate : Msg -> State -> State
+stateUpdate msg (State state) =
+    case msg of
+        MobileExpand index ->
+            State { state | mobileSelected = Just index }
+
+        MobileCollapse ->
+            State { state | mobileSelected = Nothing }
+
+        ForFilters subMsg ->
+            State { state | filters = Filters.update subMsg state.filters }
 
 
 
@@ -252,6 +278,10 @@ columnWidthPixels value (Column header opt) =
 
 type alias Row msg columns =
     NArray (Cell msg) columns
+
+
+type alias ToRow msg item columns =
+    item -> Row msg columns
 
 
 type Cell msg
