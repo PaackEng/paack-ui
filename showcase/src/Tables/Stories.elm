@@ -8,24 +8,7 @@ import Tables.Msg as Tables
 import UI.Internal.Basics exposing (maybeNotThen)
 import UI.Internal.TypeNumbers as T
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
-import UI.Table as Table
-    exposing
-        ( cellFromText
-        , columnFilterEditing
-        , columnFilterEmpty
-        , columnFiltering
-        , columnMobileDetailsHide
-        , columnMobileDetailsShow
-        , columnWidthPixels
-        , columnWidthPortion
-        , columnsFilterEnd
-        , columnsMobileDetailsEnd
-        , columnsWidthEnd
-        , header
-        , headersEnd
-        , rowEnd
-        , table
-        )
+import UI.Table as Table exposing (..)
 import UI.Text as Text exposing (Text)
 import UI.TextField as TextField
 import UIExplorer exposing (storiesOf)

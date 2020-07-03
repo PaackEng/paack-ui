@@ -18,12 +18,12 @@ type Filter msg item
 
 
 type FilterModel
-    = SingleTextFilter (Editable String)
-    | MultiTextFilter (Dict Int (Editable String))
-    | SingleDateFilter (Editable String)
-    | RangeDateFilter { from : Editable String, to : Editable String }
-    | PeriodDateFilter { date : Editable String, timePeriod : Editable TimePeriod }
-    | SelectFilter (Editable Int)
+    = SingleTextModel (Editable String)
+    | MultiTextModel (Dict Int (Editable String))
+    | SingleDateModel (Editable String)
+    | RangeDateModel { from : Editable String, to : Editable String }
+    | PeriodDateModel { date : Editable String, timePeriod : Editable TimePeriod }
+    | SelectModel (Editable Int)
 
 
 type alias Editable something =
@@ -37,8 +37,18 @@ type TimePeriod
 
 
 type Strategy msgs value item
-    = Local (value -> item -> Bool)
+    = Local (item -> value -> Bool)
     | Remote msgs
+
+
+
+-- Configs
+
+
+type alias FilterConfig data strategy =
+    { init : data
+    , strategy : strategy
+    }
 
 
 
@@ -46,9 +56,7 @@ type Strategy msgs value item
 
 
 type alias SingleTextFilterConfig msg item =
-    { init : String
-    , strategy : SingleTextFilterStrategy msg item
-    }
+    FilterConfig String (SingleTextFilterStrategy msg item)
 
 
 type alias SingleTextFilterStrategy msg item =
@@ -65,9 +73,7 @@ type alias SingleTextFilterRemote msg =
 
 
 type alias MultiTextFilterConfig msg item =
-    { init : List String
-    , strategy : MultiTextFilterStrategy msg item
-    }
+    FilterConfig (List String) (MultiTextFilterStrategy msg item)
 
 
 type alias MultiTextFilterStrategy msg item =
@@ -88,9 +94,7 @@ type alias Date =
 
 
 type alias SingleDateFilterConfig msg item =
-    { init : Maybe Date
-    , strategy : SingleDateFilterStrategy msg item
-    }
+    FilterConfig (Maybe Date) (SingleDateFilterStrategy msg item)
 
 
 type alias SingleDateFilterStrategy msg item =
@@ -111,9 +115,7 @@ type alias RangeDate =
 
 
 type alias RangeDateFilterConfig msg item =
-    { init : Maybe Date
-    , strategy : RangeDateFilterStrategy msg item
-    }
+    FilterConfig (Maybe Date) (RangeDateFilterStrategy msg item)
 
 
 type alias RangeDateFilterStrategy msg item =
@@ -135,9 +137,7 @@ type alias PeriodDate =
 
 
 type alias PeriodDateFilterConfig msg item =
-    { init : PeriodDate
-    , strategy : PeriodDateFilterStrategy msg item
-    }
+    FilterConfig PeriodDate (PeriodDateFilterStrategy msg item)
 
 
 type alias PeriodDateFilterStrategy msg item =
@@ -154,16 +154,14 @@ type alias PeriodDateFilterRemote msg =
 -- SelectFilter
 
 
-type alias SingleTextFilterConfig msg item =
-    { init : Maybe Int
-    , strategy : SingleTextFilterStrategy msg item
-    }
+type alias SelectFilterConfig msg item =
+    FilterConfig (Maybe Int) (SelectFilterStrategy msg item)
 
 
-type alias SingleTextFilterStrategy msg item =
-    Strategy (SingleTextFilterRemote msg) Int item
+type alias SelectFilterStrategy msg item =
+    Strategy (SelectFilterRemote msg) Int item
 
 
-type alias SingleTextFilterRemote msg =
+type alias SelectFilterRemote msg =
     { selectMsg : Int -> msg
     }

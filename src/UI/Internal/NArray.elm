@@ -1,6 +1,7 @@
 module UI.Internal.NArray exposing (..)
 
-import UI.Internal.NList exposing (NList)
+import Array exposing (Array)
+import UI.Internal.NList exposing (NList(..))
 import UI.Internal.TypeNumbers as T
 
 
@@ -19,7 +20,7 @@ empty =
 
 get : Int -> NArray data n -> Maybe data
 get index (NArray array) =
-    NArray (Array.get index array)
+    Array.get index array
 
 
 set : Int -> data -> NArray data n -> NArray data n
