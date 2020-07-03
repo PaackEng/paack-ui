@@ -27,33 +27,45 @@ module UI.Table exposing
         |> Table.withWidth (Element.fill |> Element.maximum 640)
         |> Table.withFilters someFilters
         |> Table.withItems
-            [ Book "Dan Brown" "The Da Vinci Code" ]
+            [ Book "Dan Brown" "Angels & Demons" "2000"
+            , Book "Dan Brown" "The Da Vinci Code" "2003"
+            , Book "Dan Brown" "The Lost Symbol" "2009"
+            , Book "Dan Brown" "Inferno" "2013"
+            , Book "Dan Brown" "Origin" "2017"
+            ]
         |> Table.renderElement renderConfig
 
-Where:
+Where `Book` is:
+
+    type alias Book =
+        { author : String, title : String, year : String }
 
     tableColumns =
         columnsEmpty
-            |> columnsPushHeader "Title"
+            |> columnsPush (headerToColumn "Title" |> columnWidthPortion 3)
             |> columnsPush (headerToColumn "Author" |> columnWidthPortion 3)
+            |> columnsPushHeader "Year"
 
-    toTableRow { author, title } =
+    toTableRow { author, title, year } =
         rowEmpty
             |> rowPushText (Text.body1 title)
             |> rowPushText (Text.body2 author)
+            |> rowPushText (Text.caption year)
 
     toTableDetails { author, title } =
         detailsEmpty
             |> detailsPushHidden
             |> detailsPush { label = "Author", content = cellFromText <| Text.body2 author }
+            |> detailsPushHidden
 
-    toTableCover { author, title } =
-        { title = title, caption = Nothing }
+    toTableCover { title, year } =
+        { title = title, caption = Just year }
 
     someFilters =
         filtersEmpty
             |> filtersPushSingleText "" (filterLocal (\{ title } str -> String.contains str title))
             |> filtersPushSingleText "" (filterRemote { editMsg = Msg.FilterAuthor })
+            |> filtersPushSingleText "" (filterLocal (\{ year } str -> String.contains str year))
 
 
 # Table
