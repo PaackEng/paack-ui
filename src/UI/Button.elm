@@ -1,6 +1,6 @@
 module UI.Button exposing
     ( Button, toggle, success, disabled, cmd, redirect
-    , ButtonBody, fromLabel, fromIcon, fromNested
+    , ButtonBody, fromLabel, fromIcon, fromNested, fromAtomicNest
     , ButtonStyle, hyperlink, primary, danger, light, clear
     , ButtonWidth, withWidth, widthFull, widthRelative
     , withSize
@@ -30,7 +30,7 @@ A button can be created and rendered as in the following pipeline:
 
 # Content
 
-@docs ButtonBody, fromLabel, fromIcon, fromNested
+@docs ButtonBody, fromLabel, fromIcon, fromNested, fromAtomicNest
 
 
 # Style
@@ -90,7 +90,7 @@ type alias Options =
 
 
 type alias Properties msg =
-    { body : ButtonBody
+    { body : ButtonBody msg
     , mode : ButtonMode msg
     }
 
@@ -102,13 +102,14 @@ type Button msg
     | Toggle (ToggleProperties msg) Options
 
 
-{-| The `ButtonBody` is required when assembling the most-basic `Button msg` type.
+{-| The `ButtonBody msg` is required when assembling the most-basic `Button msg` type.
 It indicates the contents inside of the desired button, like its label or icon.
 -}
-type ButtonBody
+type ButtonBody msg
     = BodyText String
     | BodyIcon Icon
     | BodyNested String (String -> Icon)
+    | BodyAtomicNest String (Button msg)
 
 
 type ButtonAction msg
@@ -194,7 +195,7 @@ It's another approach for [`Button.withDisabledIf`](#withDisabledIf), helping wh
             Button.disabled body
 
 -}
-disabled : ButtonBody -> Button msg
+disabled : ButtonBody msg -> Button msg
 disabled body =
     Button { mode = ButtonDisabled, body = body } defaultOptions
 
@@ -210,7 +211,7 @@ It's another approach for [`Button.withSuccessIf`](#withSuccessIf), helping when
             Button.success body
 
 -}
-success : ButtonBody -> Button msg
+success : ButtonBody msg -> Button msg
 success body =
     Button { mode = ButtonSuccess, body = body } defaultOptions
 
@@ -223,7 +224,7 @@ It uses a simple message that is triggered on a click and renders as an embossed
         |> Button.renderElement renderConfig
 
 -}
-cmd : msg -> ButtonStyle -> ButtonBody -> Button msg
+cmd : msg -> ButtonStyle -> ButtonBody msg -> Button msg
 cmd msg style body =
     Button
         { mode = ButtonActive (ActionMsg msg) style
@@ -239,7 +240,7 @@ cmd msg style body =
         |> Button.renderElement renderConfig
 
 -}
-redirect : Link -> ButtonStyle -> ButtonBody -> Button msg
+redirect : Link -> ButtonStyle -> ButtonBody msg -> Button msg
 redirect link style body =
     Button
         { mode = ButtonActive (ActionRedirect link) style
@@ -257,7 +258,7 @@ redirect link style body =
     Button.fromLabel "Click here"
 
 -}
-fromLabel : String -> ButtonBody
+fromLabel : String -> ButtonBody msg
 fromLabel label =
     BodyText label
 
@@ -267,16 +268,21 @@ fromLabel label =
     Button.fromIcon (Icon.map "Go to maps")
 
 -}
-fromIcon : Icon -> ButtonBody
+fromIcon : Icon -> ButtonBody msg
 fromIcon icon =
     BodyIcon icon
 
 
-{-| `Button.fromIcon` initiates a button's body with an icon-button nested inside another labeled-button.
--}
-fromNested : String -> (String -> Icon) -> ButtonBody
+fromNested : String -> (String -> Icon) -> ButtonBody msg
 fromNested label icon =
     BodyNested label icon
+
+
+fromAtomicNest : String -> (String -> Icon) -> msg -> ButtonBody msg
+fromAtomicNest label icon onSubClick =
+    fromIcon (icon label)
+        |> cmd onSubClick danger
+        |> BodyAtomicNest label
 
 
 
@@ -444,18 +450,32 @@ map applier button =
 
                 ActionRedirect realLink ->
                     ActionRedirect realLink
+
+        mapBody oldBody =
+            case oldBody of
+                BodyIcon icon ->
+                    BodyIcon icon
+
+                BodyText text ->
+                    BodyText text
+
+                BodyNested text icon ->
+                    BodyNested text icon
+
+                BodyAtomicNest text subButton ->
+                    BodyAtomicNest text (map applier subButton)
     in
     case button of
         Button { mode, body } opt ->
             case mode of
                 ButtonActive action style ->
-                    Button { mode = ButtonActive (newAction action) style, body = body } opt
+                    Button { mode = ButtonActive (newAction action) style, body = mapBody body } opt
 
                 ButtonDisabled ->
-                    Button { mode = ButtonDisabled, body = body } opt
+                    Button { mode = ButtonDisabled, body = mapBody body } opt
 
                 ButtonSuccess ->
-                    Button { mode = ButtonSuccess, body = body } opt
+                    Button { mode = ButtonSuccess, body = mapBody body } opt
 
         Toggle { current, toggleMsg, hint } opt ->
             Toggle
@@ -529,7 +549,7 @@ hyperlinkView :
     RenderConfig
     -> Size
     -> ButtonWidth
-    -> ButtonBody
+    -> ButtonBody msg
     -> ButtonAction msg
     -> Element msg
 hyperlinkView cfg size width body action =
@@ -562,7 +582,7 @@ workingView :
     -> Size
     -> ButtonWidth
     -> EmbossedTone
-    -> ButtonBody
+    -> ButtonBody msg
     -> ButtonAction msg
     -> Element msg
 workingView cfg size width tone body action =
@@ -597,8 +617,8 @@ staticView :
     RenderConfig
     -> Size
     -> ButtonWidth
-    -> ButtonBody
-    -> (ButtonBody -> List (Attribute msg))
+    -> ButtonBody msg
+    -> (ButtonBody msg -> List (Attribute msg))
     -> Element msg
 staticView cfg size width body theme =
     let
@@ -620,7 +640,7 @@ staticView cfg size width body theme =
         |> Element.el attrs
 
 
-bodyToElement : RenderConfig -> Size -> ButtonBody -> Element msg
+bodyToElement : RenderConfig -> Size -> ButtonBody msg -> Element msg
 bodyToElement cfg size body =
     case body of
         BodyText str ->
@@ -649,6 +669,19 @@ bodyToElement cfg size body =
                     |> Element.el [ Element.alignRight ]
                 ]
 
+        BodyAtomicNest str subButton ->
+            Element.row
+                [ Font.size <| textSize size
+                , Element.spacing 8
+                , Element.width Element.fill
+                ]
+                [ Element.text str
+                , subButton
+                    |> withSize Size.ExtraSmall
+                    |> renderElement cfg
+                    |> Element.el [ Element.alignRight ]
+                ]
+
 
 
 -- Attributes
@@ -664,7 +697,7 @@ buttonWidth width =
             Element.width Element.shrink
 
 
-bodyLayout : ButtonBody -> Size -> ( Attribute msg, Attribute msg )
+bodyLayout : ButtonBody msg -> Size -> ( Attribute msg, Attribute msg )
 bodyLayout body size =
     case body of
         BodyText _ ->
@@ -674,8 +707,10 @@ bodyLayout body size =
             iconLayout size
 
         BodyNested _ _ ->
-            -- TODO
             iconLayout size
+
+        BodyAtomicNest _ _ ->
+            atomicNestLayout size
 
 
 iconLayout : Size -> ( Attribute msg, Attribute msg )
@@ -722,6 +757,31 @@ textLayout size =
 
                 Size.ExtraSmall ->
                     ( 12 - border, ((24 - 10) // 2) - border )
+    in
+    ( pairUncurry Element.paddingXY paddingXY
+    , Border.width border
+    )
+
+
+atomicNestLayout : Size -> ( Attribute msg, Attribute msg )
+atomicNestLayout size =
+    let
+        border =
+            borderWidth size
+
+        paddingXY =
+            case size of
+                Size.Large ->
+                    ( (60 - 24) // 2 - border, (60 - 48) // 2 - border )
+
+                Size.Medium ->
+                    ( (48 - 20) // 2 - border, (48 - 36) // 2 - border )
+
+                Size.Small ->
+                    ( (36 - 16) // 2 - border, (36 - 24) // 2 - border )
+
+                Size.ExtraSmall ->
+                    ( 0, 0 )
     in
     ( pairUncurry Element.paddingXY paddingXY
     , Border.width border
@@ -895,7 +955,7 @@ workingTheme tone =
                 }
 
 
-disabledTheme : ButtonBody -> List (Attribute msg)
+disabledTheme : ButtonBody msg -> List (Attribute msg)
 disabledTheme body =
     themeToAttributes <|
         case body of
@@ -923,7 +983,7 @@ disabledTheme body =
                 }
 
 
-successTheme : ButtonBody -> List (Attribute msg)
+successTheme : ButtonBody msg -> List (Attribute msg)
 successTheme _ =
     themeToAttributes <|
         { normal =

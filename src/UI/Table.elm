@@ -745,8 +745,12 @@ simpleHeaderRender renderConfig header =
 
 closedFilteredHeader : RenderConfig -> (Msg -> msg) -> Int -> String -> Element msg
 closedFilteredHeader renderConfig toExtern index header =
+    let
+        openMsg =
+            toExtern <| FilterDialogOpen index
+    in
     Button.fromNested header Icon.add
-        |> Button.cmd (toExtern <| FilterDialogOpen index) Button.light
+        |> Button.cmd openMsg Button.light
         |> Button.withWidth Button.widthFull
         |> Button.withSize Size.small
         |> Button.renderElement renderConfig
@@ -801,8 +805,15 @@ filterStateHeader renderConfig toExtern renderer empty isFilterOpen index width 
 
 appliedFilterRender : RenderConfig -> (Msg -> msg) -> Filters.FilterModel -> Int -> String -> Element msg
 appliedFilterRender renderConfig toExtern empty index header =
-    Button.fromNested header Icon.close
-        |> Button.cmd (toExtern <| ForFilters <| Filters.Set index empty) Button.primary
+    let
+        editMsg =
+            toExtern <| ForFilters <| Filters.Set index empty
+
+        openMsg =
+            toExtern <| FilterDialogOpen index
+    in
+    Button.fromAtomicNest header Icon.close editMsg
+        |> Button.cmd openMsg Button.primary
         |> Button.withWidth Button.widthFull
         |> Button.withSize Size.small
         |> Button.renderElement renderConfig

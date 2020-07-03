@@ -234,43 +234,48 @@ update msg model =
             editMultiTextFilter column field value model
 
         Apply column ->
-            case Dict.get column model of
-                Just (SingleTextModel editable) ->
-                    editableApply editable
-                        |> SingleTextModel
-                        |> swap (Dict.insert column) model
-
-                Just (MultiTextModel dict) ->
-                    dict
-                        |> Dict.map (always editableApply)
-                        |> MultiTextModel
-                        |> swap (Dict.insert column) model
-
-                Just (SingleDateModel editable) ->
-                    editableApply editable
-                        |> SingleDateModel
-                        |> swap (Dict.insert column) model
-
-                Just (RangeDateModel { from, to }) ->
-                    { from = editableApply from, to = editableApply to }
-                        |> RangeDateModel
-                        |> swap (Dict.insert column) model
-
-                Just (PeriodDateModel { date, timePeriod }) ->
-                    { date = editableApply date, timePeriod = editableApply timePeriod }
-                        |> PeriodDateModel
-                        |> swap (Dict.insert column) model
-
-                Just (SelectModel editable) ->
-                    editableApply editable
-                        |> SelectModel
-                        |> swap (Dict.insert column) model
-
-                Nothing ->
-                    model
+            applyFilter column model
 
         Set column emptyModel ->
             Dict.insert column emptyModel model
+
+
+applyFilter : Int -> Model -> Model
+applyFilter column model =
+    case Dict.get column model of
+        Just (SingleTextModel editable) ->
+            editableApply editable
+                |> SingleTextModel
+                |> swap (Dict.insert column) model
+
+        Just (MultiTextModel dict) ->
+            dict
+                |> Dict.map (always editableApply)
+                |> MultiTextModel
+                |> swap (Dict.insert column) model
+
+        Just (SingleDateModel editable) ->
+            editableApply editable
+                |> SingleDateModel
+                |> swap (Dict.insert column) model
+
+        Just (RangeDateModel { from, to }) ->
+            { from = editableApply from, to = editableApply to }
+                |> RangeDateModel
+                |> swap (Dict.insert column) model
+
+        Just (PeriodDateModel { date, timePeriod }) ->
+            { date = editableApply date, timePeriod = editableApply timePeriod }
+                |> PeriodDateModel
+                |> swap (Dict.insert column) model
+
+        Just (SelectModel editable) ->
+            editableApply editable
+                |> SelectModel
+                |> swap (Dict.insert column) model
+
+        Nothing ->
+            model
 
 
 updateEditable : value -> Editable value -> Editable value
