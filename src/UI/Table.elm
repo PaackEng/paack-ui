@@ -170,8 +170,7 @@ withItems items (Table prop opt) =
 
 
 type Msg
-    = MobileExpand Int
-    | MobileCollapse
+    = MobileToggle Int
     | ForFilters Filters.Msg
 
 
@@ -193,11 +192,16 @@ stateInit =
 stateUpdate : Msg -> State -> State
 stateUpdate msg (State state) =
     case msg of
-        MobileExpand index ->
-            State { state | mobileSelected = Just index }
+        MobileToggle index ->
+            State
+                { state
+                    | mobileSelected =
+                        if state.mobileSelected == Just index then
+                            Nothing
 
-        MobileCollapse ->
-            State { state | mobileSelected = Nothing }
+                        else
+                            Just index
+                }
 
         ForFilters subMsg ->
             State { state | filters = Filters.update subMsg state.filters }
@@ -482,7 +486,7 @@ mobileView renderConfig prop opt responsive =
                 >> responsive.toDetails
                 >> NArray.toList
                 >> List.filterMap (Maybe.map (detailView renderConfig))
-        , selectMsg = Tuple.first >> MobileExpand >> prop.toExtern
+        , selectMsg = Tuple.first >> MobileToggle >> prop.toExtern
         }
         |> ListView.withItems (List.indexedMap Tuple.pair opt.items)
         |> ListView.withSelected (Tuple.first >> isSelected opt.state)

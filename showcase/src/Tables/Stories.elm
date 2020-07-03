@@ -1,7 +1,7 @@
 module Tables.Stories exposing (stories, update)
 
 import Element exposing (Element, fill)
-import Msg exposing (Msg(..))
+import Msg
 import Return as R exposing (Return)
 import Tables.Model as Stories
 import Tables.Msg as Stories
@@ -33,16 +33,16 @@ stories renderConfig =
 desktopTableStory renderConfig =
     storyWithModel
         ( "Desktop"
-        , \{ tablesStories } -> demoTable renderConfig tablesStories
-        , { note = "" }
+        , \{ tablesStories } -> demoWithIcons renderConfig tablesStories
+        , { note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Table) for the exact code of this example." }
         )
 
 
 mobileTableStory =
     storyWithModel
         ( "Mobile"
-        , \{ tablesStories } -> demoTable mobileCfg tablesStories
-        , { note = "" }
+        , \{ tablesStories } -> demoWithIcons mobileCfg tablesStories
+        , { note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Table) for the exact code of this example." }
         )
 
 
@@ -50,26 +50,30 @@ demoTable renderConfig model =
     let
         tableColumns =
             columnsEmpty
-                |> columnsPushHeader "Title"
+                |> columnsPush (headerToColumn "Title" |> columnWidthPortion 3)
                 |> columnsPush (headerToColumn "Author" |> columnWidthPortion 3)
+                |> columnsPushHeader "Year"
 
-        toTableRow { author, title } =
+        toTableRow { author, title, year } =
             rowEmpty
                 |> rowPushText (Text.body1 title)
                 |> rowPushText (Text.body2 author)
+                |> rowPushText (Text.caption year)
 
         toTableDetails { author, title } =
             detailsEmpty
                 |> detailsPushHidden
                 |> detailsPush { label = "Author", content = cellFromText <| Text.body2 author }
+                |> detailsPushHidden
 
-        toTableCover { author, title } =
-            { title = title, caption = Nothing }
+        toTableCover { title, year } =
+            { title = title, caption = Just year }
 
         someFilters =
             filtersEmpty
                 |> filtersPushSingleText "" (filterLocal (\{ title } str -> String.contains str title))
                 |> filtersPushSingleText "" (filterLocal (\{ author } str -> String.contains str author))
+                |> filtersPushSingleText "" (filterLocal (\{ year } str -> String.contains str year))
     in
     Table.table (Stories.ForComponent >> Msg.TablesStoriesMsg)
         tableColumns
@@ -82,8 +86,18 @@ demoTable renderConfig model =
         |> Table.withWidth (Element.fill |> Element.maximum 640)
         |> Table.withFilters someFilters
         |> Table.withItems
-            [ { author = "Dan Brown", title = "The Da Vinci Code" } ]
+            [ { author = "Dan Brown", title = "Angels & Demons", year = "2000" }
+            , { author = "Dan Brown", title = "The Da Vinci Code", year = "2003" }
+            , { author = "Dan Brown", title = "The Lost Symbol", year = "2009" }
+            , { author = "Dan Brown", title = "Inferno", year = "2013" }
+            , { author = "Dan Brown", title = "Origin", year = "2017" }
+            ]
         |> Table.renderElement renderConfig
+
+
+demoWithIcons renderConfig model =
+    model
+        |> demoTable renderConfig
         |> List.singleton
         |> (::) iconsSvgSprite
         |> Element.wrappedRow [ Element.width fill ]
