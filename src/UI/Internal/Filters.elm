@@ -32,9 +32,9 @@ type alias Model =
 type FilterModel
     = SingleTextModel (Editable String)
     | MultiTextModel (Dict Int (Editable String))
-    | SingleDateModel (Editable String)
-    | RangeDateModel { from : Editable String, to : Editable String }
-    | PeriodDateModel { date : Editable String, timePeriod : Editable TimePeriod }
+    | SingleDateModel (Editable Date)
+    | RangeDateModel { from : Editable Date, to : Editable Date }
+    | PeriodDateModel { date : Editable Date, timePeriod : Editable TimePeriod }
     | SelectModel (Editable Int)
 
 
@@ -90,7 +90,7 @@ editableApply { current } =
 
 
 type alias FilterConfig data strategy =
-    { init : Maybe data
+    { initial : Maybe data
     , strategy : strategy
     }
 
@@ -143,7 +143,7 @@ type alias Date =
 
 
 type alias SingleDateFilterConfig msg item =
-    FilterConfig (Maybe Date) (SingleDateFilterStrategy msg item)
+    FilterConfig Date (SingleDateFilterStrategy msg item)
 
 
 type alias SingleDateFilterStrategy msg item =
@@ -164,7 +164,7 @@ type alias RangeDate =
 
 
 type alias RangeDateFilterConfig msg item =
-    FilterConfig (Maybe Date) (RangeDateFilterStrategy msg item)
+    FilterConfig RangeDate (RangeDateFilterStrategy msg item)
 
 
 type alias RangeDateFilterStrategy msg item =
@@ -204,7 +204,7 @@ type alias PeriodDateFilterRemote msg =
 
 
 type alias SelectFilterConfig msg item =
-    FilterConfig (Maybe Int) (SelectFilterStrategy msg item)
+    FilterConfig Int (SelectFilterStrategy msg item)
 
 
 type alias SelectFilterStrategy msg item =
@@ -319,3 +319,125 @@ getMultiTextDict column model =
 
         _ ->
             Dict.empty
+
+
+
+-- Get Filters
+
+
+localFilterGet : Filter msg item -> Maybe FilterModel -> Maybe (item -> Bool)
+localFilterGet filter maybeModel =
+    case filter of
+        SingleTextFilter { initial, strategy } ->
+            case strategy of
+                Local applier ->
+                    case maybeModel of
+                        Just (SingleTextModel { applied }) ->
+                            Maybe.map (swap applier) applied
+
+                        Nothing ->
+                            Maybe.map (swap applier) initial
+
+                        _ ->
+                            Nothing
+
+                Remote _ ->
+                    Nothing
+
+        MultiTextFilter { initial, strategy } ->
+            case strategy of
+                Local applier ->
+                    case maybeModel of
+                        Just (MultiTextModel dict) ->
+                            dict
+                                |> Dict.toList
+                                |> List.filterMap (Tuple.second >> .applied)
+                                |> applyIfNotEmpty applier
+
+                        Nothing ->
+                            Maybe.map (swap applier) initial
+
+                        _ ->
+                            Nothing
+
+                Remote _ ->
+                    Nothing
+
+        SingleDateFilter { initial, strategy } ->
+            case strategy of
+                Local applier ->
+                    case maybeModel of
+                        Just (SingleDateModel { applied }) ->
+                            Maybe.map (swap applier) applied
+
+                        Nothing ->
+                            Maybe.map (swap applier) initial
+
+                        _ ->
+                            Nothing
+
+                Remote _ ->
+                    Nothing
+
+        RangeDateFilter { initial, strategy } ->
+            case strategy of
+                Local applier ->
+                    case maybeModel of
+                        Just (RangeDateModel { from, to }) ->
+                            Maybe.map2
+                                (\from_ to_ -> swap applier { from = from_, to = to_ })
+                                from.applied
+                                to.applied
+
+                        Nothing ->
+                            Maybe.map (swap applier) initial
+
+                        _ ->
+                            Nothing
+
+                Remote _ ->
+                    Nothing
+
+        PeriodDateFilter { initial, strategy } ->
+            case strategy of
+                Local applier ->
+                    case maybeModel of
+                        Just (PeriodDateModel { date, timePeriod }) ->
+                            Maybe.map2
+                                (\date_ timePeriod_ -> swap applier { date = date_, timePeriod = timePeriod_ })
+                                date.applied
+                                timePeriod.applied
+
+                        Nothing ->
+                            Maybe.map (swap applier) initial
+
+                        _ ->
+                            Nothing
+
+                Remote _ ->
+                    Nothing
+
+        SelectFilter { initial, strategy } ->
+            case strategy of
+                Local applier ->
+                    case maybeModel of
+                        Just (SelectModel { applied }) ->
+                            Maybe.map (swap applier) applied
+
+                        Nothing ->
+                            Maybe.map (swap applier) initial
+
+                        _ ->
+                            Nothing
+
+                Remote _ ->
+                    Nothing
+
+
+applyIfNotEmpty : (item -> List value -> Bool) -> List value -> Maybe (item -> Bool)
+applyIfNotEmpty applier list =
+    if List.length list /= 0 then
+        Just <| swap applier list
+
+    else
+        Nothing

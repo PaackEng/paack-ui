@@ -450,7 +450,7 @@ filtersPushSingleText :
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
 filtersPushSingleText init strategy accu =
-    { init = init, strategy = strategy }
+    { initial = init, strategy = strategy }
         |> Filters.SingleTextFilter
         |> swap filtersPush accu
 
@@ -608,11 +608,19 @@ desktopView renderConfig prop opt =
                         )
                         indexedList
 
+        mergedFilters =
+            List.map2 mergeFilter filters filtersState
+                |> List.filterMap identity
+                |> List.foldl reduceFilters (always True)
+
         headers =
             headersRender renderConfig prop.toExtern filters filtersState columns
 
+        filteredItems =
+            List.filter mergedFilters opt.items
+
         rows =
-            List.map (rowRender renderConfig prop.toRow columns) opt.items
+            List.map (rowRender renderConfig prop.toRow columns) filteredItems
 
         padding =
             case opt.responsive of
@@ -717,13 +725,13 @@ noFilterStateHeader :
     -> Element msg
 noFilterStateHeader renderConfig toExtern maybeFilter isFilterOpen index width header =
     case maybeFilter of
-        Just (Filters.SingleTextFilter { init, strategy }) ->
+        Just (Filters.SingleTextFilter { initial, strategy }) ->
             if isFilterOpen then
-                init
+                initial
                     |> Filters.editableInit
                     |> singleTextFilterRender renderConfig toExtern index width header
 
-            else if init /= Nothing then
+            else if initial /= Nothing then
                 appliedFilterRender renderConfig toExtern Filters.singleTextEmpty index header
 
             else
@@ -922,6 +930,23 @@ singleTextFilterRender renderConfig toExtern index width header editable =
         |> TextField.withWidth TextField.widthFull
         |> TextField.renderElement renderConfig
         |> filterEditRender renderConfig toExtern index empty width header editable
+
+
+
+-- Filter logic
+
+
+mergeFilter :
+    Maybe (Filters.Filter msg item)
+    -> ( Int, Maybe Filters.FilterModel, Bool )
+    -> Maybe (item -> Bool)
+mergeFilter filter ( _, model, _ ) =
+    Maybe.andThen (swap Filters.localFilterGet model) filter
+
+
+reduceFilters : (item -> Bool) -> (item -> Bool) -> (item -> Bool)
+reduceFilters new old =
+    \item -> new item && old item
 
 
 
