@@ -700,11 +700,7 @@ headerRender renderConfig toExtern maybeFilter ( index, maybeFilterState, isFilt
                 noFilterStateHeader renderConfig toExtern maybeFilter isFilterOpen index width header
 
             Just (Filters.SingleTextModel editable) ->
-                if isFilterOpen then
-                    singleTextFilterRender renderConfig toExtern index width header editable
-
-                else
-                    simpleHeaderRender renderConfig header
+                filterStateHeader renderConfig toExtern singleTextFilterRender Filters.singleTextEmpty isFilterOpen index width header editable
 
             _ ->
                 simpleHeaderRender renderConfig header
@@ -726,6 +722,9 @@ noFilterStateHeader renderConfig toExtern maybeFilter isFilterOpen index width h
                 init
                     |> Filters.editableInit
                     |> singleTextFilterRender renderConfig toExtern index width header
+
+            else if init /= Nothing then
+                appliedFilterRender renderConfig toExtern Filters.singleTextEmpty index header
 
             else
                 closedFilteredHeader renderConfig toExtern index header
@@ -766,6 +765,47 @@ overlayBackground onClickMsg =
         , Events.onClick onClickMsg
         ]
         Element.none
+
+
+type alias FilterStateRenderer msg value =
+    RenderConfig
+    -> (Msg -> msg)
+    -> Int
+    -> ColumnWidth
+    -> String
+    -> Filters.Editable value
+    -> Element msg
+
+
+filterStateHeader :
+    RenderConfig
+    -> (Msg -> msg)
+    -> FilterStateRenderer msg value
+    -> Filters.FilterModel
+    -> Bool
+    -> Int
+    -> ColumnWidth
+    -> String
+    -> Filters.Editable value
+    -> Element msg
+filterStateHeader renderConfig toExtern renderer empty isFilterOpen index width header editable =
+    if isFilterOpen then
+        renderer renderConfig toExtern index width header editable
+
+    else if editable.applied /= Nothing then
+        appliedFilterRender renderConfig toExtern empty index header
+
+    else
+        closedFilteredHeader renderConfig toExtern index header
+
+
+appliedFilterRender : RenderConfig -> (Msg -> msg) -> Filters.FilterModel -> Int -> String -> Element msg
+appliedFilterRender renderConfig toExtern empty index header =
+    Button.fromNested header Icon.close
+        |> Button.cmd (toExtern <| ForFilters <| Filters.Set index empty) Button.primary
+        |> Button.withWidth Button.widthFull
+        |> Button.withSize Size.small
+        |> Button.renderElement renderConfig
 
 
 filterEditingButton : RenderConfig -> msg -> msg -> Filters.Editable data -> Element msg
@@ -856,21 +896,14 @@ filterEditRender renderConfig toExtern index empty width header editable content
         ]
 
 
-singleTextFilterRender :
-    RenderConfig
-    -> (Msg -> msg)
-    -> Int
-    -> ColumnWidth
-    -> String
-    -> Filters.Editable String
-    -> Element msg
+singleTextFilterRender : FilterStateRenderer msg String
 singleTextFilterRender renderConfig toExtern index width header editable =
     let
         editMsg str =
             toExtern <| ForFilters <| Filters.EditSingleText { column = index, value = str }
 
         empty =
-            Filters.SingleTextModel Filters.editableEmpty
+            Filters.singleTextEmpty
     in
     editable
         |> Filters.editableDefault ""

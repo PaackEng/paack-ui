@@ -112,6 +112,11 @@ type alias SingleTextFilterRemote msg =
     }
 
 
+singleTextEmpty : FilterModel
+singleTextEmpty =
+    SingleTextModel editableEmpty
+
+
 
 -- MultiText
 

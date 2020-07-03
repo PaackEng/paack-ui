@@ -72,7 +72,7 @@ demoTable renderConfig model =
         someFilters =
             filtersEmpty
                 |> filtersPushSingleText Nothing (filterLocal (\{ title } str -> String.contains str title))
-                |> filtersPushSingleText Nothing (filterLocal (\{ author } str -> String.contains str author))
+                |> filtersPushSingleText (Just "Dan") (filterLocal (\{ author } str -> String.contains str author))
                 |> filtersPushSingleText Nothing (filterLocal (\{ year } str -> String.contains str year))
     in
     Table.table (Stories.ForComponent >> Msg.TablesStoriesMsg)
