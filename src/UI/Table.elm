@@ -131,7 +131,7 @@ import Element.Events as Events
 import Html.Attributes as HtmlAttrs
 import UI.Button as Button exposing (Button)
 import UI.Icon as Icon
-import UI.Internal.Basics exposing (ifThenElse, swap)
+import UI.Internal.Basics exposing (swap)
 import UI.Internal.Filters as Filters
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Internal.Palette as Palette
@@ -725,7 +725,7 @@ noFilterStateHeader :
     -> Element msg
 noFilterStateHeader renderConfig toExtern maybeFilter isFilterOpen index width header =
     case maybeFilter of
-        Just (Filters.SingleTextFilter { initial, strategy }) ->
+        Just (Filters.SingleTextFilter { initial }) ->
             if isFilterOpen then
                 initial
                     |> Filters.editableInit

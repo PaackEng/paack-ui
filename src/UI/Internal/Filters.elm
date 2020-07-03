@@ -2,7 +2,7 @@ module UI.Internal.Filters exposing (..)
 
 import Dict exposing (Dict)
 import UI.Internal.Basics exposing (maybeNotThen, swap)
-import UI.Internal.NArray as NArray exposing (NArray)
+import UI.Internal.NArray exposing (NArray)
 
 
 type Msg
