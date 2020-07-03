@@ -25,13 +25,23 @@ update msg { tableState } =
 stories renderConfig =
     storiesOf
         "Tables"
-        [ demoTableStory renderConfig ]
+        [ desktopTableStory renderConfig
+        , mobileTableStory
+        ]
 
 
-demoTableStory renderConfig =
+desktopTableStory renderConfig =
     storyWithModel
-        ( "Test"
+        ( "Desktop"
         , \{ tablesStories } -> demoTable renderConfig tablesStories
+        , { note = "" }
+        )
+
+
+mobileTableStory =
+    storyWithModel
+        ( "Mobile"
+        , \{ tablesStories } -> demoTable mobileCfg tablesStories
         , { note = "" }
         )
 
@@ -74,3 +84,10 @@ demoTable renderConfig model =
         |> Table.withItems
             [ { author = "Dan Brown", title = "The Da Vinci Code" } ]
         |> Table.renderElement renderConfig
+        |> List.singleton
+        |> (::) iconsSvgSprite
+        |> Element.wrappedRow [ Element.width fill ]
+
+
+mobileCfg =
+    RenderConfig.fromWindow { width = 375, height = 667 }
