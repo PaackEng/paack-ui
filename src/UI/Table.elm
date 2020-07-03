@@ -125,14 +125,19 @@ Where `Book` is:
 -}
 
 import Element exposing (Attribute, Element, fill, fillPortion, minimum, px, shrink)
+import Element.Background as Background
+import Element.Border as Border
 import UI.Button as Button exposing (Button)
-import UI.Internal.Basics exposing (swap)
+import UI.Internal.Basics exposing (ifThenElse, swap)
 import UI.Internal.Filters as Filters
 import UI.Internal.NArray as NArray exposing (NArray)
+import UI.Internal.Palette as Palette
 import UI.Internal.TypeNumbers as T
 import UI.ListView as ListView
+import UI.Palette as Palette exposing (brightnessMiddle, toneGray)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Text as Text exposing (Text)
+import UI.Utils.Element exposing (zeroPadding)
 
 
 {-| The `Table msg item columns` type is used for describing the component for later rendering.
@@ -482,6 +487,30 @@ renderElement renderConfig (Table prop opt) =
             desktopView renderConfig prop opt
 
 
+cellContentRender : RenderConfig -> Cell msg -> Element msg
+cellContentRender renderConfig cell_ =
+    case cell_ of
+        CellText text ->
+            Text.renderElement renderConfig text
+
+        CellButton button ->
+            Button.renderElement renderConfig button
+
+
+widthToEl : ColumnWidth -> Element.Length
+widthToEl width =
+    case width of
+        WidthPortion int ->
+            fillPortion int
+
+        WidthPixels int ->
+            px int
+
+
+
+-- Mobile rendering
+
+
 mobileView :
     RenderConfig
     -> Properties msg item columns
@@ -520,23 +549,75 @@ detailView renderConfig { label, content } =
     ( label, cellContentRender renderConfig content )
 
 
+
+-- Dekstop rendering
+
+
 desktopView :
     RenderConfig
     -> Properties msg item columns
     -> Options msg item columns
     -> Element msg
 desktopView renderConfig prop opt =
-    Element.none
+    let
+        columns =
+            NArray.toList prop.columns
+
+        headers =
+            Element.row
+                [ Element.spacing 16
+                , Element.width fill
+                , Element.paddingEach { bottom = 7, top = 0, left = 0, right = 0 }
+                , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
+                , Border.color Palette.gray.lightest
+                ]
+                (List.map (headerRender renderConfig) columns)
+
+        rows =
+            List.map (rowRender renderConfig prop.toRow columns) opt.items
+
+        padding =
+            case opt.responsive of
+                Just _ ->
+                    { top = 20, left = 20, right = 20, bottom = 0 }
+
+                Nothing ->
+                    zeroPadding
+    in
+    Element.column
+        [ Element.spacing 14
+        , Element.width opt.width
+        , Element.paddingEach padding
+        ]
+        (headers :: rows)
 
 
-cellContentRender : RenderConfig -> Cell msg -> Element msg
-cellContentRender renderConfig cell_ =
-    case cell_ of
-        CellText text ->
-            Text.renderElement renderConfig text
+headerRender : RenderConfig -> Column -> Element msg
+headerRender renderConfig (Column header { width }) =
+    header
+        |> Text.overline
+        |> cellFromText
+        |> cellContentRender renderConfig
+        |> cellCrop width
 
-        CellButton button ->
-            Button.renderElement renderConfig button
+
+rowRender : RenderConfig -> ToRow msg item columns -> List Column -> item -> Element msg
+rowRender renderConfig toRow columns item =
+    toRow item
+        |> NArray.toList
+        |> List.map2 (cellRender renderConfig) columns
+        |> Element.row
+            [ Element.spacing 16
+            , Element.width fill
+            , Element.mouseOver [ Background.color Palette.gray.lightest ]
+            ]
+
+
+cellRender : RenderConfig -> Column -> Cell msg -> Element msg
+cellRender renderConfig (Column _ { width }) cell =
+    cell
+        |> cellContentRender renderConfig
+        |> cellCrop width
 
 
 cellCrop : ColumnWidth -> Element msg -> Element msg
@@ -544,16 +625,7 @@ cellCrop width =
     Element.el
         [ Element.width (widthToEl width)
         , Element.height (shrink |> minimum 1)
+        , Element.paddingEach { zeroPadding | bottom = 2 }
         , Element.clipX
         , Element.alignTop
         ]
-
-
-widthToEl : ColumnWidth -> Element.Length
-widthToEl width =
-    case width of
-        WidthPortion int ->
-            fillPortion int
-
-        WidthPixels int ->
-            px int
