@@ -28,7 +28,7 @@ module UI.Table exposing
         |> Table.withFilters someFilters
         |> Table.withItems
             [ Book "Dan Brown" "The Da Vinci Code" ]
-        |> Table.renderElement cfg
+        |> Table.renderElement renderConfig
 
 Where:
 
@@ -433,6 +433,13 @@ filterRemote msgs =
 -- Width
 
 
+{-| Applies [`Element.width`](/packages/mdgriffith/elm-ui/latest/Element#width) to the component.
+
+    Table.withWidth
+        (Element.fill |> Element.minimum 220)
+        someTable
+
+-}
 withWidth : Element.Length -> Table msg item columns -> Table msg item columns
 withWidth width (Table prop opt_) =
     Table prop { opt_ | width = width }
@@ -442,6 +449,95 @@ withWidth width (Table prop opt_) =
 -- Rendering
 
 
+{-| End of the builder's life.
+The result of this function is a ready-to-insert Elm UI's Element.
+-}
 renderElement : RenderConfig -> Table msg item columns -> Element msg
 renderElement renderConfig (Table prop opt) =
+    case opt.responsive of
+        Just responsive ->
+            if RenderConfig.isMobile renderConfig then
+                mobileView renderConfig prop opt responsive
+
+            else
+                desktopView renderConfig prop opt
+
+        Nothing ->
+            desktopView renderConfig prop opt
+
+
+mobileView :
+    RenderConfig
+    -> Properties msg item columns
+    -> Options msg item columns
+    -> Responsive msg item columns
+    -> Element msg
+mobileView renderConfig prop opt responsive =
+    ListView.toggleableList
+        { detailsShowLabel = "Expand"
+        , detailsCollapseLabel = "Collapse"
+        , toCover = Tuple.second >> responsive.toCover
+        , toDetails =
+            Tuple.second
+                >> responsive.toDetails
+                >> NArray.toList
+                >> List.filterMap (Maybe.map (detailView renderConfig))
+        , selectMsg = Tuple.first >> MobileExpand >> prop.toExtern
+        }
+        |> ListView.withItems (List.indexedMap Tuple.pair opt.items)
+        |> ListView.withSelected (Tuple.first >> isSelected opt.state)
+        |> ListView.renderElement renderConfig
+
+
+isSelected : Maybe State -> Int -> Bool
+isSelected state position =
+    case state of
+        Nothing ->
+            False
+
+        Just (State { mobileSelected }) ->
+            Just position == mobileSelected
+
+
+detailView : RenderConfig -> Detail msg -> ( String, Element msg )
+detailView renderConfig { label, content } =
+    ( label, cellContentRender renderConfig content )
+
+
+desktopView :
+    RenderConfig
+    -> Properties msg item columns
+    -> Options msg item columns
+    -> Element msg
+desktopView renderConfig prop opt =
     Element.none
+
+
+cellContentRender : RenderConfig -> Cell msg -> Element msg
+cellContentRender renderConfig cell_ =
+    case cell_ of
+        CellText text ->
+            Text.renderElement renderConfig text
+
+        CellButton button ->
+            Button.renderElement renderConfig button
+
+
+cellCrop : ColumnWidth -> Element msg -> Element msg
+cellCrop width =
+    Element.el
+        [ Element.width (widthToEl width)
+        , Element.height (shrink |> minimum 1)
+        , Element.clipX
+        , Element.alignTop
+        ]
+
+
+widthToEl : ColumnWidth -> Element.Length
+widthToEl width =
+    case width of
+        WidthPortion int ->
+            fillPortion int
+
+        WidthPixels int ->
+            px int

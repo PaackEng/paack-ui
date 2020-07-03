@@ -43,14 +43,19 @@ map applier (NArray array) =
     NArray <| Array.map applier array
 
 
-toList : NArray data n -> NList data n
-toList (NArray array) =
+toNList : NArray data n -> NList data n
+toNList (NArray array) =
     NList <| Array.toList array
 
 
-toIndexedList : NArray data n -> NList ( Int, data ) n
-toIndexedList (NArray array) =
+toIndexedNList : NArray data n -> NList ( Int, data ) n
+toIndexedNList (NArray array) =
     NList <| Array.toIndexedList array
+
+
+toList : NArray data n -> List data
+toList (NArray array) =
+    Array.toList array
 
 
 toArray : NArray data n -> Array data
