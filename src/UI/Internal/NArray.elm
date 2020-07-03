@@ -18,6 +18,11 @@ empty =
     NArray Array.empty
 
 
+length : NArray msg columns -> Int
+length (NArray array) =
+    Array.length array
+
+
 get : Int -> NArray data n -> Maybe data
 get index (NArray array) =
     Array.get index array

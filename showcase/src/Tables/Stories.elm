@@ -50,9 +50,9 @@ demoTable renderConfig model =
     let
         tableColumns =
             columnsEmpty
-                |> columnsPush (headerToColumn "Title" |> columnWidthPortion 3)
-                |> columnsPush (headerToColumn "Author" |> columnWidthPortion 3)
-                |> columnsPushHeader "Year"
+                |> columnsPush (headerToColumn "Title" |> columnWidthPixels 320)
+                |> columnsPush (headerToColumn "Author" |> columnWidthPixels 240)
+                |> columnsPush (headerToColumn "Year" |> columnWidthPixels 120)
 
         toTableRow { author, title, year } =
             rowEmpty
@@ -71,9 +71,9 @@ demoTable renderConfig model =
 
         someFilters =
             filtersEmpty
-                |> filtersPushSingleText "" (filterLocal (\{ title } str -> String.contains str title))
-                |> filtersPushSingleText "" (filterLocal (\{ author } str -> String.contains str author))
-                |> filtersPushSingleText "" (filterLocal (\{ year } str -> String.contains str year))
+                |> filtersPushSingleText Nothing (filterLocal (\{ title } str -> String.contains str title))
+                |> filtersPushSingleText Nothing (filterLocal (\{ author } str -> String.contains str author))
+                |> filtersPushSingleText Nothing (filterLocal (\{ year } str -> String.contains str year))
     in
     Table.table (Stories.ForComponent >> Msg.TablesStoriesMsg)
         tableColumns
@@ -83,7 +83,7 @@ demoTable renderConfig model =
             , toCover = toTableCover
             }
         |> Table.withState model.tableState
-        |> Table.withWidth (Element.fill |> Element.maximum 640)
+        |> Table.withWidth Element.shrink
         |> Table.withFilters someFilters
         |> Table.withItems
             [ { author = "Dan Brown", title = "Angels & Demons", year = "2000" }

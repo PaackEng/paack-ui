@@ -1,13 +1,15 @@
 module UI.Internal.Filters exposing (..)
 
 import Dict exposing (Dict)
-import UI.Internal.Basics exposing (swap)
+import UI.Internal.Basics exposing (maybeNotThen, swap)
 import UI.Internal.NArray as NArray exposing (NArray)
 
 
 type Msg
-    = EditSingleTextFilter { column : Int, value : String }
-    | EditMultiTextFilter { column : Int, field : Int, value : String }
+    = EditSingleText { column : Int, value : String }
+    | EditMultiText { column : Int, field : Int, value : String }
+    | Apply Int
+    | Clear Int
 
 
 type alias Filters msg item columns =
@@ -56,9 +58,26 @@ init =
     Dict.empty
 
 
+get : Int -> Model -> Maybe FilterModel
+get column model =
+    Dict.get column model
+
+
 editableEmpty : Editable something
 editableEmpty =
     { current = Nothing, applied = Nothing }
+
+
+editableInit : Maybe data -> Editable data
+editableInit data =
+    { current = Nothing, applied = data }
+
+
+editableDefault : data -> Editable data -> data
+editableDefault default { current, applied } =
+    current
+        |> maybeNotThen applied
+        |> Maybe.withDefault default
 
 
 
@@ -66,7 +85,7 @@ editableEmpty =
 
 
 type alias FilterConfig data strategy =
-    { init : data
+    { init : Maybe data
     , strategy : strategy
     }
 
@@ -194,15 +213,23 @@ type alias SelectFilterRemote msg =
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        EditSingleTextFilter { column, value } ->
+        EditSingleText { column, value } ->
             model
                 |> getSingleTextEditable column
                 |> updateEditable value
                 |> SingleTextModel
                 |> swap (Dict.insert column) model
 
-        EditMultiTextFilter { column, field, value } ->
+        EditMultiText { column, field, value } ->
             editMultiTextFilter column field value model
+
+        Apply column ->
+            -- TODO
+            model
+
+        Clear column ->
+            -- TODO
+            model
 
 
 updateEditable : value -> Editable value -> Editable value

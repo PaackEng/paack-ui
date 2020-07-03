@@ -42,8 +42,8 @@ Where `Book` is:
 
     tableColumns =
         columnsEmpty
-            |> columnsPush (headerToColumn "Title" |> columnWidthPortion 3)
-            |> columnsPush (headerToColumn "Author" |> columnWidthPortion 3)
+            |> columnsPush (headerToColumn "Title" |> columnWidthPortion 2)
+            |> columnsPush (headerToColumn "Author" |> columnWidthPortion 2)
             |> columnsPushHeader "Year"
 
     toTableRow { author, title, year } =
@@ -63,9 +63,9 @@ Where `Book` is:
 
     someFilters =
         filtersEmpty
-            |> filtersPushSingleText "" (filterLocal (\{ title } str -> String.contains str title))
-            |> filtersPushSingleText "" (filterRemote { editMsg = Msg.FilterAuthor })
-            |> filtersPushSingleText "" (filterLocal (\{ year } str -> String.contains str year))
+            |> filtersPushSingleText Nothing (filterLocal (\{ title } str -> String.contains str title))
+            |> filtersPushSingleText Nothing (filterRemote { editMsg = Msg.FilterAuthor })
+            |> filtersPushSingleText Nothing (filterLocal (\{ year } str -> String.contains str year))
 
 
 # Table
@@ -127,16 +127,22 @@ Where `Book` is:
 import Element exposing (Attribute, Element, fill, fillPortion, minimum, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
+import Element.Events as Events
+import Html.Attributes as HtmlAttrs
 import UI.Button as Button exposing (Button)
+import UI.Icon as Icon
 import UI.Internal.Basics exposing (ifThenElse, swap)
 import UI.Internal.Filters as Filters
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Internal.Palette as Palette
+import UI.Internal.Primitives as Primitives
 import UI.Internal.TypeNumbers as T
 import UI.ListView as ListView
 import UI.Palette as Palette exposing (brightnessMiddle, toneGray)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
+import UI.Size as Size
 import UI.Text as Text exposing (Text)
+import UI.TextField as TextField
 import UI.Utils.Element exposing (zeroPadding)
 
 
@@ -189,6 +195,8 @@ withItems items (Table prop opt) =
 type Msg
     = MobileToggle Int
     | ForFilters Filters.Msg
+    | FilterDialogOpen Int
+    | FilterDialogClose
 
 
 type State
@@ -198,12 +206,13 @@ type State
 type alias StateModel =
     { filters : Filters.Model
     , mobileSelected : Maybe Int
+    , filterDialog : Maybe Int
     }
 
 
 stateInit : State
 stateInit =
-    State { filters = Filters.init, mobileSelected = Nothing }
+    State { filters = Filters.init, mobileSelected = Nothing, filterDialog = Nothing }
 
 
 stateUpdate : Msg -> State -> State
@@ -222,6 +231,12 @@ stateUpdate msg (State state) =
 
         ForFilters subMsg ->
             State { state | filters = Filters.update subMsg state.filters }
+
+        FilterDialogOpen index ->
+            State { state | filterDialog = Just index }
+
+        FilterDialogClose ->
+            State { state | filterDialog = Nothing }
 
 
 withState : State -> Table msg item columns -> Table msg item columns
@@ -430,7 +445,7 @@ filtersPush filter accu =
 
 
 filtersPushSingleText :
-    String
+    Maybe String
     -> Filters.SingleTextFilterStrategy msg item
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
@@ -560,18 +575,41 @@ desktopView :
     -> Element msg
 desktopView renderConfig prop opt =
     let
+        len =
+            NArray.length prop.columns
+
+        indexedList =
+            List.range 0 (len - 1)
+
         columns =
             NArray.toList prop.columns
 
+        filters =
+            opt.filters
+                |> Maybe.map (NArray.map Just >> NArray.toList)
+                |> Maybe.withDefault (List.repeat len Nothing)
+
+        filtersState =
+            case opt.state of
+                Just (State state) ->
+                    List.map
+                        (\index ->
+                            ( index
+                            , Filters.get index state.filters
+                            , state.filterDialog == Just index
+                            )
+                        )
+                        indexedList
+
+                Nothing ->
+                    List.map
+                        (\index ->
+                            ( index, Nothing, False )
+                        )
+                        indexedList
+
         headers =
-            Element.row
-                [ Element.spacing 16
-                , Element.width fill
-                , Element.paddingEach { bottom = 7, top = 0, left = 0, right = 0 }
-                , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
-                , Border.color Palette.gray.lightest
-                ]
-                (List.map (headerRender renderConfig) columns)
+            headersRender renderConfig prop.toExtern filters filtersState columns
 
         rows =
             List.map (rowRender renderConfig prop.toRow columns) opt.items
@@ -592,13 +630,26 @@ desktopView renderConfig prop opt =
         (headers :: rows)
 
 
-headerRender : RenderConfig -> Column -> Element msg
-headerRender renderConfig (Column header { width }) =
-    header
-        |> Text.overline
-        |> cellFromText
-        |> cellContentRender renderConfig
-        |> cellCrop width
+headersRender :
+    RenderConfig
+    -> (Msg -> msg)
+    -> List (Maybe (Filters.Filter msg item))
+    -> List ( Int, Maybe Filters.FilterModel, Bool )
+    -> List Column
+    -> Element msg
+headersRender renderConfig toExtern filters filtersState columns =
+    Element.row
+        [ Element.spacing 16
+        , Element.width fill
+        , Element.paddingEach { bottom = 7, top = 0, left = 0, right = 0 }
+        , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
+        , Border.color Palette.gray.lightest
+        ]
+        (List.map3 (headerRender renderConfig toExtern)
+            filters
+            filtersState
+            columns
+        )
 
 
 rowRender : RenderConfig -> ToRow msg item columns -> List Column -> item -> Element msg
@@ -629,3 +680,208 @@ cellCrop width =
         , Element.clipX
         , Element.alignTop
         ]
+
+
+
+-- Headers
+
+
+headerRender :
+    RenderConfig
+    -> (Msg -> msg)
+    -> Maybe (Filters.Filter msg item)
+    -> ( Int, Maybe Filters.FilterModel, Bool )
+    -> Column
+    -> Element msg
+headerRender renderConfig toExtern maybeFilter ( index, maybeFilterState, isFilterOpen ) (Column header { width }) =
+    cellCrop width <|
+        case maybeFilterState of
+            Nothing ->
+                noFilterStateHeader renderConfig toExtern maybeFilter isFilterOpen index width header
+
+            Just (Filters.SingleTextModel editable) ->
+                if isFilterOpen then
+                    singleTextFilterRender renderConfig toExtern index width header editable
+
+                else
+                    simpleHeaderRender renderConfig header
+
+            _ ->
+                simpleHeaderRender renderConfig header
+
+
+noFilterStateHeader :
+    RenderConfig
+    -> (Msg -> msg)
+    -> Maybe (Filters.Filter msg item)
+    -> Bool
+    -> Int
+    -> ColumnWidth
+    -> String
+    -> Element msg
+noFilterStateHeader renderConfig toExtern maybeFilter isFilterOpen index width header =
+    case maybeFilter of
+        Just (Filters.SingleTextFilter { init, strategy }) ->
+            if isFilterOpen then
+                init
+                    |> Filters.editableInit
+                    |> singleTextFilterRender renderConfig toExtern index width header
+
+            else
+                closedFilteredHeader renderConfig toExtern index header
+
+        _ ->
+            simpleHeaderRender renderConfig header
+
+
+simpleHeaderRender : RenderConfig -> String -> Element msg
+simpleHeaderRender renderConfig header =
+    header
+        |> String.toUpper
+        |> Text.overline
+        |> Text.withColor (Palette.color toneGray brightnessMiddle)
+        |> cellFromText
+        |> cellContentRender renderConfig
+
+
+closedFilteredHeader : RenderConfig -> (Msg -> msg) -> Int -> String -> Element msg
+closedFilteredHeader renderConfig toExtern index header =
+    Button.fromNested header Icon.add
+        |> Button.cmd (toExtern <| FilterDialogOpen index) Button.light
+        |> Button.withWidth Button.widthFull
+        |> Button.withSize Size.small
+        |> Button.renderElement renderConfig
+
+
+overlayBackground : msg -> Element msg
+overlayBackground onClickMsg =
+    Element.el
+        [ positionFixed
+        , zIndex 8
+        , Palette.overlayBackground
+        , Element.htmlAttribute <| HtmlAttrs.style "top" "0"
+        , Element.htmlAttribute <| HtmlAttrs.style "left" "0"
+        , Element.htmlAttribute <| HtmlAttrs.style "width" "100vw"
+        , Element.htmlAttribute <| HtmlAttrs.style "height" "100vh"
+        , Events.onClick onClickMsg
+        ]
+        Element.none
+
+
+filterEditingButton : RenderConfig -> msg -> msg -> Filters.Editable data -> Element msg
+filterEditingButton cfg applyMsg clearMsg { current } =
+    let
+        clearBtn =
+            Button.fromLabel "Clear"
+                |> Button.cmd clearMsg Button.danger
+                |> Button.withSize Size.extraSmall
+                |> Button.renderElement cfg
+
+        applyBtn =
+            Button.fromLabel "Apply"
+                |> Button.cmd applyMsg Button.primary
+                |> Button.withSize Size.extraSmall
+                |> Button.renderElement cfg
+
+        disabledBtn =
+            Button.fromLabel "Apply"
+                |> Button.disabled
+                |> Button.withSize Size.extraSmall
+                |> Button.renderElement cfg
+    in
+    case current of
+        Just _ ->
+            Element.row [ Element.spacing 8 ] [ applyBtn, clearBtn ]
+
+        Nothing ->
+            disabledBtn
+
+
+filterEditRender :
+    RenderConfig
+    -> (Msg -> msg)
+    -> Int
+    -> ColumnWidth
+    -> String
+    -> Filters.Editable String
+    -> Element msg
+    -> Element msg
+filterEditRender renderConfig toExtern index width header editable content =
+    let
+        discardMsg =
+            toExtern FilterDialogClose
+
+        applyMsg =
+            toExtern <| ForFilters <| Filters.Apply index
+
+        clearMsg =
+            toExtern <| ForFilters <| Filters.Clear index
+    in
+    Element.column []
+        [ overlayBackground discardMsg
+        , Element.column
+            [ positionFixed
+            , zIndex 9
+            , Element.width (widthToEl width)
+            , Element.alignTop
+            , Palette.mainBackground
+            , Primitives.roundedBorders
+            ]
+            [ Element.row
+                [ Element.paddingEach { top = 10, left = 12, right = 10, bottom = 7 }
+                , Element.width fill
+                , Border.color Palette.gray.lighter
+                , Border.widthEach { zeroPadding | bottom = 1 }
+                ]
+                [ Text.overline header
+                    |> Text.renderElement renderConfig
+                , Button.fromIcon (Icon.close "Close")
+                    |> Button.cmd discardMsg Button.clear
+                    |> Button.withSize Size.extraSmall
+                    |> Button.renderElement renderConfig
+                ]
+            , Element.column
+                [ Element.width fill
+                , Element.padding 12
+                , Element.spacing 20
+                ]
+                [ content
+                , filterEditingButton renderConfig applyMsg clearMsg editable
+                ]
+            ]
+        ]
+
+
+singleTextFilterRender :
+    RenderConfig
+    -> (Msg -> msg)
+    -> Int
+    -> ColumnWidth
+    -> String
+    -> Filters.Editable String
+    -> Element msg
+singleTextFilterRender renderConfig toExtern index width header editable =
+    let
+        editMsg str =
+            toExtern <| ForFilters <| Filters.EditSingleText { column = index, value = str }
+    in
+    editable
+        |> Filters.editableDefault ""
+        |> TextField.singlelineText editMsg header
+        |> TextField.withWidth TextField.widthFull
+        |> TextField.renderElement renderConfig
+        |> filterEditRender renderConfig toExtern index width header editable
+
+
+
+-- CSS: Not to be used anywhere else
+
+
+positionFixed : Attribute msg
+positionFixed =
+    Element.htmlAttribute <| HtmlAttrs.style "position" "fixed"
+
+
+zIndex : Int -> Attribute msg
+zIndex val =
+    Element.htmlAttribute <| HtmlAttrs.style "z-index" (String.fromInt val)
