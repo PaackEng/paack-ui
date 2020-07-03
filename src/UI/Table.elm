@@ -1,10 +1,11 @@
 module UI.Table exposing
     ( Table, table, withItems
-    , State, Msg, stateInit, stateUpdate
-    , Columns, Column, columnsEmpty, columnsPushHeader, columnsPush
+    , Columns, columnsEmpty, columnsPushHeader, columnsPush
+    , Column, headerToColumn, columnWidthPortion, columnWidthPixels
     , Row, rowEmpty, rowPushText, rowPushButton
     , Responsive, Cover, Details, Detail, withResponsive, detailsEmpty, detailsPush, detailsPushHidden
     , Cell, cellFromText, cellFromButton
+    , State, Msg, withState, stateInit, stateUpdate
     , Filters, withFilters, filtersEmpty, filtersPushSingleText
     , Strategy, filterLocal, filterRemote
     , withWidth
@@ -23,7 +24,7 @@ module UI.Table exposing
             , toCover = Book.toTableCover
             }
         |> Table.withState model.tableState
-        |> Table.withWidth Table.widthFull
+        |> Table.withWidth (Element.fill |> Element.maximum 640)
         |> Table.withFilters someFilters
         |> Table.withItems
             [ Book "Dan Brown" "The Da Vinci Code" ]
@@ -50,7 +51,7 @@ Where:
         { title = title, caption = Nothing }
 
     someFilters =
-        fitersEmpty
+        filtersEmpty
             |> filtersPushSingleText "" (filterLocal (\{ title } str -> String.contains str title))
             |> filtersPushSingleText "" (filterRemote { editMsg = Msg.FilterAuthor })
 
@@ -60,17 +61,17 @@ Where:
 @docs Table, table, withItems
 
 
-## State
-
-@docs State, Msg, stateInit, stateUpdate
-
-
 ## Desktop
 
-@docs Columns, Column, columnsEmpty, columnsPushHeader, columnsPush
+@docs Columns, columnsEmpty, columnsPushHeader, columnsPush
 
 
-## Desktop Rows
+## Individual column
+
+@docs Column, headerToColumn, columnWidthPortion, columnWidthPixels
+
+
+## Desktop rows
 
 @docs Row, rowEmpty, rowPushText, rowPushButton
 
@@ -80,9 +81,14 @@ Where:
 @docs Responsive, Cover, Details, Detail, withResponsive, detailsEmpty, detailsPush, detailsPushHidden
 
 
-## Exposed cell
+## Individual cell
 
 @docs Cell, cellFromText, cellFromButton
+
+
+## State
+
+@docs State, Msg, withState, stateInit, stateUpdate
 
 
 # Filters
@@ -197,6 +203,11 @@ stateUpdate msg (State state) =
             State { state | filters = Filters.update subMsg state.filters }
 
 
+withState : State -> Table msg item columns -> Table msg item columns
+withState state (Table prop opt) =
+    Table prop { opt | state = Just state }
+
+
 
 -- Columns
 
@@ -273,6 +284,25 @@ columnWidthPixels value (Column header opt) =
 
 
 
+-- Cells
+
+
+type Cell msg
+    = CellText Text
+    | CellButton (Button msg)
+
+
+cellFromText : Text -> Cell msg
+cellFromText text =
+    CellText text
+
+
+cellFromButton : Button msg -> Cell msg
+cellFromButton text =
+    CellButton text
+
+
+
 -- Desktop Rows
 
 
@@ -282,11 +312,6 @@ type alias Row msg columns =
 
 type alias ToRow msg item columns =
     item -> Row msg columns
-
-
-type Cell msg
-    = CellText Text
-    | CellButton (Button msg)
 
 
 rowEmpty : Row msg T.Zero
@@ -312,20 +337,6 @@ TODO: Example
 rowPushButton : Button msg -> Row msg columns -> Row msg (T.Increase columns)
 rowPushButton btn accu =
     NArray.push (CellButton btn) accu
-
-
-
--- Cell for third party
-
-
-cellFromText : Text -> Cell msg
-cellFromText text =
-    CellText text
-
-
-cellFromButton : Button msg -> Cell msg
-cellFromButton text =
-    CellButton text
 
 
 
@@ -422,7 +433,7 @@ filterRemote msgs =
 -- Width
 
 
-withWidth : Element.Length -> Table msg object columns -> Table msg object columns
+withWidth : Element.Length -> Table msg item columns -> Table msg item columns
 withWidth width (Table prop opt_) =
     Table prop { opt_ | width = width }
 
@@ -431,6 +442,6 @@ withWidth width (Table prop opt_) =
 -- Rendering
 
 
-renderElement : RenderConfig -> Table msg object columns -> Element msg
+renderElement : RenderConfig -> Table msg item columns -> Element msg
 renderElement renderConfig (Table prop opt) =
     Element.none
