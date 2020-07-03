@@ -9,7 +9,7 @@ type Msg
     = EditSingleText { column : Int, value : String }
     | EditMultiText { column : Int, field : Int, value : String }
     | Apply Int
-    | Clear Int
+    | Set Int FilterModel
 
 
 type alias Filters msg item columns =
@@ -78,6 +78,11 @@ editableDefault default { current, applied } =
     current
         |> maybeNotThen applied
         |> Maybe.withDefault default
+
+
+editableApply : Editable data -> Editable data
+editableApply { current } =
+    { current = Nothing, applied = current }
 
 
 
@@ -224,12 +229,43 @@ update msg model =
             editMultiTextFilter column field value model
 
         Apply column ->
-            -- TODO
-            model
+            case Dict.get column model of
+                Just (SingleTextModel editable) ->
+                    editableApply editable
+                        |> SingleTextModel
+                        |> swap (Dict.insert column) model
 
-        Clear column ->
-            -- TODO
-            model
+                Just (MultiTextModel dict) ->
+                    dict
+                        |> Dict.map (always editableApply)
+                        |> MultiTextModel
+                        |> swap (Dict.insert column) model
+
+                Just (SingleDateModel editable) ->
+                    editableApply editable
+                        |> SingleDateModel
+                        |> swap (Dict.insert column) model
+
+                Just (RangeDateModel { from, to }) ->
+                    { from = editableApply from, to = editableApply to }
+                        |> RangeDateModel
+                        |> swap (Dict.insert column) model
+
+                Just (PeriodDateModel { date, timePeriod }) ->
+                    { date = editableApply date, timePeriod = editableApply timePeriod }
+                        |> PeriodDateModel
+                        |> swap (Dict.insert column) model
+
+                Just (SelectModel editable) ->
+                    editableApply editable
+                        |> SelectModel
+                        |> swap (Dict.insert column) model
+
+                Nothing ->
+                    model
+
+        Set column emptyModel ->
+            Dict.insert column emptyModel model
 
 
 updateEditable : value -> Editable value -> Editable value

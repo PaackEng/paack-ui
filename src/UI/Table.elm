@@ -42,9 +42,9 @@ Where `Book` is:
 
     tableColumns =
         columnsEmpty
-            |> columnsPush (headerToColumn "Title" |> columnWidthPortion 2)
-            |> columnsPush (headerToColumn "Author" |> columnWidthPortion 2)
-            |> columnsPushHeader "Year"
+            |> columnsPush (headerToColumn "Title" |> columnWidthPixels 320)
+            |> columnsPush (headerToColumn "Author" |> columnWidthPixels 240)
+            |> columnsPush (headerToColumn "Year" |> columnWidthPixels 120)
 
     toTableRow { author, title, year } =
         rowEmpty
@@ -769,7 +769,7 @@ overlayBackground onClickMsg =
 
 
 filterEditingButton : RenderConfig -> msg -> msg -> Filters.Editable data -> Element msg
-filterEditingButton cfg applyMsg clearMsg { current } =
+filterEditingButton cfg applyMsg clearMsg { applied, current } =
     let
         clearBtn =
             Button.fromLabel "Clear"
@@ -789,11 +789,14 @@ filterEditingButton cfg applyMsg clearMsg { current } =
                 |> Button.withSize Size.extraSmall
                 |> Button.renderElement cfg
     in
-    case current of
-        Just _ ->
+    case ( applied, current ) of
+        ( _, Just _ ) ->
             Element.row [ Element.spacing 8 ] [ applyBtn, clearBtn ]
 
-        Nothing ->
+        ( Just _, Nothing ) ->
+            clearBtn
+
+        ( Nothing, Nothing ) ->
             disabledBtn
 
 
@@ -801,12 +804,13 @@ filterEditRender :
     RenderConfig
     -> (Msg -> msg)
     -> Int
+    -> Filters.FilterModel
     -> ColumnWidth
     -> String
-    -> Filters.Editable String
+    -> Filters.Editable data
     -> Element msg
     -> Element msg
-filterEditRender renderConfig toExtern index width header editable content =
+filterEditRender renderConfig toExtern index empty width header editable content =
     let
         discardMsg =
             toExtern FilterDialogClose
@@ -815,7 +819,7 @@ filterEditRender renderConfig toExtern index width header editable content =
             toExtern <| ForFilters <| Filters.Apply index
 
         clearMsg =
-            toExtern <| ForFilters <| Filters.Clear index
+            toExtern <| ForFilters <| Filters.Set index empty
     in
     Element.column []
         [ overlayBackground discardMsg
@@ -864,13 +868,16 @@ singleTextFilterRender renderConfig toExtern index width header editable =
     let
         editMsg str =
             toExtern <| ForFilters <| Filters.EditSingleText { column = index, value = str }
+
+        empty =
+            Filters.SingleTextModel Filters.editableEmpty
     in
     editable
         |> Filters.editableDefault ""
         |> TextField.singlelineText editMsg header
         |> TextField.withWidth TextField.widthFull
         |> TextField.renderElement renderConfig
-        |> filterEditRender renderConfig toExtern index width header editable
+        |> filterEditRender renderConfig toExtern index empty width header editable
 
 
 
