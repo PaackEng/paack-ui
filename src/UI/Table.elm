@@ -1,13 +1,12 @@
 module UI.Table exposing
     ( Table, table, withItems
-    , Columns, columnsEmpty, columnsPushHeader, columnsPush
-    , Column, headerToColumn, columnWidthPortion, columnWidthPixels
-    , Row, rowEmpty, rowPushText, rowPushButton
+    , Columns, columnsEmpty, column
+    , ColumnWidth, columnWidthPortion, columnWidthPixels
+    , Row, rowEmpty, rowCellText, rowCellButton
     , Responsive, Cover, Details, Detail, withResponsive, detailsEmpty, detailsPush, detailsPushHidden
     , Cell, cellFromText, cellFromButton
     , State, Msg, withState, stateInit, stateUpdate
-    , Filters, withFilters, filtersEmpty, filtersPushSingleText
-    , Strategy, filterLocal, filterRemote
+    , Filters, withFilters, filtersEmpty, localSingleTextFilter
     , withWidth
     , renderElement
     )
@@ -42,15 +41,15 @@ Where `Book` is:
 
     tableColumns =
         columnsEmpty
-            |> columnsPush (headerToColumn "Title" |> columnWidthPixels 320)
-            |> columnsPush (headerToColumn "Author" |> columnWidthPixels 240)
-            |> columnsPush (headerToColumn "Year" |> columnWidthPixels 120)
+            |> column "Title" (columnWidthPixels 320)
+            |> column "Author" (columnWidthPixels 240)
+            |> column "Year" (columnWidthPixels 120)
 
     toTableRow { author, title, year } =
         rowEmpty
-            |> rowPushText (Text.body1 title)
-            |> rowPushText (Text.body2 author)
-            |> rowPushText (Text.caption year)
+            |> rowCellText (Text.body1 title)
+            |> rowCellText (Text.body2 author)
+            |> rowCellText (Text.caption year)
 
     toTableDetails { author, title } =
         detailsEmpty
@@ -63,9 +62,9 @@ Where `Book` is:
 
     someFilters =
         filtersEmpty
-            |> filtersPushSingleText Nothing (filterLocal (\{ title } str -> String.contains str title))
-            |> filtersPushSingleText Nothing (filterRemote { editMsg = Msg.FilterAuthor })
-            |> filtersPushSingleText Nothing (filterLocal (\{ year } str -> String.contains str year))
+            |> localSingleTextFilter Nothing .title
+            |> localSingleTextFilter (Just "Dan") .author
+            |> localSingleTextFilter Nothing .year
 
 
 # Table
@@ -75,17 +74,17 @@ Where `Book` is:
 
 ## Desktop
 
-@docs Columns, columnsEmpty, columnsPushHeader, columnsPush
+@docs Columns, columnsEmpty, column
 
 
 ## Individual column
 
-@docs Column, headerToColumn, columnWidthPortion, columnWidthPixels
+@docs ColumnWidth, columnWidthPortion, columnWidthPixels
 
 
 ## Desktop rows
 
-@docs Row, rowEmpty, rowPushText, rowPushButton
+@docs Row, rowEmpty, rowCellText, rowCellButton
 
 
 ## Mobile
@@ -105,12 +104,7 @@ Where `Book` is:
 
 # Filters
 
-@docs Filters, withFilters, filtersEmpty, filtersPushSingleText
-
-
-## Filter's Strategy
-
-@docs Strategy, filterLocal, filterRemote
+@docs Filters, withFilters, filtersEmpty, localSingleTextFilter
 
 
 # Width
@@ -273,50 +267,35 @@ columnsEmpty =
     NArray.empty
 
 
-columnsPushHeader : String -> Columns columns -> Columns (T.Increase columns)
-columnsPushHeader header accu =
-    NArray.push (headerToColumn header) accu
-
-
-columnsPush : Column -> Columns columns -> Columns (T.Increase columns)
-columnsPush column accu =
-    NArray.push column accu
-
-
-headerToColumn : String -> Column
-headerToColumn header =
-    Column header { width = defaultColumnWidth }
-
-
-defaultColumnWidth : ColumnWidth
-defaultColumnWidth =
-    WidthPortion 1
+column : String -> ColumnWidth -> Columns columns -> Columns (T.Increase columns)
+column header width accu =
+    NArray.push (Column header { width = width }) accu
 
 
 {-| Similar to [`Element.fillPortion`](/packages/mdgriffith/elm-ui/latest/Element#fillPortion) but applied to an entire Table's column.
 
     columnEmpty
-        |> columnsPush (headerToColumn "Title" |> columnWidthPortion 3)
-        |> columnsPush (headerToColumn "Author" |> columnWidthPortion 3)
-        |> columnsPush (headerToColumn "Year" |> columnWidthPortion 2)
+        |> column "Title" (columnWidthPortion 3)
+        |> column "Author" (columnWidthPortion 3)
+        |> column "Year" (columnWidthPortion 2)
 
 -}
-columnWidthPortion : Int -> Column -> Column
-columnWidthPortion value (Column header opt) =
-    Column header { opt | width = WidthPortion value }
+columnWidthPortion : Int -> ColumnWidth
+columnWidthPortion value =
+    WidthPortion value
 
 
 {-| Similar to [`Element.px`](/packages/mdgriffith/elm-ui/latest/Element#px) but applied to an entire Table's column.
 
     columnEmpty
-        |> columnsPush (headerToColumn "Title" |> columnWidthPixels 320)
-        |> columnsPush (headerToColumn "Author" |> columnWidthPixels 320)
-        |> columnsPush (headerToColumn "Year" |> columnWidthPixels 240)
+        |> column "Title" (columnWidthPixels 320)
+        |> column "Author" (columnWidthPixels 320)
+        |> column "Year" (columnWidthPixels 240)
 
 -}
-columnWidthPixels : Int -> Column -> Column
-columnWidthPixels value (Column header opt) =
-    Column header { opt | width = WidthPixels value }
+columnWidthPixels : Int -> ColumnWidth
+columnWidthPixels value =
+    WidthPixels value
 
 
 
@@ -360,8 +339,8 @@ rowEmpty =
 TODO: Example
 
 -}
-rowPushText : Text -> Row msg columns -> Row msg (T.Increase columns)
-rowPushText text accu =
+rowCellText : Text -> Row msg columns -> Row msg (T.Increase columns)
+rowCellText text accu =
     NArray.push (CellText text) accu
 
 
@@ -370,8 +349,8 @@ rowPushText text accu =
 TODO: Example
 
 -}
-rowPushButton : Button msg -> Row msg columns -> Row msg (T.Increase columns)
-rowPushButton btn accu =
+rowCellButton : Button msg -> Row msg columns -> Row msg (T.Increase columns)
+rowCellButton btn accu =
     NArray.push (CellButton btn) accu
 
 
@@ -444,13 +423,19 @@ filtersPush filter accu =
     NArray.push filter accu
 
 
-filtersPushSingleText :
+localSingleTextFilter :
     Maybe String
-    -> Filters.SingleTextFilterStrategy msg item
+    -> (item -> String)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-filtersPushSingleText init strategy accu =
-    { initial = init, strategy = strategy }
+localSingleTextFilter init get accu =
+    let
+        applier item current =
+            get item
+                |> String.toLower
+                |> String.contains (String.toLower current)
+    in
+    { initial = init, strategy = filterLocal applier }
         |> Filters.SingleTextFilter
         |> swap filtersPush accu
 

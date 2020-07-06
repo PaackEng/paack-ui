@@ -50,15 +50,15 @@ demoTable renderConfig model =
     let
         tableColumns =
             columnsEmpty
-                |> columnsPush (headerToColumn "Title" |> columnWidthPixels 320)
-                |> columnsPush (headerToColumn "Author" |> columnWidthPixels 240)
-                |> columnsPush (headerToColumn "Year" |> columnWidthPixels 120)
+                |> column "Title" (columnWidthPixels 320)
+                |> column "Author" (columnWidthPixels 240)
+                |> column "Year" (columnWidthPixels 120)
 
         toTableRow { author, title, year } =
             rowEmpty
-                |> rowPushText (Text.body1 title)
-                |> rowPushText (Text.body2 author)
-                |> rowPushText (Text.caption year)
+                |> rowCellText (Text.body1 title)
+                |> rowCellText (Text.body2 author)
+                |> rowCellText (Text.caption year)
 
         toTableDetails { author, title } =
             detailsEmpty
@@ -71,9 +71,9 @@ demoTable renderConfig model =
 
         someFilters =
             filtersEmpty
-                |> filtersPushSingleText Nothing (filterLocal (\{ title } str -> String.contains str title))
-                |> filtersPushSingleText (Just "Dan") (filterLocal (\{ author } str -> String.contains str author))
-                |> filtersPushSingleText Nothing (filterLocal (\{ year } str -> String.contains str year))
+                |> localSingleTextFilter Nothing .title
+                |> localSingleTextFilter (Just "Dan") .author
+                |> localSingleTextFilter Nothing .year
     in
     Table.table (Stories.ForComponent >> Msg.TablesStoriesMsg)
         tableColumns
