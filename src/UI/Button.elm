@@ -531,7 +531,7 @@ toggleView cfg size hint toggleMsg current =
             iconLayout size
 
         attrs =
-            [ Primitives.relativeRoundedBorders size
+            [ Primitives.roundedBorders size
             , paddings
             , borders
             , Events.onClick <| toggleMsg (not current)
@@ -591,7 +591,7 @@ workingView cfg size width tone body action =
             bodyLayout body size
 
         attrs =
-            [ Primitives.relativeRoundedBorders size
+            [ Primitives.roundedBorders size
             , buttonWidth width
             , paddings
             , borders
@@ -626,7 +626,7 @@ staticView cfg size width body theme =
             bodyLayout body size
 
         attrs =
-            [ Primitives.relativeRoundedBorders size
+            [ Primitives.roundedBorders size
             , buttonWidth width
             , paddings
             , borders

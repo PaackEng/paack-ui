@@ -162,7 +162,7 @@ renderElement cfg (Badge { content, tone } { brightness }) =
                 |> Background.color
             , Element.paddingEach { top = 4, bottom = 4, left = 5, right = 3 }
             , Element.height (px 20)
-            , Primitives.roundedBorders
+            , Primitives.defaultRoundedBorders
             ]
 
 

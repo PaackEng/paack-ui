@@ -303,7 +303,7 @@ pageItem cfg icon link isSelected =
         baseAttrs =
             [ width fill
             , paddingXY 4 0
-            , Primitives.roundedBorders
+            , Primitives.defaultRoundedBorders
             , spacing 4
             ]
 

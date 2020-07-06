@@ -663,7 +663,7 @@ textAttrs cfg =
 genericAttr : String -> Bool -> Bool -> TextFieldWidth -> List (Attribute msg)
 genericAttr label isPlaceholder hasError width =
     [ Background.color Palette.gray.lightest
-    , Primitives.roundedBorders
+    , Primitives.defaultRoundedBorders
     , Border.color <|
         if hasError then
             Palette.danger.light

@@ -6,7 +6,8 @@ module UI.Table exposing
     , Responsive, Cover, Details, Detail, withResponsive, detailsEmpty, detailsPush, detailsPushHidden
     , Cell, cellFromText, cellFromButton
     , State, Msg, withState, stateInit, stateUpdate
-    , Filters, withFilters, filtersEmpty, localSingleTextFilter
+    , Filters, withFilters, filtersEmpty
+    , localSingleTextFilter, remoteSingleTextFilter
     , withWidth
     , renderElement
     )
@@ -104,7 +105,12 @@ Where `Book` is:
 
 # Filters
 
-@docs Filters, withFilters, filtersEmpty, localSingleTextFilter
+@docs Filters, withFilters, filtersEmpty
+
+
+## Single Text
+
+@docs localSingleTextFilter, remoteSingleTextFilter
 
 
 # Width
@@ -443,6 +449,21 @@ localSingleTextFilter init get accu =
 filterLocal : (item -> value -> Bool) -> Strategy msgs value item
 filterLocal isKept =
     Filters.Local isKept
+
+
+remoteSingleTextFilter :
+    Maybe String
+    -> (String -> msg)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+remoteSingleTextFilter init editMsg accu =
+    let
+        msgs =
+            { editMsg = editMsg }
+    in
+    { initial = init, strategy = filterRemote msgs }
+        |> Filters.SingleTextFilter
+        |> swap filtersPush accu
 
 
 filterRemote : msgs -> Strategy msgs value item
@@ -873,7 +894,7 @@ filterEditRender renderConfig toExtern index empty width header editable content
             , Element.width (widthToEl width)
             , Element.alignTop
             , Palette.mainBackground
-            , Primitives.roundedBorders
+            , Primitives.defaultRoundedBorders
             ]
             [ Element.row
                 [ Element.paddingEach { top = 10, left = 12, right = 10, bottom = 7 }
