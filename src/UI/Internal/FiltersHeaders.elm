@@ -2,7 +2,6 @@ module UI.Internal.FiltersHeaders exposing (applied, normal)
 
 import Element exposing (Attribute, Element, fill)
 import Element.Background as Background
-import Element.Events as Events
 import Element.Font as Font
 import UI.Button as Button
 import UI.Icon as Icon
