@@ -133,6 +133,7 @@ import UI.Button as Button exposing (Button)
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (swap)
 import UI.Internal.Filters as Filters
+import UI.Internal.FiltersHeaders as FiltersHeaders
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
@@ -769,11 +770,7 @@ closedFilteredHeader renderConfig toExtern index header =
         openMsg =
             toExtern <| FilterDialogOpen index
     in
-    Button.fromNested header Icon.add
-        |> Button.cmd openMsg Button.light
-        |> Button.withWidth Button.widthFull
-        |> Button.withSize Size.small
-        |> Button.renderElement renderConfig
+    FiltersHeaders.normal renderConfig openMsg header
 
 
 overlayBackground : msg -> Element msg
@@ -826,17 +823,13 @@ filterStateHeader renderConfig toExtern renderer empty isFilterOpen index width 
 appliedFilterRender : RenderConfig -> (Msg -> msg) -> Filters.FilterModel -> Int -> String -> Element msg
 appliedFilterRender renderConfig toExtern empty index header =
     let
-        editMsg =
+        clearMsg =
             toExtern <| ForFilters <| Filters.Set index empty
 
         openMsg =
             toExtern <| FilterDialogOpen index
     in
-    Button.fromAtomicNest header Icon.close editMsg
-        |> Button.cmd openMsg Button.primary
-        |> Button.withWidth Button.widthFull
-        |> Button.withSize Size.small
-        |> Button.renderElement renderConfig
+    FiltersHeaders.applied renderConfig openMsg clearMsg "Clear" header
 
 
 filterEditingButton : RenderConfig -> msg -> msg -> Filters.Editable data -> Element msg
