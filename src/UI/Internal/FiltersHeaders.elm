@@ -2,7 +2,6 @@ module UI.Internal.FiltersHeaders exposing (applied, normal)
 
 import Element exposing (Attribute, Element, fill)
 import Element.Background as Background
-import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
 import UI.Button as Button
@@ -56,13 +55,12 @@ attrs isApplied =
 
         paddingXY =
             Element.paddingXY
-                ((36 - 16) // 2 - border)
-                ((36 - baseHeight) // 2 - border)
+                ((36 - 16) // 2)
+                ((36 - baseHeight) // 2)
 
         workingTheme =
             if isApplied then
                 [ Background.color Palette.primary.middle
-                , Border.color Palette.primary.middle
                 , Palette.color
                     Palette.tonePrimary
                     Palette.brightnessMiddle
@@ -73,7 +71,6 @@ attrs isApplied =
 
             else
                 [ Background.color Palette.gray.lightest
-                , Border.color Palette.gray.lightest
                 , Font.color Palette.primary.darkest
                 ]
     in
@@ -81,7 +78,6 @@ attrs isApplied =
     , Element.width Element.fill
     , paddingXY
     , Element.spacing 8
-    , Border.width border
     , Font.size textSize
     , Font.semiBold
     , Element.pointer
@@ -93,11 +89,6 @@ attrs isApplied =
 textSize : Int
 textSize =
     12
-
-
-border : Int
-border =
-    2
 
 
 size : Size
