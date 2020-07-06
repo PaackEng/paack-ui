@@ -690,15 +690,14 @@ cellRender : RenderConfig -> Column -> Cell msg -> Element msg
 cellRender renderConfig (Column _ { width }) cell =
     cell
         |> cellContentRender renderConfig
-        |> cellCrop width
+        |> cellSpace width
 
 
-cellCrop : ColumnWidth -> Element msg -> Element msg
-cellCrop width =
+cellSpace : ColumnWidth -> Element msg -> Element msg
+cellSpace width =
     Element.el
         [ Element.width (widthToEl width)
         , Element.height (shrink |> minimum 1)
-        , Element.clipX
         , Element.alignTop
         ]
 
@@ -715,7 +714,7 @@ headerRender :
     -> Column
     -> Element msg
 headerRender renderConfig toExtern maybeFilter ( index, maybeFilterState, isFilterOpen ) (Column header { width }) =
-    cellCrop width <|
+    cellSpace width <|
         case maybeFilterState of
             Nothing ->
                 noFilterStateHeader renderConfig toExtern maybeFilter isFilterOpen index width header
@@ -776,7 +775,7 @@ closedFilteredHeader renderConfig toExtern index header =
 overlayBackground : msg -> Element msg
 overlayBackground onClickMsg =
     Element.el
-        [ positionFixed
+        [ positionFixed -- Needs for starting at the top-left corner
         , zIndex 8
         , Palette.overlayBackground
         , Element.htmlAttribute <| HtmlAttrs.style "top" "0"
@@ -885,39 +884,42 @@ filterEditRender renderConfig toExtern index empty width header editable content
         clearMsg =
             toExtern <| ForFilters <| Filters.Set index empty
     in
-    Element.column []
-        [ overlayBackground discardMsg
-        , Element.column
-            [ positionFixed
-            , zIndex 9
-            , Element.width (widthToEl width)
-            , Element.alignTop
-            , Palette.mainBackground
-            , Primitives.defaultRoundedBorders
-            ]
-            [ Element.row
-                [ Element.paddingEach { top = 10, left = 12, right = 10, bottom = 7 }
-                , Element.width fill
-                , Border.color Palette.gray.lighter
-                , Border.widthEach { zeroPadding | bottom = 1 }
-                ]
-                [ Text.overline header
-                    |> Text.renderElement renderConfig
-                , Button.fromIcon (Icon.close "Close")
-                    |> Button.cmd discardMsg Button.clear
-                    |> Button.withSize Size.extraSmall
-                    |> Button.renderElement renderConfig
-                ]
-            , Element.column
+    Element.el
+        [ Element.width fill
+        , Element.height (shrink |> minimum 1)
+        , Element.inFront <|
+            -- Using inFront is required for cell's proportional width
+            Element.column
                 [ Element.width fill
-                , Element.padding 12
-                , Element.spacing 20
+                , zIndex 9
+                , Element.alignTop
+                , Palette.mainBackground
+                , Primitives.defaultRoundedBorders
                 ]
-                [ content
-                , filterEditingButton renderConfig applyMsg clearMsg editable
+                [ Element.row
+                    [ Element.paddingEach { top = 10, left = 12, right = 10, bottom = 7 }
+                    , Element.width fill
+                    , Border.color Palette.gray.lighter
+                    , Border.widthEach { zeroPadding | bottom = 1 }
+                    ]
+                    [ Text.overline header
+                        |> Text.renderElement renderConfig
+                    , Button.fromIcon (Icon.close "Close")
+                        |> Button.cmd discardMsg Button.clear
+                        |> Button.withSize Size.extraSmall
+                        |> Button.renderElement renderConfig
+                    ]
+                , Element.column
+                    [ Element.width fill
+                    , Element.padding 12
+                    , Element.spacing 20
+                    ]
+                    [ content
+                    , filterEditingButton renderConfig applyMsg clearMsg editable
+                    ]
                 ]
-            ]
         ]
+        (overlayBackground discardMsg)
 
 
 singleTextFilterRender : FilterStateRenderer msg String
