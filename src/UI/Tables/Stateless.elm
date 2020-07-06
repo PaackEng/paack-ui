@@ -1,5 +1,5 @@
 module UI.Tables.Stateless exposing
-    ( StatelessTable, StatelessConfig, stateless, withItems
+    ( StatelessTable, StatelessConfig, table, withItems
     , withWidth
     , renderElement
     )
@@ -8,19 +8,19 @@ module UI.Tables.Stateless exposing
 
 `UI.Tables` are type-safe, which means that every row needs to have the same number of columns (including the headers). Otherwise, compilation fails.
 
-    Table.stateless
+    Stateless.table
         { columns = Book.tableColumns
         , toRow = Book.toTableRow
         }
-        |> Table.withWidth (Element.fill |> Element.maximum 640)
-        |> Table.withItems
+        |> Stateless.withWidth (Element.fill |> Element.maximum 640)
+        |> Stateless.withItems
             [ Book "Dan Brown" "Angels & Demons" "2000"
             , Book "Dan Brown" "The Da Vinci Code" "2003"
             , Book "Dan Brown" "The Lost Symbol" "2009"
             , Book "Dan Brown" "Inferno" "2013"
             , Book "Dan Brown" "Origin" "2017"
             ]
-        |> Table.renderElement renderConfig
+        |> Stateless.renderElement renderConfig
 
 Where `Book` is:
 
@@ -42,7 +42,7 @@ Where `Book` is:
 
 # Stateless
 
-@docs StatelessTable, StatelessConfig, stateless, withItems
+@docs StatelessTable, StatelessConfig, table, withItems
 
 
 # Width
@@ -82,8 +82,8 @@ type alias Options item =
     }
 
 
-stateless : StatelessConfig msg item columns -> StatelessTable msg item columns
-stateless config =
+table : StatelessConfig msg item columns -> StatelessTable msg item columns
+table config =
     Table config defaultOptions
 
 

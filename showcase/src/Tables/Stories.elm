@@ -78,7 +78,7 @@ demoTable renderConfig model =
                 |> localSingleTextFilter (Just "Dan") .author
                 |> localSingleTextFilter Nothing .year
     in
-    Stateable.stateable
+    Stateable.table
         { toExtern = Stories.ForComponent >> Msg.TablesStoriesMsg
         , columns = tableColumns
         , toRow = toTableRow
@@ -136,7 +136,7 @@ statelessDemoTable renderConfig =
                 |> rowCellText (Text.body2 author)
                 |> rowCellText (Text.caption year)
     in
-    Stateless.stateless
+    Stateless.table
         { columns = tableColumns
         , toRow = toTableRow
         }

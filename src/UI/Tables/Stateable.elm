@@ -1,5 +1,5 @@
 module UI.Tables.Stateable exposing
-    ( StateableTable, StateableConfig, stateable, withItems
+    ( StateableTable, StateableConfig, table, withItems
     , Responsive, Cover, Details, Detail, withResponsive, detailsEmpty, detailsPush, detailsPushHidden
     , State, Msg, init, update
     , Filters, withFilters, filtersEmpty
@@ -12,26 +12,26 @@ module UI.Tables.Stateable exposing
 
 `UI.Tables` are type-safe, which means that every row needs to have the same number of columns (including the headers). Otherwise, compilation fails.
 
-    Table.stateable
+    Stateable.table
         { toExtern = Msg.ForTable
         , columns = Book.tableColumns
         , toRow = Book.toTableRow
         , state = model.tableState
         }
-        |> Table.withResponsive
+        |> Stateable.withResponsive
             { toDetails = Book.toTableDetails
             , toCover = Book.toTableCover
             }
-        |> Table.withWidth (Element.fill |> Element.maximum 640)
-        |> Table.withFilters someFilters
-        |> Table.withItems
+        |> Stateable.withWidth (Element.fill |> Element.maximum 640)
+        |> Stateable.withFilters someFilters
+        |> Stateable.withItems
             [ Book "Dan Brown" "Angels & Demons" "2000"
             , Book "Dan Brown" "The Da Vinci Code" "2003"
             , Book "Dan Brown" "The Lost Symbol" "2009"
             , Book "Dan Brown" "Inferno" "2013"
             , Book "Dan Brown" "Origin" "2017"
             ]
-        |> Table.renderElement renderConfig
+        |> Stateable.renderElement renderConfig
 
 Where `Book` is:
 
@@ -68,7 +68,7 @@ Where `Book` is:
 
 # Stateable
 
-@docs StateableTable, StateableConfig, stateable, withItems
+@docs StateableTable, StateableConfig, table, withItems
 
 
 ## Mobile
@@ -149,8 +149,8 @@ type alias Options msg item columns =
     }
 
 
-stateable : StateableConfig msg item columns -> StateableTable msg item columns
-stateable config =
+table : StateableConfig msg item columns -> StateableTable msg item columns
+table config =
     Table config defaultOptions
 
 
