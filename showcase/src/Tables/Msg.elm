@@ -1,7 +1,7 @@
 module Tables.Msg exposing (Msg(..))
 
 import Tables.Model exposing (..)
-import UI.Table as Table
+import UI.Tables.Stateable as Table
 
 
 type Msg

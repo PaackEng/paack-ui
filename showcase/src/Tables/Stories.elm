@@ -8,7 +8,9 @@ import Tables.Msg as Stories
 import UI.Internal.Basics exposing (maybeNotThen)
 import UI.Internal.TypeNumbers as T
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
-import UI.Table as Table exposing (..)
+import UI.Tables.Common as Table exposing (..)
+import UI.Tables.Stateable as Stateable exposing (..)
+import UI.Tables.Stateless as Stateless
 import UI.Text as Text exposing (Text)
 import UI.TextField as TextField
 import UIExplorer exposing (storiesOf)
@@ -19,7 +21,7 @@ update : Stories.Msg -> Stories.Model -> Return Stories.Msg Stories.Model
 update msg { tableState } =
     case msg of
         Stories.ForComponent subMsg ->
-            ( { tableState = Table.stateUpdate subMsg tableState }, Cmd.none )
+            ( { tableState = Stateable.update subMsg tableState }, Cmd.none )
 
 
 stories renderConfig =
@@ -27,6 +29,7 @@ stories renderConfig =
         "Tables"
         [ desktopTableStory renderConfig
         , mobileTableStory
+        , statelessTableStory renderConfig
         ]
 
 
@@ -34,7 +37,7 @@ desktopTableStory renderConfig =
     storyWithModel
         ( "Desktop"
         , \{ tablesStories } -> demoWithIcons renderConfig tablesStories
-        , { note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Table) for the exact code of this example." }
+        , { note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Tables-Stateful) for the exact code of this example." }
         )
 
 
@@ -42,7 +45,7 @@ mobileTableStory =
     storyWithModel
         ( "Mobile"
         , \{ tablesStories } -> demoWithIcons mobileCfg tablesStories
-        , { note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Table) for the exact code of this example." }
+        , { note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Tables-Stateful) for the exact code of this example." }
         )
 
 
@@ -75,17 +78,19 @@ demoTable renderConfig model =
                 |> localSingleTextFilter (Just "Dan") .author
                 |> localSingleTextFilter Nothing .year
     in
-    Table.table (Stories.ForComponent >> Msg.TablesStoriesMsg)
-        tableColumns
-        toTableRow
-        |> Table.withResponsive
+    Stateable.stateable
+        { toExtern = Stories.ForComponent >> Msg.TablesStoriesMsg
+        , columns = tableColumns
+        , toRow = toTableRow
+        , state = model.tableState
+        }
+        |> Stateable.withResponsive
             { toDetails = toTableDetails
             , toCover = toTableCover
             }
-        |> Table.withState model.tableState
-        |> Table.withWidth Element.shrink
-        |> Table.withFilters someFilters
-        |> Table.withItems
+        |> Stateable.withWidth Element.shrink
+        |> Stateable.withFilters someFilters
+        |> Stateable.withItems
             [ { author = "Dan Brown", title = "Angels & Demons", year = "2000" }
             , { author = "Dan Brown", title = "The Da Vinci Code", year = "2003" }
             , { author = "Dan Brown", title = "The Lost Symbol", year = "2009" }
@@ -94,7 +99,7 @@ demoTable renderConfig model =
             , { author = "Suzanne Collins", title = "The Hunger Games", year = "2008" }
             , { author = "Agatha Christie", title = "Murder on the Orient Express", year = "1933" }
             ]
-        |> Table.renderElement renderConfig
+        |> Stateable.renderElement renderConfig
 
 
 demoWithIcons renderConfig model =
@@ -107,3 +112,42 @@ demoWithIcons renderConfig model =
 
 mobileCfg =
     RenderConfig.fromWindow { width = 375, height = 667 }
+
+
+statelessTableStory renderConfig =
+    storyWithModel
+        ( "Stateless"
+        , \_ -> statelessDemoTable renderConfig
+        , { note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Tables-Stateless) for the exact code of this example." }
+        )
+
+
+statelessDemoTable renderConfig =
+    let
+        tableColumns =
+            columnsEmpty
+                |> column "Title" (columnWidthPixels 320)
+                |> column "Author" (columnWidthPixels 240)
+                |> column "Year" (columnWidthPixels 120)
+
+        toTableRow { author, title, year } =
+            rowEmpty
+                |> rowCellText (Text.body1 title)
+                |> rowCellText (Text.body2 author)
+                |> rowCellText (Text.caption year)
+    in
+    Stateless.stateless
+        { columns = tableColumns
+        , toRow = toTableRow
+        }
+        |> Stateless.withWidth Element.shrink
+        |> Stateless.withItems
+            [ { author = "Dan Brown", title = "Angels & Demons", year = "2000" }
+            , { author = "Dan Brown", title = "The Da Vinci Code", year = "2003" }
+            , { author = "Dan Brown", title = "The Lost Symbol", year = "2009" }
+            , { author = "Dan Brown", title = "Inferno", year = "2013" }
+            , { author = "Dan Brown", title = "Origin", year = "2017" }
+            , { author = "Suzanne Collins", title = "The Hunger Games", year = "2008" }
+            , { author = "Agatha Christie", title = "Murder on the Orient Express", year = "1933" }
+            ]
+        |> Stateless.renderElement renderConfig

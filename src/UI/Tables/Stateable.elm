@@ -1,11 +1,7 @@
-module UI.Table exposing
-    ( Table, table, withItems
-    , Columns, columnsEmpty, column
-    , ColumnWidth, columnWidthPortion, columnWidthPixels
-    , Row, rowEmpty, rowCellText, rowCellButton
+module UI.Tables.Stateable exposing
+    ( StateableTable, StateableConfig, stateable, withItems
     , Responsive, Cover, Details, Detail, withResponsive, detailsEmpty, detailsPush, detailsPushHidden
-    , Cell, cellFromText, cellFromButton
-    , State, Msg, withState, stateInit, stateUpdate
+    , State, Msg, init, update
     , Filters, withFilters, filtersEmpty
     , localSingleTextFilter, remoteSingleTextFilter
     , withWidth
@@ -16,14 +12,16 @@ module UI.Table exposing
 
 `UI.Tables` are type-safe, which means that every row needs to have the same number of columns (including the headers). Otherwise, compilation fails.
 
-    Table.table Msg.ForTable
-        Book.tableColumns
-        Book.toTableRow
+    Table.stateable
+        { toExtern = Msg.ForTable
+        , columns = Book.tableColumns
+        , toRow = Book.toTableRow
+        , state = model.tableState
+        }
         |> Table.withResponsive
             { toDetails = Book.toTableDetails
             , toCover = Book.toTableCover
             }
-        |> Table.withState model.tableState
         |> Table.withWidth (Element.fill |> Element.maximum 640)
         |> Table.withFilters someFilters
         |> Table.withItems
@@ -68,24 +66,9 @@ Where `Book` is:
             |> localSingleTextFilter Nothing .year
 
 
-# Table
+# Stateable
 
-@docs Table, table, withItems
-
-
-## Desktop
-
-@docs Columns, columnsEmpty, column
-
-
-## Individual column
-
-@docs ColumnWidth, columnWidthPortion, columnWidthPixels
-
-
-## Desktop rows
-
-@docs Row, rowEmpty, rowCellText, rowCellButton
+@docs StateableTable, StateableConfig, stateable, withItems
 
 
 ## Mobile
@@ -93,14 +76,9 @@ Where `Book` is:
 @docs Responsive, Cover, Details, Detail, withResponsive, detailsEmpty, detailsPush, detailsPushHidden
 
 
-## Individual cell
-
-@docs Cell, cellFromText, cellFromButton
-
-
 ## State
 
-@docs State, Msg, withState, stateInit, stateUpdate
+@docs State, Msg, init, update
 
 
 # Filters
@@ -124,12 +102,11 @@ Where `Book` is:
 
 -}
 
-import Element exposing (Attribute, Element, fill, fillPortion, minimum, px, shrink)
-import Element.Background as Background
+import Element exposing (Attribute, Element, fill, minimum, shrink)
 import Element.Border as Border
 import Element.Events as Events
 import Html.Attributes as HtmlAttrs
-import UI.Button as Button exposing (Button)
+import UI.Button as Button
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (swap)
 import UI.Internal.Filters as Filters
@@ -137,26 +114,30 @@ import UI.Internal.FiltersHeaders as FiltersHeaders
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
+import UI.Internal.Table exposing (..)
+import UI.Internal.TableView exposing (..)
 import UI.Internal.TypeNumbers as T
 import UI.ListView as ListView
-import UI.Palette as Palette exposing (brightnessMiddle, toneGray)
+import UI.Palette as Palette
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Size as Size
-import UI.Text as Text exposing (Text)
+import UI.Tables.Common as Common exposing (..)
+import UI.Text as Text
 import UI.TextField as TextField
 import UI.Utils.Element exposing (zeroPadding)
 
 
-{-| The `Table msg item columns` type is used for describing the component for later rendering.
+{-| The `StateableTable msg item columns` type is used for describing the component for later rendering.
 -}
-type Table msg item columns
-    = Table (Properties msg item columns) (Options msg item columns)
+type StateableTable msg item columns
+    = Table (StateableConfig msg item columns) (Options msg item columns)
 
 
-type alias Properties msg item columns =
+type alias StateableConfig msg item columns =
     { columns : Columns columns
     , toRow : ToRow msg item columns
     , toExtern : Msg -> msg
+    , state : State
     }
 
 
@@ -164,14 +145,13 @@ type alias Options msg item columns =
     { items : List item
     , filters : Maybe (Filters msg item columns)
     , width : Element.Length
-    , state : Maybe State
     , responsive : Maybe (Responsive msg item columns)
     }
 
 
-table : (Msg -> msg) -> Columns columns -> ToRow msg item columns -> Table msg item columns
-table toExtern columns toRow =
-    Table { columns = columns, toRow = toRow, toExtern = toExtern } defaultOptions
+stateable : StateableConfig msg item columns -> StateableTable msg item columns
+stateable config =
+    Table config defaultOptions
 
 
 defaultOptions : Options msg item columns
@@ -179,12 +159,11 @@ defaultOptions =
     { items = []
     , filters = Nothing
     , width = shrink
-    , state = Nothing
     , responsive = Nothing
     }
 
 
-withItems : List item -> Table msg item columns -> Table msg item columns
+withItems : List item -> StateableTable msg item columns -> StateableTable msg item columns
 withItems items (Table prop opt) =
     Table prop { opt | items = items }
 
@@ -211,13 +190,13 @@ type alias StateModel =
     }
 
 
-stateInit : State
-stateInit =
+init : State
+init =
     State { filters = Filters.init, mobileSelected = Nothing, filterDialog = Nothing }
 
 
-stateUpdate : Msg -> State -> State
-stateUpdate msg (State state) =
+update : Msg -> State -> State
+update msg (State state) =
     case msg of
         MobileToggle index ->
             State
@@ -240,127 +219,6 @@ stateUpdate msg (State state) =
             State { state | filterDialog = Nothing }
 
 
-withState : State -> Table msg item columns -> Table msg item columns
-withState state (Table prop opt) =
-    Table prop { opt | state = Just state }
-
-
-
--- Columns
-
-
-type alias Columns columns =
-    NArray Column columns
-
-
-type Column
-    = Column String ColumnOptions
-
-
-type alias ColumnOptions =
-    { width : ColumnWidth
-    }
-
-
-{-| `ColumnWidth` specifies a cell's width.
--}
-type ColumnWidth
-    = WidthPixels Int
-    | WidthPortion Int
-
-
-columnsEmpty : Columns T.Zero
-columnsEmpty =
-    NArray.empty
-
-
-column : String -> ColumnWidth -> Columns columns -> Columns (T.Increase columns)
-column header width accu =
-    NArray.push (Column header { width = width }) accu
-
-
-{-| Similar to [`Element.fillPortion`](/packages/mdgriffith/elm-ui/latest/Element#fillPortion) but applied to an entire Table's column.
-
-    columnEmpty
-        |> column "Title" (columnWidthPortion 3)
-        |> column "Author" (columnWidthPortion 3)
-        |> column "Year" (columnWidthPortion 2)
-
--}
-columnWidthPortion : Int -> ColumnWidth
-columnWidthPortion value =
-    WidthPortion value
-
-
-{-| Similar to [`Element.px`](/packages/mdgriffith/elm-ui/latest/Element#px) but applied to an entire Table's column.
-
-    columnEmpty
-        |> column "Title" (columnWidthPixels 320)
-        |> column "Author" (columnWidthPixels 320)
-        |> column "Year" (columnWidthPixels 240)
-
--}
-columnWidthPixels : Int -> ColumnWidth
-columnWidthPixels value =
-    WidthPixels value
-
-
-
--- Cells
-
-
-type Cell msg
-    = CellText Text
-    | CellButton (Button msg)
-
-
-cellFromText : Text -> Cell msg
-cellFromText text =
-    CellText text
-
-
-cellFromButton : Button msg -> Cell msg
-cellFromButton text =
-    CellButton text
-
-
-
--- Desktop Rows
-
-
-type alias Row msg columns =
-    NArray (Cell msg) columns
-
-
-type alias ToRow msg item columns =
-    item -> Row msg columns
-
-
-rowEmpty : Row msg T.Zero
-rowEmpty =
-    NArray.empty
-
-
-{-| Transforms a `UI.Text` into a cell appending it to a row.
-
-TODO: Example
-
--}
-rowCellText : Text -> Row msg columns -> Row msg (T.Increase columns)
-rowCellText text accu =
-    NArray.push (CellText text) accu
-
-
-{-| Transforms a `UI.Button` into a cell appending it to a row.
-
-TODO: Example
-
--}
-rowCellButton : Button msg -> Row msg columns -> Row msg (T.Increase columns)
-rowCellButton btn accu =
-    NArray.push (CellButton btn) accu
-
-
 
 -- Responsive
 
@@ -376,14 +234,14 @@ type alias Cover =
 
 
 type alias Detail msg =
-    { label : String, content : Cell msg }
+    { label : String, content : Common.Cell msg }
 
 
 type alias Details msg columns =
     NArray (Maybe (Detail msg)) columns
 
 
-withResponsive : Responsive msg item columns -> Table msg item columns -> Table msg item columns
+withResponsive : Responsive msg item columns -> StateableTable msg item columns -> StateableTable msg item columns
 withResponsive responsive (Table prop opt) =
     Table prop { opt | responsive = Just responsive }
 
@@ -415,7 +273,7 @@ type alias Strategy msgs value item =
     Filters.Strategy msgs value item
 
 
-withFilters : Filters msg item columns -> Table msg item columns -> Table msg item columns
+withFilters : Filters msg item columns -> StateableTable msg item columns -> StateableTable msg item columns
 withFilters filters (Table prop opt) =
     Table prop { opt | filters = Just filters }
 
@@ -435,14 +293,14 @@ localSingleTextFilter :
     -> (item -> String)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-localSingleTextFilter init get accu =
+localSingleTextFilter initValue get accu =
     let
         applier item current =
             get item
                 |> String.toLower
                 |> String.contains (String.toLower current)
     in
-    { initial = init, strategy = filterLocal applier }
+    { initial = initValue, strategy = filterLocal applier }
         |> Filters.SingleTextFilter
         |> swap filtersPush accu
 
@@ -457,12 +315,12 @@ remoteSingleTextFilter :
     -> (String -> msg)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-remoteSingleTextFilter init editMsg accu =
+remoteSingleTextFilter initValue editMsg accu =
     let
         msgs =
             { editMsg = editMsg }
     in
-    { initial = init, strategy = filterRemote msgs }
+    { initial = initValue, strategy = filterRemote msgs }
         |> Filters.SingleTextFilter
         |> swap filtersPush accu
 
@@ -483,7 +341,7 @@ filterRemote msgs =
         someTable
 
 -}
-withWidth : Element.Length -> Table msg item columns -> Table msg item columns
+withWidth : Element.Length -> StateableTable msg item columns -> StateableTable msg item columns
 withWidth width (Table prop opt_) =
     Table prop { opt_ | width = width }
 
@@ -495,7 +353,7 @@ withWidth width (Table prop opt_) =
 {-| End of the builder's life.
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
-renderElement : RenderConfig -> Table msg item columns -> Element msg
+renderElement : RenderConfig -> StateableTable msg item columns -> Element msg
 renderElement renderConfig (Table prop opt) =
     case opt.responsive of
         Just responsive ->
@@ -509,39 +367,13 @@ renderElement renderConfig (Table prop opt) =
             desktopView renderConfig prop opt
 
 
-cellContentRender : RenderConfig -> Cell msg -> Element msg
-cellContentRender renderConfig cell_ =
-    case cell_ of
-        CellText text ->
-            text
-                |> Text.renderElement renderConfig
-                |> Element.el
-                    [ Element.width fill
-                    , Element.clipX
-                    , Element.padding 8
-                    ]
-
-        CellButton button ->
-            Button.renderElement renderConfig button
-
-
-widthToEl : ColumnWidth -> Element.Length
-widthToEl width =
-    case width of
-        WidthPortion int ->
-            fillPortion int
-
-        WidthPixels int ->
-            px int
-
-
 
 -- Mobile rendering
 
 
 mobileView :
     RenderConfig
-    -> Properties msg item columns
+    -> StateableConfig msg item columns
     -> Options msg item columns
     -> Responsive msg item columns
     -> Element msg
@@ -558,18 +390,13 @@ mobileView renderConfig prop opt responsive =
         , selectMsg = Tuple.first >> MobileToggle >> prop.toExtern
         }
         |> ListView.withItems (List.indexedMap Tuple.pair opt.items)
-        |> ListView.withSelected (Tuple.first >> isSelected opt.state)
+        |> ListView.withSelected (Tuple.first >> isSelected prop.state)
         |> ListView.renderElement renderConfig
 
 
-isSelected : Maybe State -> Int -> Bool
-isSelected state position =
-    case state of
-        Nothing ->
-            False
-
-        Just (State { mobileSelected }) ->
-            Just position == mobileSelected
+isSelected : State -> Int -> Bool
+isSelected (State { mobileSelected }) position =
+    Just position == mobileSelected
 
 
 detailView : RenderConfig -> Detail msg -> ( String, Element msg )
@@ -583,7 +410,7 @@ detailView renderConfig { label, content } =
 
 desktopView :
     RenderConfig
-    -> Properties msg item columns
+    -> StateableConfig msg item columns
     -> Options msg item columns
     -> Element msg
 desktopView renderConfig prop opt =
@@ -603,21 +430,14 @@ desktopView renderConfig prop opt =
                 |> Maybe.withDefault (List.repeat len Nothing)
 
         filtersState =
-            case opt.state of
-                Just (State state) ->
+            case prop.state of
+                State state ->
                     List.map
                         (\index ->
                             ( index
                             , Filters.get index state.filters
                             , state.filterDialog == Just index
                             )
-                        )
-                        indexedList
-
-                Nothing ->
-                    List.map
-                        (\index ->
-                            ( index, Nothing, False )
                         )
                         indexedList
 
@@ -660,46 +480,12 @@ headersRender :
     -> Element msg
 headersRender renderConfig toExtern filters filtersState columns =
     Element.row
-        [ Element.spacing 8
-        , Element.width fill
-        , Element.paddingEach { bottom = 7, top = 0, left = 0, right = 0 }
-        , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
-        , Border.color Palette.gray.lightest
-        ]
+        headersAttr
         (List.map3 (headerRender renderConfig toExtern)
             filters
             filtersState
             columns
         )
-
-
-rowRender : RenderConfig -> ToRow msg item columns -> List Column -> item -> Element msg
-rowRender renderConfig toRow columns item =
-    toRow item
-        |> NArray.toList
-        |> List.map2 (cellRender renderConfig) columns
-        |> Element.row
-            [ Element.spacing 8
-            , Primitives.defaultRoundedBorders
-            , Element.width fill
-            , Element.mouseOver [ Background.color Palette.gray.lightest ]
-            ]
-
-
-cellRender : RenderConfig -> Column -> Cell msg -> Element msg
-cellRender renderConfig (Column _ { width }) cell =
-    cell
-        |> cellContentRender renderConfig
-        |> cellSpace width
-
-
-cellSpace : ColumnWidth -> Element msg -> Element msg
-cellSpace width =
-    Element.el
-        [ Element.width (widthToEl width)
-        , Element.height (shrink |> minimum 1)
-        , Element.alignTop
-        ]
 
 
 
@@ -732,7 +518,7 @@ noFilterStateHeader :
     -> Maybe (Filters.Filter msg item)
     -> Bool
     -> Int
-    -> ColumnWidth
+    -> Common.ColumnWidth
     -> String
     -> Element msg
 noFilterStateHeader renderConfig toExtern maybeFilter isFilterOpen index width header =
@@ -751,16 +537,6 @@ noFilterStateHeader renderConfig toExtern maybeFilter isFilterOpen index width h
 
         _ ->
             simpleHeaderRender renderConfig header
-
-
-simpleHeaderRender : RenderConfig -> String -> Element msg
-simpleHeaderRender renderConfig header =
-    header
-        |> String.toUpper
-        |> Text.overline
-        |> Text.withColor (Palette.color toneGray brightnessMiddle)
-        |> cellFromText
-        |> cellContentRender renderConfig
 
 
 closedFilteredHeader : RenderConfig -> (Msg -> msg) -> Int -> String -> Element msg
@@ -791,7 +567,7 @@ type alias FilterStateRenderer msg value =
     RenderConfig
     -> (Msg -> msg)
     -> Int
-    -> ColumnWidth
+    -> Common.ColumnWidth
     -> String
     -> Filters.Editable value
     -> Element msg
@@ -804,7 +580,7 @@ filterStateHeader :
     -> Filters.FilterModel
     -> Bool
     -> Int
-    -> ColumnWidth
+    -> Common.ColumnWidth
     -> String
     -> Filters.Editable value
     -> Element msg
@@ -868,7 +644,7 @@ filterEditRender :
     -> (Msg -> msg)
     -> Int
     -> Filters.FilterModel
-    -> ColumnWidth
+    -> Common.ColumnWidth
     -> String
     -> Filters.Editable data
     -> Element msg

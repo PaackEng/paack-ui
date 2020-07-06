@@ -1,6 +1,6 @@
 module Tables.Model exposing (..)
 
-import UI.Table as Table
+import UI.Tables.Stateable as Table
 
 
 type alias Model =
@@ -9,4 +9,4 @@ type alias Model =
 
 initModel : Model
 initModel =
-    { tableState = Table.stateInit }
+    { tableState = Table.init }
