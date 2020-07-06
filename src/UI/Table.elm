@@ -512,7 +512,13 @@ cellContentRender : RenderConfig -> Cell msg -> Element msg
 cellContentRender renderConfig cell_ =
     case cell_ of
         CellText text ->
-            Text.renderElement renderConfig text
+            text
+                |> Text.renderElement renderConfig
+                |> Element.el
+                    [ Element.width fill
+                    , Element.clipX
+                    , Element.padding 8
+                    ]
 
         CellButton button ->
             Button.renderElement renderConfig button
@@ -637,7 +643,7 @@ desktopView renderConfig prop opt =
                     zeroPadding
     in
     Element.column
-        [ Element.spacing 14
+        [ Element.spacing 2
         , Element.width opt.width
         , Element.paddingEach padding
         ]
@@ -653,7 +659,7 @@ headersRender :
     -> Element msg
 headersRender renderConfig toExtern filters filtersState columns =
     Element.row
-        [ Element.spacing 16
+        [ Element.spacing 8
         , Element.width fill
         , Element.paddingEach { bottom = 7, top = 0, left = 0, right = 0 }
         , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
@@ -672,7 +678,8 @@ rowRender renderConfig toRow columns item =
         |> NArray.toList
         |> List.map2 (cellRender renderConfig) columns
         |> Element.row
-            [ Element.spacing 16
+            [ Element.spacing 8
+            , Primitives.defaultRoundedBorders
             , Element.width fill
             , Element.mouseOver [ Background.color Palette.gray.lightest ]
             ]
@@ -690,7 +697,6 @@ cellCrop width =
     Element.el
         [ Element.width (widthToEl width)
         , Element.height (shrink |> minimum 1)
-        , Element.paddingEach { zeroPadding | bottom = 2 }
         , Element.clipX
         , Element.alignTop
         ]
