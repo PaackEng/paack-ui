@@ -12,6 +12,7 @@ import UI.Internal.Size as Size exposing (Size)
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Utils.ARIA as ARIA
+import UI.Utils.Element as Element
 
 
 
@@ -21,7 +22,7 @@ import UI.Utils.ARIA as ARIA
 normal : RenderConfig -> msg -> String -> Element msg
 normal renderConfig openMsg label =
     -- Button.light
-    Element.row (Events.onClick openMsg :: attrs False)
+    Element.row (Element.onIndividualClick openMsg :: attrs False)
         [ Element.text label
         , Icon.add label
             |> Icon.withSize size
@@ -33,7 +34,7 @@ normal renderConfig openMsg label =
 applied : RenderConfig -> msg -> msg -> String -> String -> Element msg
 applied renderConfig openMsg clearMsg clearHint label =
     -- Button.primary
-    Element.row (Events.onClick openMsg :: attrs True)
+    Element.row (Element.onIndividualClick openMsg :: attrs True)
         [ Element.text label
         , Button.fromIcon (Icon.close clearHint)
             |> Button.cmd clearMsg Button.danger

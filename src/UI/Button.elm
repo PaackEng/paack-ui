@@ -506,7 +506,7 @@ toggleView cfg size hint toggleMsg current =
             [ Primitives.roundedBorders size
             , paddings
             , borders
-            , Events.onClick <| toggleMsg (not current)
+            , Element.onIndividualClick <| toggleMsg (not current)
             ]
                 ++ ARIA.toElementAttributes ARIA.roleButton
                 ++ toggleTheme current
@@ -546,7 +546,7 @@ hyperlinkView cfg size width body action =
         ActionMsg msg ->
             body
                 |> bodyToElement cfg size
-                |> Element.el (Events.onClick msg :: attrs)
+                |> Element.el (Element.onIndividualClick msg :: attrs)
 
 
 workingView :
@@ -582,7 +582,7 @@ workingView cfg size width tone body action =
         ActionMsg msg ->
             body
                 |> bodyToElement cfg size
-                |> Element.el (Events.onClick msg :: attrs)
+                |> Element.el (Element.onIndividualClick msg :: attrs)
 
 
 staticView :
