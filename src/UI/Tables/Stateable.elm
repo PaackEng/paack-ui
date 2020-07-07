@@ -13,7 +13,7 @@ module UI.Tables.Stateful exposing
 `UI.Tables` are type-safe, which means that every row needs to have the same number of columns (including the headers). Otherwise, compilation fails.
 
     Stateful.table
-        { toExtern = Msg.ForTable
+        { toExternalMsg = Msg.ForTable
         , columns = Book.tableColumns
         , toRow = Book.toTableRow
         , state = model.tableState
@@ -108,7 +108,7 @@ import Element.Events as Events
 import Html.Attributes as HtmlAttrs
 import UI.Button as Button
 import UI.Icon as Icon
-import UI.Internal.Basics exposing (swap)
+import UI.Internal.Basics exposing (flip)
 import UI.Internal.Filters as Filters
 import UI.Internal.FiltersHeaders as FiltersHeaders
 import UI.Internal.NArray as NArray exposing (NArray)
@@ -136,7 +136,7 @@ type StatefulTable msg item columns
 type alias StatefulConfig msg item columns =
     { columns : Columns columns
     , toRow : ToRow msg item columns
-    , toExtern : Msg -> msg
+    , toExternalMsg : Msg -> msg
     , state : State
     }
 
@@ -280,12 +280,7 @@ withFilters filters (Table prop opt) =
 
 filtersEmpty : Filters msg item T.Zero
 filtersEmpty =
-    NArray.empty
-
-
-filtersPush : Filters.Filter msg item -> Filters msg item columns -> Filters msg item (T.Increase columns)
-filtersPush filter accu =
-    NArray.push filter accu
+    Filters.filtersEmpty
 
 
 localSingleTextFilter :
@@ -294,20 +289,7 @@ localSingleTextFilter :
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
 localSingleTextFilter initValue get accu =
-    let
-        applier item current =
-            get item
-                |> String.toLower
-                |> String.contains (String.toLower current)
-    in
-    { initial = initValue, strategy = filterLocal applier }
-        |> Filters.SingleTextFilter
-        |> swap filtersPush accu
-
-
-filterLocal : (item -> value -> Bool) -> Strategy msgs value item
-filterLocal isKept =
-    Filters.Local isKept
+    Filters.localSingleTextFilter initValue get accu
 
 
 remoteSingleTextFilter :
@@ -316,18 +298,7 @@ remoteSingleTextFilter :
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
 remoteSingleTextFilter initValue editMsg accu =
-    let
-        msgs =
-            { editMsg = editMsg }
-    in
-    { initial = initValue, strategy = filterRemote msgs }
-        |> Filters.SingleTextFilter
-        |> swap filtersPush accu
-
-
-filterRemote : msgs -> Strategy msgs value item
-filterRemote msgs =
-    Filters.Remote msgs
+    Filters.remoteSingleTextFilter initValue editMsg accu
 
 
 
@@ -387,7 +358,7 @@ mobileView renderConfig prop opt responsive =
                 >> responsive.toDetails
                 >> NArray.toList
                 >> List.filterMap (Maybe.map (detailView renderConfig))
-        , selectMsg = Tuple.first >> MobileToggle >> prop.toExtern
+        , selectMsg = Tuple.first >> MobileToggle >> prop.toExternalMsg
         }
         |> ListView.withItems (List.indexedMap Tuple.pair opt.items)
         |> ListView.withSelected (Tuple.first >> isSelected prop.state)
@@ -447,7 +418,7 @@ desktopView renderConfig prop opt =
                 |> List.foldl reduceFilters (always True)
 
         headers =
-            headersRender renderConfig prop.toExtern filters filtersState columns
+            headersRender renderConfig prop.toExternalMsg filters filtersState columns
 
         filteredItems =
             List.filter mergedFilters opt.items
@@ -478,10 +449,10 @@ headersRender :
     -> List ( Int, Maybe Filters.FilterModel, Bool )
     -> List Column
     -> Element msg
-headersRender renderConfig toExtern filters filtersState columns =
+headersRender renderConfig toExternalMsg filters filtersState columns =
     Element.row
         headersAttr
-        (List.map3 (headerRender renderConfig toExtern)
+        (List.map3 (headerRender renderConfig toExternalMsg)
             filters
             filtersState
             columns
@@ -499,14 +470,14 @@ headerRender :
     -> ( Int, Maybe Filters.FilterModel, Bool )
     -> Column
     -> Element msg
-headerRender renderConfig toExtern maybeFilter ( index, maybeFilterState, isFilterOpen ) (Column header { width }) =
+headerRender renderConfig toExternalMsg maybeFilter ( index, maybeFilterState, isFilterOpen ) (Column header { width }) =
     cellSpace width <|
         case maybeFilterState of
             Nothing ->
-                noFilterStateHeader renderConfig toExtern maybeFilter isFilterOpen index width header
+                noFilterStateHeader renderConfig toExternalMsg maybeFilter isFilterOpen index width header
 
             Just (Filters.SingleTextModel editable) ->
-                filterStateHeader renderConfig toExtern singleTextFilterRender Filters.singleTextEmpty isFilterOpen index width header editable
+                filterStateHeader renderConfig toExternalMsg singleTextFilterRender Filters.singleTextEmpty isFilterOpen index width header editable
 
             _ ->
                 simpleHeaderRender renderConfig header
@@ -521,29 +492,29 @@ noFilterStateHeader :
     -> Common.ColumnWidth
     -> String
     -> Element msg
-noFilterStateHeader renderConfig toExtern maybeFilter isFilterOpen index width header =
+noFilterStateHeader renderConfig toExternalMsg maybeFilter isFilterOpen index width header =
     case maybeFilter of
         Just (Filters.SingleTextFilter { initial }) ->
             if isFilterOpen then
                 initial
                     |> Filters.editableInit
-                    |> singleTextFilterRender renderConfig toExtern index width header
+                    |> singleTextFilterRender renderConfig toExternalMsg index width header
 
             else if initial /= Nothing then
-                appliedFilterRender renderConfig toExtern Filters.singleTextEmpty index header
+                appliedFilterRender renderConfig toExternalMsg Filters.singleTextEmpty index header
 
             else
-                closedFilteredHeader renderConfig toExtern index header
+                closedFilteredHeader renderConfig toExternalMsg index header
 
         _ ->
             simpleHeaderRender renderConfig header
 
 
 closedFilteredHeader : RenderConfig -> (Msg -> msg) -> Int -> String -> Element msg
-closedFilteredHeader renderConfig toExtern index header =
+closedFilteredHeader renderConfig toExternalMsg index header =
     let
         openMsg =
-            toExtern <| FilterDialogOpen index
+            toExternalMsg <| FilterDialogOpen index
     in
     FiltersHeaders.normal renderConfig openMsg header
 
@@ -584,25 +555,25 @@ filterStateHeader :
     -> String
     -> Filters.Editable value
     -> Element msg
-filterStateHeader renderConfig toExtern renderer empty isFilterOpen index width header editable =
+filterStateHeader renderConfig toExternalMsg renderer empty isFilterOpen index width header editable =
     if isFilterOpen then
-        renderer renderConfig toExtern index width header editable
+        renderer renderConfig toExternalMsg index width header editable
 
     else if editable.applied /= Nothing then
-        appliedFilterRender renderConfig toExtern empty index header
+        appliedFilterRender renderConfig toExternalMsg empty index header
 
     else
-        closedFilteredHeader renderConfig toExtern index header
+        closedFilteredHeader renderConfig toExternalMsg index header
 
 
 appliedFilterRender : RenderConfig -> (Msg -> msg) -> Filters.FilterModel -> Int -> String -> Element msg
-appliedFilterRender renderConfig toExtern empty index header =
+appliedFilterRender renderConfig toExternalMsg empty index header =
     let
         clearMsg =
-            toExtern <| ForFilters <| Filters.Set index empty
+            toExternalMsg <| ForFilters <| Filters.Set index empty
 
         openMsg =
-            toExtern <| FilterDialogOpen index
+            toExternalMsg <| FilterDialogOpen index
     in
     FiltersHeaders.applied renderConfig openMsg clearMsg "Clear" header
 
@@ -649,16 +620,16 @@ filterEditRender :
     -> Filters.Editable data
     -> Element msg
     -> Element msg
-filterEditRender renderConfig toExtern index empty width header editable content =
+filterEditRender renderConfig toExternalMsg index empty width header editable content =
     let
         discardMsg =
-            toExtern FilterDialogClose
+            toExternalMsg FilterDialogClose
 
         applyMsg =
-            toExtern <| ForFilters <| Filters.Apply index
+            toExternalMsg <| ForFilters <| Filters.Apply index
 
         clearMsg =
-            toExtern <| ForFilters <| Filters.Set index empty
+            toExternalMsg <| ForFilters <| Filters.Set index empty
     in
     Element.el
         [ Element.width fill
@@ -699,10 +670,10 @@ filterEditRender renderConfig toExtern index empty width header editable content
 
 
 singleTextFilterRender : FilterStateRenderer msg String
-singleTextFilterRender renderConfig toExtern index width header editable =
+singleTextFilterRender renderConfig toExternalMsg index width header editable =
     let
         editMsg str =
-            toExtern <| ForFilters <| Filters.EditSingleText { column = index, value = str }
+            toExternalMsg <| ForFilters <| Filters.EditSingleText { column = index, value = str }
 
         empty =
             Filters.singleTextEmpty
@@ -712,7 +683,7 @@ singleTextFilterRender renderConfig toExtern index width header editable =
         |> TextField.singlelineText editMsg header
         |> TextField.withWidth TextField.widthFull
         |> TextField.renderElement renderConfig
-        |> filterEditRender renderConfig toExtern index empty width header editable
+        |> filterEditRender renderConfig toExternalMsg index empty width header editable
 
 
 
@@ -724,7 +695,7 @@ mergeFilter :
     -> ( Int, Maybe Filters.FilterModel, Bool )
     -> Maybe (item -> Bool)
 mergeFilter filter ( _, model, _ ) =
-    Maybe.andThen (swap Filters.localFilterGet model) filter
+    Maybe.andThen (flip Filters.localFilterGet model) filter
 
 
 reduceFilters : (item -> Bool) -> (item -> Bool) -> (item -> Bool)

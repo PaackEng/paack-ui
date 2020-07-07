@@ -59,6 +59,6 @@ maybeNotThen replacement primary =
             replacement
 
 
-swap : (a -> b -> c) -> b -> a -> c
-swap applier b a =
+flip : (a -> b -> c) -> b -> a -> c
+flip applier b a =
     applier a b

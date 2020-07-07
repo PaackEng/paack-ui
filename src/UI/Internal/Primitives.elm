@@ -10,8 +10,6 @@ defaultRoundedBorders =
     Border.rounded 8
 
 
-{-| REVIEW: I don't think I liked this name, gimme suggestions for this!
--}
 roundedBorders : Size -> Attribute msg
 roundedBorders size =
     Border.rounded <|

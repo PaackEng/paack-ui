@@ -51,18 +51,6 @@ mobileTableStory =
 
 demoTable renderConfig model =
     let
-        tableColumns =
-            columnsEmpty
-                |> column "Title" (columnWidthPixels 320)
-                |> column "Author" (columnWidthPixels 240)
-                |> column "Year" (columnWidthPixels 120)
-
-        toTableRow { author, title, year } =
-            rowEmpty
-                |> rowCellText (Text.body1 title)
-                |> rowCellText (Text.body2 author)
-                |> rowCellText (Text.caption year)
-
         toTableDetails { author, title } =
             detailsEmpty
                 |> detailHidden
@@ -90,15 +78,7 @@ demoTable renderConfig model =
             }
         |> Stateful.withWidth Element.shrink
         |> Stateful.withFilters someFilters
-        |> Stateful.withItems
-            [ { author = "Dan Brown", title = "Angels & Demons", year = "2000" }
-            , { author = "Dan Brown", title = "The Da Vinci Code", year = "2003" }
-            , { author = "Dan Brown", title = "The Lost Symbol", year = "2009" }
-            , { author = "Dan Brown", title = "Inferno", year = "2013" }
-            , { author = "Dan Brown", title = "Origin", year = "2017" }
-            , { author = "Suzanne Collins", title = "The Hunger Games", year = "2008" }
-            , { author = "Agatha Christie", title = "Murder on the Orient Express", year = "1933" }
-            ]
+        |> Stateful.withItems books
         |> Stateful.renderElement renderConfig
 
 
@@ -123,31 +103,35 @@ statelessTableStory renderConfig =
 
 
 statelessDemoTable renderConfig =
-    let
-        tableColumns =
-            columnsEmpty
-                |> column "Title" (columnWidthPixels 320)
-                |> column "Author" (columnWidthPixels 240)
-                |> column "Year" (columnWidthPixels 120)
-
-        toTableRow { author, title, year } =
-            rowEmpty
-                |> rowCellText (Text.body1 title)
-                |> rowCellText (Text.body2 author)
-                |> rowCellText (Text.caption year)
-    in
     Stateless.table
         { columns = tableColumns
         , toRow = toTableRow
         }
         |> Stateless.withWidth Element.shrink
-        |> Stateless.withItems
-            [ { author = "Dan Brown", title = "Angels & Demons", year = "2000" }
-            , { author = "Dan Brown", title = "The Da Vinci Code", year = "2003" }
-            , { author = "Dan Brown", title = "The Lost Symbol", year = "2009" }
-            , { author = "Dan Brown", title = "Inferno", year = "2013" }
-            , { author = "Dan Brown", title = "Origin", year = "2017" }
-            , { author = "Suzanne Collins", title = "The Hunger Games", year = "2008" }
-            , { author = "Agatha Christie", title = "Murder on the Orient Express", year = "1933" }
-            ]
+        |> Stateless.withItems books
         |> Stateless.renderElement renderConfig
+
+
+books =
+    [ { author = "Dan Brown", title = "Angels & Demons", year = "2000" }
+    , { author = "Dan Brown", title = "The Da Vinci Code", year = "2003" }
+    , { author = "Dan Brown", title = "The Lost Symbol", year = "2009" }
+    , { author = "Dan Brown", title = "Inferno", year = "2013" }
+    , { author = "Dan Brown", title = "Origin", year = "2017" }
+    , { author = "Suzanne Collins", title = "The Hunger Games", year = "2008" }
+    , { author = "Agatha Christie", title = "Murder on the Orient Express", year = "1933" }
+    ]
+
+
+tableColumns =
+    columnsEmpty
+        |> column "Title" (columnWidthPixels 320)
+        |> column "Author" (columnWidthPixels 240)
+        |> column "Year" (columnWidthPixels 120)
+
+
+toTableRow { author, title, year } =
+    rowEmpty
+        |> rowCellText (Text.body1 title)
+        |> rowCellText (Text.body2 author)
+        |> rowCellText (Text.caption year)

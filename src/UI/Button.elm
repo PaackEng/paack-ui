@@ -884,7 +884,7 @@ disabledTheme body =
                 , hover = Nothing
                 }
 
-            _ ->
+            BodyText _ ->
                 { normal =
                     { background = Just <| Palette.color Palette.toneGray brightnessLight
                     , border = Just <| Palette.color Palette.toneGray brightnessLight
