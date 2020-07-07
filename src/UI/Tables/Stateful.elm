@@ -2,7 +2,7 @@ module UI.Tables.Stateful exposing
     ( StatefulTable, StatefulConfig, table, withItems
     , Responsive, Cover, Details, Detail, withResponsive, detailsEmpty, detailShown, detailHidden
     , State, Msg, init, update
-    , Filters, withFilters, filtersEmpty
+    , Filters, filtersEmpty, stateWithFilters
     , localSingleTextFilter, remoteSingleTextFilter
     , withWidth
     , renderElement
@@ -83,7 +83,7 @@ Where `Book` is:
 
 # Filters
 
-@docs Filters, withFilters, filtersEmpty
+@docs Filters, filtersEmpty, stateWithFilters
 
 
 ## Single Text
@@ -102,6 +102,7 @@ Where `Book` is:
 
 -}
 
+import Array
 import Element exposing (Attribute, Element, fill, minimum, shrink)
 import Element.Border as Border
 import Element.Events as Events
@@ -137,13 +138,12 @@ type alias StatefulConfig msg item columns =
     { columns : Columns columns
     , toRow : ToRow msg item columns
     , toExternalMsg : Msg -> msg
-    , state : State
+    , state : State msg item columns
     }
 
 
 type alias Options msg item columns =
     { items : List item
-    , filters : Maybe (Filters msg item columns)
     , width : Element.Length
     , responsive : Maybe (Responsive msg item columns)
     }
@@ -157,7 +157,6 @@ table config =
 defaultOptions : Options msg item columns
 defaultOptions =
     { items = []
-    , filters = Nothing
     , width = shrink
     , responsive = Nothing
     }
@@ -179,27 +178,27 @@ type Msg
     | FilterDialogClose
 
 
-type State
-    = State StateModel
+type State msg item columns
+    = State (StateModel msg item columns)
 
 
-type alias StateModel =
-    { filters : Filters.Model
+type alias StateModel msg item columns =
+    { filters : Maybe (Filters msg item columns)
     , mobileSelected : Maybe Int
     , filterDialog : Maybe Int
     }
 
 
-init : State
+init : State msg item columns
 init =
-    State { filters = Filters.init, mobileSelected = Nothing, filterDialog = Nothing }
+    State { filters = Nothing, mobileSelected = Nothing, filterDialog = Nothing }
 
 
-update : Msg -> State -> State
-update msg (State state) =
+update : Msg -> State msg item columns -> ( State msg item columns, Cmd msg )
+update msg ((State state) as model) =
     case msg of
         MobileToggle index ->
-            State
+            ( State
                 { state
                     | mobileSelected =
                         if state.mobileSelected == Just index then
@@ -208,15 +207,26 @@ update msg (State state) =
                         else
                             Just index
                 }
+            , Cmd.none
+            )
 
         ForFilters subMsg ->
-            State { state | filters = Filters.update subMsg state.filters }
+            case state.filters of
+                Just filters ->
+                    filters
+                        |> Filters.update subMsg
+                        |> (\( newFilters, subCmd ) ->
+                                ( State { state | filters = Just newFilters }, subCmd )
+                           )
+
+                Nothing ->
+                    ( model, Cmd.none )
 
         FilterDialogOpen index ->
-            State { state | filterDialog = Just index }
+            ( State { state | filterDialog = Just index }, Cmd.none )
 
         FilterDialogClose ->
-            State { state | filterDialog = Nothing }
+            ( State { state | filterDialog = Nothing }, Cmd.none )
 
 
 
@@ -269,36 +279,22 @@ type alias Filters msg item columns =
     Filters.Filters msg item columns
 
 
-type alias Strategy msgs value item =
-    Filters.Strategy msgs value item
-
-
-withFilters : Filters msg item columns -> StatefulTable msg item columns -> StatefulTable msg item columns
-withFilters filters (Table prop opt) =
-    Table prop { opt | filters = Just filters }
+stateWithFilters : Filters msg item columns -> State msg item columns -> State msg item columns
+stateWithFilters filters (State state) =
+    State { state | filters = Just filters }
 
 
 filtersEmpty : Filters msg item T.Zero
 filtersEmpty =
-    Filters.filtersEmpty
+    Filters.empty
 
 
-localSingleTextFilter :
-    Maybe String
-    -> (item -> String)
-    -> Filters msg item columns
-    -> Filters msg item (T.Increase columns)
-localSingleTextFilter initValue get accu =
-    Filters.localSingleTextFilter initValue get accu
+localSingleTextFilter =
+    Filters.singleTextLocal
 
 
-remoteSingleTextFilter :
-    Maybe String
-    -> (Maybe String -> msg)
-    -> Filters msg item columns
-    -> Filters msg item (T.Increase columns)
-remoteSingleTextFilter initValue applyMsg accu =
-    Filters.remoteSingleTextFilter initValue applyMsg accu
+remoteSingleTextFilter =
+    Filters.singleTextRemote
 
 
 
@@ -365,7 +361,7 @@ mobileView renderConfig prop opt responsive =
         |> ListView.renderElement renderConfig
 
 
-isSelected : State -> Int -> Bool
+isSelected : State msg item columns -> Int -> Bool
 isSelected (State { mobileSelected }) position =
     Just position == mobileSelected
 
@@ -389,36 +385,33 @@ desktopView renderConfig prop opt =
         len =
             NArray.length prop.columns
 
-        indexedList =
-            List.range 0 (len - 1)
-
         columns =
             NArray.toList prop.columns
 
-        filters =
-            opt.filters
-                |> Maybe.map (NArray.map Just >> NArray.toList)
-                |> Maybe.withDefault (List.repeat len Nothing)
-
-        filtersState =
+        state =
             case prop.state of
-                State state ->
-                    List.map
-                        (\index ->
-                            ( index
-                            , Filters.get index state.filters
-                            , state.filterDialog == Just index
-                            )
-                        )
-                        indexedList
+                State this ->
+                    this
+
+        filters =
+            state.filters
+                |> Maybe.map
+                    (Array.toIndexedList
+                        >> List.map (\( k, v ) -> ( k, Just v, isSelected prop.state k ))
+                    )
+                |> Maybe.withDefault (List.range 0 len |> List.map (\k -> ( k, Nothing, False )))
 
         mergedFilters =
-            List.map2 Filters.filtersMerge filters filtersState
-                |> List.filterMap identity
-                |> List.foldl Filters.filtersReduce (always True)
+            state.filters
+                |> Maybe.map
+                    (Array.toList
+                        >> List.filterMap Filters.filterGet
+                        >> List.foldl Filters.filtersReduce (always True)
+                    )
+                |> Maybe.withDefault (always True)
 
         headers =
-            headersRender renderConfig prop.toExternalMsg filters filtersState columns
+            headersRender renderConfig prop.toExternalMsg filters columns
 
         rows =
             opt.items
@@ -444,16 +437,14 @@ desktopView renderConfig prop opt =
 headersRender :
     RenderConfig
     -> (Msg -> msg)
-    -> List (Maybe (Filters.Filter msg item))
-    -> List ( Int, Maybe Filters.FilterModel, Bool )
+    -> List ( Int, Maybe (Filters.Filter msg item), Bool )
     -> List Column
     -> Element msg
-headersRender renderConfig toExternalMsg filters filtersState columns =
+headersRender renderConfig toExternalMsg filters columns =
     Element.row
         headersAttr
-        (List.map3 (headerRender renderConfig toExternalMsg)
+        (List.map2 (headerRender renderConfig toExternalMsg)
             filters
-            filtersState
             columns
         )
 
@@ -461,11 +452,10 @@ headersRender renderConfig toExternalMsg filters filtersState columns =
 headerRender :
     RenderConfig
     -> (Msg -> msg)
-    -> Maybe (Filters.Filter msg item)
-    -> ( Int, Maybe Filters.FilterModel, Bool )
+    -> ( Int, Maybe (Filters.Filter msg item), Bool )
     -> Column
     -> Element msg
-headerRender renderConfig toExternalMsg maybeFilter ( index, maybeFilterState, isFilterOpen ) (Column header { width }) =
+headerRender renderConfig toExternalMsg ( index, maybeFilter, isFilterOpen ) (Column header { width }) =
     cellSpace width <|
         case maybeFilter of
             Nothing ->
@@ -482,4 +472,4 @@ headerRender renderConfig toExternalMsg maybeFilter ( index, maybeFilterState, i
                         , isOpen = isFilterOpen
                         }
                 in
-                FiltersHeaders.header renderConfig filter maybeFilterState config
+                FiltersHeaders.header renderConfig filter config

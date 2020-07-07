@@ -35,42 +35,27 @@ type alias Config msg =
 header :
     RenderConfig
     -> Filters.Filter msg item
-    -> Maybe Filters.FilterModel
     -> Config msg
     -> Element msg
-header renderConfig filter maybeState config =
+header renderConfig filter config =
     let
         clearMsg =
-            Filters.getClearMsg config.fromFiltersMsg config.index filter
+            config.fromFiltersMsg <| Filters.Clear config.index
+
+        applyMsg =
+            config.fromFiltersMsg <| Filters.Apply config.index
     in
     if config.isOpen then
         case filter of
-            Filters.SingleTextFilter { initial, strategy } ->
-                let
-                    editable =
-                        case maybeState of
-                            Just (Filters.SingleTextModel value) ->
-                                value
-
-                            _ ->
-                                { applied = initial, current = Nothing }
-
-                    applyMsg =
-                        case strategy of
-                            Filters.Local _ ->
-                                config.fromFiltersMsg <| Filters.Apply config.index
-
-                            Filters.Remote remoteApplyMsg ->
-                                remoteApplyMsg editable.current
-                in
+            Filters.SingleTextFilter { editable, strategy } ->
                 singleTextFilterRender renderConfig config editable
-                    |> dialog renderConfig config filter clearMsg applyMsg maybeState
+                    |> dialog renderConfig config filter clearMsg applyMsg
 
             _ ->
                 -- TODO
                 Element.none
 
-    else if Filters.isApplied filter maybeState then
+    else if Filters.isApplied filter then
         headerApplied renderConfig
             config.openMsg
             clearMsg
@@ -236,16 +221,15 @@ dialog :
     -> Filters.Filter msg item
     -> msg
     -> msg
-    -> Maybe Filters.FilterModel
     -> Element msg
     -> Element msg
-dialog renderConfig config filter clearMsg applyMsg maybeState content =
+dialog renderConfig config filter clearMsg applyMsg content =
     let
         applied =
-            Filters.isApplied filter maybeState
+            Filters.isApplied filter
 
         current =
-            Filters.isEdited filter maybeState
+            Filters.isEdited filter
     in
     Element.el
         [ Element.width fill
@@ -301,7 +285,7 @@ singleTextFilterRender renderConfig { fromFiltersMsg, index, label } editable =
             fromFiltersMsg <| Filters.EditSingleText { column = index, value = str }
     in
     editable
-        |> Filters.editableDefault ""
+        |> Filters.editableWithDefault ""
         |> TextField.singlelineText editMsg label
         |> TextField.withWidth TextField.widthFull
         |> TextField.renderElement renderConfig
