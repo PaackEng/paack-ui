@@ -1,6 +1,6 @@
 module UI.Tables.Stateable exposing
     ( StateableTable, StateableConfig, table, withItems
-    , Responsive, Cover, Details, Detail, withResponsive, detailsEmpty, detailsPush, detailsPushHidden
+    , Responsive, Cover, Details, Detail, withResponsive, detailsEmpty, detailShown, detailHidden
     , State, Msg, init, update
     , Filters, withFilters, filtersEmpty
     , localSingleTextFilter, remoteSingleTextFilter
@@ -52,9 +52,9 @@ Where `Book` is:
 
     toTableDetails { author, title } =
         detailsEmpty
-            |> detailsPushHidden
-            |> detailsPush { label = "Author", content = cellFromText <| Text.body2 author }
-            |> detailsPushHidden
+            |> detailHidden
+            |> detailShown { label = "Author", content = cellFromText <| Text.body2 author }
+            |> detailHidden
 
     toTableCover { title, year } =
         { title = title, caption = Just year }
@@ -73,7 +73,7 @@ Where `Book` is:
 
 ## Mobile
 
-@docs Responsive, Cover, Details, Detail, withResponsive, detailsEmpty, detailsPush, detailsPushHidden
+@docs Responsive, Cover, Details, Detail, withResponsive, detailsEmpty, detailShown, detailHidden
 
 
 ## State
@@ -251,13 +251,13 @@ detailsEmpty =
     NArray.empty
 
 
-detailsPush : Detail msg -> Details msg columns -> Details msg (T.Increase columns)
-detailsPush detail accu =
+detailShown : Detail msg -> Details msg columns -> Details msg (T.Increase columns)
+detailShown detail accu =
     NArray.push (Just detail) accu
 
 
-detailsPushHidden : Details msg columns -> Details msg (T.Increase columns)
-detailsPushHidden accu =
+detailHidden : Details msg columns -> Details msg (T.Increase columns)
+detailHidden accu =
     NArray.push Nothing accu
 
 

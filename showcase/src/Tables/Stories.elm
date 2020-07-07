@@ -65,9 +65,9 @@ demoTable renderConfig model =
 
         toTableDetails { author, title } =
             detailsEmpty
-                |> detailsPushHidden
-                |> detailsPush { label = "Author", content = cellFromText <| Text.body2 author }
-                |> detailsPushHidden
+                |> detailHidden
+                |> detailShown { label = "Author", content = cellFromText <| Text.body2 author }
+                |> detailHidden
 
         toTableCover { title, year } =
             { title = title, caption = Just year }
