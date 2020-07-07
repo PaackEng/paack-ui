@@ -9,7 +9,7 @@ import UI.Internal.Basics exposing (maybeNotThen)
 import UI.Internal.TypeNumbers as T
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Tables.Common as Table exposing (..)
-import UI.Tables.Stateable as Stateable exposing (..)
+import UI.Tables.Stateful as Stateful exposing (..)
 import UI.Tables.Stateless as Stateless
 import UI.Text as Text exposing (Text)
 import UI.TextField as TextField
@@ -21,7 +21,7 @@ update : Stories.Msg -> Stories.Model -> Return Stories.Msg Stories.Model
 update msg { tableState } =
     case msg of
         Stories.ForComponent subMsg ->
-            ( { tableState = Stateable.update subMsg tableState }, Cmd.none )
+            ( { tableState = Stateful.update subMsg tableState }, Cmd.none )
 
 
 stories renderConfig =
@@ -78,19 +78,19 @@ demoTable renderConfig model =
                 |> localSingleTextFilter (Just "Dan") .author
                 |> localSingleTextFilter Nothing .year
     in
-    Stateable.table
+    Stateful.table
         { toExtern = Stories.ForComponent >> Msg.TablesStoriesMsg
         , columns = tableColumns
         , toRow = toTableRow
         , state = model.tableState
         }
-        |> Stateable.withResponsive
+        |> Stateful.withResponsive
             { toDetails = toTableDetails
             , toCover = toTableCover
             }
-        |> Stateable.withWidth Element.shrink
-        |> Stateable.withFilters someFilters
-        |> Stateable.withItems
+        |> Stateful.withWidth Element.shrink
+        |> Stateful.withFilters someFilters
+        |> Stateful.withItems
             [ { author = "Dan Brown", title = "Angels & Demons", year = "2000" }
             , { author = "Dan Brown", title = "The Da Vinci Code", year = "2003" }
             , { author = "Dan Brown", title = "The Lost Symbol", year = "2009" }
@@ -99,7 +99,7 @@ demoTable renderConfig model =
             , { author = "Suzanne Collins", title = "The Hunger Games", year = "2008" }
             , { author = "Agatha Christie", title = "Murder on the Orient Express", year = "1933" }
             ]
-        |> Stateable.renderElement renderConfig
+        |> Stateful.renderElement renderConfig
 
 
 demoWithIcons renderConfig model =

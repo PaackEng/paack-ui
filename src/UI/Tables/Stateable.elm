@@ -1,5 +1,5 @@
-module UI.Tables.Stateable exposing
-    ( StateableTable, StateableConfig, table, withItems
+module UI.Tables.Stateful exposing
+    ( StatefulTable, StatefulConfig, table, withItems
     , Responsive, Cover, Details, Detail, withResponsive, detailsEmpty, detailShown, detailHidden
     , State, Msg, init, update
     , Filters, withFilters, filtersEmpty
@@ -12,26 +12,26 @@ module UI.Tables.Stateable exposing
 
 `UI.Tables` are type-safe, which means that every row needs to have the same number of columns (including the headers). Otherwise, compilation fails.
 
-    Stateable.table
+    Stateful.table
         { toExtern = Msg.ForTable
         , columns = Book.tableColumns
         , toRow = Book.toTableRow
         , state = model.tableState
         }
-        |> Stateable.withResponsive
+        |> Stateful.withResponsive
             { toDetails = Book.toTableDetails
             , toCover = Book.toTableCover
             }
-        |> Stateable.withWidth (Element.fill |> Element.maximum 640)
-        |> Stateable.withFilters someFilters
-        |> Stateable.withItems
+        |> Stateful.withWidth (Element.fill |> Element.maximum 640)
+        |> Stateful.withFilters someFilters
+        |> Stateful.withItems
             [ Book "Dan Brown" "Angels & Demons" "2000"
             , Book "Dan Brown" "The Da Vinci Code" "2003"
             , Book "Dan Brown" "The Lost Symbol" "2009"
             , Book "Dan Brown" "Inferno" "2013"
             , Book "Dan Brown" "Origin" "2017"
             ]
-        |> Stateable.renderElement renderConfig
+        |> Stateful.renderElement renderConfig
 
 Where `Book` is:
 
@@ -66,9 +66,9 @@ Where `Book` is:
             |> localSingleTextFilter Nothing .year
 
 
-# Stateable
+# Stateful
 
-@docs StateableTable, StateableConfig, table, withItems
+@docs StatefulTable, StatefulConfig, table, withItems
 
 
 ## Mobile
@@ -127,13 +127,13 @@ import UI.TextField as TextField
 import UI.Utils.Element exposing (zeroPadding)
 
 
-{-| The `StateableTable msg item columns` type is used for describing the component for later rendering.
+{-| The `StatefulTable msg item columns` type is used for describing the component for later rendering.
 -}
-type StateableTable msg item columns
-    = Table (StateableConfig msg item columns) (Options msg item columns)
+type StatefulTable msg item columns
+    = Table (StatefulConfig msg item columns) (Options msg item columns)
 
 
-type alias StateableConfig msg item columns =
+type alias StatefulConfig msg item columns =
     { columns : Columns columns
     , toRow : ToRow msg item columns
     , toExtern : Msg -> msg
@@ -149,7 +149,7 @@ type alias Options msg item columns =
     }
 
 
-table : StateableConfig msg item columns -> StateableTable msg item columns
+table : StatefulConfig msg item columns -> StatefulTable msg item columns
 table config =
     Table config defaultOptions
 
@@ -163,7 +163,7 @@ defaultOptions =
     }
 
 
-withItems : List item -> StateableTable msg item columns -> StateableTable msg item columns
+withItems : List item -> StatefulTable msg item columns -> StatefulTable msg item columns
 withItems items (Table prop opt) =
     Table prop { opt | items = items }
 
@@ -241,7 +241,7 @@ type alias Details msg columns =
     NArray (Maybe (Detail msg)) columns
 
 
-withResponsive : Responsive msg item columns -> StateableTable msg item columns -> StateableTable msg item columns
+withResponsive : Responsive msg item columns -> StatefulTable msg item columns -> StatefulTable msg item columns
 withResponsive responsive (Table prop opt) =
     Table prop { opt | responsive = Just responsive }
 
@@ -273,7 +273,7 @@ type alias Strategy msgs value item =
     Filters.Strategy msgs value item
 
 
-withFilters : Filters msg item columns -> StateableTable msg item columns -> StateableTable msg item columns
+withFilters : Filters msg item columns -> StatefulTable msg item columns -> StatefulTable msg item columns
 withFilters filters (Table prop opt) =
     Table prop { opt | filters = Just filters }
 
@@ -341,7 +341,7 @@ filterRemote msgs =
         someTable
 
 -}
-withWidth : Element.Length -> StateableTable msg item columns -> StateableTable msg item columns
+withWidth : Element.Length -> StatefulTable msg item columns -> StatefulTable msg item columns
 withWidth width (Table prop opt_) =
     Table prop { opt_ | width = width }
 
@@ -353,7 +353,7 @@ withWidth width (Table prop opt_) =
 {-| End of the builder's life.
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
-renderElement : RenderConfig -> StateableTable msg item columns -> Element msg
+renderElement : RenderConfig -> StatefulTable msg item columns -> Element msg
 renderElement renderConfig (Table prop opt) =
     case opt.responsive of
         Just responsive ->
@@ -373,7 +373,7 @@ renderElement renderConfig (Table prop opt) =
 
 mobileView :
     RenderConfig
-    -> StateableConfig msg item columns
+    -> StatefulConfig msg item columns
     -> Options msg item columns
     -> Responsive msg item columns
     -> Element msg
@@ -410,7 +410,7 @@ detailView renderConfig { label, content } =
 
 desktopView :
     RenderConfig
-    -> StateableConfig msg item columns
+    -> StatefulConfig msg item columns
     -> Options msg item columns
     -> Element msg
 desktopView renderConfig prop opt =
