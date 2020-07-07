@@ -67,7 +67,7 @@ demoTable renderConfig model =
                 |> localSingleTextFilter Nothing .year
     in
     Stateful.table
-        { toExtern = Stories.ForComponent >> Msg.TablesStoriesMsg
+        { toExternalMsg = Stories.ForComponent >> Msg.TablesStoriesMsg
         , columns = tableColumns
         , toRow = toTableRow
         , state = model.tableState

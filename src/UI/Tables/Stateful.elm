@@ -294,11 +294,11 @@ localSingleTextFilter initValue get accu =
 
 remoteSingleTextFilter :
     Maybe String
-    -> (String -> msg)
+    -> (Maybe String -> msg)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-remoteSingleTextFilter initValue editMsg accu =
-    Filters.remoteSingleTextFilter initValue editMsg accu
+remoteSingleTextFilter initValue applyMsg accu =
+    Filters.remoteSingleTextFilter initValue applyMsg accu
 
 
 
@@ -413,18 +413,17 @@ desktopView renderConfig prop opt =
                         indexedList
 
         mergedFilters =
-            List.map2 mergeFilter filters filtersState
+            List.map2 Filters.filtersMerge filters filtersState
                 |> List.filterMap identity
-                |> List.foldl reduceFilters (always True)
+                |> List.foldl Filters.filtersReduce (always True)
 
         headers =
             headersRender renderConfig prop.toExternalMsg filters filtersState columns
 
-        filteredItems =
-            List.filter mergedFilters opt.items
-
         rows =
-            List.map (rowRender renderConfig prop.toRow columns) filteredItems
+            opt.items
+                |> List.filter mergedFilters
+                |> List.map (rowRender renderConfig prop.toRow columns)
 
         padding =
             case opt.responsive of
@@ -459,10 +458,6 @@ headersRender renderConfig toExternalMsg filters filtersState columns =
         )
 
 
-
--- Headers
-
-
 headerRender :
     RenderConfig
     -> (Msg -> msg)
@@ -472,246 +467,19 @@ headerRender :
     -> Element msg
 headerRender renderConfig toExternalMsg maybeFilter ( index, maybeFilterState, isFilterOpen ) (Column header { width }) =
     cellSpace width <|
-        case maybeFilterState of
+        case maybeFilter of
             Nothing ->
-                noFilterStateHeader renderConfig toExternalMsg maybeFilter isFilterOpen index width header
-
-            Just (Filters.SingleTextModel editable) ->
-                filterStateHeader renderConfig toExternalMsg singleTextFilterRender Filters.singleTextEmpty isFilterOpen index width header editable
-
-            _ ->
                 simpleHeaderRender renderConfig header
 
-
-noFilterStateHeader :
-    RenderConfig
-    -> (Msg -> msg)
-    -> Maybe (Filters.Filter msg item)
-    -> Bool
-    -> Int
-    -> Common.ColumnWidth
-    -> String
-    -> Element msg
-noFilterStateHeader renderConfig toExternalMsg maybeFilter isFilterOpen index width header =
-    case maybeFilter of
-        Just (Filters.SingleTextFilter { initial }) ->
-            if isFilterOpen then
-                initial
-                    |> Filters.editableInit
-                    |> singleTextFilterRender renderConfig toExternalMsg index width header
-
-            else if initial /= Nothing then
-                appliedFilterRender renderConfig toExternalMsg Filters.singleTextEmpty index header
-
-            else
-                closedFilteredHeader renderConfig toExternalMsg index header
-
-        _ ->
-            simpleHeaderRender renderConfig header
-
-
-closedFilteredHeader : RenderConfig -> (Msg -> msg) -> Int -> String -> Element msg
-closedFilteredHeader renderConfig toExternalMsg index header =
-    let
-        openMsg =
-            toExternalMsg <| FilterDialogOpen index
-    in
-    FiltersHeaders.normal renderConfig openMsg header
-
-
-overlayBackground : msg -> Element msg
-overlayBackground onClickMsg =
-    Element.el
-        [ positionFixed -- Needs for starting at the top-left corner
-        , zIndex 8
-        , Palette.overlayBackground
-        , Element.htmlAttribute <| HtmlAttrs.style "top" "0"
-        , Element.htmlAttribute <| HtmlAttrs.style "left" "0"
-        , Element.htmlAttribute <| HtmlAttrs.style "width" "100vw"
-        , Element.htmlAttribute <| HtmlAttrs.style "height" "100vh"
-        , Events.onClick onClickMsg
-        ]
-        Element.none
-
-
-type alias FilterStateRenderer msg value =
-    RenderConfig
-    -> (Msg -> msg)
-    -> Int
-    -> Common.ColumnWidth
-    -> String
-    -> Filters.Editable value
-    -> Element msg
-
-
-filterStateHeader :
-    RenderConfig
-    -> (Msg -> msg)
-    -> FilterStateRenderer msg value
-    -> Filters.FilterModel
-    -> Bool
-    -> Int
-    -> Common.ColumnWidth
-    -> String
-    -> Filters.Editable value
-    -> Element msg
-filterStateHeader renderConfig toExternalMsg renderer empty isFilterOpen index width header editable =
-    if isFilterOpen then
-        renderer renderConfig toExternalMsg index width header editable
-
-    else if editable.applied /= Nothing then
-        appliedFilterRender renderConfig toExternalMsg empty index header
-
-    else
-        closedFilteredHeader renderConfig toExternalMsg index header
-
-
-appliedFilterRender : RenderConfig -> (Msg -> msg) -> Filters.FilterModel -> Int -> String -> Element msg
-appliedFilterRender renderConfig toExternalMsg empty index header =
-    let
-        clearMsg =
-            toExternalMsg <| ForFilters <| Filters.Set index empty
-
-        openMsg =
-            toExternalMsg <| FilterDialogOpen index
-    in
-    FiltersHeaders.applied renderConfig openMsg clearMsg "Clear" header
-
-
-filterEditingButton : RenderConfig -> msg -> msg -> Filters.Editable data -> Element msg
-filterEditingButton cfg applyMsg clearMsg { applied, current } =
-    let
-        clearBtn =
-            Button.fromLabel "Clear"
-                |> Button.cmd clearMsg Button.danger
-                |> Button.withSize Size.extraSmall
-                |> Button.renderElement cfg
-
-        applyBtn =
-            Button.fromLabel "Apply"
-                |> Button.cmd applyMsg Button.primary
-                |> Button.withSize Size.extraSmall
-                |> Button.renderElement cfg
-
-        disabledBtn =
-            Button.fromLabel "Apply"
-                |> Button.disabled
-                |> Button.withSize Size.extraSmall
-                |> Button.renderElement cfg
-    in
-    case ( applied, current ) of
-        ( _, Just _ ) ->
-            Element.row [ Element.spacing 8 ] [ applyBtn, clearBtn ]
-
-        ( Just _, Nothing ) ->
-            clearBtn
-
-        ( Nothing, Nothing ) ->
-            disabledBtn
-
-
-filterEditRender :
-    RenderConfig
-    -> (Msg -> msg)
-    -> Int
-    -> Filters.FilterModel
-    -> Common.ColumnWidth
-    -> String
-    -> Filters.Editable data
-    -> Element msg
-    -> Element msg
-filterEditRender renderConfig toExternalMsg index empty width header editable content =
-    let
-        discardMsg =
-            toExternalMsg FilterDialogClose
-
-        applyMsg =
-            toExternalMsg <| ForFilters <| Filters.Apply index
-
-        clearMsg =
-            toExternalMsg <| ForFilters <| Filters.Set index empty
-    in
-    Element.el
-        [ Element.width fill
-        , Element.height (shrink |> minimum 1)
-        , Element.inFront <|
-            -- Using inFront is required for cell's proportional width
-            Element.column
-                [ Element.width fill
-                , zIndex 9
-                , Element.alignTop
-                , Palette.mainBackground
-                , Primitives.defaultRoundedBorders
-                ]
-                [ Element.row
-                    [ Element.paddingEach { top = 10, left = 12, right = 10, bottom = 7 }
-                    , Element.width fill
-                    , Border.color Palette.gray.lighter
-                    , Border.widthEach { zeroPadding | bottom = 1 }
-                    ]
-                    [ Text.overline header
-                        |> Text.renderElement renderConfig
-                    , Button.fromIcon (Icon.close "Close")
-                        |> Button.cmd discardMsg Button.clear
-                        |> Button.withSize Size.extraSmall
-                        |> Button.renderElement renderConfig
-                    ]
-                , Element.column
-                    [ Element.width fill
-                    , Element.padding 12
-                    , Element.spacing 20
-                    ]
-                    [ content
-                    , filterEditingButton renderConfig applyMsg clearMsg editable
-                    ]
-                ]
-        ]
-        (overlayBackground discardMsg)
-
-
-singleTextFilterRender : FilterStateRenderer msg String
-singleTextFilterRender renderConfig toExternalMsg index width header editable =
-    let
-        editMsg str =
-            toExternalMsg <| ForFilters <| Filters.EditSingleText { column = index, value = str }
-
-        empty =
-            Filters.singleTextEmpty
-    in
-    editable
-        |> Filters.editableDefault ""
-        |> TextField.singlelineText editMsg header
-        |> TextField.withWidth TextField.widthFull
-        |> TextField.renderElement renderConfig
-        |> filterEditRender renderConfig toExternalMsg index empty width header editable
-
-
-
--- Filter logic
-
-
-mergeFilter :
-    Maybe (Filters.Filter msg item)
-    -> ( Int, Maybe Filters.FilterModel, Bool )
-    -> Maybe (item -> Bool)
-mergeFilter filter ( _, model, _ ) =
-    Maybe.andThen (flip Filters.localFilterGet model) filter
-
-
-reduceFilters : (item -> Bool) -> (item -> Bool) -> (item -> Bool)
-reduceFilters new old =
-    \item -> new item && old item
-
-
-
--- CSS: Not to be used anywhere else
-
-
-positionFixed : Attribute msg
-positionFixed =
-    Element.htmlAttribute <| HtmlAttrs.style "position" "fixed"
-
-
-zIndex : Int -> Attribute msg
-zIndex val =
-    Element.htmlAttribute <| HtmlAttrs.style "z-index" (String.fromInt val)
+            Just filter ->
+                let
+                    config =
+                        { openMsg = toExternalMsg <| FilterDialogOpen index
+                        , discardMsg = toExternalMsg <| FilterDialogClose
+                        , fromFiltersMsg = ForFilters >> toExternalMsg
+                        , index = index
+                        , label = header
+                        , isOpen = isFilterOpen
+                        }
+                in
+                FiltersHeaders.header renderConfig filter maybeFilterState config

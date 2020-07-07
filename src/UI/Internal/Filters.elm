@@ -32,10 +32,10 @@ type alias Model =
 
 type FilterModel
     = SingleTextModel (Editable String)
-    | MultiTextModel (Dict Int (Editable String))
+    | MultiTextModel (Editable (Dict Int String))
     | SingleDateModel (Editable Date)
-    | RangeDateModel { from : Editable Date, to : Editable Date }
-    | PeriodDateModel { date : Editable Date, timePeriod : Editable TimePeriod }
+    | RangeDateModel (Editable RangeDate)
+    | PeriodDateModel (Editable PeriodDate)
     | SelectModel (Editable Int)
 
 
@@ -49,9 +49,9 @@ type TimePeriod
     | After
 
 
-type Strategy msgs value item
+type Strategy msg value item
     = Local (item -> value -> Bool)
-    | Remote msgs
+    | Remote msg
 
 
 init : Model
@@ -91,14 +91,19 @@ filtersEmpty =
     NArray.empty
 
 
-filtersPush : Filters.Filter msg item -> Filters msg item columns -> Filters msg item (T.Increase columns)
+filtersPush : Filter msg item -> Filters msg item columns -> Filters msg item (T.Increase columns)
 filtersPush filter accu =
     NArray.push filter accu
 
 
-filterRemote : msgs -> Strategy msgs value item
-filterRemote msgs =
-    Filters.Remote msgs
+filterLocal : (item -> value -> Bool) -> Strategy msg value item
+filterLocal isKept =
+    Local isKept
+
+
+filterRemote : msg -> Strategy msg value item
+filterRemote applyMsg =
+    Remote applyMsg
 
 
 
@@ -124,8 +129,7 @@ type alias SingleTextFilterStrategy msg item =
 
 
 type alias SingleTextFilterRemote msg =
-    { editMsg : String -> msg
-    }
+    Maybe String -> msg
 
 
 singleTextEmpty : FilterModel
@@ -138,35 +142,26 @@ localSingleTextFilter :
     -> (item -> String)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-localSingleTextFilter initValue get accu =
+localSingleTextFilter initValue getStr accu =
     let
         applier item current =
-            get item
+            getStr item
                 |> String.toLower
                 |> String.contains (String.toLower current)
     in
     { initial = initValue, strategy = filterLocal applier }
-        |> Filters.SingleTextFilter
+        |> SingleTextFilter
         |> flip filtersPush accu
-
-
-filterLocal : (item -> value -> Bool) -> Strategy msgs value item
-filterLocal isKept =
-    Filters.Local isKept
 
 
 remoteSingleTextFilter :
     Maybe String
-    -> (String -> msg)
+    -> (Maybe String -> msg)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-remoteSingleTextFilter initValue editMsg accu =
-    let
-        msgs =
-            { editMsg = editMsg }
-    in
-    { initial = initValue, strategy = filterRemote msgs }
-        |> Filters.SingleTextFilter
+remoteSingleTextFilter initValue applyMsg accu =
+    { initial = initValue, strategy = filterRemote applyMsg }
+        |> SingleTextFilter
         |> flip filtersPush accu
 
 
@@ -183,8 +178,7 @@ type alias MultiTextFilterStrategy msg item =
 
 
 type alias MultiTextFilterRemote msg =
-    { editMsg : Int -> String -> msg
-    }
+    List String -> msg
 
 
 
@@ -204,8 +198,7 @@ type alias SingleDateFilterStrategy msg item =
 
 
 type alias SingleDateFilterRemote msg =
-    { editMsg : Date -> msg
-    }
+    Maybe Date -> msg
 
 
 
@@ -213,7 +206,7 @@ type alias SingleDateFilterRemote msg =
 
 
 type alias RangeDate =
-    { from : Date, to : String }
+    { from : Date, to : Date }
 
 
 type alias RangeDateFilterConfig msg item =
@@ -225,9 +218,7 @@ type alias RangeDateFilterStrategy msg item =
 
 
 type alias RangeDateFilterRemote msg =
-    { fromEditMsg : Date -> msg
-    , toEditMsg : String -> msg
-    }
+    Maybe ( Date, Date ) -> msg
 
 
 
@@ -247,9 +238,7 @@ type alias PeriodDateFilterStrategy msg item =
 
 
 type alias PeriodDateFilterRemote msg =
-    { dateEditMsg : String -> msg
-    , periodEditMsg : TimePeriod -> msg
-    }
+    Maybe ( String, TimePeriod ) -> msg
 
 
 
@@ -265,8 +254,7 @@ type alias SelectFilterStrategy msg item =
 
 
 type alias SelectFilterRemote msg =
-    { selectMsg : Int -> msg
-    }
+    Maybe Int -> msg
 
 
 
@@ -301,9 +289,8 @@ applyFilter column model =
                 |> SingleTextModel
                 |> flip (Dict.insert column) model
 
-        Just (MultiTextModel dict) ->
-            dict
-                |> Dict.map (always editableApply)
+        Just (MultiTextModel editable) ->
+            editableApply editable
                 |> MultiTextModel
                 |> flip (Dict.insert column) model
 
@@ -312,13 +299,13 @@ applyFilter column model =
                 |> SingleDateModel
                 |> flip (Dict.insert column) model
 
-        Just (RangeDateModel { from, to }) ->
-            { from = editableApply from, to = editableApply to }
+        Just (RangeDateModel editable) ->
+            editableApply editable
                 |> RangeDateModel
                 |> flip (Dict.insert column) model
 
-        Just (PeriodDateModel { date, timePeriod }) ->
-            { date = editableApply date, timePeriod = editableApply timePeriod }
+        Just (PeriodDateModel editable) ->
+            editableApply editable
                 |> PeriodDateModel
                 |> flip (Dict.insert column) model
 
@@ -339,8 +326,8 @@ updateEditable new old =
 getSingleTextEditable : Int -> Model -> Editable String
 getSingleTextEditable column model =
     case Dict.get column model of
-        Just (SingleTextModel data) ->
-            data
+        Just (SingleTextModel editable) ->
+            editable
 
         _ ->
             editableEmpty
@@ -349,33 +336,115 @@ getSingleTextEditable column model =
 editMultiTextFilter : Int -> Int -> String -> Model -> Model
 editMultiTextFilter column field value model =
     let
-        oldDict =
-            getMultiTextDict column model
+        newValue =
+            case Dict.get column model of
+                Just (MultiTextModel editable) ->
+                    editable.current
+                        |> Maybe.withDefault Dict.empty
+                        |> Dict.insert field value
+                        |> flip updateEditable editable
 
-        oldEditable =
-            oldDict
-                |> Dict.get field
-                |> Maybe.withDefault editableEmpty
+                _ ->
+                    Dict.empty
+                        |> Dict.insert field value
+                        |> flip updateEditable editableEmpty
     in
-    oldEditable
-        |> updateEditable value
-        |> flip (Dict.insert field) oldDict
+    newValue
         |> MultiTextModel
         |> flip (Dict.insert column) model
 
 
-getMultiTextDict : Int -> Model -> Dict Int (Editable String)
-getMultiTextDict column model =
-    case Dict.get column model of
-        Just (MultiTextModel data) ->
-            data
-
-        _ ->
-            Dict.empty
-
-
 
 -- Get Filters
+
+
+getClearMsg : (Msg -> msg) -> Int -> Filter msg item -> msg
+getClearMsg toExternalMsg index filter =
+    case filter of
+        SingleTextFilter { strategy } ->
+            case strategy of
+                Local _ ->
+                    singleTextEmpty
+                        |> Set index
+                        |> toExternalMsg
+
+                Remote applyMsg ->
+                    applyMsg Nothing
+
+        _ ->
+            Debug.todo "TODO"
+
+
+isEdited : Filter msg item -> Maybe FilterModel -> Bool
+isEdited filter columnModel =
+    case columnModel of
+        Just (SingleTextModel { current }) ->
+            current /= Nothing
+
+        Just (MultiTextModel { current }) ->
+            current /= Nothing
+
+        Just (SingleDateModel { current }) ->
+            current /= Nothing
+
+        Just (RangeDateModel { current }) ->
+            current /= Nothing
+
+        Just (PeriodDateModel { current }) ->
+            current /= Nothing
+
+        Just (SelectModel { current }) ->
+            current /= Nothing
+
+        Nothing ->
+            False
+
+
+isApplied : Filter msg item -> Maybe FilterModel -> Bool
+isApplied filter columnModel =
+    case columnModel of
+        Just (SingleTextModel { applied }) ->
+            applied /= Nothing
+
+        Just (MultiTextModel { applied }) ->
+            applied /= Nothing
+
+        Just (SingleDateModel { applied }) ->
+            applied /= Nothing
+
+        Just (RangeDateModel { applied }) ->
+            applied /= Nothing
+
+        Just (PeriodDateModel { applied }) ->
+            applied /= Nothing
+
+        Just (SelectModel { applied }) ->
+            applied /= Nothing
+
+        Nothing ->
+            hasInitial filter
+
+
+hasInitial : Filter msg item -> Bool
+hasInitial filter =
+    case filter of
+        SingleTextFilter { initial } ->
+            initial /= Nothing
+
+        MultiTextFilter { initial } ->
+            initial /= Nothing
+
+        SingleDateFilter { initial } ->
+            initial /= Nothing
+
+        RangeDateFilter { initial } ->
+            initial /= Nothing
+
+        PeriodDateFilter { initial } ->
+            initial /= Nothing
+
+        SelectFilter { initial } ->
+            initial /= Nothing
 
 
 localFilterGet : Filter msg item -> Maybe FilterModel -> Maybe (item -> Bool)
@@ -401,11 +470,10 @@ localFilterGet filter maybeModel =
             case strategy of
                 Local applier ->
                     case maybeModel of
-                        Just (MultiTextModel dict) ->
-                            dict
-                                |> Dict.toList
-                                |> List.filterMap (Tuple.second >> .applied)
-                                |> applyIfNotEmpty applier
+                        Just (MultiTextModel { applied }) ->
+                            Maybe.andThen
+                                (Dict.values >> applyIfNotEmpty applier)
+                                applied
 
                         Nothing ->
                             Maybe.map (flip applier) initial
@@ -436,11 +504,8 @@ localFilterGet filter maybeModel =
             case strategy of
                 Local applier ->
                     case maybeModel of
-                        Just (RangeDateModel { from, to }) ->
-                            Maybe.map2
-                                (\from_ to_ -> flip applier { from = from_, to = to_ })
-                                from.applied
-                                to.applied
+                        Just (RangeDateModel { applied }) ->
+                            Maybe.map (flip applier) applied
 
                         Nothing ->
                             Maybe.map (flip applier) initial
@@ -455,11 +520,8 @@ localFilterGet filter maybeModel =
             case strategy of
                 Local applier ->
                     case maybeModel of
-                        Just (PeriodDateModel { date, timePeriod }) ->
-                            Maybe.map2
-                                (\date_ timePeriod_ -> flip applier { date = date_, timePeriod = timePeriod_ })
-                                date.applied
-                                timePeriod.applied
+                        Just (PeriodDateModel { applied }) ->
+                            Maybe.map (flip applier) applied
 
                         Nothing ->
                             Maybe.map (flip applier) initial
@@ -494,3 +556,20 @@ applyIfNotEmpty applier list =
 
     else
         Nothing
+
+
+
+-- Filters combination
+
+
+filtersMerge :
+    Maybe (Filter msg item)
+    -> ( Int, Maybe FilterModel, Bool )
+    -> Maybe (item -> Bool)
+filtersMerge filter ( _, model, _ ) =
+    Maybe.andThen (flip localFilterGet model) filter
+
+
+filtersReduce : (item -> Bool) -> (item -> Bool) -> (item -> Bool)
+filtersReduce new old =
+    \item -> new item && old item

@@ -1,6 +1,6 @@
 module Tables.Model exposing (..)
 
-import UI.Tables.Stateable as Table
+import UI.Tables.Stateful as Table
 
 
 type alias Model =
