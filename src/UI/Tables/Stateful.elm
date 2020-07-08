@@ -121,7 +121,6 @@ import UI.Internal.TableView exposing (..)
 import UI.ListView as ListView
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Tables.Common as Common exposing (..)
-import UI.Utils.Element exposing (zeroPadding)
 import UI.Utils.TypeNumbers as T
 
 
@@ -415,12 +414,7 @@ desktopView renderConfig prop opt =
             List.map (rowRender renderConfig prop.toRow columns) items
 
         padding =
-            case opt.responsive of
-                Just _ ->
-                    { top = 20, left = 20, right = 20, bottom = 0 }
-
-                Nothing ->
-                    zeroPadding
+            { top = 20, left = 20, right = 20, bottom = 0 }
 
         length =
             NArray.length prop.columns
