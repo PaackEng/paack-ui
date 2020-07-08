@@ -2,7 +2,7 @@ module UI.Utils.Element exposing
     ( colorSetOpacity, colorTransition
     , desktopMaximum
     , svg, title, ellipsis, maxHeightVH, maxHeightPct
-    , disabled, onEnterPressed
+    , disabled, onEnterPressed, onIndividualClick
     , RectangleSides, zeroPadding
     )
 
@@ -26,7 +26,7 @@ module UI.Utils.Element exposing
 
 # Input
 
-@docs disabled, onEnterPressed
+@docs disabled, onEnterPressed, onIndividualClick
 
 
 # Padding, borders and size
@@ -211,6 +211,14 @@ zeroPadding =
     , right = 0
     , bottom = 0
     }
+
+
+onIndividualClick : msg -> Attribute msg
+onIndividualClick message =
+    Decode.succeed message
+        |> Decode.map (\msg -> { message = msg, stopPropagation = True, preventDefault = True })
+        |> HtmlEvents.custom "click"
+        |> Element.htmlAttribute
 
 
 

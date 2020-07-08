@@ -1,6 +1,6 @@
 module UI.Internal.NList exposing (..)
 
-import UI.Internal.TypeNumbers as T
+import UI.Utils.TypeNumbers as T
 
 
 {-| The NList is a fixed-length list using phantom-type for compile-time constrains.

@@ -67,7 +67,6 @@ A button can be created and rendered as in the following pipeline:
 import Element exposing (Attribute, Element)
 import Element.Background as Background
 import Element.Border as Border
-import Element.Events as Events
 import Element.Font as Font
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Basics exposing (lazyMap, maybeToList, pairUncurry, prependMaybe)
@@ -342,6 +341,8 @@ withWidth width button =
 
 [size]: UI-Size
 
+The sizes (in height) are: Large - 60px; Medium - 48px; Small - 36px; Extra Small - 24px.
+
     Button.withSize Size.large someButton
 
 **NOTE**: Button's default size is [`Size.medium`](UI-Size#medium)
@@ -501,10 +502,10 @@ toggleView cfg size hint toggleMsg current =
             iconLayout size
 
         attrs =
-            [ Primitives.roundedBorders
+            [ Primitives.roundedBorders size
             , paddings
             , borders
-            , Events.onClick <| toggleMsg (not current)
+            , Element.onIndividualClick <| toggleMsg (not current)
             ]
                 ++ ARIA.toElementAttributes ARIA.roleButton
                 ++ toggleTheme current
@@ -525,8 +526,7 @@ hyperlinkView :
 hyperlinkView cfg size width body action =
     let
         attrs =
-            [ Primitives.roundedBorders
-            , buttonWidth width
+            [ buttonWidth width
             , Palette.color tonePrimary brightnessMiddle
                 |> Palette.toElementColor
                 |> Font.color
@@ -545,7 +545,7 @@ hyperlinkView cfg size width body action =
         ActionMsg msg ->
             body
                 |> bodyToElement cfg size
-                |> Element.el (Events.onClick msg :: attrs)
+                |> Element.el (Element.onIndividualClick msg :: attrs)
 
 
 workingView :
@@ -562,7 +562,7 @@ workingView cfg size width tone body action =
             bodyLayout body size
 
         attrs =
-            [ Primitives.roundedBorders
+            [ Primitives.roundedBorders size
             , buttonWidth width
             , paddings
             , borders
@@ -581,7 +581,7 @@ workingView cfg size width tone body action =
         ActionMsg msg ->
             body
                 |> bodyToElement cfg size
-                |> Element.el (Events.onClick msg :: attrs)
+                |> Element.el (Element.onIndividualClick msg :: attrs)
 
 
 staticView :
@@ -597,7 +597,7 @@ staticView cfg size width body theme =
             bodyLayout body size
 
         attrs =
-            [ Primitives.roundedBorders
+            [ Primitives.roundedBorders size
             , buttonWidth width
             , paddings
             , borders
