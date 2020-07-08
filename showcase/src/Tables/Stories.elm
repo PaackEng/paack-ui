@@ -6,22 +6,26 @@ import Return as R exposing (Return)
 import Tables.Model as Stories
 import Tables.Msg as Stories
 import UI.Internal.Basics exposing (maybeNotThen)
-import UI.Internal.TypeNumbers as T
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Tables.Common as Table exposing (..)
 import UI.Tables.Stateful as Stateful exposing (..)
 import UI.Tables.Stateless as Stateless
 import UI.Text as Text exposing (Text)
 import UI.TextField as TextField
+import UI.Utils.TypeNumbers as T
 import UIExplorer exposing (storiesOf)
 import Utils exposing (iconsSvgSprite, story, storyWithModel)
 
 
-update : Stories.Msg -> Stories.Model -> Return Stories.Msg Stories.Model
+update : Stories.Msg -> Stories.Model -> Return Msg.Msg Stories.Model
 update msg { tableState } =
     case msg of
         Stories.ForComponent subMsg ->
-            ( { tableState = Stateful.update subMsg tableState }, Cmd.none )
+            let
+                ( newModel, subCmd ) =
+                    Stateful.update subMsg tableState
+            in
+            ( { tableState = newModel }, subCmd )
 
 
 stories renderConfig =
@@ -59,12 +63,6 @@ demoTable renderConfig model =
 
         toTableCover { title, year } =
             { title = title, caption = Just year }
-
-        someFilters =
-            filtersEmpty
-                |> localSingleTextFilter Nothing .title
-                |> localSingleTextFilter (Just "Dan") .author
-                |> localSingleTextFilter Nothing .year
     in
     Stateful.table
         { toExternalMsg = Stories.ForComponent >> Msg.TablesStoriesMsg
@@ -77,7 +75,6 @@ demoTable renderConfig model =
             , toCover = toTableCover
             }
         |> Stateful.withWidth Element.shrink
-        |> Stateful.withFilters someFilters
         |> Stateful.withItems books
         |> Stateful.renderElement renderConfig
 

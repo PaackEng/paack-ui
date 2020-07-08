@@ -2,7 +2,7 @@ module UI.Internal.NArray exposing (..)
 
 import Array exposing (Array)
 import UI.Internal.NList exposing (NList(..))
-import UI.Internal.TypeNumbers as T
+import UI.Utils.TypeNumbers as T
 
 
 {-| The NArray is a fixed-length array using phantom-type for compile-time constrains.

@@ -15,7 +15,6 @@ import UI.Internal.Size as Size exposing (Size)
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
-import UI.Tables.Common as Common
 import UI.Text as Text
 import UI.TextField as TextField
 import UI.Utils.ARIA as ARIA
@@ -47,7 +46,7 @@ header renderConfig filter config =
     in
     if config.isOpen then
         case filter of
-            Filters.SingleTextFilter { editable, strategy } ->
+            Filters.SingleTextFilter { editable } ->
                 singleTextFilterRender renderConfig config editable
                     |> dialog renderConfig config filter clearMsg applyMsg
 

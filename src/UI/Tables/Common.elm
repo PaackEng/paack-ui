@@ -32,8 +32,8 @@ module UI.Tables.Common exposing
 import UI.Button exposing (Button)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Internal.Table as Internal exposing (..)
-import UI.Internal.TypeNumbers as T
 import UI.Text exposing (Text)
+import UI.Utils.TypeNumbers as T
 
 
 

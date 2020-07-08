@@ -23,7 +23,6 @@ module UI.Tables.Stateful exposing
             , toCover = Book.toTableCover
             }
         |> Stateful.withWidth (Element.fill |> Element.maximum 640)
-        |> Stateful.withFilters someFilters
         |> Stateful.withItems
             [ Book "Dan Brown" "Angels & Demons" "2000"
             , Book "Dan Brown" "The Da Vinci Code" "2003"
@@ -65,6 +64,16 @@ Where `Book` is:
             |> localSingleTextFilter (Just "Dan") .author
             |> localSingleTextFilter Nothing .year
 
+And on model:
+
+    { -...
+    , tableState : Stateful.Table Msg.Msg TypeNumbers.Three
+    }
+
+    { -...
+    , tableState = Stateful.withFilters Book.someFilters Stateful.init
+    }
+
 
 # Stateful
 
@@ -102,30 +111,18 @@ Where `Book` is:
 
 -}
 
-import Array
-import Element exposing (Attribute, Element, fill, minimum, shrink)
-import Element.Border as Border
-import Element.Events as Events
-import Html.Attributes as HtmlAttrs
-import UI.Button as Button
-import UI.Icon as Icon
+import Element exposing (Element, shrink)
 import UI.Internal.Basics exposing (flip)
 import UI.Internal.Filters as Filters
 import UI.Internal.FiltersHeaders as FiltersHeaders
 import UI.Internal.NArray as NArray exposing (NArray)
-import UI.Internal.Palette as Palette
-import UI.Internal.Primitives as Primitives
 import UI.Internal.Table exposing (..)
 import UI.Internal.TableView exposing (..)
-import UI.Internal.TypeNumbers as T
 import UI.ListView as ListView
-import UI.Palette as Palette
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
-import UI.Size as Size
 import UI.Tables.Common as Common exposing (..)
-import UI.Text as Text
-import UI.TextField as TextField
 import UI.Utils.Element exposing (zeroPadding)
+import UI.Utils.TypeNumbers as T
 
 
 {-| The `StatefulTable msg item columns` type is used for describing the component for later rendering.
@@ -289,10 +286,20 @@ filtersEmpty =
     Filters.empty
 
 
+localSingleTextFilter :
+    Maybe String
+    -> (item -> String)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
 localSingleTextFilter =
     Filters.singleTextLocal
 
 
+remoteSingleTextFilter :
+    Maybe String
+    -> (Maybe String -> msg)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
 remoteSingleTextFilter =
     Filters.singleTextRemote
 
@@ -382,41 +389,30 @@ desktopView :
     -> Element msg
 desktopView renderConfig prop opt =
     let
-        len =
-            NArray.length prop.columns
-
         columns =
             NArray.toList prop.columns
 
         state =
             case prop.state of
-                State this ->
-                    this
+                State state_ ->
+                    state_
 
         filters =
-            state.filters
-                |> Maybe.map
-                    (Array.toIndexedList
-                        >> List.map (\( k, v ) -> ( k, Just v, isSelected prop.state k ))
-                    )
-                |> Maybe.withDefault (List.range 0 len |> List.map (\k -> ( k, Nothing, False )))
+            case state.filters of
+                Just filtersArr ->
+                    NArray.toList filtersArr
 
-        mergedFilters =
-            state.filters
-                |> Maybe.map
-                    (Array.toList
-                        >> List.filterMap Filters.filterGet
-                        >> List.foldl Filters.filtersReduce (always True)
-                    )
-                |> Maybe.withDefault (always True)
+                Nothing ->
+                    []
 
-        headers =
-            headersRender renderConfig prop.toExternalMsg filters columns
+        items =
+            filters
+                |> List.filterMap Filters.filterGet
+                |> List.foldl Filters.filtersReduce (always True)
+                |> flip List.filter opt.items
 
         rows =
-            opt.items
-                |> List.filter mergedFilters
-                |> List.map (rowRender renderConfig prop.toRow columns)
+            List.map (rowRender renderConfig prop.toRow columns) items
 
         padding =
             case opt.responsive of
@@ -425,6 +421,12 @@ desktopView renderConfig prop opt =
 
                 Nothing ->
                     zeroPadding
+
+        length =
+            NArray.length prop.columns
+
+        headers =
+            headersRender renderConfig prop.toExternalMsg state.filterDialog length filters columns
     in
     Element.column
         [ Element.spacing 2
@@ -437,25 +439,38 @@ desktopView renderConfig prop opt =
 headersRender :
     RenderConfig
     -> (Msg -> msg)
-    -> List ( Int, Maybe (Filters.Filter msg item), Bool )
+    -> Maybe Int
+    -> Int
+    -> List (Filters.Filter msg item)
     -> List Column
     -> Element msg
-headersRender renderConfig toExternalMsg filters columns =
-    Element.row
-        headersAttr
-        (List.map2 (headerRender renderConfig toExternalMsg)
-            filters
-            columns
-        )
+headersRender renderConfig toExternalMsg selected length filters columns =
+    let
+        index =
+            List.range 0 length
+
+        maybeFilters =
+            case filters of
+                [] ->
+                    List.repeat length Nothing
+
+                _ ->
+                    List.map Just filters
+    in
+    maybeFilters
+        |> List.map3 (headerRender renderConfig toExternalMsg selected) index columns
+        |> Element.row headersAttr
 
 
 headerRender :
     RenderConfig
     -> (Msg -> msg)
-    -> ( Int, Maybe (Filters.Filter msg item), Bool )
+    -> Maybe Int
+    -> Int
     -> Column
+    -> Maybe (Filters.Filter msg item)
     -> Element msg
-headerRender renderConfig toExternalMsg ( index, maybeFilter, isFilterOpen ) (Column header { width }) =
+headerRender renderConfig toExternalMsg selected index (Column header { width }) maybeFilter =
     cellSpace width <|
         case maybeFilter of
             Nothing ->
@@ -469,7 +484,7 @@ headerRender renderConfig toExternalMsg ( index, maybeFilter, isFilterOpen ) (Co
                         , fromFiltersMsg = ForFilters >> toExternalMsg
                         , index = index
                         , label = header
-                        , isOpen = isFilterOpen
+                        , isOpen = selected == Just index
                         }
                 in
                 FiltersHeaders.header renderConfig filter config

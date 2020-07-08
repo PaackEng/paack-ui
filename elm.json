@@ -18,13 +18,14 @@
         "UI.RenderConfig",
         "UI.Size",
         "UI.Tables.Common",
-        "UI.Tables.Stateable",
+        "UI.Tables.Stateful",
         "UI.Tables.Stateless",
         "UI.Text",
         "UI.TextField",
         "UI.Utils.ARIA",
         "UI.Utils.Element",
-        "UI.Utils.Focus"
+        "UI.Utils.Focus",
+        "UI.Utils.TypeNumbers"
     ],
     "elm-version": "0.19.0 <= v < 0.20.0",
     "dependencies": {

@@ -4,7 +4,7 @@ import Array exposing (Array)
 import Task
 import UI.Internal.Basics exposing (flip, maybeNotThen)
 import UI.Internal.NArray as NArray exposing (NArray)
-import UI.Internal.TypeNumbers as T
+import UI.Utils.TypeNumbers as T
 
 
 type Msg
@@ -52,6 +52,7 @@ type alias RemoteMessages msg value =
     { applyMsg : value -> msg, clearMsg : msg }
 
 
+configSetEditable : FilterConfig msg value item -> Editable value -> FilterConfig msg value item
 configSetEditable config newEditable =
     { config | editable = newEditable }
 
@@ -271,6 +272,7 @@ update msg model =
             filterClear column model
 
 
+dispatchApply : Strategy msg value item -> value -> Filters msg item columns -> ( Filters msg item columns, Cmd msg )
 dispatchApply strategy value newModel =
     case strategy of
         Local _ ->
@@ -286,6 +288,7 @@ dispatchApply strategy value newModel =
             )
 
 
+dispatchClear : Strategy msg value item -> Filters msg item columns -> ( Filters msg item columns, Cmd msg )
 dispatchClear strategy newModel =
     case strategy of
         Local _ ->
@@ -301,6 +304,12 @@ dispatchClear strategy newModel =
             )
 
 
+applyShortcut :
+    Filters msg item columns
+    -> Int
+    -> FilterConfig msg value item
+    -> (FilterConfig msg value item -> Filter msg item)
+    -> ( Filters msg item columns, Cmd msg )
 applyShortcut model column config constructor =
     case config.editable.current of
         Just newValue ->
