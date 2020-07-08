@@ -446,9 +446,6 @@ headersRender :
     -> Element msg
 headersRender renderConfig toExternalMsg selected length filters columns =
     let
-        index =
-            List.range 0 length
-
         maybeFilters =
             case filters of
                 [] ->
@@ -458,7 +455,8 @@ headersRender renderConfig toExternalMsg selected length filters columns =
                     List.map Just filters
     in
     maybeFilters
-        |> List.map3 (headerRender renderConfig toExternalMsg selected) index columns
+        |> List.map2 (headerRender renderConfig toExternalMsg selected) columns
+        |> List.indexedMap (\index val -> val index)
         |> Element.row headersAttr
 
 
@@ -466,11 +464,11 @@ headerRender :
     RenderConfig
     -> (Msg -> msg)
     -> Maybe Int
-    -> Int
     -> Column
     -> Maybe (Filters.Filter msg item)
+    -> Int
     -> Element msg
-headerRender renderConfig toExternalMsg selected index (Column header { width }) maybeFilter =
+headerRender renderConfig toExternalMsg selected (Column header { width }) maybeFilter index =
     cellSpace width <|
         case maybeFilter of
             Nothing ->
