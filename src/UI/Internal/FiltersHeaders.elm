@@ -47,7 +47,7 @@ header renderConfig filter config =
     if config.isOpen then
         case filter of
             Filters.SingleTextFilter { editable } ->
-                singleTextFilterRender renderConfig config editable
+                singleTextFilterRender renderConfig applyMsg config editable
                     |> dialog renderConfig config filter clearMsg applyMsg
 
             _ ->
@@ -275,10 +275,11 @@ zIndex val =
 
 singleTextFilterRender :
     RenderConfig
+    -> msg
     -> Config msg
     -> Filters.Editable String
     -> Element msg
-singleTextFilterRender renderConfig { fromFiltersMsg, index, label } editable =
+singleTextFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } editable =
     let
         editMsg str =
             fromFiltersMsg <| Filters.EditSingleText { column = index, value = str }
@@ -287,4 +288,5 @@ singleTextFilterRender renderConfig { fromFiltersMsg, index, label } editable =
         |> Filters.editableWithDefault ""
         |> TextField.singlelineText editMsg label
         |> TextField.withWidth TextField.widthFull
+        |> TextField.withOnEnterPressed applyMsg
         |> TextField.renderElement renderConfig
