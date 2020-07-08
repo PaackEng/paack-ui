@@ -396,19 +396,17 @@ desktopView renderConfig prop opt =
                 State state_ ->
                     state_
 
-        filters =
+        items =
             case state.filters of
                 Just filtersArr ->
-                    NArray.toList filtersArr
+                    filtersArr
+                        |> NArray.toList
+                        |> List.filterMap Filters.filterGet
+                        |> List.foldl Filters.filtersReduce (always True)
+                        |> flip List.filter opt.items
 
                 Nothing ->
-                    []
-
-        items =
-            filters
-                |> List.filterMap Filters.filterGet
-                |> List.foldl Filters.filtersReduce (always True)
-                |> flip List.filter opt.items
+                    opt.items
 
         rows =
             List.map (rowRender renderConfig prop.toRow columns) items
@@ -416,11 +414,12 @@ desktopView renderConfig prop opt =
         padding =
             { top = 20, left = 20, right = 20, bottom = 0 }
 
-        length =
-            NArray.length prop.columns
-
         headers =
-            headersRender renderConfig prop.toExternalMsg state.filterDialog length filters columns
+            headersRender renderConfig
+                prop.toExternalMsg
+                state.filterDialog
+                state.filters
+                columns
     in
     Element.column
         [ Element.spacing 2
@@ -434,49 +433,44 @@ headersRender :
     RenderConfig
     -> (Msg -> msg)
     -> Maybe Int
-    -> Int
-    -> List (Filters.Filter msg item)
+    -> Maybe (Filters.Filters msg item columns)
     -> List Column
     -> Element msg
-headersRender renderConfig toExternalMsg selected length filters columns =
-    let
-        maybeFilters =
-            case filters of
-                [] ->
-                    List.repeat length Nothing
+headersRender renderConfig toExternalMsg selected filters columns =
+    Element.row headersAttr <|
+        case filters of
+            Just filterArr ->
+                filterArr
+                    |> NArray.toList
+                    |> List.map2 (filterHeader renderConfig toExternalMsg selected) columns
+                    |> List.indexedMap (\index val -> val index)
 
-                _ ->
-                    List.map Just filters
-    in
-    maybeFilters
-        |> List.map2 (headerRender renderConfig toExternalMsg selected) columns
-        |> List.indexedMap (\index val -> val index)
-        |> Element.row headersAttr
+            Nothing ->
+                List.map
+                    (\(Column header { width }) ->
+                        header
+                            |> simpleHeaderRender renderConfig
+                            |> cellSpace width
+                    )
+                    columns
 
 
-headerRender :
+filterHeader :
     RenderConfig
     -> (Msg -> msg)
     -> Maybe Int
     -> Column
-    -> Maybe (Filters.Filter msg item)
+    -> Filters.Filter msg item
     -> Int
     -> Element msg
-headerRender renderConfig toExternalMsg selected (Column header { width }) maybeFilter index =
-    cellSpace width <|
-        case maybeFilter of
-            Nothing ->
-                simpleHeaderRender renderConfig header
-
-            Just filter ->
-                let
-                    config =
-                        { openMsg = toExternalMsg <| FilterDialogOpen index
-                        , discardMsg = toExternalMsg <| FilterDialogClose
-                        , fromFiltersMsg = ForFilters >> toExternalMsg
-                        , index = index
-                        , label = header
-                        , isOpen = selected == Just index
-                        }
-                in
-                FiltersHeaders.header renderConfig filter config
+filterHeader renderConfig toExternalMsg selected (Column header { width }) filter index =
+    FiltersHeaders.header renderConfig
+        filter
+        { openMsg = toExternalMsg <| FilterDialogOpen index
+        , discardMsg = toExternalMsg <| FilterDialogClose
+        , fromFiltersMsg = ForFilters >> toExternalMsg
+        , index = index
+        , label = header
+        , isOpen = selected == Just index
+        }
+        |> cellSpace width
