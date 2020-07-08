@@ -8,6 +8,7 @@
         "UI.Alert",
         "UI.Badge",
         "UI.Button",
+        "UI.Checkbox",
         "UI.Icon",
         "UI.Link",
         "UI.ListView",

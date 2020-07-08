@@ -43,6 +43,11 @@ foldl applier accu (NArray array) =
     Array.foldl applier accu array
 
 
+indexedMap : (Int -> a -> b) -> NArray a n -> NArray b n
+indexedMap applier (NArray array) =
+    NArray <| Array.indexedMap applier array
+
+
 map : (a -> b) -> NArray a n -> NArray b n
 map applier (NArray array) =
     NArray <| Array.map applier array
@@ -61,6 +66,11 @@ toIndexedNList (NArray array) =
 toList : NArray data n -> List data
 toList (NArray array) =
     Array.toList array
+
+
+toIndexedList : NArray data n -> List ( Int, data )
+toIndexedList (NArray array) =
+    Array.toIndexedList array
 
 
 toArray : NArray data n -> Array data
