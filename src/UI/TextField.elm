@@ -5,6 +5,7 @@ module UI.TextField exposing
     , username, email
     , search
     , static
+    , withSize
     , TextFieldWidth, withWidth, widthFull, widthRelative
     , setLabelVisible, withPlaceholder, withIcon
     , withFocus, withOnEnterPressed, withError
@@ -19,7 +20,7 @@ Different from [`Element.Input`](/packages/mdgriffith/elm-ui/latest/Element-Inpu
     TextField.email Msg.OnTextFieldChanged
         "Enter your email"
         model.emailValue
-        |> TextField.setLabelVisible true
+        |> TextField.setLabelVisible True
         |> TextField.renderElement renderConfig
 
 **Notes**:
@@ -61,6 +62,11 @@ Different from [`Element.Input`](/packages/mdgriffith/elm-ui/latest/Element-Inpu
 @docs static
 
 
+# Size
+
+@docs withSize
+
+
 # Width
 
 @docs TextFieldWidth, withWidth, widthFull, widthRelative
@@ -90,9 +96,11 @@ import Element.Input as Input
 import UI.Icon exposing (Icon)
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
+import UI.Internal.Size as Size
 import UI.Internal.Text as Text
 import UI.Palette as Palette exposing (brightnessMiddle, toneGray)
 import UI.RenderConfig exposing (RenderConfig)
+import UI.Size exposing (Size)
 import UI.Text as Text
 import UI.Utils.Element as Element
 import UI.Utils.Focus as Focus exposing (Focus)
@@ -106,6 +114,7 @@ type alias Options msg =
     , width : TextFieldWidth
     , errorCaption : Maybe String
     , onEnterPressed : Maybe msg
+    , size : Size
     }
 
 
@@ -205,6 +214,12 @@ withWidth : TextFieldWidth -> TextField msg -> TextField msg
 withWidth width (TextField prop opt) =
     TextField prop
         { opt | width = width }
+
+
+withSize : Size -> TextField msg -> TextField msg
+withSize size (TextField prop opt) =
+    TextField prop
+        { opt | size = size }
 
 
 {-| Show or hide the text field's label.
@@ -533,6 +548,7 @@ defaultOptions =
     , width = WidthRelative
     , errorCaption = Nothing
     , onEnterPressed = Nothing
+    , size = Size.default
     }
 
 
@@ -650,20 +666,36 @@ attrs cfg prop opt =
         isPlaceholder
         hasError
         opt.width
+        opt.size
         |> eventAttr
         |> focustAttr
-        |> (++) (textAttrs cfg)
+        |> (++) (textAttrs cfg opt.size)
 
 
-textAttrs : RenderConfig -> List (Attribute msg)
-textAttrs cfg =
-    Text.attributes cfg Text.SizeSubtitle2 False Text.ColorInherit
+textAttrs : RenderConfig -> Size -> List (Attribute msg)
+textAttrs cfg size =
+    let
+        textSize =
+            case size of
+                Size.Large ->
+                    Text.SizeSubtitle2
+
+                Size.Medium ->
+                    Text.SizeSubtitle2
+
+                Size.Small ->
+                    Text.SizeSubtitle2
+
+                Size.ExtraSmall ->
+                    Text.SizeCaption
+    in
+    Text.attributes cfg textSize False Text.ColorInherit
 
 
-genericAttr : String -> Bool -> Bool -> TextFieldWidth -> List (Attribute msg)
-genericAttr label isPlaceholder hasError width =
+genericAttr : String -> Bool -> Bool -> TextFieldWidth -> Size -> List (Attribute msg)
+genericAttr label isPlaceholder hasError width size =
     [ Background.color Palette.gray.lightest
-    , Primitives.defaultRoundedBorders
+    , Primitives.roundedBorders size
     , Border.color <|
         if hasError then
             Palette.danger.light
@@ -676,7 +708,7 @@ genericAttr label isPlaceholder hasError width =
 
         else
             1
-    , Element.paddingXY 18 16
+    , Primitives.textFieldPadding size
     , Element.focused
         [ Border.color Palette.primary.lighter
         ]

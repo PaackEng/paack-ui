@@ -8,6 +8,7 @@ import UI.Button as Button
 import UI.Icon as Icon
 import UI.Internal.Palette as Palette
 import UI.Size as Size
+import UI.TextField as TextField
 import UIExplorer exposing (storiesOf)
 import Utils exposing (iconsSvgSprite)
 
@@ -75,6 +76,14 @@ buttonView cfg size body =
 sizeView cfg size =
     [ List.map (iconView cfg size) icons
     , List.map (buttonView cfg size) buttons
+    , [ TextField.singlelineText (always Msg.NoOp)
+            "Whatever"
+            ""
+            |> TextField.setLabelVisible False
+            |> TextField.withSize size
+            |> TextField.renderElement cfg
+            |> Element.el [ Element.width (Element.px 140) ]
+      ]
     ]
         |> List.concat
         |> (::) iconsSvgSprite

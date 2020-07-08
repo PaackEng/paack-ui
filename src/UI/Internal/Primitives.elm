@@ -1,4 +1,4 @@
-module UI.Internal.Primitives exposing (defaultRoundedBorders, roundedBorders)
+module UI.Internal.Primitives exposing (..)
 
 import Element exposing (Attribute)
 import Element.Border as Border
@@ -25,3 +25,21 @@ roundedBorders size =
 
             Size.ExtraSmall ->
                 4
+
+
+textFieldPadding : Size -> Attribute msg
+textFieldPadding size =
+    case size of
+        Size.Large ->
+            -- TODO: NOT Specified in Core Design System
+            Element.paddingXY 24 22
+
+        Size.Medium ->
+            Element.paddingXY 18 16
+
+        Size.Small ->
+            -- TODO: NOT Specified in Core Design System
+            Element.paddingXY 12 10
+
+        Size.ExtraSmall ->
+            Element.paddingXY 8 5
