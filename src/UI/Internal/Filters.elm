@@ -10,6 +10,7 @@ import UI.Utils.TypeNumbers as T
 type Msg
     = EditSingleText { column : Int, value : String }
     | EditMultiText { column : Int, field : Int, value : String }
+    | EditSelect { column : Int, value : Int }
     | Apply Int
     | Clear Int
 
@@ -28,7 +29,7 @@ type Filter msg item
     | SingleDateFilter (SingleDateFilterConfig msg item)
     | RangeDateFilter (RangeDateFilterConfig msg item)
     | PeriodDateFilter (PeriodDateFilterConfig msg item)
-    | SelectFilter (SelectFilterConfig msg item)
+    | SelectFilter (List String) (SelectFilterConfig msg item)
 
 
 type alias Editable value =
@@ -204,6 +205,47 @@ type alias MultiTextFilterConfig msg item =
     FilterConfig msg (Array String) item
 
 
+multiTextLocal :
+    List String
+    -> (item -> String)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+multiTextLocal initValue getStr accu =
+    let
+        applier item current =
+            getStr item
+                |> String.toLower
+                |> String.contains (String.toLower current)
+
+        strategy item valueArray =
+            valueArray
+                |> Array.toList
+                |> List.any (applier item)
+    in
+    { editable = { applied = listToMaybeArray initValue, current = Nothing }
+    , strategy = strategyLocal strategy
+    }
+        |> MultiTextFilter
+        |> flip push accu
+
+
+multiTextRemote :
+    List String
+    -> (List String -> msg)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+multiTextRemote initValue applyMsg accu =
+    { editable = { applied = listToMaybeArray initValue, current = Nothing }
+    , strategy =
+        strategyRemote
+            { applyMsg = Array.toList >> applyMsg
+            , clearMsg = applyMsg []
+            }
+    }
+        |> MultiTextFilter
+        |> flip push accu
+
+
 multiTextEdit : Int -> Int -> String -> Filters msg item columns -> Filters msg item columns
 multiTextEdit column field value model =
     case get column model of
@@ -218,6 +260,15 @@ multiTextEdit column field value model =
 
         _ ->
             model
+
+
+listToMaybeArray : List a -> Maybe (Array a)
+listToMaybeArray list =
+    if list == [] then
+        Nothing
+
+    else
+        Just <| Array.fromList list
 
 
 
@@ -252,6 +303,52 @@ type alias SelectFilterConfig msg item =
     FilterConfig msg Int item
 
 
+selectLocal :
+    List String
+    -> Maybe Int
+    -> (item -> Int -> Bool)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+selectLocal list initValue filter accu =
+    { editable = { applied = initValue, current = Nothing }
+    , strategy = strategyLocal filter
+    }
+        |> SelectFilter list
+        |> flip push accu
+
+
+selectRemote :
+    List String
+    -> Maybe Int
+    -> (Maybe Int -> msg)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+selectRemote list initValue applyMsg accu =
+    { editable = { applied = initValue, current = Nothing }
+    , strategy =
+        strategyRemote
+            { applyMsg = Just >> applyMsg
+            , clearMsg = applyMsg Nothing
+            }
+    }
+        |> SelectFilter list
+        |> flip push accu
+
+
+selectEdit : Int -> Int -> Filters msg item columns -> Filters msg item columns
+selectEdit column value model =
+    case get column model of
+        Just (SelectFilter list config) ->
+            config.editable
+                |> editableSetCurrent value
+                |> configSetEditable config
+                |> SelectFilter list
+                |> flip (set column) model
+
+        _ ->
+            model
+
+
 
 -- Update
 
@@ -264,6 +361,9 @@ update msg model =
 
         EditMultiText { column, field, value } ->
             ( multiTextEdit column field value model, Cmd.none )
+
+        EditSelect { column, value } ->
+            ( selectEdit column value model, Cmd.none )
 
         Apply column ->
             applyFilter column model
@@ -341,8 +441,8 @@ applyFilter column model =
         Just (PeriodDateFilter config) ->
             applyShortcut model column config PeriodDateFilter
 
-        Just (SelectFilter config) ->
-            applyShortcut model column config SelectFilter
+        Just (SelectFilter list config) ->
+            applyShortcut model column config (SelectFilter list)
 
         Nothing ->
             ( model, Cmd.none )
@@ -386,10 +486,10 @@ filterClear column model =
                 |> flip (set column) model
                 |> dispatchClear config.strategy
 
-        Just (SelectFilter config) ->
+        Just (SelectFilter list config) ->
             editableEmpty
                 |> configSetEditable config
-                |> SelectFilter
+                |> SelectFilter list
                 |> flip (set column) model
                 |> dispatchClear config.strategy
 
@@ -424,7 +524,7 @@ isEdited filter =
         PeriodDateFilter { editable } ->
             editable.current /= Nothing
 
-        SelectFilter { editable } ->
+        SelectFilter _ { editable } ->
             editable.current /= Nothing
 
 
@@ -446,7 +546,7 @@ isApplied filter =
         PeriodDateFilter { editable } ->
             editable.applied /= Nothing
 
-        SelectFilter { editable } ->
+        SelectFilter _ { editable } ->
             editable.applied /= Nothing
 
 
@@ -478,7 +578,7 @@ filterGet filter =
         PeriodDateFilter config ->
             localAppliedMap config
 
-        SelectFilter config ->
+        SelectFilter _ config ->
             localAppliedMap config
 
 

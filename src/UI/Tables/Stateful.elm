@@ -4,6 +4,8 @@ module UI.Tables.Stateful exposing
     , State, Msg, init, update
     , Filters, filtersEmpty, stateWithFilters
     , localSingleTextFilter, remoteSingleTextFilter
+    , localMultiTextFilter, remoteMultiTextFilter
+    , localSelectFilter, remoteSelectFilter
     , withWidth
     , renderElement
     )
@@ -98,6 +100,16 @@ And on model:
 ## Single Text
 
 @docs localSingleTextFilter, remoteSingleTextFilter
+
+
+## Multi Text
+
+@docs localMultiTextFilter, remoteMultiTextFilter
+
+
+## Select (Radio Buttons)
+
+@docs localSelectFilter, remoteSelectFilter
 
 
 # Width
@@ -301,6 +313,44 @@ remoteSingleTextFilter :
     -> Filters msg item (T.Increase columns)
 remoteSingleTextFilter =
     Filters.singleTextRemote
+
+
+localMultiTextFilter :
+    List String
+    -> (item -> String)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+localMultiTextFilter =
+    Filters.multiTextLocal
+
+
+remoteMultiTextFilter :
+    List String
+    -> (List String -> msg)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+remoteMultiTextFilter =
+    Filters.multiTextRemote
+
+
+localSelectFilter :
+    List String
+    -> Maybe Int
+    -> (item -> Int -> Bool)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+localSelectFilter =
+    Filters.selectLocal
+
+
+remoteSelectFilter :
+    List String
+    -> Maybe Int
+    -> (Maybe Int -> msg)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+remoteSelectFilter =
+    Filters.selectRemote
 
 
 

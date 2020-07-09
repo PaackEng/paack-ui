@@ -1,5 +1,6 @@
 module UI.Internal.FiltersHeaders exposing (Config, header)
 
+import Array exposing (Array)
 import Element exposing (Attribute, Element, fill, minimum, shrink)
 import Element.Background as Background
 import Element.Border as Border
@@ -7,7 +8,9 @@ import Element.Events as Events
 import Element.Font as Font
 import Html.Attributes as HtmlAttrs
 import UI.Button as Button
+import UI.Checkbox exposing (radioButton)
 import UI.Icon as Icon
+import UI.Internal.Basics exposing (maybeNotThen)
 import UI.Internal.Filters as Filters
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
@@ -48,6 +51,14 @@ header renderConfig filter config =
         case filter of
             Filters.SingleTextFilter { editable } ->
                 singleTextFilterRender renderConfig applyMsg config editable
+                    |> dialog renderConfig config filter clearMsg applyMsg
+
+            Filters.MultiTextFilter { editable } ->
+                multiTextFilterRender renderConfig applyMsg config editable
+                    |> dialog renderConfig config filter clearMsg applyMsg
+
+            Filters.SelectFilter list { editable } ->
+                selectFilterRender renderConfig config list editable
                     |> dialog renderConfig config filter clearMsg applyMsg
 
             _ ->
@@ -291,3 +302,54 @@ singleTextFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
         |> TextField.withWidth TextField.widthFull
         |> TextField.withOnEnterPressed applyMsg
         |> TextField.renderElement renderConfig
+
+
+multiTextFilterRender :
+    RenderConfig
+    -> msg
+    -> Config msg
+    -> Filters.Editable (Array String)
+    -> Element msg
+multiTextFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } editableArr =
+    let
+        editMsg str =
+            fromFiltersMsg <| Filters.EditSingleText { column = index, value = str }
+
+        single line =
+            line
+                |> TextField.singlelineText editMsg label
+                |> TextField.withSize Size.extraSmall
+                |> TextField.withWidth TextField.widthFull
+                |> TextField.withOnEnterPressed applyMsg
+                |> TextField.renderElement renderConfig
+    in
+    editableArr
+        |> Filters.editableWithDefault Array.empty
+        |> Array.foldl (\new accu -> single new :: accu) []
+        |> Element.row [ Element.width fill, Element.spacing 8 ]
+
+
+selectFilterRender :
+    RenderConfig
+    -> Config msg
+    -> List String
+    -> Filters.Editable Int
+    -> Element msg
+selectFilterRender renderConfig { fromFiltersMsg, index } list { current, applied } =
+    let
+        editMsg subIndex =
+            fromFiltersMsg <| Filters.EditSelect { column = index, value = subIndex }
+
+        selected =
+            maybeNotThen applied current
+
+        single subIndex line =
+            radioButton
+                renderConfig
+                (always <| editMsg subIndex)
+                line
+                (selected == Just subIndex)
+    in
+    list
+        |> List.indexedMap single
+        |> Element.column [ Element.spacing 8 ]
