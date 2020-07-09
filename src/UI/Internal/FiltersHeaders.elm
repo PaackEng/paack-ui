@@ -76,7 +76,7 @@ headerNormal renderConfig openMsg label =
     -- Button.light
     Element.row (Element.onIndividualClick openMsg :: headerAttrs False)
         [ Element.text label
-        , Icon.add label
+        , Icon.filter label
             |> Icon.withSize size
             |> Icon.renderElement renderConfig
             |> Element.el [ Element.alignRight ]
