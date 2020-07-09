@@ -1,6 +1,6 @@
 module UI.Icon exposing
     ( svgSpriteImport
-    , Icon, add, close, edit, eventLog, previousContent, logout, notifications, paackSpaces, packages, print, nextContent, sandwichMenu, search, seeMore, toggle, toggleDown, toggleUp, warning
+    , Icon, add, close, edit, eventLog, previousContent, logout, notifications, paackSpaces, packages, print, nextContent, sandwichMenu, search, seeMore, toggle, toggleDown, toggleUp, warning, filter
     , getHint
     , withColor
     , withSize, withCustomSize
@@ -30,7 +30,7 @@ An icon can be created and rendered as in the following pipeline:
 
 # Building
 
-@docs Icon, add, close, edit, eventLog, previousContent, logout, notifications, paackSpaces, packages, print, nextContent, sandwichMenu, search, seeMore, toggle, toggleDown, toggleUp, warning
+@docs Icon, add, close, edit, eventLog, previousContent, logout, notifications, paackSpaces, packages, print, nextContent, sandwichMenu, search, seeMore, toggle, toggleDown, toggleUp, warning, filter
 
 
 # Disassemble
@@ -108,6 +108,7 @@ type IconGlyph
     | RightArrow
     | SeeMore
     | Warning
+    | Filter
 
 
 
@@ -347,6 +348,16 @@ warning hint =
     Icon (Properties hint Warning) defaultOptions
 
 
+{-| A funnel symbol represented by 3 lines horizontally aligned.
+
+    Icon.filter "Filter title column"
+
+-}
+filter : String -> Icon
+filter hint =
+    Icon (Properties hint Filter) defaultOptions
+
+
 
 -- Rendering
 
@@ -435,6 +446,9 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
 
             Warning ->
                 svgIcon "Warning1"
+
+            Filter ->
+                svgIcon "Filter1"
 
 
 

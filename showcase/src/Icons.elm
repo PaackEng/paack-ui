@@ -47,6 +47,7 @@ icons =
     , ( Icon.nextContent, "Icon.nextContent" )
     , ( Icon.seeMore, "Icon.seeMore" )
     , ( Icon.warning, "Icon.warning" )
+    , ( Icon.filter, "Icon.filter" )
     ]
 
 
