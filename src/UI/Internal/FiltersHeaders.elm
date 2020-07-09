@@ -287,6 +287,7 @@ singleTextFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
     editable
         |> Filters.editableWithDefault ""
         |> TextField.singlelineText editMsg label
+        |> TextField.withSize Size.extraSmall
         |> TextField.withWidth TextField.widthFull
         |> TextField.withOnEnterPressed applyMsg
         |> TextField.renderElement renderConfig

@@ -42,4 +42,4 @@ textFieldPadding size =
             Element.paddingXY 12 10
 
         Size.ExtraSmall ->
-            Element.paddingXY 8 5
+            Element.paddingXY 8 7
