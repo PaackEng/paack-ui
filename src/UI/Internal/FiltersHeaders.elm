@@ -312,21 +312,25 @@ multiTextFilterRender :
     -> Element msg
 multiTextFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } editableArr =
     let
-        editMsg str =
-            fromFiltersMsg <| Filters.EditSingleText { column = index, value = str }
+        editMsg subIndex str =
+            fromFiltersMsg <| Filters.EditMultiText { column = index, field = subIndex, value = str }
 
-        single line =
+        single subIndex line =
             line
-                |> TextField.singlelineText editMsg label
+                |> TextField.singlelineText (editMsg subIndex) label
                 |> TextField.withSize Size.extraSmall
                 |> TextField.withWidth TextField.widthFull
                 |> TextField.withOnEnterPressed applyMsg
                 |> TextField.renderElement renderConfig
+
+        instanceArr =
+            Filters.editableWithDefault Array.empty editableArr
     in
-    editableArr
-        |> Filters.editableWithDefault Array.empty
-        |> Array.foldl (\new accu -> single new :: accu) []
-        |> Element.row [ Element.width fill, Element.spacing 8 ]
+    instanceArr
+        |> Array.push ""
+        |> Array.indexedMap single
+        |> Array.toList
+        |> Element.column [ Element.width fill, Element.spacing 8 ]
 
 
 selectFilterRender :

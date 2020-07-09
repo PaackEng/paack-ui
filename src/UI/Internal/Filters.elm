@@ -2,7 +2,7 @@ module UI.Internal.Filters exposing (..)
 
 import Array exposing (Array)
 import Task
-import UI.Internal.Basics exposing (flip, maybeNotThen)
+import UI.Internal.Basics exposing (flip, ifThenElse, maybeNotThen)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Utils.TypeNumbers as T
 
@@ -252,7 +252,7 @@ multiTextEdit column field value model =
         Just (MultiTextFilter config) ->
             config.editable
                 |> editableWithDefault Array.empty
-                |> Array.set field value
+                |> flexibleArray field value
                 |> flip editableSetCurrent config.editable
                 |> configSetEditable config
                 |> MultiTextFilter
@@ -269,6 +269,21 @@ listToMaybeArray list =
 
     else
         Just <| Array.fromList list
+
+
+flexibleArray : Int -> String -> Array String -> Array String
+flexibleArray index newValue array =
+    if Array.length array == index then
+        if String.isEmpty newValue then
+            array
+
+        else
+            Array.push newValue array
+
+    else
+        array
+            |> Array.set index newValue
+            |> Array.filter (not << String.isEmpty)
 
 
 

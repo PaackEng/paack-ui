@@ -1,7 +1,7 @@
 module Tables.Model exposing (..)
 
 import Msg exposing (Msg)
-import UI.Tables.Stateful as Table exposing (filtersEmpty, localSelectFilter, localSingleTextFilter)
+import UI.Tables.Stateful as Table exposing (filtersEmpty, localMultiTextFilter, localSelectFilter, localSingleTextFilter)
 import UI.Utils.TypeNumbers exposing (Three)
 
 
@@ -25,7 +25,7 @@ initModel =
 
 someFilters =
     filtersEmpty
-        |> localSingleTextFilter Nothing .title
+        |> localMultiTextFilter [] .title
         |> localSingleTextFilter (Just "Dan") .author
         |> localSelectFilter
             [ "Last Decade", "New Millennium", "Old Century" ]
