@@ -57,6 +57,10 @@ header renderConfig filter config =
                 multiTextFilterRender renderConfig applyMsg config editable
                     |> dialog renderConfig config filter clearMsg applyMsg
 
+            Filters.SingleDateFilter { editable } ->
+                singleDateFilterRender renderConfig applyMsg config editable
+                    |> dialog renderConfig config filter clearMsg applyMsg
+
             Filters.SelectFilter list { editable } ->
                 selectFilterRender renderConfig config list editable
                     |> dialog renderConfig config filter clearMsg applyMsg
@@ -357,3 +361,13 @@ selectFilterRender renderConfig { fromFiltersMsg, index } list { current, applie
     list
         |> List.indexedMap single
         |> Element.column [ Element.spacing 8 ]
+
+
+singleDateFilterRender :
+    RenderConfig
+    -> msg
+    -> Config msg
+    -> Filters.Editable String
+    -> Element msg
+singleDateFilterRender =
+    singleTextFilterRender

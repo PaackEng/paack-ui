@@ -2,7 +2,7 @@ module UI.Internal.Filters exposing (..)
 
 import Array exposing (Array)
 import Task
-import UI.Internal.Basics exposing (flip, ifThenElse, maybeNotThen)
+import UI.Internal.Basics exposing (flip, maybeNotThen)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Utils.TypeNumbers as T
 
@@ -292,6 +292,56 @@ flexibleArray index newValue array =
 
 type alias SingleDateFilterConfig msg item =
     FilterConfig msg Date item
+
+
+singleDateLocal :
+    Maybe String
+    -> (item -> String)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+singleDateLocal initValue getStr accu =
+    let
+        applier item current =
+            getStr item
+                |> String.toLower
+                |> String.contains (String.toLower current)
+    in
+    { editable = { applied = initValue, current = Nothing }
+    , strategy = strategyLocal applier
+    }
+        |> SingleDateFilter
+        |> flip push accu
+
+
+singleDateRemote :
+    Maybe String
+    -> (Maybe String -> msg)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+singleDateRemote initValue applyMsg accu =
+    { editable = { applied = initValue, current = Nothing }
+    , strategy =
+        strategyRemote
+            { applyMsg = Just >> applyMsg
+            , clearMsg = applyMsg Nothing
+            }
+    }
+        |> SingleDateFilter
+        |> flip push accu
+
+
+singleDateEdit : Int -> String -> Filters msg item columns -> Filters msg item columns
+singleDateEdit column value model =
+    case get column model of
+        Just (SingleDateFilter config) ->
+            config.editable
+                |> editableSetCurrent value
+                |> configSetEditable config
+                |> SingleDateFilter
+                |> flip (set column) model
+
+        _ ->
+            model
 
 
 

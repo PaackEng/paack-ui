@@ -5,6 +5,7 @@ module UI.Tables.Stateful exposing
     , Filters, filtersEmpty, stateWithFilters
     , localSingleTextFilter, remoteSingleTextFilter
     , localMultiTextFilter, remoteMultiTextFilter
+    , localSingleDateFilter, remoteSingleDateFilter
     , localSelectFilter, remoteSelectFilter
     , withWidth
     , renderElement
@@ -105,6 +106,11 @@ And on model:
 ## Multi Text
 
 @docs localMultiTextFilter, remoteMultiTextFilter
+
+
+## Single Date
+
+@docs localSingleDateFilter, remoteSingleDateFilter
 
 
 ## Select (Radio Buttons)
@@ -331,6 +337,24 @@ remoteMultiTextFilter :
     -> Filters msg item (T.Increase columns)
 remoteMultiTextFilter =
     Filters.multiTextRemote
+
+
+localSingleDateFilter :
+    Maybe String
+    -> (item -> String)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+localSingleDateFilter =
+    Filters.singleDateLocal
+
+
+remoteSingleDateFilter :
+    Maybe String
+    -> (Maybe String -> msg)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+remoteSingleDateFilter =
+    Filters.singleDateRemote
 
 
 localSelectFilter :

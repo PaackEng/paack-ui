@@ -26,7 +26,7 @@ initModel =
 someFilters =
     filtersEmpty
         |> localMultiTextFilter [] .title
-        |> localSingleTextFilter (Just "Dan") .author
+        |> localMultiTextFilter [ "Dan" ] .author
         |> localSelectFilter
             [ "Last Decade", "New Millennium", "Old Century" ]
             Nothing
