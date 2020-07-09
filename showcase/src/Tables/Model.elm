@@ -1,18 +1,19 @@
 module Tables.Model exposing (..)
 
 import Msg exposing (Msg)
-import UI.Tables.Stateful as Table exposing (filtersEmpty, localMultiTextFilter, localSelectFilter, localSingleTextFilter)
-import UI.Utils.TypeNumbers exposing (Three)
+import UI.Tables.Stateful as Table exposing (filtersEmpty, localMultiTextFilter, localSelectFilter, localSingleDateFilter)
+import UI.Utils.TypeNumbers exposing (Four)
 
 
 type alias Model =
-    { tableState : Table.State Msg Book Three }
+    { tableState : Table.State Msg Book Four }
 
 
 type alias Book =
     { author : String
     , title : String
     , year : String
+    , acquired : String
     }
 
 
@@ -44,3 +45,4 @@ someFilters =
                     _ ->
                         False
             )
+        |> localSingleDateFilter Nothing .acquired

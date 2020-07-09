@@ -11,6 +11,7 @@ type Msg
     = EditSingleText { column : Int, value : String }
     | EditMultiText { column : Int, field : Int, value : String }
     | EditSelect { column : Int, value : Int }
+    | EditSingleDate { column : Int, value : String }
     | Apply Int
     | Clear Int
 
@@ -429,6 +430,9 @@ update msg model =
 
         EditSelect { column, value } ->
             ( selectEdit column value model, Cmd.none )
+
+        EditSingleDate { column, value } ->
+            ( singleDateEdit column value model, Cmd.none )
 
         Apply column ->
             applyFilter column model

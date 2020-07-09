@@ -60,6 +60,7 @@ demoTable renderConfig model =
                 |> detailHidden
                 |> detailShown { label = "Author", content = cellFromText <| Text.body2 author }
                 |> detailHidden
+                |> detailHidden
 
         toTableCover { title, year } =
             { title = title, caption = Just year }
@@ -110,13 +111,13 @@ statelessDemoTable renderConfig =
 
 
 books =
-    [ { author = "Dan Brown", title = "Angels & Demons", year = "2000" }
-    , { author = "Dan Brown", title = "The Da Vinci Code", year = "2003" }
-    , { author = "Dan Brown", title = "The Lost Symbol", year = "2009" }
-    , { author = "Dan Brown", title = "Inferno", year = "2013" }
-    , { author = "Dan Brown", title = "Origin", year = "2017" }
-    , { author = "Suzanne Collins", title = "The Hunger Games", year = "2008" }
-    , { author = "Agatha Christie", title = "Murder on the Orient Express", year = "1933" }
+    [ { author = "Dan Brown", title = "Angels & Demons", year = "2000", acquired = "10/06/2005" }
+    , { author = "Dan Brown", title = "The Da Vinci Code", year = "2003", acquired = "09/07/2007" }
+    , { author = "Dan Brown", title = "The Lost Symbol", year = "2009", acquired = "22/10/2018" }
+    , { author = "Dan Brown", title = "Inferno", year = "2013", acquired = "04/10/2018" }
+    , { author = "Dan Brown", title = "Origin", year = "2017", acquired = "02/02/2017" }
+    , { author = "Suzanne Collins", title = "The Hunger Games", year = "2008", acquired = "24/12/2008" }
+    , { author = "Agatha Christie", title = "Murder on the Orient Express", year = "1933", acquired = "23/09/2000" }
     ]
 
 
@@ -125,10 +126,12 @@ tableColumns =
         |> column "Title" (columnWidthPixels 320)
         |> column "Author" (columnWidthPixels 240)
         |> column "Year" (columnWidthPixels 120)
+        |> column "Acquired" (columnWidthPixels 180)
 
 
-toTableRow { author, title, year } =
+toTableRow { author, title, year, acquired } =
     rowEmpty
         |> rowCellText (Text.body1 title)
         |> rowCellText (Text.body2 author)
         |> rowCellText (Text.caption year)
+        |> rowCellText (Text.caption acquired)
