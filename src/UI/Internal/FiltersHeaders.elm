@@ -12,7 +12,7 @@ import UI.Checkbox exposing (radioButton)
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (maybeNotThen)
 import UI.Internal.Filters as Filters
-import UI.Internal.Human exposing (Date(..), dateToNumericString)
+import UI.Internal.Human exposing (Date(..), RangeDate, dateIfValid, dateToNumericString)
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Size as Size exposing (Size)
@@ -20,7 +20,7 @@ import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
-import UI.TextField as TextField
+import UI.TextField as TextField exposing (TextField)
 import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element exposing (zeroPadding)
 
@@ -60,6 +60,10 @@ header renderConfig filter config =
 
             Filters.SingleDateFilter { editable } ->
                 singleDateFilterRender renderConfig applyMsg config editable
+                    |> dialog renderConfig config filter clearMsg applyMsg
+
+            Filters.RangeDateFilter { editable } ->
+                rangeDateFilterRender renderConfig applyMsg config editable
                     |> dialog renderConfig config filter clearMsg applyMsg
 
             Filters.SelectFilter list { editable } ->
@@ -380,22 +384,64 @@ singleDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
                 |> Filters.editableWithDefault (DateInvalid "")
 
         correctInput =
-            current
-                |> dateToNumericString
-                |> TextField.singlelineText editMsg label
-                |> TextField.withPlaceholder "DD/MM/YYYY"
-                |> TextField.withSize Size.extraSmall
-                |> TextField.withWidth TextField.widthFull
-                |> TextField.withOnEnterPressed applyMsg
+            dateInput applyMsg editMsg "DD/MM/YYYY" label current
 
         invalidInput =
             correctInput
                 |> TextField.withError "Invalid date format."
     in
-    TextField.renderElement renderConfig <|
-        case current of
-            DateValid _ ->
-                correctInput
+    current
+        |> dateIfValid correctInput invalidInput
+        |> TextField.renderElement renderConfig
 
-            DateInvalid _ ->
-                invalidInput
+
+dateInput : msg -> (String -> msg) -> String -> String -> Date -> TextField msg
+dateInput applyMsg editMsg placeholder label current =
+    current
+        |> dateToNumericString
+        |> TextField.singlelineText editMsg label
+        |> TextField.withPlaceholder placeholder
+        |> TextField.withSize Size.extraSmall
+        |> TextField.withWidth TextField.widthFull
+        |> TextField.withOnEnterPressed applyMsg
+
+
+rangeDateFilterRender :
+    RenderConfig
+    -> msg
+    -> Config msg
+    -> Filters.Editable RangeDate
+    -> Element msg
+rangeDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } editable =
+    let
+        editFromMsg str =
+            fromFiltersMsg <| Filters.EditRangeFromDate { column = index, value = str }
+
+        editToMsg str =
+            fromFiltersMsg <| Filters.EditRangeToDate { column = index, value = str }
+
+        current =
+            editable
+                |> Filters.editableWithDefault
+                    { from = DateInvalid "", to = DateInvalid "" }
+
+        correctFromInput =
+            dateInput applyMsg editFromMsg "From: DD/MM/YYYY" label current.from
+
+        correctToInput =
+            dateInput applyMsg editToMsg "To: DD/MM/YYYY" label current.to
+
+        invalidInput input =
+            TextField.withError "Invalid date format." input
+    in
+    Element.column
+        [ Element.width fill
+        , Element.spacing 8
+        ]
+        [ current.from
+            |> dateIfValid correctFromInput (invalidInput correctFromInput)
+            |> TextField.renderElement renderConfig
+        , current.to
+            |> dateIfValid correctToInput (invalidInput correctToInput)
+            |> TextField.renderElement renderConfig
+        ]

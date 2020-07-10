@@ -6,6 +6,7 @@ module UI.Tables.Stateful exposing
     , localSingleTextFilter, remoteSingleTextFilter
     , localMultiTextFilter, remoteMultiTextFilter
     , localSingleDateFilter, remoteSingleDateFilter
+    , localRangeDateFilter, remoteRangeDateFilter
     , localSelectFilter, remoteSelectFilter
     , withWidth
     , renderElement
@@ -113,6 +114,11 @@ And on model:
 @docs localSingleDateFilter, remoteSingleDateFilter
 
 
+## Range Dates
+
+@docs localRangeDateFilter, remoteRangeDateFilter
+
+
 ## Select (Radio Buttons)
 
 @docs localSelectFilter, remoteSelectFilter
@@ -134,7 +140,7 @@ import Time
 import UI.Internal.Basics exposing (flip)
 import UI.Internal.Filters as Filters
 import UI.Internal.FiltersHeaders as FiltersHeaders
-import UI.Internal.Human exposing (Date)
+import UI.Internal.Human exposing (Date, RangeDate)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Internal.Table exposing (..)
 import UI.Internal.TableView exposing (..)
@@ -359,6 +365,28 @@ remoteSingleDateFilter :
     -> Filters.Filters msg item (T.Increase columns)
 remoteSingleDateFilter =
     Filters.singleDateRemote
+
+
+localRangeDateFilter :
+    Time.Zone
+    -> Maybe Time.Posix
+    -> Maybe Time.Posix
+    -> (item -> Time.Posix)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+localRangeDateFilter =
+    Filters.rangeDateLocal
+
+
+remoteRangeDateFilter :
+    Time.Zone
+    -> Maybe Time.Posix
+    -> Maybe Time.Posix
+    -> (Maybe RangeDate -> msg)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+remoteRangeDateFilter =
+    Filters.rangeDateRemote
 
 
 localSelectFilter :

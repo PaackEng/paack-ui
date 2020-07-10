@@ -4,7 +4,7 @@ import Array exposing (Array)
 import Task
 import Time exposing (Posix)
 import UI.Internal.Basics exposing (flip, maybeNotThen)
-import UI.Internal.Human exposing (Date(..), isDateEqualPosix, parseDate, posixToValidDate)
+import UI.Internal.Human exposing (Date(..), RangeDate, isDateEqualPosix, isPosixBetweenDates, parseDate, posixToValidDate)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Utils.TypeNumbers as T
 
@@ -12,8 +12,10 @@ import UI.Utils.TypeNumbers as T
 type Msg
     = EditSingleText { column : Int, value : String }
     | EditMultiText { column : Int, field : Int, value : String }
-    | EditSelect { column : Int, value : Int }
     | EditSingleDate { column : Int, value : String }
+    | EditRangeFromDate { column : Int, value : String }
+    | EditRangeToDate { column : Int, value : String }
+    | EditSelect { column : Int, value : Int }
     | Apply Int
     | Clear Int
 
@@ -63,10 +65,6 @@ configSetEditable config newEditable =
 
 
 -- Type-helpers
-
-
-type alias RangeDate =
-    { from : Date, to : Date }
 
 
 type TimePeriod
@@ -354,6 +352,107 @@ type alias RangeDateFilterConfig msg item =
     FilterConfig msg RangeDate item
 
 
+rangeDateLocal :
+    Time.Zone
+    -> Maybe Posix
+    -> Maybe Posix
+    -> (item -> Posix)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+rangeDateLocal timeZone fromInit toInit getPosix accu =
+    let
+        compare posix { from, to } =
+            isPosixBetweenDates timeZone posix from to
+
+        applier item current =
+            compare (getPosix item) current
+    in
+    { editable = { applied = rangeDateInit timeZone fromInit toInit, current = Nothing }
+    , strategy = strategyLocal applier
+    }
+        |> RangeDateFilter
+        |> flip push accu
+
+
+rangeDateRemote :
+    Time.Zone
+    -> Maybe Posix
+    -> Maybe Posix
+    -> (Maybe RangeDate -> msg)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+rangeDateRemote timeZone fromInit toInit applyMsg accu =
+    { editable = { applied = rangeDateInit timeZone fromInit toInit, current = Nothing }
+    , strategy =
+        strategyRemote
+            { applyMsg = Just >> applyMsg
+            , clearMsg = applyMsg Nothing
+            }
+    }
+        |> RangeDateFilter
+        |> flip push accu
+
+
+rangeDateInit : Time.Zone -> Maybe Posix -> Maybe Posix -> Maybe RangeDate
+rangeDateInit timeZone fromInit toInit =
+    case ( fromInit, toInit ) of
+        ( Just fromPosix, Just toPosix ) ->
+            Just { from = posixToValidDate timeZone fromPosix, to = posixToValidDate timeZone toPosix }
+
+        ( Just fromPosix, Nothing ) ->
+            Just { from = posixToValidDate timeZone fromPosix, to = DateInvalid "" }
+
+        ( Nothing, Just toPosix ) ->
+            Just { from = DateInvalid "", to = posixToValidDate timeZone toPosix }
+
+        ( Nothing, Nothing ) ->
+            Nothing
+
+
+rangeDateFromEdit : Int -> String -> Filters msg item columns -> Filters msg item columns
+rangeDateFromEdit column value model =
+    case get column model of
+        Just (RangeDateFilter config) ->
+            config.editable
+                |> editableMapCurrent
+                    (\maybeCurrent ->
+                        { from = parseDate value
+                        , to =
+                            maybeCurrent
+                                |> Maybe.map .to
+                                |> Maybe.withDefault (DateInvalid "")
+                        }
+                    )
+                |> configSetEditable config
+                |> RangeDateFilter
+                |> flip (set column) model
+
+        _ ->
+            model
+
+
+rangeDateToEdit : Int -> String -> Filters msg item columns -> Filters msg item columns
+rangeDateToEdit column value model =
+    case get column model of
+        Just (RangeDateFilter config) ->
+            config.editable
+                |> editableMapCurrent
+                    (\maybeCurrent ->
+                        { from =
+                            maybeCurrent
+                                |> Maybe.map .from
+                                |> Maybe.withDefault (DateInvalid "")
+                        , to = parseDate value
+                        }
+                    )
+                |> configSetEditable config
+                |> RangeDateFilter
+                |> flip (set column) model
+
+        _ ->
+            model
+
+
 
 -- PeriodDate
 
@@ -429,11 +528,17 @@ update msg model =
         EditMultiText { column, field, value } ->
             ( multiTextEdit column field value model, Cmd.none )
 
-        EditSelect { column, value } ->
-            ( selectEdit column value model, Cmd.none )
-
         EditSingleDate { column, value } ->
             ( singleDateEdit column value model, Cmd.none )
+
+        EditRangeFromDate { column, value } ->
+            ( rangeDateFromEdit column value model, Cmd.none )
+
+        EditRangeToDate { column, value } ->
+            ( rangeDateToEdit column value model, Cmd.none )
+
+        EditSelect { column, value } ->
+            ( selectEdit column value model, Cmd.none )
 
         Apply column ->
             applyFilter column model
@@ -570,6 +675,11 @@ filterClear column model =
 editableSetCurrent : value -> Editable value -> Editable value
 editableSetCurrent new old =
     { old | current = Just new }
+
+
+editableMapCurrent : (Maybe value -> value) -> Editable value -> Editable value
+editableMapCurrent applier old =
+    { old | current = Just <| applier <| maybeNotThen old.applied <| old.current }
 
 
 

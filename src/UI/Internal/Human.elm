@@ -1,13 +1,34 @@
-module UI.Internal.Human exposing (Date(..), dateToNumericString, isDateEqualPosix, parseDate, posixToValidDate)
+module UI.Internal.Human exposing (Date(..), RangeDate, dateIfValid, dateToNumericString, isDateEqualPosix, isPosixBetweenDates, parseDate, posixToValidDate)
 
 import Time
 
 
 type Date
-    = DateValid { year : Int, month : Time.Month, day : Int }
+    = DateValid PrimitiveDate
     | DateInvalid String
 
 
+type alias PrimitiveDate =
+    { year : Int, month : Time.Month, day : Int }
+
+
+type alias RangeDate =
+    { from : Date, to : Date }
+
+
+{-|
+
+               _      ______ _____ _______
+         /\   | |    |  ____|  __ \__   __|
+        /  \  | |    | |__  | |__) | | |
+       / /\ \ | |    |  __| |  _  /  | |
+      / ____ \| |____| |____| | \ \  | |
+     /_/    \_\______|______|_|  \_\ |_|
+
+
+    This funciton doesn't validate impossible dates like 31/02/2020
+
+-}
 parseDate : String -> Date
 parseDate inputString =
     case String.split "/" inputString of
@@ -66,6 +87,33 @@ isDateEqualPosix date timeZone posix =
 
         DateInvalid _ ->
             False
+
+
+isPosixBetweenDates : Time.Zone -> Time.Posix -> Date -> Date -> Bool
+isPosixBetweenDates timeZone posix date1 date2 =
+    case ( date1, date2 ) of
+        ( DateValid s1, DateValid s2 ) ->
+            let
+                value =
+                    { year = Time.toYear timeZone posix
+                    , month = Time.toMonth timeZone posix
+                    , day = Time.toDay timeZone posix
+                    }
+            in
+            dateAfter s1 value && dateBefore s2 value
+
+        _ ->
+            False
+
+
+dateIfValid : a -> a -> Date -> a
+dateIfValid if_ then_ value =
+    case value of
+        DateValid _ ->
+            if_
+
+        DateInvalid _ ->
+            then_
 
 
 parseMonthNumber : String -> Maybe Time.Month
@@ -149,3 +197,55 @@ monthToInt month =
 
         Time.Dec ->
             12
+
+
+dateAfter : PrimitiveDate -> PrimitiveDate -> Bool
+dateAfter min value =
+    let
+        minMonth =
+            monthToInt min.month
+
+        valueMonth =
+            monthToInt value.month
+    in
+    if value.year > min.year then
+        True
+
+    else if value.year == min.year then
+        if valueMonth > minMonth then
+            True
+
+        else if valueMonth == minMonth then
+            value.day >= min.day
+
+        else
+            False
+
+    else
+        False
+
+
+dateBefore : PrimitiveDate -> PrimitiveDate -> Bool
+dateBefore max value =
+    let
+        maxMonth =
+            monthToInt max.month
+
+        valueMonth =
+            monthToInt value.month
+    in
+    if value.year < max.year then
+        True
+
+    else if value.year == max.year then
+        if valueMonth < maxMonth then
+            True
+
+        else if valueMonth == maxMonth then
+            value.day <= max.day
+
+        else
+            False
+
+    else
+        False

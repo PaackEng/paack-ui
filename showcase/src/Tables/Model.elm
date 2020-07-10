@@ -2,7 +2,7 @@ module Tables.Model exposing (..)
 
 import Msg exposing (Msg)
 import Time
-import UI.Tables.Stateful as Table exposing (filtersEmpty, localMultiTextFilter, localSelectFilter, localSingleDateFilter)
+import UI.Tables.Stateful as Table exposing (filtersEmpty, localMultiTextFilter, localRangeDateFilter, localSelectFilter)
 import UI.Utils.TypeNumbers exposing (Four)
 
 
@@ -46,4 +46,4 @@ someFilters =
                     _ ->
                         False
             )
-        |> localSingleDateFilter Time.utc Nothing .acquired
+        |> localRangeDateFilter Time.utc Nothing Nothing .acquired
