@@ -57,12 +57,29 @@ mobileTableStory =
 
 demoTable renderConfig model =
     let
-        toTableDetails { author, title } =
+        toTableDetails { author, title, acquired, read } =
             detailsEmpty
                 |> detailHidden
                 |> detailShown { label = "Author", content = cellFromText <| Text.body2 author }
                 |> detailHidden
-                |> detailHidden
+                |> detailShown
+                    { label = "Acquired"
+                    , content =
+                        acquired
+                            |> posixToValidDate Time.utc
+                            |> dateToNumericString
+                            |> Text.body2
+                            |> cellFromText
+                    }
+                |> detailShown
+                    { label = "Read"
+                    , content =
+                        read
+                            |> posixToValidDate Time.utc
+                            |> dateToNumericString
+                            |> Text.body2
+                            |> cellFromText
+                    }
 
         toTableCover { title, year } =
             { title = title, caption = Just year }
@@ -113,13 +130,48 @@ statelessDemoTable renderConfig =
 
 
 books =
-    [ { author = "Dan Brown", title = "Angels & Demons", year = "2000", acquired = millisToPosix 1118405730000 }
-    , { author = "Dan Brown", title = "The Da Vinci Code", year = "2003", acquired = millisToPosix 1183983330000 }
-    , { author = "Dan Brown", title = "The Lost Symbol", year = "2009", acquired = millisToPosix 1540210530000 }
-    , { author = "Dan Brown", title = "Inferno", year = "2013", acquired = millisToPosix 1538655330000 }
-    , { author = "Dan Brown", title = "Origin", year = "2017", acquired = millisToPosix 1486037730000 }
-    , { author = "Suzanne Collins", title = "The Hunger Games", year = "2008", acquired = millisToPosix 1230120930000 }
-    , { author = "Agatha Christie", title = "Murder on the Orient Express", year = "1933", acquired = millisToPosix 969711330000 }
+    [ { author = "Dan Brown"
+      , title = "Angels & Demons"
+      , year = "2000"
+      , acquired = millisToPosix 1118405730000
+      , read = millisToPosix 1118405730000
+      }
+    , { author = "Dan Brown"
+      , title = "The Da Vinci Code"
+      , year = "2003"
+      , acquired = millisToPosix 1183983330000
+      , read = millisToPosix 1183983330000
+      }
+    , { author = "Dan Brown"
+      , title = "The Lost Symbol"
+      , year = "2009"
+      , acquired = millisToPosix 1540210530000
+      , read = millisToPosix 1540210530000
+      }
+    , { author = "Dan Brown"
+      , title = "Inferno"
+      , year = "2013"
+      , acquired = millisToPosix 1538655330000
+      , read = millisToPosix 1538655330000
+      }
+    , { author = "Dan Brown"
+      , title = "Origin"
+      , year = "2017"
+      , acquired = millisToPosix 1486037730000
+      , read = millisToPosix 1486037730000
+      }
+    , { author = "Suzanne Collins"
+      , title = "The Hunger Games"
+      , year = "2008"
+      , acquired = millisToPosix 1230120930000
+      , read = millisToPosix 1230120930000
+      }
+    , { author = "Agatha Christie"
+      , title = "Murder on the Orient Express"
+      , year = "1933"
+      , acquired = millisToPosix 969711330000
+      , read = millisToPosix 969711330000
+      }
     ]
 
 
@@ -129,11 +181,13 @@ tableColumns =
         |> column "Author" (columnWidthPixels 240)
         |> column "Year" (columnWidthPixels 120)
         |> column "Acquired" (columnWidthPixels 180)
+        |> column "Read" (columnWidthPixels 180)
 
 
-toTableRow { author, title, year, acquired } =
+toTableRow { author, title, year, acquired, read } =
     rowEmpty
         |> rowCellText (Text.body1 title)
         |> rowCellText (Text.body2 author)
         |> rowCellText (Text.caption year)
         |> rowCellText (Text.caption <| dateToNumericString <| posixToValidDate Time.utc acquired)
+        |> rowCellText (Text.caption <| dateToNumericString <| posixToValidDate Time.utc read)

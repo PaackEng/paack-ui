@@ -7,6 +7,7 @@ module UI.Tables.Stateful exposing
     , localMultiTextFilter, remoteMultiTextFilter
     , localSingleDateFilter, remoteSingleDateFilter
     , localRangeDateFilter, remoteRangeDateFilter
+    , localPeriodDateFilter, remotePeriodDateFilter
     , localSelectFilter, remoteSelectFilter
     , withWidth
     , renderElement
@@ -119,6 +120,11 @@ And on model:
 @docs localRangeDateFilter, remoteRangeDateFilter
 
 
+## Period Dates
+
+@docs localPeriodDateFilter, remotePeriodDateFilter
+
+
 ## Select (Radio Buttons)
 
 @docs localSelectFilter, remoteSelectFilter
@@ -140,7 +146,7 @@ import Time
 import UI.Internal.Basics exposing (flip)
 import UI.Internal.Filters as Filters
 import UI.Internal.FiltersHeaders as FiltersHeaders
-import UI.Internal.Human exposing (Date, RangeDate)
+import UI.Internal.Human exposing (Date, PeriodComparison, PeriodDate, RangeDate)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Internal.Table exposing (..)
 import UI.Internal.TableView exposing (..)
@@ -387,6 +393,28 @@ remoteRangeDateFilter :
     -> Filters msg item (T.Increase columns)
 remoteRangeDateFilter =
     Filters.rangeDateRemote
+
+
+localPeriodDateFilter :
+    Time.Zone
+    -> Maybe Time.Posix
+    -> Maybe PeriodComparison
+    -> (item -> Time.Posix)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+localPeriodDateFilter =
+    Filters.periodDateLocal
+
+
+remotePeriodDateFilter :
+    Time.Zone
+    -> Maybe Time.Posix
+    -> Maybe PeriodComparison
+    -> (Maybe PeriodDate -> msg)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+remotePeriodDateFilter =
+    Filters.periodDateRemote
 
 
 localSelectFilter :

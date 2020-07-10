@@ -2,12 +2,12 @@ module Tables.Model exposing (..)
 
 import Msg exposing (Msg)
 import Time
-import UI.Tables.Stateful as Table exposing (filtersEmpty, localMultiTextFilter, localRangeDateFilter, localSelectFilter)
-import UI.Utils.TypeNumbers exposing (Four)
+import UI.Tables.Stateful as Table
+import UI.Utils.TypeNumbers exposing (Five)
 
 
 type alias Model =
-    { tableState : Table.State Msg Book Four }
+    { tableState : Table.State Msg Book Five }
 
 
 type alias Book =
@@ -15,6 +15,7 @@ type alias Book =
     , title : String
     , year : String
     , acquired : Time.Posix
+    , read : Time.Posix
     }
 
 
@@ -26,10 +27,10 @@ initModel =
 
 
 someFilters =
-    filtersEmpty
-        |> localMultiTextFilter [] .title
-        |> localMultiTextFilter [ "Dan" ] .author
-        |> localSelectFilter
+    Table.filtersEmpty
+        |> Table.localMultiTextFilter [] .title
+        |> Table.localMultiTextFilter [ "Dan" ] .author
+        |> Table.localSelectFilter
             [ "Last Decade", "New Millennium", "Old Century" ]
             Nothing
             (\item selected ->
@@ -46,4 +47,5 @@ someFilters =
                     _ ->
                         False
             )
-        |> localRangeDateFilter Time.utc Nothing Nothing .acquired
+        |> Table.localRangeDateFilter Time.utc Nothing Nothing .acquired
+        |> Table.localPeriodDateFilter Time.utc Nothing Nothing .read
