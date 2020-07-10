@@ -5,7 +5,9 @@ import Msg
 import Return as R exposing (Return)
 import Tables.Model as Stories
 import Tables.Msg as Stories
+import Time exposing (millisToPosix)
 import UI.Internal.Basics exposing (maybeNotThen)
+import UI.Internal.Human exposing (dateToNumericString, posixToValidDate)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Tables.Common as Table exposing (..)
 import UI.Tables.Stateful as Stateful exposing (..)
@@ -111,13 +113,13 @@ statelessDemoTable renderConfig =
 
 
 books =
-    [ { author = "Dan Brown", title = "Angels & Demons", year = "2000", acquired = "10/06/2005" }
-    , { author = "Dan Brown", title = "The Da Vinci Code", year = "2003", acquired = "09/07/2007" }
-    , { author = "Dan Brown", title = "The Lost Symbol", year = "2009", acquired = "22/10/2018" }
-    , { author = "Dan Brown", title = "Inferno", year = "2013", acquired = "04/10/2018" }
-    , { author = "Dan Brown", title = "Origin", year = "2017", acquired = "02/02/2017" }
-    , { author = "Suzanne Collins", title = "The Hunger Games", year = "2008", acquired = "24/12/2008" }
-    , { author = "Agatha Christie", title = "Murder on the Orient Express", year = "1933", acquired = "23/09/2000" }
+    [ { author = "Dan Brown", title = "Angels & Demons", year = "2000", acquired = millisToPosix 1118405730000 }
+    , { author = "Dan Brown", title = "The Da Vinci Code", year = "2003", acquired = millisToPosix 1183983330000 }
+    , { author = "Dan Brown", title = "The Lost Symbol", year = "2009", acquired = millisToPosix 1540210530000 }
+    , { author = "Dan Brown", title = "Inferno", year = "2013", acquired = millisToPosix 1538655330000 }
+    , { author = "Dan Brown", title = "Origin", year = "2017", acquired = millisToPosix 1486037730000 }
+    , { author = "Suzanne Collins", title = "The Hunger Games", year = "2008", acquired = millisToPosix 1230120930000 }
+    , { author = "Agatha Christie", title = "Murder on the Orient Express", year = "1933", acquired = millisToPosix 969711330000 }
     ]
 
 
@@ -134,4 +136,4 @@ toTableRow { author, title, year, acquired } =
         |> rowCellText (Text.body1 title)
         |> rowCellText (Text.body2 author)
         |> rowCellText (Text.caption year)
-        |> rowCellText (Text.caption acquired)
+        |> rowCellText (Text.caption <| dateToNumericString <| posixToValidDate Time.utc acquired)

@@ -12,7 +12,7 @@ import UI.Checkbox exposing (radioButton)
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (maybeNotThen)
 import UI.Internal.Filters as Filters
-import UI.Internal.Human exposing (parseDate)
+import UI.Internal.Human exposing (Date(..), dateToNumericString, parseDate)
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Size as Size exposing (Size)
@@ -368,7 +368,7 @@ singleDateFilterRender :
     RenderConfig
     -> msg
     -> Config msg
-    -> Filters.Editable String
+    -> Filters.Editable Date
     -> Element msg
 singleDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } editable =
     let
@@ -377,10 +377,11 @@ singleDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
 
         current =
             editable
-                |> Filters.editableWithDefault ""
+                |> Filters.editableWithDefault (DateInvalid "")
 
         correctInput =
             current
+                |> dateToNumericString
                 |> TextField.singlelineText editMsg label
                 |> TextField.withPlaceholder "DD/MM/YYYY"
                 |> TextField.withSize Size.extraSmall
@@ -392,9 +393,9 @@ singleDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
                 |> TextField.withError "Invalid date format."
     in
     TextField.renderElement renderConfig <|
-        case parseDate current of
-            Just _ ->
+        case current of
+            DateValid _ ->
                 correctInput
 
-            Nothing ->
+            DateInvalid _ ->
                 invalidInput

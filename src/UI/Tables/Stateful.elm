@@ -130,9 +130,11 @@ And on model:
 -}
 
 import Element exposing (Element, shrink)
+import Time
 import UI.Internal.Basics exposing (flip)
 import UI.Internal.Filters as Filters
 import UI.Internal.FiltersHeaders as FiltersHeaders
+import UI.Internal.Human exposing (Date)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Internal.Table exposing (..)
 import UI.Internal.TableView exposing (..)
@@ -340,8 +342,9 @@ remoteMultiTextFilter =
 
 
 localSingleDateFilter :
-    Maybe String
-    -> (item -> String)
+    Time.Zone
+    -> Maybe Time.Posix
+    -> (item -> Time.Posix)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
 localSingleDateFilter =
@@ -349,10 +352,11 @@ localSingleDateFilter =
 
 
 remoteSingleDateFilter :
-    Maybe String
-    -> (Maybe String -> msg)
-    -> Filters msg item columns
-    -> Filters msg item (T.Increase columns)
+    Time.Zone
+    -> Maybe Time.Posix
+    -> (Maybe Date -> msg)
+    -> Filters.Filters msg item columns
+    -> Filters.Filters msg item (T.Increase columns)
 remoteSingleDateFilter =
     Filters.singleDateRemote
 

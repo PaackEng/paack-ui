@@ -1,6 +1,7 @@
 module Tables.Model exposing (..)
 
 import Msg exposing (Msg)
+import Time
 import UI.Tables.Stateful as Table exposing (filtersEmpty, localMultiTextFilter, localSelectFilter, localSingleDateFilter)
 import UI.Utils.TypeNumbers exposing (Four)
 
@@ -13,7 +14,7 @@ type alias Book =
     { author : String
     , title : String
     , year : String
-    , acquired : String
+    , acquired : Time.Posix
     }
 
 
@@ -45,4 +46,4 @@ someFilters =
                     _ ->
                         False
             )
-        |> localSingleDateFilter Nothing .acquired
+        |> localSingleDateFilter Time.utc Nothing .acquired

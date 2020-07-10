@@ -2,7 +2,9 @@ module UI.Internal.Filters exposing (..)
 
 import Array exposing (Array)
 import Task
+import Time exposing (Posix)
 import UI.Internal.Basics exposing (flip, maybeNotThen)
+import UI.Internal.Human exposing (Date(..), parseDate, posixToValidDate)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Utils.TypeNumbers as T
 
@@ -65,10 +67,6 @@ configSetEditable config newEditable =
 
 type alias RangeDate =
     { from : Date, to : Date }
-
-
-type alias Date =
-    String
 
 
 type TimePeriod
@@ -296,18 +294,27 @@ type alias SingleDateFilterConfig msg item =
 
 
 singleDateLocal :
-    Maybe String
-    -> (item -> String)
+    Time.Zone
+    -> Maybe Posix
+    -> (item -> Posix)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-singleDateLocal initValue getStr accu =
+singleDateLocal timeZone initValue getPosix accu =
     let
+        compare posix current =
+            case current of
+                DateValid { year, month, day } ->
+                    (year == Time.toYear timeZone posix)
+                        && (month == Time.toMonth timeZone posix)
+                        && (day == Time.toDay timeZone posix)
+
+                DateInvalid _ ->
+                    False
+
         applier item current =
-            getStr item
-                |> String.toLower
-                |> String.contains (String.toLower current)
+            compare (getPosix item) current
     in
-    { editable = { applied = initValue, current = Nothing }
+    { editable = { applied = Maybe.map (posixToValidDate timeZone) initValue, current = Nothing }
     , strategy = strategyLocal applier
     }
         |> SingleDateFilter
@@ -315,12 +322,13 @@ singleDateLocal initValue getStr accu =
 
 
 singleDateRemote :
-    Maybe String
-    -> (Maybe String -> msg)
+    Time.Zone
+    -> Maybe Posix
+    -> (Maybe Date -> msg)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-singleDateRemote initValue applyMsg accu =
-    { editable = { applied = initValue, current = Nothing }
+singleDateRemote timeZone initValue applyMsg accu =
+    { editable = { applied = Maybe.map (posixToValidDate timeZone) initValue, current = Nothing }
     , strategy =
         strategyRemote
             { applyMsg = Just >> applyMsg
@@ -336,7 +344,7 @@ singleDateEdit column value model =
     case get column model of
         Just (SingleDateFilter config) ->
             config.editable
-                |> editableSetCurrent value
+                |> editableSetCurrent (parseDate value)
                 |> configSetEditable config
                 |> SingleDateFilter
                 |> flip (set column) model
