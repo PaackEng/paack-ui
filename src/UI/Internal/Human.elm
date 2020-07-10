@@ -1,4 +1,4 @@
-module UI.Internal.Human exposing (Date(..), dateToNumericString, parseDate, posixToValidDate)
+module UI.Internal.Human exposing (Date(..), dateToNumericString, isDateEqualPosix, parseDate, posixToValidDate)
 
 import Time
 
@@ -54,6 +54,18 @@ posixToValidDate timeZone posix =
         , month = Time.toMonth timeZone posix
         , day = Time.toDay timeZone posix
         }
+
+
+isDateEqualPosix : Date -> Time.Zone -> Time.Posix -> Bool
+isDateEqualPosix date timeZone posix =
+    case date of
+        DateValid { year, month, day } ->
+            (year == Time.toYear timeZone posix)
+                && (month == Time.toMonth timeZone posix)
+                && (day == Time.toDay timeZone posix)
+
+        DateInvalid _ ->
+            False
 
 
 parseMonthNumber : String -> Maybe Time.Month

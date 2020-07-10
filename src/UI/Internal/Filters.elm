@@ -4,7 +4,7 @@ import Array exposing (Array)
 import Task
 import Time exposing (Posix)
 import UI.Internal.Basics exposing (flip, maybeNotThen)
-import UI.Internal.Human exposing (Date(..), parseDate, posixToValidDate)
+import UI.Internal.Human exposing (Date(..), isDateEqualPosix, parseDate, posixToValidDate)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Utils.TypeNumbers as T
 
@@ -302,14 +302,7 @@ singleDateLocal :
 singleDateLocal timeZone initValue getPosix accu =
     let
         compare posix current =
-            case current of
-                DateValid { year, month, day } ->
-                    (year == Time.toYear timeZone posix)
-                        && (month == Time.toMonth timeZone posix)
-                        && (day == Time.toDay timeZone posix)
-
-                DateInvalid _ ->
-                    False
+            isDateEqualPosix current timeZone posix
 
         applier item current =
             compare (getPosix item) current
