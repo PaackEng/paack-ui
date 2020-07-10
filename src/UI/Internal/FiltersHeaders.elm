@@ -12,7 +12,7 @@ import UI.Checkbox exposing (radioButton)
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (maybeNotThen)
 import UI.Internal.Filters as Filters
-import UI.Internal.Human exposing (Date(..), dateToNumericString, parseDate)
+import UI.Internal.Human exposing (Date(..), dateToNumericString)
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Size as Size exposing (Size)
