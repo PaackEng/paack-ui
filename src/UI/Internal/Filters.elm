@@ -4,7 +4,7 @@ import Array exposing (Array)
 import Task
 import Time exposing (Posix)
 import UI.Internal.Basics exposing (flip, maybeNotThen)
-import UI.Internal.Human exposing (Date(..), RangeDate, isDateEqualPosix, isPosixBetweenDates, parseDate, posixToValidDate)
+import UI.Internal.Human exposing (..)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Utils.TypeNumbers as T
 
@@ -15,6 +15,8 @@ type Msg
     | EditSingleDate { column : Int, value : String }
     | EditRangeFromDate { column : Int, value : String }
     | EditRangeToDate { column : Int, value : String }
+    | EditPeriodDate { column : Int, value : String }
+    | EditPeriodComparison { column : Int, value : PeriodComparison }
     | EditSelect { column : Int, value : Int }
     | Apply Int
     | Clear Int
@@ -61,20 +63,6 @@ type alias RemoteMessages msg value =
 configSetEditable : FilterConfig msg value item -> Editable value -> FilterConfig msg value item
 configSetEditable config newEditable =
     { config | editable = newEditable }
-
-
-
--- Type-helpers
-
-
-type TimePeriod
-    = On
-    | Before
-    | After
-
-
-type alias PeriodDate =
-    { date : Date, timePeriod : TimePeriod }
 
 
 
@@ -300,7 +288,7 @@ singleDateLocal :
 singleDateLocal timeZone initValue getPosix accu =
     let
         compare posix current =
-            isDateEqualPosix current timeZone posix
+            isPosixEqualDate current timeZone posix
 
         applier item current =
             compare (getPosix item) current
@@ -461,6 +449,115 @@ type alias PeriodDateFilterConfig msg item =
     FilterConfig msg PeriodDate item
 
 
+periodDateInit : Time.Zone -> Maybe Posix -> Maybe PeriodComparison -> Maybe PeriodDate
+periodDateInit timeZone posixInit periodInit =
+    case ( posixInit, periodInit ) of
+        ( Just posix, Just period ) ->
+            Just { date = posixToValidDate timeZone posix, comparison = period }
+
+        ( Just posix, Nothing ) ->
+            Just { date = posixToValidDate timeZone posix, comparison = On }
+
+        ( Nothing, Just period ) ->
+            Just { date = DateInvalid "", comparison = period }
+
+        ( Nothing, Nothing ) ->
+            Nothing
+
+
+periodDateLocal :
+    Time.Zone
+    -> Maybe Posix
+    -> Maybe PeriodComparison
+    -> (item -> Posix)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+periodDateLocal timeZone posixInit periodInit getPosix accu =
+    let
+        compare posix { date, comparison } =
+            case comparison of
+                On ->
+                    isPosixEqualDate date timeZone posix
+
+                Before ->
+                    isPosixBeforeDate date timeZone posix
+
+                After ->
+                    isPosixAfterDate date timeZone posix
+
+        applier item current =
+            compare (getPosix item) current
+    in
+    { editable = { applied = periodDateInit timeZone posixInit periodInit, current = Nothing }
+    , strategy = strategyLocal applier
+    }
+        |> PeriodDateFilter
+        |> flip push accu
+
+
+periodDateRemote :
+    Time.Zone
+    -> Maybe Posix
+    -> Maybe PeriodComparison
+    -> (Maybe PeriodDate -> msg)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+periodDateRemote timeZone posixInit periodInit applyMsg accu =
+    { editable = { applied = periodDateInit timeZone posixInit periodInit, current = Nothing }
+    , strategy =
+        strategyRemote
+            { applyMsg = Just >> applyMsg
+            , clearMsg = applyMsg Nothing
+            }
+    }
+        |> PeriodDateFilter
+        |> flip push accu
+
+
+periodDateEdit : Int -> String -> Filters msg item columns -> Filters msg item columns
+periodDateEdit column value model =
+    case get column model of
+        Just (PeriodDateFilter config) ->
+            config.editable
+                |> editableMapCurrent
+                    (\maybeCurrent ->
+                        { date = parseDate value
+                        , comparison =
+                            maybeCurrent
+                                |> Maybe.map .comparison
+                                |> Maybe.withDefault On
+                        }
+                    )
+                |> configSetEditable config
+                |> PeriodDateFilter
+                |> flip (set column) model
+
+        _ ->
+            model
+
+
+periodDateComparisonEdit : Int -> PeriodComparison -> Filters msg item columns -> Filters msg item columns
+periodDateComparisonEdit column value model =
+    case get column model of
+        Just (PeriodDateFilter config) ->
+            config.editable
+                |> editableMapCurrent
+                    (\maybeCurrent ->
+                        { date =
+                            maybeCurrent
+                                |> Maybe.map .date
+                                |> Maybe.withDefault (DateInvalid "")
+                        , comparison = value
+                        }
+                    )
+                |> configSetEditable config
+                |> PeriodDateFilter
+                |> flip (set column) model
+
+        _ ->
+            model
+
+
 
 -- SelectFilter
 
@@ -536,6 +633,12 @@ update msg model =
 
         EditRangeToDate { column, value } ->
             ( rangeDateToEdit column value model, Cmd.none )
+
+        EditPeriodDate { column, value } ->
+            ( periodDateEdit column value model, Cmd.none )
+
+        EditPeriodComparison { column, value } ->
+            ( periodDateComparisonEdit column value model, Cmd.none )
 
         EditSelect { column, value } ->
             ( selectEdit column value model, Cmd.none )

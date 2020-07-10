@@ -12,7 +12,7 @@ import UI.Checkbox exposing (radioButton)
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (maybeNotThen)
 import UI.Internal.Filters as Filters
-import UI.Internal.Human exposing (Date(..), RangeDate, dateIfValid, dateToNumericString)
+import UI.Internal.Human exposing (Date(..), PeriodComparison(..), PeriodDate, RangeDate, dateIfValid, dateToNumericString)
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Size as Size exposing (Size)
@@ -47,32 +47,31 @@ header renderConfig filter config =
 
         applyMsg =
             config.fromFiltersMsg <| Filters.Apply config.index
+
+        filterRender renderer editable =
+            renderer renderConfig applyMsg config editable
+                |> dialog renderConfig config filter clearMsg applyMsg
     in
     if config.isOpen then
         case filter of
             Filters.SingleTextFilter { editable } ->
-                singleTextFilterRender renderConfig applyMsg config editable
-                    |> dialog renderConfig config filter clearMsg applyMsg
+                filterRender singleTextFilterRender editable
 
             Filters.MultiTextFilter { editable } ->
-                multiTextFilterRender renderConfig applyMsg config editable
-                    |> dialog renderConfig config filter clearMsg applyMsg
+                filterRender multiTextFilterRender editable
 
             Filters.SingleDateFilter { editable } ->
-                singleDateFilterRender renderConfig applyMsg config editable
-                    |> dialog renderConfig config filter clearMsg applyMsg
+                filterRender singleDateFilterRender editable
 
             Filters.RangeDateFilter { editable } ->
-                rangeDateFilterRender renderConfig applyMsg config editable
-                    |> dialog renderConfig config filter clearMsg applyMsg
+                filterRender rangeDateFilterRender editable
+
+            Filters.PeriodDateFilter { editable } ->
+                filterRender periodDateFilterRender editable
 
             Filters.SelectFilter list { editable } ->
                 selectFilterRender renderConfig config list editable
                     |> dialog renderConfig config filter clearMsg applyMsg
-
-            _ ->
-                -- TODO
-                Element.none
 
     else if Filters.isApplied filter then
         headerApplied renderConfig
@@ -385,25 +384,10 @@ singleDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
 
         correctInput =
             dateInput applyMsg editMsg "DD/MM/YYYY" label current
-
-        invalidInput =
-            correctInput
-                |> TextField.withError "Invalid date format."
     in
     current
-        |> dateIfValid correctInput invalidInput
+        |> validDateField correctInput
         |> TextField.renderElement renderConfig
-
-
-dateInput : msg -> (String -> msg) -> String -> String -> Date -> TextField msg
-dateInput applyMsg editMsg placeholder label current =
-    current
-        |> dateToNumericString
-        |> TextField.singlelineText editMsg label
-        |> TextField.withPlaceholder placeholder
-        |> TextField.withSize Size.extraSmall
-        |> TextField.withWidth TextField.widthFull
-        |> TextField.withOnEnterPressed applyMsg
 
 
 rangeDateFilterRender :
@@ -430,18 +414,81 @@ rangeDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } edi
 
         correctToInput =
             dateInput applyMsg editToMsg "To: DD/MM/YYYY" label current.to
-
-        invalidInput input =
-            TextField.withError "Invalid date format." input
     in
     Element.column
         [ Element.width fill
         , Element.spacing 8
         ]
         [ current.from
-            |> dateIfValid correctFromInput (invalidInput correctFromInput)
+            |> validDateField correctFromInput
             |> TextField.renderElement renderConfig
         , current.to
-            |> dateIfValid correctToInput (invalidInput correctToInput)
+            |> validDateField correctToInput
             |> TextField.renderElement renderConfig
         ]
+
+
+periodDateFilterRender :
+    RenderConfig
+    -> msg
+    -> Config msg
+    -> Filters.Editable PeriodDate
+    -> Element msg
+periodDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } editable =
+    let
+        editDateMsg str =
+            fromFiltersMsg <| Filters.EditPeriodDate { column = index, value = str }
+
+        editComparisonMsg value =
+            fromFiltersMsg <| Filters.EditPeriodComparison { column = index, value = value }
+
+        current =
+            editable
+                |> Filters.editableWithDefault { date = DateInvalid "", comparison = On }
+
+        correctInput =
+            dateInput applyMsg editDateMsg "DD/MM/YYYY" label current.date
+    in
+    Element.column
+        [ Element.width fill
+        , Element.spacing 8
+        ]
+        [ current.date
+            |> validDateField correctInput
+            |> TextField.renderElement renderConfig
+        , radioButton
+            renderConfig
+            (always <| editComparisonMsg On)
+            "On"
+            (current.comparison == On)
+        , radioButton
+            renderConfig
+            (always <| editComparisonMsg Before)
+            "Before"
+            (current.comparison == Before)
+        , radioButton
+            renderConfig
+            (always <| editComparisonMsg After)
+            "After"
+            (current.comparison == After)
+        ]
+
+
+
+-- Internal
+
+
+dateInput : msg -> (String -> msg) -> String -> String -> Date -> TextField msg
+dateInput applyMsg editMsg placeholder label current =
+    current
+        |> dateToNumericString
+        |> TextField.singlelineText editMsg label
+        |> TextField.withPlaceholder placeholder
+        |> TextField.withSize Size.extraSmall
+        |> TextField.withWidth TextField.widthFull
+        |> TextField.withOnEnterPressed applyMsg
+
+
+validDateField : TextField msg -> Date -> TextField msg
+validDateField field date =
+    dateIfValid field (TextField.withError "Invalid date format." field) date

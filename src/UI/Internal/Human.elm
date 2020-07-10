@@ -1,6 +1,29 @@
-module UI.Internal.Human exposing (Date(..), RangeDate, dateIfValid, dateToNumericString, isDateEqualPosix, isPosixBetweenDates, parseDate, posixToValidDate)
+module UI.Internal.Human exposing
+    ( Date(..)
+    , PeriodComparison(..)
+    , PeriodDate
+    , RangeDate
+    , dateIfValid
+    , dateToNumericString
+    , isPosixAfterDate
+    , isPosixBeforeDate
+    , isPosixBetweenDates
+    , isPosixEqualDate
+    , parseDate
+    , posixToValidDate
+    )
 
 import Time
+
+
+type PeriodComparison
+    = On
+    | Before
+    | After
+
+
+type alias PeriodDate =
+    { date : Date, comparison : PeriodComparison }
 
 
 type Date
@@ -77,8 +100,8 @@ posixToValidDate timeZone posix =
         }
 
 
-isDateEqualPosix : Date -> Time.Zone -> Time.Posix -> Bool
-isDateEqualPosix date timeZone posix =
+isPosixEqualDate : Date -> Time.Zone -> Time.Posix -> Bool
+isPosixEqualDate date timeZone posix =
     case date of
         DateValid { year, month, day } ->
             (year == Time.toYear timeZone posix)
@@ -95,14 +118,35 @@ isPosixBetweenDates timeZone posix date1 date2 =
         ( DateValid s1, DateValid s2 ) ->
             let
                 value =
-                    { year = Time.toYear timeZone posix
-                    , month = Time.toMonth timeZone posix
-                    , day = Time.toDay timeZone posix
-                    }
+                    posixToPrimitiveDate timeZone posix
             in
             dateAfter s1 value && dateBefore s2 value
 
         _ ->
+            False
+
+
+isPosixBeforeDate : Date -> Time.Zone -> Time.Posix -> Bool
+isPosixBeforeDate maybeDate timeZone posix =
+    case maybeDate of
+        DateValid date ->
+            posix
+                |> posixToPrimitiveDate timeZone
+                |> dateBefore date
+
+        DateInvalid _ ->
+            False
+
+
+isPosixAfterDate : Date -> Time.Zone -> Time.Posix -> Bool
+isPosixAfterDate maybeDate timeZone posix =
+    case maybeDate of
+        DateValid date ->
+            posix
+                |> posixToPrimitiveDate timeZone
+                |> dateAfter date
+
+        DateInvalid _ ->
             False
 
 
@@ -114,6 +158,18 @@ dateIfValid if_ then_ value =
 
         DateInvalid _ ->
             then_
+
+
+
+-- Internals
+
+
+posixToPrimitiveDate : Time.Zone -> Time.Posix -> PrimitiveDate
+posixToPrimitiveDate timeZone posix =
+    { year = Time.toYear timeZone posix
+    , month = Time.toMonth timeZone posix
+    , day = Time.toDay timeZone posix
+    }
 
 
 parseMonthNumber : String -> Maybe Time.Month
