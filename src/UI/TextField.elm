@@ -708,7 +708,7 @@ genericAttr label isPlaceholder hasError width size =
 
         else
             1
-    , Primitives.textFieldPadding size
+    , textFieldPadding size
     , Element.focused
         [ Border.color Palette.primary.lighter
         ]
@@ -744,3 +744,21 @@ inputLabel cfg label labelVisible =
 
     else
         Input.labelHidden label
+
+
+textFieldPadding : Size -> Attribute msg
+textFieldPadding size =
+    case size of
+        Size.Large ->
+            -- TODO: NOT Specified in Core Design System
+            Element.paddingXY 24 22
+
+        Size.Medium ->
+            Element.paddingXY 18 16
+
+        Size.Small ->
+            -- TODO: NOT Specified in Core Design System
+            Element.paddingXY 12 10
+
+        Size.ExtraSmall ->
+            Element.paddingXY 8 7
