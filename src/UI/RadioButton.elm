@@ -13,7 +13,6 @@ import Element exposing (Attribute, Element, px)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
-import UI.Button as Button
 import UI.Icon as Icon
 import UI.Internal.Palette as Palette
 import UI.Internal.Size as Size
