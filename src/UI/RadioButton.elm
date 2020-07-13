@@ -3,12 +3,9 @@ module UI.RadioButton exposing (radioGroup)
 {-|
 
 
-# Atomic Elements
+# Grouped Elements
 
-@docs checkbox, radioButton
-
-**NOTE**:
-We have plans for "checklists" and "radioGroups", but this won't be created until usecase appears.
+@docs radioGroup
 
 -}
 

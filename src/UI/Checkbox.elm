@@ -5,7 +5,7 @@ module UI.Checkbox exposing (checkbox)
 
 # Atomic Elements
 
-@docs checkbox, radioButton
+@docs checkbox
 
 **NOTE**:
 We have plans for "checklists", but this won't be created until usecase appears.
