@@ -1,6 +1,6 @@
 module UI.Icon exposing
     ( svgSpriteImport
-    , Icon, add, close, edit, eventLog, previousContent, logout, notifications, paackSpaces, packages, print, nextContent, sandwichMenu, search, seeMore, toggle, toggleDown, toggleUp, warning, filter
+    , Icon, add, check, close, edit, eventLog, previousContent, logout, notifications, paackSpaces, packages, print, nextContent, sandwichMenu, search, seeMore, toggle, toggleDown, toggleUp, warning, filter
     , getHint
     , withColor
     , withSize, withCustomSize
@@ -30,7 +30,7 @@ An icon can be created and rendered as in the following pipeline:
 
 # Building
 
-@docs Icon, add, close, edit, eventLog, previousContent, logout, notifications, paackSpaces, packages, print, nextContent, sandwichMenu, search, seeMore, toggle, toggleDown, toggleUp, warning, filter
+@docs Icon, add, check, close, edit, eventLog, previousContent, logout, notifications, paackSpaces, packages, print, nextContent, sandwichMenu, search, seeMore, toggle, toggleDown, toggleUp, warning, filter
 
 
 # Disassemble
@@ -90,6 +90,7 @@ type Icon
 
 type IconGlyph
     = Add
+    | Check
     | Close
     | Edit
     | EventLog
@@ -222,6 +223,11 @@ toggleDown hint =
 add : String -> Icon
 add hint =
     Icon (Properties hint Add) defaultOptions
+
+
+check : String -> Icon
+check hint =
+    Icon (Properties hint Check) defaultOptions
 
 
 {-| A times sign. Usually used for closing dialogs.
@@ -401,6 +407,9 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
 
             DownArrow ->
                 svgIcon "DownArrow1"
+
+            Check ->
+                svgIcon "Check1"
 
             Close ->
                 svgIcon "Close1"

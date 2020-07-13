@@ -9,35 +9,91 @@ module UI.RadioButton exposing (radioGroup)
 
 -}
 
-import Element exposing (Element)
+import Element exposing (Attribute, Element, px)
+import Element.Background as Background
+import Element.Border as Border
+import Element.Events as Events
 import UI.Button as Button
+import UI.Icon as Icon
+import UI.Internal.Palette as Palette
 import UI.Internal.Size as Size
+import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
+import UI.Utils.ARIA as ARIA
+import UI.Utils.Element as Element
+
+
+radioGroup : RenderConfig -> String -> (a -> msg) -> Maybe a -> List ( a, String ) -> Element msg
+radioGroup renderConfig label message selected buttons =
+    buttons
+        |> List.map
+            (\( id, buttonLabel ) ->
+                radioButton renderConfig
+                    (message id)
+                    buttonLabel
+                    (selected == Just id)
+            )
+        |> Element.column
+            (Element.spacing 8
+                :: (ARIA.toElementAttributes <| ARIA.roleRadioGroup label)
+            )
 
 
 radioButton : RenderConfig -> msg -> String -> Bool -> Element msg
 radioButton renderConfig message label state =
-    Element.row [ Element.spacing 8 ]
-        [ Button.toggle "Select"
-            (always message)
-            state
-            |> Button.withSize Size.extraSmall
-            |> Button.renderElement renderConfig
+    let
+        radioAttrs =
+            [ Element.width (px 26)
+            , Element.height (px 26)
+            , Border.color Palette.primary.middle
+            , Border.width 3
+            , Border.rounded 26
+            , Events.onClick message
+            , Element.pointer
+            ]
+                ++ (ARIA.toElementAttributes <| ARIA.rolePresentation)
+
+        radioIcon =
+            if state then
+                Element.el
+                    (radioSelected :: radioAttrs)
+                    (radioCheck renderConfig)
+
+            else
+                Element.el
+                    radioAttrs
+                    Element.none
+
+        rowAttrs =
+            Element.spacing 8
+                :: (ARIA.toElementAttributes <| ARIA.roleRadio state)
+    in
+    Element.row rowAttrs
+        [ radioIcon
         , Text.caption label
             |> Text.renderElement renderConfig
         ]
 
 
-radioGroup : RenderConfig -> (a -> msg) -> Maybe a -> List ( a, String ) -> Element msg
-radioGroup renderConfig message selected buttons =
-    buttons
-        |> List.map
-            (\( id, label ) ->
-                radioButton renderConfig
-                    (message id)
-                    label
-                    (selected == Just id)
+radioSelected : Attribute msg
+radioSelected =
+    Background.color Palette.primary.middle
+
+
+radioCheck : RenderConfig -> Element msg
+radioCheck renderConfig =
+    Icon.check "Selected"
+        |> Icon.withSize Size.small
+        |> Icon.withColor
+            (Palette.color
+                Palette.tonePrimary
+                Palette.brightnessMiddle
+                |> Palette.setContrasting True
             )
-        |> Element.column [ Element.spacing 8 ]
+        |> Icon.renderElement renderConfig
+        |> Element.el
+            [ Element.centerY
+            , Element.centerX
+            ]

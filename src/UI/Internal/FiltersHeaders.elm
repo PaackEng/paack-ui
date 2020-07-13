@@ -355,7 +355,11 @@ selectFilterRender renderConfig { fromFiltersMsg, index } list { current, applie
         selected =
             maybeNotThen applied current
     in
-    radioGroup renderConfig editMsg selected (List.indexedMap Tuple.pair list)
+    radioGroup renderConfig
+        "Select option for filtering"
+        editMsg
+        selected
+        (List.indexedMap Tuple.pair list)
 
 
 singleDateFilterRender :
@@ -453,7 +457,11 @@ periodDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
         [ current.date
             |> validDateField correctInput
             |> TextField.renderElement renderConfig
-        , radioGroup renderConfig editComparisonMsg (Just current.comparison) options
+        , radioGroup renderConfig
+            "Select period reference"
+            editComparisonMsg
+            (Just current.comparison)
+            options
         ]
 
 

@@ -1,5 +1,6 @@
 module UI.Utils.ARIA exposing
-    ( ElementSemantics, roleButton, roleImage
+    ( ElementSemantics, roleButton, roleImage, rolePresentation
+    , roleRadioGroup, roleRadio
     , toElementAttributes
     )
 
@@ -8,7 +9,12 @@ module UI.Utils.ARIA exposing
 
 # Building
 
-@docs ElementSemantics, roleButton, roleImage
+@docs ElementSemantics, roleButton, roleImage, rolePresentation
+
+
+## Radio buttons
+
+@docs roleRadioGroup, roleRadio
 
 
 # Rendering
@@ -19,6 +25,7 @@ module UI.Utils.ARIA exposing
 
 import Element exposing (Attribute)
 import Html.Attributes as HtmlAttrs
+import UI.Internal.Basics exposing (ifThenElse)
 
 
 {-| Roles defines the type of UI element.
@@ -29,6 +36,9 @@ See [MDN article](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARI
 type ElementSemantics
     = RoleButton
     | RoleImage String
+    | RoleRadioGroup String
+    | RoleRadio Bool
+    | RolePresentation
 
 
 {-| "The button role should be used for clickable elements that trigger a response when activated by the user." - MDN
@@ -55,6 +65,21 @@ roleImage label =
     RoleImage label
 
 
+roleRadioGroup : String -> ElementSemantics
+roleRadioGroup label =
+    RoleRadioGroup label
+
+
+roleRadio : Bool -> ElementSemantics
+roleRadio checked =
+    RoleRadio checked
+
+
+rolePresentation : ElementSemantics
+rolePresentation =
+    RolePresentation
+
+
 {-| Transform a [`ElementSemantics`](#ElementSemantics) in a list of [`Element.Attribute`](/packages/mdgriffith/elm-ui/latest/Element#Attribute).
 -}
 toElementAttributes : ElementSemantics -> List (Attribute msg)
@@ -69,6 +94,20 @@ toElementAttributes role =
         RoleImage label ->
             [ roleAttr "img"
             , labelAttr label
+            ]
+
+        RoleRadioGroup label ->
+            [ roleAttr "radiogroup"
+            , labelAttr label
+            ]
+
+        RoleRadio checked ->
+            [ roleAttr "radio"
+            , checkedAttr checked
+            ]
+
+        RolePresentation ->
+            [ roleAttr "presentation"
             ]
 
 
@@ -97,4 +136,12 @@ expandedAttr : String -> Attribute msg
 expandedAttr value =
     value
         |> HtmlAttrs.attribute "aria-expanded"
+        |> Element.htmlAttribute
+
+
+checkedAttr : Bool -> Attribute msg
+checkedAttr value =
+    "false"
+        |> ifThenElse value "true"
+        |> HtmlAttrs.attribute "aria-checked"
         |> Element.htmlAttribute
