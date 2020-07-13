@@ -213,6 +213,13 @@ zeroPadding =
     }
 
 
+{-| Equivalent to [`Element.onClick`](/packages/mdgriffith/elm-ui/latest/Element#fill) with `stopPropagation` and `preventDefault` applied.
+
+    Element.el
+        [ Element.onIndividualClick Msg.CoolTextClicked ]
+        (Element.text "Cool text")
+
+-}
 onIndividualClick : msg -> Attribute msg
 onIndividualClick message =
     Decode.succeed message

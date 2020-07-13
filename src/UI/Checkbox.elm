@@ -7,9 +7,6 @@ module UI.Checkbox exposing (checkbox)
 
 @docs checkbox
 
-**NOTE**:
-We have plans for "checklists", but this won't be created until usecase appears.
-
 -}
 
 import Element exposing (Attribute, Element, px)

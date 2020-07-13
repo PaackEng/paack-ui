@@ -71,16 +71,41 @@ roleImage label =
     RoleImage label
 
 
+{-| "An element whose content is completely presentational (like a spacer image, decorative graphic, or clearing element)" - W3C
+
+    Element.el
+        (ARIA.toElementAttributes <| ARIA.rolePresentation)
+        totallyRedundantElement
+
+-}
 rolePresentation : ElementSemantics
 rolePresentation =
     RolePresentation
 
 
+{-| "A checkable input in a group of elements with the same role, only one of which can be checked at a time." - W3C
+
+    Element.row
+        (ARIA.toElementAttributes <| ARIA.roleRadio True)
+        [ checkedIcon
+        , Element.text "Chocolate"
+        ]
+
+-}
 roleRadio : Bool -> ElementSemantics
 roleRadio checked =
     RoleRadio checked
 
 
+{-| "A radiogroup is a type of select list that can only have a single entry checked at any one time." - W3C
+
+    Element.column
+        (ARIA.toElementAttributes <| ARIA.roleRadioGroup "Pick an ice cream flavor")
+        [ chocolateIceCream
+        , strawberryIceCream
+        ]
+
+-}
 roleRadioGroup : String -> ElementSemantics
 roleRadioGroup label =
     RoleRadioGroup label
