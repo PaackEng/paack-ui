@@ -607,4 +607,4 @@ filterHeader renderConfig toExternalMsg selected (Column header { width }) filte
         , label = header
         , isOpen = selected == Just index
         }
-        |> cellSpace width
+        |> topCellSpace width
