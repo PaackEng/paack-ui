@@ -106,7 +106,7 @@ headerApplied : RenderConfig -> msg -> msg -> String -> String -> Element msg
 headerApplied renderConfig openMsg clearMsg clearHint label =
     -- Button.primary
     Element.row (Element.onIndividualClick openMsg :: headerAttrs True)
-        [ Element.text label
+        [ Element.text (label ++ " (1)")
         , Button.fromIcon (Icon.close clearHint)
             |> Button.cmd clearMsg Button.danger
             |> Button.withSize Size.ExtraSmall
@@ -144,6 +144,8 @@ headerAttrs isApplied =
             else
                 [ Background.color Palette.gray.lightest
                 , Font.color Palette.primary.darkest
+                , Element.mouseOver
+                    [ Background.color Palette.primary.lightest ]
                 ]
     in
     [ Primitives.roundedBorders size

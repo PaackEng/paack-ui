@@ -15,10 +15,8 @@ import Element.Border as Border
 import Element.Events as Events
 import UI.Icon as Icon
 import UI.Internal.Palette as Palette
-import UI.Internal.Size as Size
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
-import UI.Size as Size
 import UI.Text as Text
 import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element
@@ -84,7 +82,7 @@ radioSelected =
 radioCheck : RenderConfig -> Element msg
 radioCheck renderConfig =
     Icon.check "Selected"
-        |> Icon.withSize Size.small
+        |> Icon.withCustomSize 14
         |> Icon.withColor
             (Palette.color
                 Palette.tonePrimary
