@@ -1,4 +1,4 @@
-module UI.Checkbox exposing (checkbox, radioButton)
+module UI.Checkbox exposing (checkbox)
 
 {-|
 
@@ -8,7 +8,7 @@ module UI.Checkbox exposing (checkbox, radioButton)
 @docs checkbox, radioButton
 
 **NOTE**:
-We have plans for "checklists" and "radioGroups", but this won't be created until usecase appears.
+We have plans for "checklists", but this won't be created until usecase appears.
 
 -}
 
@@ -24,19 +24,6 @@ checkbox : RenderConfig -> (Bool -> msg) -> String -> Bool -> Element msg
 checkbox renderConfig message label state =
     Element.row [ Element.spacing 8 ]
         [ Button.toggle "Check"
-            message
-            state
-            |> Button.withSize Size.extraSmall
-            |> Button.renderElement renderConfig
-        , Text.caption label
-            |> Text.renderElement renderConfig
-        ]
-
-
-radioButton : RenderConfig -> (Bool -> msg) -> String -> Bool -> Element msg
-radioButton renderConfig message label state =
-    Element.row [ Element.spacing 8 ]
-        [ Button.toggle "Select"
             message
             state
             |> Button.withSize Size.extraSmall

@@ -8,7 +8,6 @@ import Element.Events as Events
 import Element.Font as Font
 import Html.Attributes as HtmlAttrs
 import UI.Button as Button
-import UI.Checkbox exposing (radioButton)
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (maybeNotThen)
 import UI.Internal.DateInput exposing (DateInput(..), PeriodComparison(..), PeriodDate, RangeDate, dateIfValid, dateToNumericString)
@@ -17,6 +16,7 @@ import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Size as Size exposing (Size)
 import UI.Palette as Palette
+import UI.RadioButton exposing (radioGroup)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
@@ -354,17 +354,8 @@ selectFilterRender renderConfig { fromFiltersMsg, index } list { current, applie
 
         selected =
             maybeNotThen applied current
-
-        single subIndex line =
-            radioButton
-                renderConfig
-                (always <| editMsg subIndex)
-                line
-                (selected == Just subIndex)
     in
-    list
-        |> List.indexedMap single
-        |> Element.column [ Element.spacing 8 ]
+    radioGroup renderConfig editMsg selected (List.indexedMap Tuple.pair list)
 
 
 singleDateFilterRender :
@@ -448,6 +439,12 @@ periodDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
 
         correctInput =
             dateInput applyMsg editDateMsg "DD/MM/YYYY" label current.date
+
+        options =
+            [ ( On, "On" )
+            , ( Before, "Before" )
+            , ( After, "After" )
+            ]
     in
     Element.column
         [ Element.width fill
@@ -456,21 +453,7 @@ periodDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
         [ current.date
             |> validDateField correctInput
             |> TextField.renderElement renderConfig
-        , radioButton
-            renderConfig
-            (always <| editComparisonMsg On)
-            "On"
-            (current.comparison == On)
-        , radioButton
-            renderConfig
-            (always <| editComparisonMsg Before)
-            "Before"
-            (current.comparison == Before)
-        , radioButton
-            renderConfig
-            (always <| editComparisonMsg After)
-            "After"
-            (current.comparison == After)
+        , radioGroup renderConfig editComparisonMsg (Just current.comparison) options
         ]
 
 
