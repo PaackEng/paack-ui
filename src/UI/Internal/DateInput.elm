@@ -1,5 +1,5 @@
-module UI.Internal.Human exposing
-    ( Date(..)
+module UI.Internal.DateInput exposing
+    ( DateInput(..)
     , PeriodComparison(..)
     , PeriodDate
     , RangeDate
@@ -23,10 +23,10 @@ type PeriodComparison
 
 
 type alias PeriodDate =
-    { date : Date, comparison : PeriodComparison }
+    { date : DateInput, comparison : PeriodComparison }
 
 
-type Date
+type DateInput
     = DateValid PrimitiveDate
     | DateInvalid String
 
@@ -36,7 +36,7 @@ type alias PrimitiveDate =
 
 
 type alias RangeDate =
-    { from : Date, to : Date }
+    { from : DateInput, to : DateInput }
 
 
 {-|
@@ -52,7 +52,7 @@ type alias RangeDate =
     This funciton doesn't validate impossible dates like 31/02/2020
 
 -}
-parseDate : String -> Date
+parseDate : String -> DateInput
 parseDate inputString =
     case String.split "/" inputString of
         [ dayStr, monthStr, yearStr ] ->
@@ -77,7 +77,7 @@ parseDate inputString =
             DateInvalid inputString
 
 
-dateToNumericString : Date -> String
+dateToNumericString : DateInput -> String
 dateToNumericString date =
     case date of
         DateInvalid string ->
@@ -91,7 +91,7 @@ dateToNumericString date =
                 ++ (year |> String.fromInt)
 
 
-posixToValidDate : Time.Zone -> Time.Posix -> Date
+posixToValidDate : Time.Zone -> Time.Posix -> DateInput
 posixToValidDate timeZone posix =
     DateValid
         { year = Time.toYear timeZone posix
@@ -100,7 +100,7 @@ posixToValidDate timeZone posix =
         }
 
 
-isPosixEqualDate : Date -> Time.Zone -> Time.Posix -> Bool
+isPosixEqualDate : DateInput -> Time.Zone -> Time.Posix -> Bool
 isPosixEqualDate date timeZone posix =
     case date of
         DateValid { year, month, day } ->
@@ -112,7 +112,7 @@ isPosixEqualDate date timeZone posix =
             False
 
 
-isPosixBetweenDates : Time.Zone -> Time.Posix -> Date -> Date -> Bool
+isPosixBetweenDates : Time.Zone -> Time.Posix -> DateInput -> DateInput -> Bool
 isPosixBetweenDates timeZone posix date1 date2 =
     case ( date1, date2 ) of
         ( DateValid s1, DateValid s2 ) ->
@@ -126,7 +126,7 @@ isPosixBetweenDates timeZone posix date1 date2 =
             False
 
 
-isPosixBeforeDate : Date -> Time.Zone -> Time.Posix -> Bool
+isPosixBeforeDate : DateInput -> Time.Zone -> Time.Posix -> Bool
 isPosixBeforeDate maybeDate timeZone posix =
     case maybeDate of
         DateValid date ->
@@ -138,7 +138,7 @@ isPosixBeforeDate maybeDate timeZone posix =
             False
 
 
-isPosixAfterDate : Date -> Time.Zone -> Time.Posix -> Bool
+isPosixAfterDate : DateInput -> Time.Zone -> Time.Posix -> Bool
 isPosixAfterDate maybeDate timeZone posix =
     case maybeDate of
         DateValid date ->
@@ -150,7 +150,7 @@ isPosixAfterDate maybeDate timeZone posix =
             False
 
 
-dateIfValid : a -> a -> Date -> a
+dateIfValid : a -> a -> DateInput -> a
 dateIfValid if_ then_ value =
     case value of
         DateValid _ ->

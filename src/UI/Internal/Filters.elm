@@ -4,7 +4,7 @@ import Array exposing (Array)
 import Task
 import Time exposing (Posix)
 import UI.Internal.Basics exposing (flip, maybeNotThen)
-import UI.Internal.Human exposing (..)
+import UI.Internal.DateInput exposing (..)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Utils.TypeNumbers as T
 
@@ -276,7 +276,7 @@ flexibleArray index newValue array =
 
 
 type alias SingleDateFilterConfig msg item =
-    FilterConfig msg Date item
+    FilterConfig msg DateInput item
 
 
 singleDateLocal :
@@ -303,7 +303,7 @@ singleDateLocal timeZone initValue getPosix accu =
 singleDateRemote :
     Time.Zone
     -> Maybe Posix
-    -> (Maybe Date -> msg)
+    -> (Maybe DateInput -> msg)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
 singleDateRemote timeZone initValue applyMsg accu =

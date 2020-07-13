@@ -7,7 +7,7 @@ import Tables.Model as Stories
 import Tables.Msg as Stories
 import Time exposing (millisToPosix)
 import UI.Internal.Basics exposing (maybeNotThen)
-import UI.Internal.Human exposing (dateToNumericString, posixToValidDate)
+import UI.Internal.DateInput exposing (dateToNumericString, posixToValidDate)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Tables.Common as Table exposing (..)
 import UI.Tables.Stateful as Stateful exposing (..)

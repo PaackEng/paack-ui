@@ -110,7 +110,7 @@ And on model:
 @docs localMultiTextFilter, remoteMultiTextFilter
 
 
-## Single Date
+## Single DateInput
 
 @docs localSingleDateFilter, remoteSingleDateFilter
 
@@ -144,9 +144,9 @@ And on model:
 import Element exposing (Element, shrink)
 import Time
 import UI.Internal.Basics exposing (flip)
+import UI.Internal.DateInput exposing (DateInput, PeriodComparison, PeriodDate, RangeDate)
 import UI.Internal.Filters as Filters
 import UI.Internal.FiltersHeaders as FiltersHeaders
-import UI.Internal.Human exposing (Date, PeriodComparison, PeriodDate, RangeDate)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Internal.Table exposing (..)
 import UI.Internal.TableView exposing (..)
@@ -366,7 +366,7 @@ localSingleDateFilter =
 remoteSingleDateFilter :
     Time.Zone
     -> Maybe Time.Posix
-    -> (Maybe Date -> msg)
+    -> (Maybe DateInput -> msg)
     -> Filters.Filters msg item columns
     -> Filters.Filters msg item (T.Increase columns)
 remoteSingleDateFilter =
