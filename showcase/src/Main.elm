@@ -14,6 +14,7 @@ import Model as Model exposing (Model)
 import Msg exposing (Msg(..))
 import Paginators.Stories as Paginators
 import Palette
+import Radio.Stories as Radio
 import Return as R
 import Sizes
 import Tables.Stories as Tables
@@ -75,6 +76,7 @@ main =
         , Paginators.stories renderConfig
         , Sizes.stories renderConfig
         , Checkboxes.stories renderConfig
+        , Radio.stories renderConfig
         ]
 
 
@@ -115,6 +117,12 @@ updateStories msg ({ customModel } as model) =
         CheckboxesStoriesMsg subMsg ->
             Checkboxes.update subMsg customModel.checkboxesStories
                 |> R.map (\t -> { customModel | checkboxesStories = t })
+                |> R.map (\newCustomModel -> { model | customModel = newCustomModel })
+                |> Tuple.mapSecond (always Cmd.none)
+
+        RadioStoriesMsg subMsg ->
+            Radio.update subMsg customModel.radioStories
+                |> R.map (\t -> { customModel | radioStories = t })
                 |> R.map (\newCustomModel -> { model | customModel = newCustomModel })
                 |> Tuple.mapSecond (always Cmd.none)
 
