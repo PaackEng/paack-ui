@@ -4,7 +4,7 @@ import Array exposing (Array)
 import Task
 import Time exposing (Posix)
 import UI.Internal.Basics exposing (flip, maybeNotThen)
-import UI.Internal.DateInput exposing (..)
+import UI.Internal.DateInput as DateInput exposing (DateInput(..), PeriodComparison(..), PeriodDate, RangeDate)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Utils.TypeNumbers as T
 
@@ -288,12 +288,12 @@ singleDateLocal :
 singleDateLocal timeZone initValue getPosix accu =
     let
         compare posix current =
-            isPosixEqualDate current timeZone posix
+            DateInput.isPosixEqual current timeZone posix
 
         applier item current =
             compare (getPosix item) current
     in
-    { editable = { applied = Maybe.map (posixToValidDate timeZone) initValue, current = Nothing }
+    { editable = { applied = Maybe.map (DateInput.fromPosix timeZone) initValue, current = Nothing }
     , strategy = strategyLocal applier
     }
         |> SingleDateFilter
@@ -307,7 +307,7 @@ singleDateRemote :
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
 singleDateRemote timeZone initValue applyMsg accu =
-    { editable = { applied = Maybe.map (posixToValidDate timeZone) initValue, current = Nothing }
+    { editable = { applied = Maybe.map (DateInput.fromPosix timeZone) initValue, current = Nothing }
     , strategy =
         strategyRemote
             { applyMsg = Just >> applyMsg
@@ -323,7 +323,7 @@ singleDateEdit column value model =
     case get column model of
         Just (SingleDateFilter config) ->
             config.editable
-                |> editableSetCurrent (parseDate value)
+                |> editableSetCurrent (DateInput.parseDD_MM_YYYY dateSeparator value)
                 |> configSetEditable config
                 |> SingleDateFilter
                 |> flip (set column) model
@@ -350,7 +350,7 @@ rangeDateLocal :
 rangeDateLocal timeZone fromInit toInit getPosix accu =
     let
         compare posix { from, to } =
-            isPosixBetweenDates timeZone posix from to
+            DateInput.isPosixBetween timeZone posix from to
 
         applier item current =
             compare (getPosix item) current
@@ -385,13 +385,13 @@ rangeDateInit : Time.Zone -> Maybe Posix -> Maybe Posix -> Maybe RangeDate
 rangeDateInit timeZone fromInit toInit =
     case ( fromInit, toInit ) of
         ( Just fromPosix, Just toPosix ) ->
-            Just { from = posixToValidDate timeZone fromPosix, to = posixToValidDate timeZone toPosix }
+            Just { from = DateInput.fromPosix timeZone fromPosix, to = DateInput.fromPosix timeZone toPosix }
 
         ( Just fromPosix, Nothing ) ->
-            Just { from = posixToValidDate timeZone fromPosix, to = DateInvalid "" }
+            Just { from = DateInput.fromPosix timeZone fromPosix, to = DateInvalid "" }
 
         ( Nothing, Just toPosix ) ->
-            Just { from = DateInvalid "", to = posixToValidDate timeZone toPosix }
+            Just { from = DateInvalid "", to = DateInput.fromPosix timeZone toPosix }
 
         ( Nothing, Nothing ) ->
             Nothing
@@ -404,7 +404,7 @@ rangeDateFromEdit column value model =
             config.editable
                 |> editableMapCurrent
                     (\maybeCurrent ->
-                        { from = parseDate value
+                        { from = DateInput.parseDD_MM_YYYY dateSeparator value
                         , to =
                             maybeCurrent
                                 |> Maybe.map .to
@@ -430,7 +430,7 @@ rangeDateToEdit column value model =
                             maybeCurrent
                                 |> Maybe.map .from
                                 |> Maybe.withDefault (DateInvalid "")
-                        , to = parseDate value
+                        , to = DateInput.parseDD_MM_YYYY dateSeparator value
                         }
                     )
                 |> configSetEditable config
@@ -453,10 +453,10 @@ periodDateInit : Time.Zone -> Maybe Posix -> Maybe PeriodComparison -> Maybe Per
 periodDateInit timeZone posixInit periodInit =
     case ( posixInit, periodInit ) of
         ( Just posix, Just period ) ->
-            Just { date = posixToValidDate timeZone posix, comparison = period }
+            Just { date = DateInput.fromPosix timeZone posix, comparison = period }
 
         ( Just posix, Nothing ) ->
-            Just { date = posixToValidDate timeZone posix, comparison = On }
+            Just { date = DateInput.fromPosix timeZone posix, comparison = On }
 
         ( Nothing, Just period ) ->
             Just { date = DateInvalid "", comparison = period }
@@ -477,13 +477,13 @@ periodDateLocal timeZone posixInit periodInit getPosix accu =
         compare posix { date, comparison } =
             case comparison of
                 On ->
-                    isPosixEqualDate date timeZone posix
+                    DateInput.isPosixEqual date timeZone posix
 
                 Before ->
-                    isPosixBeforeDate date timeZone posix
+                    DateInput.isPosixBefore date timeZone posix
 
                 After ->
-                    isPosixAfterDate date timeZone posix
+                    DateInput.isPosixAfter date timeZone posix
 
         applier item current =
             compare (getPosix item) current
@@ -521,7 +521,7 @@ periodDateEdit column value model =
             config.editable
                 |> editableMapCurrent
                     (\maybeCurrent ->
-                        { date = parseDate value
+                        { date = DateInput.parseDD_MM_YYYY dateSeparator value
                         , comparison =
                             maybeCurrent
                                 |> Maybe.map .comparison
@@ -872,3 +872,12 @@ filterGet filter =
 filtersReduce : (item -> Bool) -> (item -> Bool) -> (item -> Bool)
 filtersReduce new old =
     \item -> new item && old item
+
+
+
+-- Constant
+
+
+dateSeparator : String
+dateSeparator =
+    "/"

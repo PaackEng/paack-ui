@@ -7,7 +7,7 @@ import Tables.Model as Stories
 import Tables.Msg as Stories
 import Time exposing (millisToPosix)
 import UI.Internal.Basics exposing (maybeNotThen)
-import UI.Internal.DateInput exposing (dateToNumericString, posixToValidDate)
+import UI.Internal.DateInput as DateInput
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Tables.Common as Table exposing (..)
 import UI.Tables.Stateful as Stateful exposing (..)
@@ -66,8 +66,8 @@ demoTable renderConfig model =
                     { label = "Acquired"
                     , content =
                         acquired
-                            |> posixToValidDate Time.utc
-                            |> dateToNumericString
+                            |> DateInput.fromPosix Time.utc
+                            |> DateInput.toDD_MM_YYYY "/"
                             |> Text.body2
                             |> cellFromText
                     }
@@ -75,8 +75,8 @@ demoTable renderConfig model =
                     { label = "Read"
                     , content =
                         read
-                            |> posixToValidDate Time.utc
-                            |> dateToNumericString
+                            |> DateInput.fromPosix Time.utc
+                            |> DateInput.toDD_MM_YYYY "/"
                             |> Text.body2
                             |> cellFromText
                     }
@@ -189,5 +189,5 @@ toTableRow { author, title, year, acquired, read } =
         |> rowCellText (Text.body1 title)
         |> rowCellText (Text.body2 author)
         |> rowCellText (Text.caption year)
-        |> rowCellText (Text.caption <| dateToNumericString <| posixToValidDate Time.utc acquired)
-        |> rowCellText (Text.caption <| dateToNumericString <| posixToValidDate Time.utc read)
+        |> rowCellText (Text.caption <| DateInput.toDD_MM_YYYY "/" <| DateInput.fromPosix Time.utc acquired)
+        |> rowCellText (Text.caption <| DateInput.toDD_MM_YYYY "/" <| DateInput.fromPosix Time.utc read)

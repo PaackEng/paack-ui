@@ -65,6 +65,15 @@ cellSpace width =
     Element.el
         [ Element.width (widthToEl width)
         , Element.height (shrink |> minimum 1)
+        , Element.centerY
+        ]
+
+
+topCellSpace : Common.ColumnWidth -> Element msg -> Element msg
+topCellSpace width =
+    Element.el
+        [ Element.width (widthToEl width)
+        , Element.height (shrink |> minimum 1)
         , Element.alignTop
         ]
 

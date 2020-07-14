@@ -3,17 +3,19 @@ module UI.Internal.DateInput exposing
     , PeriodComparison(..)
     , PeriodDate
     , RangeDate
-    , dateIfValid
-    , dateToNumericString
-    , isPosixAfterDate
-    , isPosixBeforeDate
-    , isPosixBetweenDates
-    , isPosixEqualDate
-    , parseDate
-    , posixToValidDate
+    , fromPosix
+    , ifValid
+    , isPosixAfter
+    , isPosixBefore
+    , isPosixBetween
+    , isPosixEqual
+    , parseDD_MM_YYYY
+    , toDD_MM_YYYY
+    , toTextField
     )
 
 import Time
+import UI.TextField as TextField exposing (TextField)
 
 
 type PeriodComparison
@@ -52,9 +54,9 @@ type alias RangeDate =
     This funciton doesn't validate impossible dates like 31/02/2020
 
 -}
-parseDate : String -> DateInput
-parseDate inputString =
-    case String.split "/" inputString of
+parseDD_MM_YYYY : String -> String -> DateInput
+parseDD_MM_YYYY separator inputString =
+    case String.split separator inputString of
         [ dayStr, monthStr, yearStr ] ->
             case ( String.toInt dayStr, parseMonthNumber monthStr, String.toInt yearStr ) of
                 ( Just day, Just month, Just year ) ->
@@ -77,22 +79,22 @@ parseDate inputString =
             DateInvalid inputString
 
 
-dateToNumericString : DateInput -> String
-dateToNumericString date =
+toDD_MM_YYYY : String -> DateInput -> String
+toDD_MM_YYYY separator date =
     case date of
         DateInvalid string ->
             string
 
         DateValid { year, month, day } ->
             (day |> String.fromInt |> String.padLeft 2 '0')
-                ++ "/"
+                ++ separator
                 ++ (month |> monthToInt |> String.fromInt |> String.padLeft 2 '0')
-                ++ "/"
+                ++ separator
                 ++ (year |> String.fromInt)
 
 
-posixToValidDate : Time.Zone -> Time.Posix -> DateInput
-posixToValidDate timeZone posix =
+fromPosix : Time.Zone -> Time.Posix -> DateInput
+fromPosix timeZone posix =
     DateValid
         { year = Time.toYear timeZone posix
         , month = Time.toMonth timeZone posix
@@ -100,8 +102,8 @@ posixToValidDate timeZone posix =
         }
 
 
-isPosixEqualDate : DateInput -> Time.Zone -> Time.Posix -> Bool
-isPosixEqualDate date timeZone posix =
+isPosixEqual : DateInput -> Time.Zone -> Time.Posix -> Bool
+isPosixEqual date timeZone posix =
     case date of
         DateValid { year, month, day } ->
             (year == Time.toYear timeZone posix)
@@ -112,8 +114,8 @@ isPosixEqualDate date timeZone posix =
             False
 
 
-isPosixBetweenDates : Time.Zone -> Time.Posix -> DateInput -> DateInput -> Bool
-isPosixBetweenDates timeZone posix date1 date2 =
+isPosixBetween : Time.Zone -> Time.Posix -> DateInput -> DateInput -> Bool
+isPosixBetween timeZone posix date1 date2 =
     case ( date1, date2 ) of
         ( DateValid s1, DateValid s2 ) ->
             let
@@ -126,8 +128,8 @@ isPosixBetweenDates timeZone posix date1 date2 =
             False
 
 
-isPosixBeforeDate : DateInput -> Time.Zone -> Time.Posix -> Bool
-isPosixBeforeDate maybeDate timeZone posix =
+isPosixBefore : DateInput -> Time.Zone -> Time.Posix -> Bool
+isPosixBefore maybeDate timeZone posix =
     case maybeDate of
         DateValid date ->
             posix
@@ -138,8 +140,8 @@ isPosixBeforeDate maybeDate timeZone posix =
             False
 
 
-isPosixAfterDate : DateInput -> Time.Zone -> Time.Posix -> Bool
-isPosixAfterDate maybeDate timeZone posix =
+isPosixAfter : DateInput -> Time.Zone -> Time.Posix -> Bool
+isPosixAfter maybeDate timeZone posix =
     case maybeDate of
         DateValid date ->
             posix
@@ -150,14 +152,28 @@ isPosixAfterDate maybeDate timeZone posix =
             False
 
 
-dateIfValid : a -> a -> DateInput -> a
-dateIfValid if_ then_ value =
+ifValid : a -> a -> DateInput -> a
+ifValid if_ then_ value =
     case value of
         DateValid _ ->
             if_
 
         DateInvalid _ ->
             then_
+
+
+toTextField : String -> (String -> msg) -> String -> DateInput -> TextField msg
+toTextField separator editMsg label current =
+    let
+        correct =
+            current
+                |> toDD_MM_YYYY separator
+                |> TextField.singlelineText editMsg label
+
+        invalid =
+            TextField.withError "Invalid date format." correct
+    in
+    ifValid correct invalid current
 
 
 

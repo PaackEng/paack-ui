@@ -1,5 +1,6 @@
 module UI.Utils.ARIA exposing
-    ( ElementSemantics, roleButton, roleImage
+    ( ElementSemantics, roleButton, roleImage, rolePresentation, roleCheckbox
+    , roleRadioGroup, roleRadio
     , toElementAttributes
     )
 
@@ -8,7 +9,12 @@ module UI.Utils.ARIA exposing
 
 # Building
 
-@docs ElementSemantics, roleButton, roleImage
+@docs ElementSemantics, roleButton, roleImage, rolePresentation, roleCheckbox
+
+
+## Radio buttons
+
+@docs roleRadioGroup, roleRadio
 
 
 # Rendering
@@ -19,6 +25,7 @@ module UI.Utils.ARIA exposing
 
 import Element exposing (Attribute)
 import Html.Attributes as HtmlAttrs
+import UI.Internal.Basics exposing (ifThenElse)
 
 
 {-| Roles defines the type of UI element.
@@ -28,7 +35,11 @@ See [MDN article](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARI
 -}
 type ElementSemantics
     = RoleButton
+    | RoleCheckbox Bool
     | RoleImage String
+    | RolePresentation
+    | RoleRadio Bool
+    | RoleRadioGroup String
 
 
 {-| "The button role should be used for clickable elements that trigger a response when activated by the user." - MDN
@@ -43,6 +54,11 @@ roleButton =
     RoleButton
 
 
+roleCheckbox : Bool -> ElementSemantics
+roleCheckbox checked =
+    RoleCheckbox checked
+
+
 {-| "Can be used to identify multiple elements inside page content that should be considered as a single image." - MDN
 
     Element.el
@@ -53,6 +69,21 @@ roleButton =
 roleImage : String -> ElementSemantics
 roleImage label =
     RoleImage label
+
+
+rolePresentation : ElementSemantics
+rolePresentation =
+    RolePresentation
+
+
+roleRadio : Bool -> ElementSemantics
+roleRadio checked =
+    RoleRadio checked
+
+
+roleRadioGroup : String -> ElementSemantics
+roleRadioGroup label =
+    RoleRadioGroup label
 
 
 {-| Transform a [`ElementSemantics`](#ElementSemantics) in a list of [`Element.Attribute`](/packages/mdgriffith/elm-ui/latest/Element#Attribute).
@@ -66,8 +97,27 @@ toElementAttributes role =
             , expandedAttr "undefined"
             ]
 
+        RoleCheckbox checked ->
+            [ roleAttr "checkbox"
+            , checkedAttr checked
+            ]
+
         RoleImage label ->
             [ roleAttr "img"
+            , labelAttr label
+            ]
+
+        RolePresentation ->
+            [ roleAttr "presentation"
+            ]
+
+        RoleRadio checked ->
+            [ roleAttr "radio"
+            , checkedAttr checked
+            ]
+
+        RoleRadioGroup label ->
+            [ roleAttr "radiogroup"
             , labelAttr label
             ]
 
@@ -97,4 +147,12 @@ expandedAttr : String -> Attribute msg
 expandedAttr value =
     value
         |> HtmlAttrs.attribute "aria-expanded"
+        |> Element.htmlAttribute
+
+
+checkedAttr : Bool -> Attribute msg
+checkedAttr value =
+    "false"
+        |> ifThenElse value "true"
+        |> HtmlAttrs.attribute "aria-checked"
         |> Element.htmlAttribute

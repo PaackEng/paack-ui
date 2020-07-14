@@ -3,6 +3,7 @@ module Main exposing (main)
 import Alerts
 import Badges
 import Buttons.Stories as Buttons
+import Checkboxes.Stories as Checkboxes
 import Element exposing (Element)
 import Element.Font as Font
 import Html exposing (Html, i)
@@ -13,12 +14,12 @@ import Model as Model exposing (Model)
 import Msg exposing (Msg(..))
 import Paginators.Stories as Paginators
 import Palette
+import Radio.Stories as Radio
 import Return as R
 import Sizes
 import Tables.Stories as Tables
 import TextField
 import Texts
-import UI.Checkbox as Checkbox
 import UI.ListView
 import UI.NavigationContainer
 import UI.RenderConfig exposing (RenderConfig)
@@ -74,6 +75,8 @@ main =
         , Tables.stories renderConfig
         , Paginators.stories renderConfig
         , Sizes.stories renderConfig
+        , Checkboxes.stories renderConfig
+        , Radio.stories renderConfig
         ]
 
 
@@ -108,6 +111,18 @@ updateStories msg ({ customModel } as model) =
         TablesStoriesMsg subMsg ->
             Tables.update subMsg customModel.tablesStories
                 |> R.map (\t -> { customModel | tablesStories = t })
+                |> R.map (\newCustomModel -> { model | customModel = newCustomModel })
+                |> Tuple.mapSecond (always Cmd.none)
+
+        CheckboxesStoriesMsg subMsg ->
+            Checkboxes.update subMsg customModel.checkboxesStories
+                |> R.map (\t -> { customModel | checkboxesStories = t })
+                |> R.map (\newCustomModel -> { model | customModel = newCustomModel })
+                |> Tuple.mapSecond (always Cmd.none)
+
+        RadioStoriesMsg subMsg ->
+            Radio.update subMsg customModel.radioStories
+                |> R.map (\t -> { customModel | radioStories = t })
                 |> R.map (\newCustomModel -> { model | customModel = newCustomModel })
                 |> Tuple.mapSecond (always Cmd.none)
 
