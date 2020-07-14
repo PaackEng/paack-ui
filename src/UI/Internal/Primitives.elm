@@ -1,4 +1,4 @@
-module UI.Internal.Primitives exposing (defaultRoundedBorders, roundedBorders)
+module UI.Internal.Primitives exposing (..)
 
 import Element exposing (Attribute)
 import Element.Border as Border

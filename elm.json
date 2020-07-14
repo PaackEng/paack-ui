@@ -8,6 +8,7 @@
         "UI.Alert",
         "UI.Badge",
         "UI.Button",
+        "UI.Checkbox",
         "UI.Icon",
         "UI.Link",
         "UI.ListView",
@@ -15,6 +16,7 @@
         "UI.NavigationContainer",
         "UI.Paginator",
         "UI.Palette",
+        "UI.RadioButton",
         "UI.RenderConfig",
         "UI.Size",
         "UI.Tables.Common",
@@ -33,6 +35,7 @@
         "elm/html": "1.0.0 <= v < 2.0.0",
         "elm/json": "1.1.3 <= v < 2.0.0",
         "elm/svg": "1.0.1 <= v < 2.0.0",
+        "elm/time": "1.0.0 <= v < 2.0.0",
         "mdgriffith/elm-ui": "1.1.5 <= v < 2.0.0"
     },
     "test-dependencies": {

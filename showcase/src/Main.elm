@@ -18,6 +18,7 @@ import Sizes
 import Tables.Stories as Tables
 import TextField
 import Texts
+import UI.Checkbox as Checkbox
 import UI.ListView
 import UI.NavigationContainer
 import UI.RenderConfig exposing (RenderConfig)

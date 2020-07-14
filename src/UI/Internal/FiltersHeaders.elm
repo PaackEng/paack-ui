@@ -1,5 +1,6 @@
 module UI.Internal.FiltersHeaders exposing (Config, header)
 
+import Array exposing (Array)
 import Element exposing (Attribute, Element, fill, minimum, shrink)
 import Element.Background as Background
 import Element.Border as Border
@@ -8,15 +9,18 @@ import Element.Font as Font
 import Html.Attributes as HtmlAttrs
 import UI.Button as Button
 import UI.Icon as Icon
+import UI.Internal.Basics exposing (maybeNotThen)
+import UI.Internal.DateInput exposing (DateInput(..), PeriodComparison(..), PeriodDate, RangeDate, dateIfValid, dateToNumericString)
 import UI.Internal.Filters as Filters
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Size as Size exposing (Size)
 import UI.Palette as Palette
+import UI.RadioButton exposing (radioGroup)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
-import UI.TextField as TextField
+import UI.TextField as TextField exposing (TextField)
 import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element exposing (zeroPadding)
 
@@ -43,16 +47,31 @@ header renderConfig filter config =
 
         applyMsg =
             config.fromFiltersMsg <| Filters.Apply config.index
+
+        filterRender renderer editable =
+            renderer renderConfig applyMsg config editable
+                |> dialog renderConfig config filter clearMsg applyMsg
     in
     if config.isOpen then
         case filter of
             Filters.SingleTextFilter { editable } ->
-                singleTextFilterRender renderConfig applyMsg config editable
-                    |> dialog renderConfig config filter clearMsg applyMsg
+                filterRender singleTextFilterRender editable
 
-            _ ->
-                -- TODO
-                Element.none
+            Filters.MultiTextFilter { editable } ->
+                filterRender multiTextFilterRender editable
+
+            Filters.SingleDateFilter { editable } ->
+                filterRender singleDateFilterRender editable
+
+            Filters.RangeDateFilter { editable } ->
+                filterRender rangeDateFilterRender editable
+
+            Filters.PeriodDateFilter { editable } ->
+                filterRender periodDateFilterRender editable
+
+            Filters.SelectFilter list { editable } ->
+                selectFilterRender renderConfig config list editable
+                    |> dialog renderConfig config filter clearMsg applyMsg
 
     else if Filters.isApplied filter then
         headerApplied renderConfig
@@ -287,6 +306,172 @@ singleTextFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
     editable
         |> Filters.editableWithDefault ""
         |> TextField.singlelineText editMsg label
+        |> TextField.withSize Size.extraSmall
         |> TextField.withWidth TextField.widthFull
         |> TextField.withOnEnterPressed applyMsg
         |> TextField.renderElement renderConfig
+
+
+multiTextFilterRender :
+    RenderConfig
+    -> msg
+    -> Config msg
+    -> Filters.Editable (Array String)
+    -> Element msg
+multiTextFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } editableArr =
+    let
+        editMsg subIndex str =
+            fromFiltersMsg <| Filters.EditMultiText { column = index, field = subIndex, value = str }
+
+        single subIndex line =
+            line
+                |> TextField.singlelineText (editMsg subIndex) label
+                |> TextField.withSize Size.extraSmall
+                |> TextField.withWidth TextField.widthFull
+                |> TextField.withOnEnterPressed applyMsg
+                |> TextField.renderElement renderConfig
+
+        instanceArr =
+            Filters.editableWithDefault Array.empty editableArr
+    in
+    instanceArr
+        |> Array.push ""
+        |> Array.indexedMap single
+        |> Array.toList
+        |> Element.column [ Element.width fill, Element.spacing 8 ]
+
+
+selectFilterRender :
+    RenderConfig
+    -> Config msg
+    -> List String
+    -> Filters.Editable Int
+    -> Element msg
+selectFilterRender renderConfig { fromFiltersMsg, index } list { current, applied } =
+    let
+        editMsg subIndex =
+            fromFiltersMsg <| Filters.EditSelect { column = index, value = subIndex }
+
+        selected =
+            maybeNotThen applied current
+    in
+    radioGroup renderConfig editMsg selected (List.indexedMap Tuple.pair list)
+
+
+singleDateFilterRender :
+    RenderConfig
+    -> msg
+    -> Config msg
+    -> Filters.Editable DateInput
+    -> Element msg
+singleDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } editable =
+    let
+        editMsg str =
+            fromFiltersMsg <| Filters.EditSingleDate { column = index, value = str }
+
+        current =
+            editable
+                |> Filters.editableWithDefault (DateInvalid "")
+
+        correctInput =
+            dateInput applyMsg editMsg "DD/MM/YYYY" label current
+    in
+    current
+        |> validDateField correctInput
+        |> TextField.renderElement renderConfig
+
+
+rangeDateFilterRender :
+    RenderConfig
+    -> msg
+    -> Config msg
+    -> Filters.Editable RangeDate
+    -> Element msg
+rangeDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } editable =
+    let
+        editFromMsg str =
+            fromFiltersMsg <| Filters.EditRangeFromDate { column = index, value = str }
+
+        editToMsg str =
+            fromFiltersMsg <| Filters.EditRangeToDate { column = index, value = str }
+
+        current =
+            editable
+                |> Filters.editableWithDefault
+                    { from = DateInvalid "", to = DateInvalid "" }
+
+        correctFromInput =
+            dateInput applyMsg editFromMsg "From: DD/MM/YYYY" label current.from
+
+        correctToInput =
+            dateInput applyMsg editToMsg "To: DD/MM/YYYY" label current.to
+    in
+    Element.column
+        [ Element.width fill
+        , Element.spacing 8
+        ]
+        [ current.from
+            |> validDateField correctFromInput
+            |> TextField.renderElement renderConfig
+        , current.to
+            |> validDateField correctToInput
+            |> TextField.renderElement renderConfig
+        ]
+
+
+periodDateFilterRender :
+    RenderConfig
+    -> msg
+    -> Config msg
+    -> Filters.Editable PeriodDate
+    -> Element msg
+periodDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } editable =
+    let
+        editDateMsg str =
+            fromFiltersMsg <| Filters.EditPeriodDate { column = index, value = str }
+
+        editComparisonMsg value =
+            fromFiltersMsg <| Filters.EditPeriodComparison { column = index, value = value }
+
+        current =
+            editable
+                |> Filters.editableWithDefault { date = DateInvalid "", comparison = On }
+
+        correctInput =
+            dateInput applyMsg editDateMsg "DD/MM/YYYY" label current.date
+
+        options =
+            [ ( On, "On" )
+            , ( Before, "Before" )
+            , ( After, "After" )
+            ]
+    in
+    Element.column
+        [ Element.width fill
+        , Element.spacing 8
+        ]
+        [ current.date
+            |> validDateField correctInput
+            |> TextField.renderElement renderConfig
+        , radioGroup renderConfig editComparisonMsg (Just current.comparison) options
+        ]
+
+
+
+-- Internal
+
+
+dateInput : msg -> (String -> msg) -> String -> String -> DateInput -> TextField msg
+dateInput applyMsg editMsg placeholder label current =
+    current
+        |> dateToNumericString
+        |> TextField.singlelineText editMsg label
+        |> TextField.withPlaceholder placeholder
+        |> TextField.withSize Size.extraSmall
+        |> TextField.withWidth TextField.widthFull
+        |> TextField.withOnEnterPressed applyMsg
+
+
+validDateField : TextField msg -> DateInput -> TextField msg
+validDateField field date =
+    dateIfValid field (TextField.withError "Invalid date format." field) date

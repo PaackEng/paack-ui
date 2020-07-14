@@ -4,6 +4,11 @@ module UI.Tables.Stateful exposing
     , State, Msg, init, update
     , Filters, filtersEmpty, stateWithFilters
     , localSingleTextFilter, remoteSingleTextFilter
+    , localMultiTextFilter, remoteMultiTextFilter
+    , localSingleDateFilter, remoteSingleDateFilter
+    , localRangeDateFilter, remoteRangeDateFilter
+    , localPeriodDateFilter, remotePeriodDateFilter
+    , localSelectFilter, remoteSelectFilter
     , withWidth
     , renderElement
     )
@@ -100,6 +105,31 @@ And on model:
 @docs localSingleTextFilter, remoteSingleTextFilter
 
 
+## Multi Text
+
+@docs localMultiTextFilter, remoteMultiTextFilter
+
+
+## Single DateInput
+
+@docs localSingleDateFilter, remoteSingleDateFilter
+
+
+## Range Dates
+
+@docs localRangeDateFilter, remoteRangeDateFilter
+
+
+## Period Dates
+
+@docs localPeriodDateFilter, remotePeriodDateFilter
+
+
+## Select (Radio Buttons)
+
+@docs localSelectFilter, remoteSelectFilter
+
+
 # Width
 
 @docs withWidth
@@ -112,7 +142,9 @@ And on model:
 -}
 
 import Element exposing (Element, shrink)
+import Time
 import UI.Internal.Basics exposing (flip)
+import UI.Internal.DateInput exposing (DateInput, PeriodComparison, PeriodDate, RangeDate)
 import UI.Internal.Filters as Filters
 import UI.Internal.FiltersHeaders as FiltersHeaders
 import UI.Internal.NArray as NArray exposing (NArray)
@@ -303,6 +335,108 @@ remoteSingleTextFilter =
     Filters.singleTextRemote
 
 
+localMultiTextFilter :
+    List String
+    -> (item -> String)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+localMultiTextFilter =
+    Filters.multiTextLocal
+
+
+remoteMultiTextFilter :
+    List String
+    -> (List String -> msg)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+remoteMultiTextFilter =
+    Filters.multiTextRemote
+
+
+localSingleDateFilter :
+    Time.Zone
+    -> Maybe Time.Posix
+    -> (item -> Time.Posix)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+localSingleDateFilter =
+    Filters.singleDateLocal
+
+
+remoteSingleDateFilter :
+    Time.Zone
+    -> Maybe Time.Posix
+    -> (Maybe DateInput -> msg)
+    -> Filters.Filters msg item columns
+    -> Filters.Filters msg item (T.Increase columns)
+remoteSingleDateFilter =
+    Filters.singleDateRemote
+
+
+localRangeDateFilter :
+    Time.Zone
+    -> Maybe Time.Posix
+    -> Maybe Time.Posix
+    -> (item -> Time.Posix)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+localRangeDateFilter =
+    Filters.rangeDateLocal
+
+
+remoteRangeDateFilter :
+    Time.Zone
+    -> Maybe Time.Posix
+    -> Maybe Time.Posix
+    -> (Maybe RangeDate -> msg)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+remoteRangeDateFilter =
+    Filters.rangeDateRemote
+
+
+localPeriodDateFilter :
+    Time.Zone
+    -> Maybe Time.Posix
+    -> Maybe PeriodComparison
+    -> (item -> Time.Posix)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+localPeriodDateFilter =
+    Filters.periodDateLocal
+
+
+remotePeriodDateFilter :
+    Time.Zone
+    -> Maybe Time.Posix
+    -> Maybe PeriodComparison
+    -> (Maybe PeriodDate -> msg)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+remotePeriodDateFilter =
+    Filters.periodDateRemote
+
+
+localSelectFilter :
+    List String
+    -> Maybe Int
+    -> (item -> Int -> Bool)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+localSelectFilter =
+    Filters.selectLocal
+
+
+remoteSelectFilter :
+    List String
+    -> Maybe Int
+    -> (Maybe Int -> msg)
+    -> Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+remoteSelectFilter =
+    Filters.selectRemote
+
+
 
 -- Width
 
@@ -396,19 +530,17 @@ desktopView renderConfig prop opt =
                 State state_ ->
                     state_
 
-        filters =
+        items =
             case state.filters of
                 Just filtersArr ->
-                    NArray.toList filtersArr
+                    filtersArr
+                        |> NArray.toList
+                        |> List.filterMap Filters.filterGet
+                        |> List.foldl Filters.filtersReduce (always True)
+                        |> flip List.filter opt.items
 
                 Nothing ->
-                    []
-
-        items =
-            filters
-                |> List.filterMap Filters.filterGet
-                |> List.foldl Filters.filtersReduce (always True)
-                |> flip List.filter opt.items
+                    opt.items
 
         rows =
             List.map (rowRender renderConfig prop.toRow columns) items
@@ -416,11 +548,12 @@ desktopView renderConfig prop opt =
         padding =
             { top = 20, left = 20, right = 20, bottom = 0 }
 
-        length =
-            NArray.length prop.columns
-
         headers =
-            headersRender renderConfig prop.toExternalMsg state.filterDialog length filters columns
+            headersRender renderConfig
+                prop.toExternalMsg
+                state.filterDialog
+                state.filters
+                columns
     in
     Element.column
         [ Element.spacing 2
@@ -434,49 +567,44 @@ headersRender :
     RenderConfig
     -> (Msg -> msg)
     -> Maybe Int
-    -> Int
-    -> List (Filters.Filter msg item)
+    -> Maybe (Filters.Filters msg item columns)
     -> List Column
     -> Element msg
-headersRender renderConfig toExternalMsg selected length filters columns =
-    let
-        maybeFilters =
-            case filters of
-                [] ->
-                    List.repeat length Nothing
+headersRender renderConfig toExternalMsg selected filters columns =
+    Element.row headersAttr <|
+        case filters of
+            Just filterArr ->
+                filterArr
+                    |> NArray.toList
+                    |> List.map2 (filterHeader renderConfig toExternalMsg selected) columns
+                    |> List.indexedMap (\index val -> val index)
 
-                _ ->
-                    List.map Just filters
-    in
-    maybeFilters
-        |> List.map2 (headerRender renderConfig toExternalMsg selected) columns
-        |> List.indexedMap (\index val -> val index)
-        |> Element.row headersAttr
+            Nothing ->
+                List.map
+                    (\(Column header { width }) ->
+                        header
+                            |> simpleHeaderRender renderConfig
+                            |> cellSpace width
+                    )
+                    columns
 
 
-headerRender :
+filterHeader :
     RenderConfig
     -> (Msg -> msg)
     -> Maybe Int
     -> Column
-    -> Maybe (Filters.Filter msg item)
+    -> Filters.Filter msg item
     -> Int
     -> Element msg
-headerRender renderConfig toExternalMsg selected (Column header { width }) maybeFilter index =
-    cellSpace width <|
-        case maybeFilter of
-            Nothing ->
-                simpleHeaderRender renderConfig header
-
-            Just filter ->
-                let
-                    config =
-                        { openMsg = toExternalMsg <| FilterDialogOpen index
-                        , discardMsg = toExternalMsg <| FilterDialogClose
-                        , fromFiltersMsg = ForFilters >> toExternalMsg
-                        , index = index
-                        , label = header
-                        , isOpen = selected == Just index
-                        }
-                in
-                FiltersHeaders.header renderConfig filter config
+filterHeader renderConfig toExternalMsg selected (Column header { width }) filter index =
+    FiltersHeaders.header renderConfig
+        filter
+        { openMsg = toExternalMsg <| FilterDialogOpen index
+        , discardMsg = toExternalMsg <| FilterDialogClose
+        , fromFiltersMsg = ForFilters >> toExternalMsg
+        , index = index
+        , label = header
+        , isOpen = selected == Just index
+        }
+        |> cellSpace width
