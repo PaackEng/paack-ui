@@ -108,7 +108,7 @@ headerApplied renderConfig openMsg clearMsg clearHint label =
     Element.row (Element.onIndividualClick openMsg :: headerAttrs True)
         [ Element.text (label ++ " (1)")
         , Button.fromIcon (Icon.close clearHint)
-            |> Button.cmd clearMsg Button.danger
+            |> Button.cmd clearMsg Button.primary
             |> Button.withSize Size.ExtraSmall
             |> Button.renderElement renderConfig
             |> Element.el [ Element.alignRight ]
@@ -147,6 +147,7 @@ headerAttrs isApplied =
                 , Element.mouseOver
                     [ Background.color Palette.primary.lightest ]
                 ]
+                    ++ Element.colorTransition 100
     in
     [ Primitives.roundedBorders size
     , Element.width Element.fill

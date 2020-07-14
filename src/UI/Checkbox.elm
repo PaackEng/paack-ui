@@ -37,7 +37,7 @@ checkbox renderConfig message label state =
             , Events.onClick (message (not state))
             , Element.pointer
             ]
-                ++ (ARIA.toElementAttributes <| ARIA.roleButton)
+                ++ (ARIA.toElementAttributes <| ARIA.roleCheckbox state)
 
         boxIcon =
             if state then

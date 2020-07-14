@@ -1,5 +1,5 @@
 module UI.Utils.ARIA exposing
-    ( ElementSemantics, roleButton, roleImage, rolePresentation
+    ( ElementSemantics, roleButton, roleImage, rolePresentation, roleCheckbox
     , roleRadioGroup, roleRadio
     , toElementAttributes
     )
@@ -9,7 +9,7 @@ module UI.Utils.ARIA exposing
 
 # Building
 
-@docs ElementSemantics, roleButton, roleImage, rolePresentation
+@docs ElementSemantics, roleButton, roleImage, rolePresentation, roleCheckbox
 
 
 ## Radio buttons
@@ -35,10 +35,11 @@ See [MDN article](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARI
 -}
 type ElementSemantics
     = RoleButton
+    | RoleCheckbox Bool
     | RoleImage String
-    | RoleRadioGroup String
-    | RoleRadio Bool
     | RolePresentation
+    | RoleRadio Bool
+    | RoleRadioGroup String
 
 
 {-| "The button role should be used for clickable elements that trigger a response when activated by the user." - MDN
@@ -53,6 +54,11 @@ roleButton =
     RoleButton
 
 
+roleCheckbox : Bool -> ElementSemantics
+roleCheckbox checked =
+    RoleCheckbox checked
+
+
 {-| "Can be used to identify multiple elements inside page content that should be considered as a single image." - MDN
 
     Element.el
@@ -65,9 +71,9 @@ roleImage label =
     RoleImage label
 
 
-roleRadioGroup : String -> ElementSemantics
-roleRadioGroup label =
-    RoleRadioGroup label
+rolePresentation : ElementSemantics
+rolePresentation =
+    RolePresentation
 
 
 roleRadio : Bool -> ElementSemantics
@@ -75,9 +81,9 @@ roleRadio checked =
     RoleRadio checked
 
 
-rolePresentation : ElementSemantics
-rolePresentation =
-    RolePresentation
+roleRadioGroup : String -> ElementSemantics
+roleRadioGroup label =
+    RoleRadioGroup label
 
 
 {-| Transform a [`ElementSemantics`](#ElementSemantics) in a list of [`Element.Attribute`](/packages/mdgriffith/elm-ui/latest/Element#Attribute).
@@ -91,14 +97,18 @@ toElementAttributes role =
             , expandedAttr "undefined"
             ]
 
+        RoleCheckbox checked ->
+            [ roleAttr "checkbox"
+            , checkedAttr checked
+            ]
+
         RoleImage label ->
             [ roleAttr "img"
             , labelAttr label
             ]
 
-        RoleRadioGroup label ->
-            [ roleAttr "radiogroup"
-            , labelAttr label
+        RolePresentation ->
+            [ roleAttr "presentation"
             ]
 
         RoleRadio checked ->
@@ -106,8 +116,9 @@ toElementAttributes role =
             , checkedAttr checked
             ]
 
-        RolePresentation ->
-            [ roleAttr "presentation"
+        RoleRadioGroup label ->
+            [ roleAttr "radiogroup"
+            , labelAttr label
             ]
 
 
