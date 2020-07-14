@@ -54,6 +54,15 @@ roleButton =
     RoleButton
 
 
+{-| "The checkbox role is used for checkable interactive controls." -MDN
+
+    Element.row
+        (ARIA.toElementAttributes <| ARIA.roleCheckbox False)
+        [ notCheckedIcon
+        , Element.text "I accept the Terms of Service"
+        ]
+
+-}
 roleCheckbox : Bool -> ElementSemantics
 roleCheckbox checked =
     RoleCheckbox checked

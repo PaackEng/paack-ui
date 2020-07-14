@@ -10,7 +10,7 @@ module UI.Tables.Common exposing
 
 ## Desktop
 
-@docs Columns, Column, columnsEmpty, column
+@docs Columns, columnsEmpty, column
 
 
 ## Individual column
@@ -40,6 +40,12 @@ import UI.Utils.TypeNumbers as T
 -- Columns
 
 
+{-| Array with all the columns from a table.
+
+This is a type-safe sized-array.
+See [`TypeNumbers`](UI-Utils-TypeNumbers) for how to compose the phantom type.
+
+-}
 type alias Columns columns =
     NArray Column columns
 
@@ -50,11 +56,26 @@ type alias ColumnWidth =
     Internal.ColumnWidth
 
 
+{-| An empty set of columns.
+
+    columnsEmpty
+        |> column "Star" (columnWidthPortion 3)
+        |> column "Constellation" (columnWidthPortion 3)
+        |> column "Distance" (columnWidthPortion 2)
+
+-}
 columnsEmpty : Columns T.Zero
 columnsEmpty =
     NArray.empty
 
 
+{-| Appends a new column to the list of columns, defining its header's label and the entire column's width.
+
+    columnsEmpty
+        |> column "Name" (columnWidthPortion 3)
+        |> column "Age" (columnWidthPortion 1)
+
+-}
 column : String -> ColumnWidth -> Columns columns -> Columns (T.Increase columns)
 column header width accu =
     NArray.push (Column header { width = width }) accu
@@ -62,7 +83,7 @@ column header width accu =
 
 {-| Similar to [`Element.fillPortion`](/packages/mdgriffith/elm-ui/latest/Element#fillPortion) but applied to an entire Table's column.
 
-    columnEmpty
+    columnsEmpty
         |> column "Title" (columnWidthPortion 3)
         |> column "Author" (columnWidthPortion 3)
         |> column "Year" (columnWidthPortion 2)
@@ -76,9 +97,9 @@ columnWidthPortion value =
 {-| Similar to [`Element.px`](/packages/mdgriffith/elm-ui/latest/Element#px) but applied to an entire Table's column.
 
     columnEmpty
-        |> column "Title" (columnWidthPixels 320)
-        |> column "Author" (columnWidthPixels 320)
-        |> column "Year" (columnWidthPixels 240)
+        |> column "Name" (columnWidthPixels 320)
+        |> column "Length" (columnWidthPixels 240)
+        |> column "Population" (columnWidthPixels 240)
 
 -}
 columnWidthPixels : Int -> ColumnWidth
@@ -90,15 +111,30 @@ columnWidthPixels value =
 -- Cells
 
 
+{-| A singular cell of a table.
+Can hold texts and buttons by now.
+-}
 type alias Cell msg =
     Internal.Cell msg
 
 
+{-| Creates a cell with some text content.
+
+    cellFromText <| Text.body2 "Watermelon"
+
+-}
 cellFromText : Text -> Cell msg
 cellFromText text =
     CellText text
 
 
+{-| Creates a cell with a button inside.
+
+    Button.fromText "Delete"
+        |> Button.cmd Msg.Delete Button.danger
+        |> cellFromButton
+
+-}
 cellFromButton : Button msg -> Cell msg
 cellFromButton text =
     CellButton text
@@ -108,14 +144,29 @@ cellFromButton text =
 -- Desktop Rows
 
 
+{-| Array with all the cells in a single row.
+
+This is a type-safe sized-array.
+See [`TypeNumbers`](UI-Utils-TypeNumbers) for how to compose the phantom type.
+
+-}
 type alias Row msg columns =
     NArray (Cell msg) columns
 
 
+{-| Helper for composing a map function for a single row.
+-}
 type alias ToRow msg item columns =
     item -> Row msg columns
 
 
+{-| An empty set of cells for a row.
+
+    rowEmpty
+        |> rowCellText (Text.body1 "Hello")
+        |> rowCellText (Text.body2 "World")
+
+-}
 rowEmpty : Row msg T.Zero
 rowEmpty =
     NArray.empty
@@ -123,7 +174,11 @@ rowEmpty =
 
 {-| Transforms a `UI.Text` into a cell appending it to a row.
 
-TODO: Example
+Similar to [`cellFromText`](#cellFromText) but infused for rows.
+
+    rowEmpty
+        |> rowCellText (Text.body1 "Coffee")
+        |> rowCellText (Text.body2 "Brazil")
 
 -}
 rowCellText : Text -> Row msg columns -> Row msg (T.Increase columns)
@@ -133,7 +188,16 @@ rowCellText text accu =
 
 {-| Transforms a `UI.Button` into a cell appending it to a row.
 
-TODO: Example
+Similar to [`cellFromText`](#cellFromText) but infused for rows.
+
+    rowEmpty
+        |> rowCellText (Text.body1 "Aldebaran")
+        |> rowCellButton
+            ("See in Stellarium"
+                |> Button.fromText
+                |> Button.redirect "stellarium://gj/9159"
+                    Button.hyperlink
+            )
 
 -}
 rowCellButton : Button msg -> Row msg columns -> Row msg (T.Increase columns)

@@ -1,9 +1,6 @@
 module UI.Checkbox exposing (checkbox)
 
-{-|
-
-
-# Atomic Elements
+{-| Accessible and uniform-styled implementation of a checkbox.
 
 @docs checkbox
 
@@ -22,6 +19,14 @@ import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element
 
 
+{-| Atomic function that defines the component specifications and render to an Element.
+
+    Checkbox.checkbox renderConfig
+        Msg.SetRemember
+        "Never ask again"
+        model.rememberSelected
+
+-}
 checkbox : RenderConfig -> (Bool -> msg) -> String -> Bool -> Element msg
 checkbox renderConfig message label state =
     let

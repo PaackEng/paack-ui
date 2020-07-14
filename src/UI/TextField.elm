@@ -216,6 +216,17 @@ withWidth width (TextField prop opt) =
         { opt | width = width }
 
 
+{-| With `TextField.withSize`, you'll be able to scale the field between the [standard sizes][size].
+
+[size]: UI-Size
+
+The sizes (in height) are: Large - 60px; Medium - 48px; Small - 36px; Extra Small - 28px.
+
+    TextField.withSize Size.large someField
+
+**NOTE**: TextField's default size is [`Size.medium`](UI-Size#medium)
+
+-}
 withSize : Size -> TextField msg -> TextField msg
 withSize size (TextField prop opt) =
     TextField prop

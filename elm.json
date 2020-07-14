@@ -16,7 +16,7 @@
         "UI.NavigationContainer",
         "UI.Paginator",
         "UI.Palette",
-        "UI.RadioButton",
+        "UI.Radio",
         "UI.RenderConfig",
         "UI.Size",
         "UI.Tables.Common",
