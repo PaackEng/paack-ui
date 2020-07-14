@@ -16,7 +16,7 @@ import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Size as Size exposing (Size)
 import UI.Palette as Palette
-import UI.RadioButton exposing (radioGroup)
+import UI.Radio as Radio
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
@@ -349,7 +349,7 @@ selectFilterRender :
     -> Filters.Editable Int
     -> Element msg
 selectFilterRender renderConfig { fromFiltersMsg, index } list { current, applied } =
-    radioGroup renderConfig
+    Radio.group renderConfig
         "Select option for filtering"
         (\subIndex -> fromFiltersMsg <| Filters.EditSelect { column = index, value = subIndex })
         (maybeNotThen applied current)
@@ -436,7 +436,7 @@ periodDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
         [ current.date
             |> dateInput applyMsg editDateMsg "DD/MM/YYYY" label
             |> TextField.renderElement renderConfig
-        , radioGroup renderConfig
+        , Radio.group renderConfig
             "Select period reference"
             editComparisonMsg
             (Just current.comparison)

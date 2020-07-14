@@ -1,11 +1,11 @@
-module UI.RadioButton exposing (radioGroup)
+module UI.Radio exposing (group)
 
 {-|
 
 
 # Grouped Elements
 
-@docs radioGroup
+@docs group
 
 -}
 
@@ -22,8 +22,8 @@ import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element
 
 
-radioGroup : RenderConfig -> String -> (a -> msg) -> Maybe a -> List ( a, String ) -> Element msg
-radioGroup renderConfig label message selected buttons =
+group : RenderConfig -> String -> (a -> msg) -> Maybe a -> List ( a, String ) -> Element msg
+group renderConfig label message selected buttons =
     buttons
         |> List.map
             (\( id, buttonLabel ) ->
