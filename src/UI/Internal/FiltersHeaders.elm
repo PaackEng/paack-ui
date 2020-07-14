@@ -106,7 +106,7 @@ headerApplied : RenderConfig -> msg -> msg -> String -> String -> Element msg
 headerApplied renderConfig openMsg clearMsg clearHint label =
     -- Button.primary
     Element.row (Element.onIndividualClick openMsg :: headerAttrs True)
-        [ Element.text (label ++ " (1)")
+        [ Element.text label
         , Button.fromIcon (Icon.close clearHint)
             |> Button.cmd clearMsg Button.primary
             |> Button.withSize Size.ExtraSmall
