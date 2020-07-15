@@ -171,6 +171,12 @@ type StatefulTable msg item columns
 This is record that constrains type-safe sized-arrays.
 See [`TypeNumbers`](UI-Utils-TypeNumbers) for how to compose its phantom type.
 
+    { toExternalMsg = Msg.ForTable
+    , columns = Book.tableColumns
+    , toRow = Book.toTableRow
+    , state = model.tableState
+    }
+
 -}
 type alias StatefulConfig msg item columns =
     { columns : Columns columns
@@ -188,10 +194,13 @@ type alias Options msg item columns =
 
 
 {-| Constructs a stateful table from its columns and rows.
+Also defines the handling function for messages, and the current table's state.
 
     table
         { columns = Book.tableColumns
         , toRow = Book.toTableRow
+        , toExternalMsg = Msg.ForTable
+        , state = model.tableState
         }
 
 -}
@@ -208,6 +217,18 @@ defaultOptions =
     }
 
 
+{-| Each of these items will become a row in this table.
+
+    withItems
+        [ Book "Dan Brown" "Angels & Demons" "2000"
+        , Book "Dan Brown" "The Da Vinci Code" "2003"
+        , Book "Dan Brown" "The Lost Symbol" "2009"
+        , Book "Dan Brown" "Inferno" "2013"
+        , Book "Dan Brown" "Origin" "2017"
+        ]
+        someTable
+
+-}
 withItems : List item -> StatefulTable msg item columns -> StatefulTable msg item columns
 withItems items (Table prop opt) =
     Table prop { opt | items = items }
@@ -217,6 +238,8 @@ withItems items (Table prop opt) =
 -- State
 
 
+{-| The `Stateful.Msg` handles stateful table's related messages.
+-}
 type Msg
     = MobileToggle Int
     | ForFilters Filters.Msg
@@ -224,6 +247,8 @@ type Msg
     | FilterDialogClose
 
 
+{-| Keep this one in your Model, it holds the table's current state.
+-}
 type State msg item columns
     = State (StateModel msg item columns)
 
@@ -235,11 +260,26 @@ type alias StateModel msg item columns =
     }
 
 
+{-| The correct way of instantiating a [`Table.State`](#State).
+
+    { -- ...
+    , tableState = Stateful.init
+    -- ...
+    }
+
+-}
 init : State msg item columns
 init =
     State { filters = Nothing, mobileSelected = Nothing, filterDialog = Nothing }
 
 
+{-| Given a message, apply an update to the [`Table.State`](#State).
+Do not ignore the returned `Cmd`, it may include remote filter's messages.
+
+    ( newModel, newCmd ) =
+        Table.update subMsg oldModel.tableState
+
+-}
 update : Msg -> State msg item columns -> ( State msg item columns, Cmd msg )
 update msg ((State state) as model) =
     case msg of
@@ -279,39 +319,99 @@ update msg ((State state) as model) =
 -- Responsive
 
 
+{-| Required information for displaying the mobile's layout.
+
+This is record that constrains type-safe sized-arrays.
+See [`TypeNumbers`](UI-Utils-TypeNumbers) for how to compose its phantom type.
+
+    { toDetails = Book.toTableDetails
+    , toCover = Book.toTableCover
+    }
+
+-}
 type alias Responsive msg item columns =
     { toDetails : item -> Details msg columns
     , toCover : item -> Cover
     }
 
 
+{-| What is displayed in a collapsed mobile's row.
+
+    { title = "Foo Fighters - Everlong"
+    , caption = Just "Morumbi - São Paulo 2015-01-23"
+    }
+
+-}
 type alias Cover =
     ListView.ToggleableCover
 
 
+{-| Used to render a cell in the mobile's layout.
+-}
 type alias Detail msg =
     { label : String, content : Common.Cell msg }
 
 
+{-| A set of [`Detail msg`](#Detail).
+Must have the same amount of elements as cells do in the table's row.
+-}
 type alias Details msg columns =
     NArray (Maybe (Detail msg)) columns
 
 
+{-| Allows a table to have a responsive layout when on mobile.
+
+    withResponsive
+        { toDetails = Book.toTableDetails
+        , toCover = Book.toTableCover
+        }
+        someTable
+
+-}
 withResponsive : Responsive msg item columns -> StatefulTable msg item columns -> StatefulTable msg item columns
 withResponsive responsive (Table prop opt) =
     Table prop { opt | responsive = Just responsive }
 
 
+{-| An empty [`Details`](#Details) set.
+
+    toTableDetails { author, title } =
+        detailsEmpty
+            |> detailHidden
+            |> detailShown
+                { label = "Author"
+                , content = cellFromText (Text.body2 author)
+                }
+            |> detailHidden
+
+-}
 detailsEmpty : Details msg T.Zero
 detailsEmpty =
     NArray.empty
 
 
+{-| Defines that a cell will be shown in the mobile's layout.
+
+    detailShown
+        { label = "Edit"
+        , content = cellFromButton editButton
+        }
+        detailsSet
+
+-}
 detailShown : Detail msg -> Details msg columns -> Details msg (T.Increase columns)
 detailShown detail accu =
     NArray.push (Just detail) accu
 
 
+{-| Defines that a cell will be hidden in the mobile's layout.
+
+    detailsEmpty
+        |> detailHidden
+        |> detailHidden
+        |> detailHidden
+
+-}
 detailHidden : Details msg columns -> Details msg (T.Increase columns)
 detailHidden accu =
     NArray.push Nothing accu
@@ -321,15 +421,36 @@ detailHidden accu =
 -- Filters
 
 
+{-| Array with all the columns' filters and their initial state.
+
+This is a type-safe sized-array.
+See [`TypeNumbers`](UI-Utils-TypeNumbers) for how to compose its phantom type.
+
+-}
 type alias Filters msg item columns =
     Filters.Filters msg item columns
 
 
+{-| Apply filters defintion to a table's [`State`](#State).
+
+    model =
+        stateWithFilters Book.filtersInit init
+
+-}
 stateWithFilters : Filters msg item columns -> State msg item columns -> State msg item columns
 stateWithFilters filters (State state) =
     State { state | filters = Just filters }
 
 
+{-| An empty [`Filters`](#Filters) set.
+
+    toTableDetails { author, title } =
+        filtersEmpty
+            |> localSingleTextFilter Nothing .title
+            |> localSingleTextFilter (Just "Dan") .author
+            |> localSingleTextFilter Nothing .year
+
+-}
 filtersEmpty : Filters msg item T.Zero
 filtersEmpty =
     Filters.empty

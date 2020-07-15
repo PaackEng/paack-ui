@@ -56,7 +56,7 @@ type alias ColumnWidth =
     Internal.ColumnWidth
 
 
-{-| An empty set of columns.
+{-| An empty [`Columns`](#Columns) set.
 
     columnsEmpty
         |> column "Star" (columnWidthPortion 3)

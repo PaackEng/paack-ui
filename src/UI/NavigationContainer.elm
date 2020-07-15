@@ -11,8 +11,8 @@ module UI.NavigationContainer exposing
 {-| The `UI.NavigationContainer` (abbreviated as `Nav`) is a page presenter.
 Depending on the situation, it applies the sidebar menu, dialogs, and mobile's navbar over the current page.
 
-For this, a page must provide some required data through the [`Nav.Container`](UI-NavigationContainer#Container) record.
-That aggregated with the current rendering configuration provided by [`UI.RenderConfig`](UI-RenderConfig#RenderConfig) and the [`Nav.State`](UI-NavigationContainer#State), multiplex between possible viewing layouts.
+For this, a page must provide some required data through the [`Nav.Container`](#Container) record.
+That aggregated with the current rendering configuration provided by [`UI.RenderConfig`](UI-RenderConfig#RenderConfig) and the [`Nav.State`](#State), multiplex between possible viewing layouts.
 
 Example of usage:
 
@@ -97,13 +97,13 @@ import UI.Utils.Element as Element
 -- Expose
 
 
-{-| This record must be generated with [`Nav.menuPage`](UI-NavigationContainer#menuPage)
+{-| This record must be generated with [`Nav.menuPage`](#menuPage)
 -}
 type MenuPage
     = MenuPage Menu.Page
 
 
-{-| This record must be generated with [`Nav.menuAction`](UI-NavigationContainer#menuAction)
+{-| This record must be generated with [`Nav.menuAction`](#menuAction)
 -}
 type MenuAction msg
     = MenuAction (Menu.Action msg)
@@ -142,7 +142,7 @@ type Content msg
 
 
 {-| The `Nav.Dialog msg` is a record holding the description of a dialog.
-See [`Nav.dialog`](UI-NavigationContainer#dialog) to see how to create a dialog.
+See [`Nav.dialog`](#dialog) to see how to create a dialog.
 -}
 type Dialog msg
     = Dialog (Dialog.Dialog msg)
@@ -174,7 +174,7 @@ type alias Container msg =
 
 
 {-| The `Nav.Navigator` handles menu, dialogs and page viewing.
-It must be initialized using [`Nav.navigator`](UI-NavigationContainer#navigator).
+It must be initialized using [`Nav.navigator`](#navigator).
 -}
 type Navigator page msg
     = Navigator (NavigatorRecord page msg)
@@ -313,7 +313,7 @@ contentMap applier data =
                     }
 
 
-{-| Given a message, apply an update to the [`Nav.State`](UI-NavigationContainer#State).
+{-| Given a message, apply an update to the [`Nav.State`](#State).
 -}
 stateUpdate : Msg -> State -> ( State, Cmd Msg )
 stateUpdate msg (State state) =
@@ -326,7 +326,7 @@ stateUpdate msg (State state) =
 -- Constructors
 
 
-{-| The correct way of instantiating a [`Nav.State`](UI-NavigationContainer#State).
+{-| The correct way of instantiating a [`Nav.State`](#State).
 
     Nav.stateInit renderConfig
 
@@ -368,7 +368,7 @@ contentStackChild prop body =
     ContentStackChild prop body
 
 
-{-| `Nav.menuPage` describes a page to [`Nav.withMenuPages`](UI-NavigationContainer#withMenuPages).
+{-| `Nav.menuPage` describes a page to [`Nav.withMenuPages`](#withMenuPages).
 
     Nav.menuPage (Icon.edit "Edit cards")
         (Link.link "/edit-cards")
@@ -380,7 +380,7 @@ menuPage icon link isCurrent =
     MenuPage <| Menu.Page icon link isCurrent
 
 
-{-| `Nav.menuPage` describes an action to [`Nav.withMenuActions`](UI-NavigationContainer#withMenuActions).
+{-| `Nav.menuPage` describes an action to [`Nav.withMenuActions`](#withMenuActions).
 
     Nav.menuAction
         (Icon.logout "Logout")
@@ -394,9 +394,9 @@ menuAction icon msg =
 
 {-| `Nav.navigator` holds the minimum amount of information required for all the features (menu, dialogs, and page's layout) to work.
 
-The first parameter is a function that should transform [`Nav.Msg`](UI-NavigationContainer#Msg) in a message type controlled by the user.
+The first parameter is a function that should transform [`Nav.Msg`](#Msg) in a message type controlled by the user.
 
-The second is the current [`Nav.State`](UI-NavigationContainer#State), do not initialize this on view, hold it on the app's model, and then pass it to this function.
+The second is the current [`Nav.State`](#State), do not initialize this on view, hold it on the app's model, and then pass it to this function.
 
 The third (and last) parameter is a lambda used to obtain the current page's container.
 
@@ -423,7 +423,7 @@ navigator applier (State state) pagesContainers =
             (menu applier state)
 
 
-{-| `Nav.dialog` constructs a [`Nav.Dialog`](UI-NavigationContainer#Dialog) from a title, a close message, and the dialog's view.
+{-| `Nav.dialog` constructs a [`Nav.Dialog`](#Dialog) from a title, a close message, and the dialog's view.
 Note that the title renders inside the dialog's decoration, with a close button on the opposite side.
 
 This dialog and its decoration render over the current page's view, adding a transparent black layer between them.
