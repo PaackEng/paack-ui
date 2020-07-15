@@ -157,11 +157,21 @@ import UI.Utils.TypeNumbers as T
 
 
 {-| The `StatefulTable msg item columns` type is used for describing the component for later rendering.
+
+This is type that constrains type-safe sized-arrays.
+See [`TypeNumbers`](UI-Utils-TypeNumbers) for how to compose its phantom type.
+
 -}
 type StatefulTable msg item columns
     = Table (StatefulConfig msg item columns) (Options msg item columns)
 
 
+{-| Record with parameters for the creation of a [`StatefulTable`](#table).
+
+This is record that constrains type-safe sized-arrays.
+See [`TypeNumbers`](UI-Utils-TypeNumbers) for how to compose its phantom type.
+
+-}
 type alias StatefulConfig msg item columns =
     { columns : Columns columns
     , toRow : ToRow msg item columns
@@ -177,6 +187,14 @@ type alias Options msg item columns =
     }
 
 
+{-| Constructs a stateful table from its columns and rows.
+
+    table
+        { columns = Book.tableColumns
+        , toRow = Book.toTableRow
+        }
+
+-}
 table : StatefulConfig msg item columns -> StatefulTable msg item columns
 table config =
     Table config defaultOptions

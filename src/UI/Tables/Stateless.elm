@@ -65,11 +65,21 @@ import UI.Tables.Common exposing (..)
 
 
 {-| The `StatelessTable msg item columns` type is used for describing the component for later rendering.
+
+This is type that constrains type-safe sized-arrays.
+See [`TypeNumbers`](UI-Utils-TypeNumbers) for how to compose its phantom type.
+
 -}
 type StatelessTable msg item columns
     = Table (StatelessConfig msg item columns) (Options item)
 
 
+{-| Record with parameters for the creation of a [`StatelessTable`](#table).
+
+This is record that constrains type-safe sized-arrays.
+See [`TypeNumbers`](UI-Utils-TypeNumbers) for how to compose its phantom type.
+
+-}
 type alias StatelessConfig msg item columns =
     { columns : Columns columns
     , toRow : ToRow msg item columns
@@ -82,6 +92,14 @@ type alias Options item =
     }
 
 
+{-| Constructs a stateless table from its columns and rows.
+
+    table
+        { columns = Book.tableColumns
+        , toRow = Book.toTableRow
+        }
+
+-}
 table : StatelessConfig msg item columns -> StatelessTable msg item columns
 table config =
     Table config defaultOptions
@@ -94,6 +112,18 @@ defaultOptions =
     }
 
 
+{-| Each of these items will become a row in this table.
+
+    withItems
+        [ Book "Dan Brown" "Angels & Demons" "2000"
+        , Book "Dan Brown" "The Da Vinci Code" "2003"
+        , Book "Dan Brown" "The Lost Symbol" "2009"
+        , Book "Dan Brown" "Inferno" "2013"
+        , Book "Dan Brown" "Origin" "2017"
+        ]
+        someTable
+
+-}
 withItems : List item -> StatelessTable msg item columns -> StatelessTable msg item columns
 withItems items (Table prop opt) =
     Table prop { opt | items = items }

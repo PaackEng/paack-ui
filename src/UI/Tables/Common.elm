@@ -43,7 +43,7 @@ import UI.Utils.TypeNumbers as T
 {-| Array with all the columns from a table.
 
 This is a type-safe sized-array.
-See [`TypeNumbers`](UI-Utils-TypeNumbers) for how to compose the phantom type.
+See [`TypeNumbers`](UI-Utils-TypeNumbers) for how to compose its phantom type.
 
 -}
 type alias Columns columns =
@@ -188,7 +188,7 @@ rowCellText text accu =
 
 {-| Transforms a `UI.Button` into a cell appending it to a row.
 
-Similar to [`cellFromText`](#cellFromText) but infused for rows.
+Similar to [`cellFromButton`](#cellFromButton) but infused for rows.
 
     rowEmpty
         |> rowCellText (Text.body1 "Aldebaran")
