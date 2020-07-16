@@ -9,6 +9,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          persist-credentials: false
 
       - name: Setup Node
         uses: actions/setup-node@v1
@@ -21,7 +23,7 @@ jobs:
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@3.5.7
         with:
-          ACCESS_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages
           FOLDER: dist
 
