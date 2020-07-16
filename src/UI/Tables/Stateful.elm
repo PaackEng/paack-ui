@@ -7,7 +7,7 @@ module UI.Tables.Stateful exposing
     , localMultiTextFilter, remoteMultiTextFilter
     , localSingleDateFilter, remoteSingleDateFilter
     , localRangeDateFilter, remoteRangeDateFilter
-    , localPeriodDateFilter, remotePeriodDateFilter
+    , periodSingle, pariodAfter, periodBefore, localPeriodDateFilter, remotePeriodDateFilter
     , localSelectFilter, remoteSelectFilter
     , withWidth
     , renderElement
@@ -122,7 +122,7 @@ And on model:
 
 ## Period Dates
 
-@docs localPeriodDateFilter, remotePeriodDateFilter
+@docs periodSingle, pariodAfter, periodBefore, localPeriodDateFilter, remotePeriodDateFilter
 
 
 ## Select (Radio Buttons)
@@ -144,7 +144,7 @@ And on model:
 import Element exposing (Element, shrink)
 import Time
 import UI.Internal.Basics exposing (flip)
-import UI.Internal.DateInput exposing (DateInput, PeriodComparison, PeriodDate, RangeDate)
+import UI.Internal.DateInput as DateInput exposing (DateInput, PeriodDate, RangeDate)
 import UI.Internal.Filters as Filters
 import UI.Internal.FiltersHeaders as FiltersHeaders
 import UI.Internal.NArray as NArray exposing (NArray)
@@ -421,6 +421,10 @@ detailHidden accu =
 -- Filters
 
 
+type alias PeriodComparison =
+    DateInput.PeriodComparison
+
+
 {-| Array with all the columns' filters and their initial state.
 
 This is a type-safe sized-array.
@@ -456,6 +460,15 @@ filtersEmpty =
     Filters.empty
 
 
+{-| A filter with one single text field.
+Only part of the content must match the filter's input.
+Filtering logic is applied internally by the component.
+
+    localSingleTextFilter
+        maybeInitialValue
+        mapItemToString
+
+-}
 localSingleTextFilter :
     Maybe String
     -> (item -> String)
@@ -465,6 +478,16 @@ localSingleTextFilter =
     Filters.singleTextLocal
 
 
+{-| A filter with one single text field.
+Only part of the content must match the filter's input.
+Filtering logic is applied through an external message.
+When `Nothing` is applied to the message, it means to clear the current filter.
+
+    remoteSingleTextFilter
+        maybeInitialValue
+        Msg.ApplyFilter
+
+-}
 remoteSingleTextFilter :
     Maybe String
     -> (Maybe String -> msg)
@@ -474,6 +497,22 @@ remoteSingleTextFilter =
     Filters.singleTextRemote
 
 
+{-| A filter with multiple text field.
+The content must match at least one of those fields otherwise it's filtered out.
+Only part of the content must match the filter's input.
+Filtering logic is applied internally by the component.
+
+    localMultiTextFilter
+        []
+        mapItemToString
+
+For having an initial filter applied:
+
+    localMultiTextFilter
+        [ "initial", "fields" ]
+        mapItemToString
+
+-}
 localMultiTextFilter :
     List String
     -> (item -> String)
@@ -483,6 +522,18 @@ localMultiTextFilter =
     Filters.multiTextLocal
 
 
+{-| A filter with multiple text field.
+The content must match at least one of those fields otherwise it's filtered out.
+Only part of the content must match the filter's input.
+
+Filtering logic is applied through an external message.
+When an empty list is applied to the message, it means to clear the current filter.
+
+    remoteMultiTextFilter
+        [ "initial", "fields" ]
+        Msg.ApplyFilter
+
+-}
 remoteMultiTextFilter :
     List String
     -> (List String -> msg)
@@ -492,6 +543,14 @@ remoteMultiTextFilter =
     Filters.multiTextRemote
 
 
+{-| A filter for dates with one single field.
+Filtering logic is applied internally by the component.
+
+    localSingleDateFilter timeZone
+        (Just somePosixEpoch)
+        mapItemToPosixEpoch
+
+-}
 localSingleDateFilter :
     Time.Zone
     -> Maybe Time.Posix
@@ -502,6 +561,15 @@ localSingleDateFilter =
     Filters.singleDateLocal
 
 
+{-| A filter for dates with one single field.
+Filtering logic is applied through an external message.
+When `Nothing` is applied to the message, it means to clear the current filter.
+
+    remoteSingleDateFilter
+        maybeInitialPosix
+        Msg.ApplyFilter
+
+-}
 remoteSingleDateFilter :
     Time.Zone
     -> Maybe Time.Posix
@@ -512,6 +580,18 @@ remoteSingleDateFilter =
     Filters.singleDateRemote
 
 
+{-| A filter for dates in an expected range.
+The range is defined using two date fields.
+Filtering logic is applied internally by the component.
+
+    localRangeDateFilter timeZone
+        (Just datesAfterThis)
+        (Just datesBeforeThis)
+        mapItemToPosixEpoch
+
+**NOTE**: Hours, minutes and seconds are discarded from the range limits.
+
+-}
 localRangeDateFilter :
     Time.Zone
     -> Maybe Time.Posix
@@ -523,6 +603,20 @@ localRangeDateFilter =
     Filters.rangeDateLocal
 
 
+{-| A filter for dates in an expected range.
+The range is defined using two date fields.
+
+Filtering logic is applied through an external message.
+When `Nothing` is applied to the message, it means to clear the current filter.
+
+    remoteRangeDateFilter timeZone
+        (Just datesAfterThis)
+        (Just datesBeforeThis)
+        Msg.ApplyFilter
+
+**NOTE**: Hours, minutes and seconds are discarded from the range limits.
+
+-}
 remoteRangeDateFilter :
     Time.Zone
     -> Maybe Time.Posix
@@ -534,6 +628,18 @@ remoteRangeDateFilter =
     Filters.rangeDateRemote
 
 
+{-| A filter for a single date, dates before specified date, or dates after specified date.
+The filter-case is defined using radio buttons.
+Filtering logic is applied internally by the component.
+
+    localPeriodDateFilter timeZone
+        (Just somePosixEpoch)
+        (Just periodAfter)
+        mapItemToPosixEpoch
+
+**NOTE**: Hours, minutes and seconds are discarded from the range limits.
+
+-}
 localPeriodDateFilter :
     Time.Zone
     -> Maybe Time.Posix
@@ -545,6 +651,20 @@ localPeriodDateFilter =
     Filters.periodDateLocal
 
 
+{-| A filter for a single date, dates before specified date, or dates after specified date.
+The filter-case is defined using radio buttons.
+
+Filtering logic is applied through an external message.
+When `Nothing` is applied to the message, it means to clear the current filter.
+
+    remotePeriodDateFilter timeZone
+        (Just somePosixEpoch)
+        (Just periodAfter)
+        Msg.ApplyFilter
+
+**NOTE**: Hours, minutes and seconds are discarded from the range limits.
+
+-}
 remotePeriodDateFilter :
     Time.Zone
     -> Maybe Time.Posix
@@ -556,6 +676,17 @@ remotePeriodDateFilter =
     Filters.periodDateRemote
 
 
+{-| A filter for custom radio buttons.
+Filtering logic is applied internally by the component.
+
+    localSelectFilter
+        [ "Option 1"
+        , "Option 2"
+        ]
+        (Just 1)
+        mapItemEachOptionToBool
+
+-}
 localSelectFilter :
     List String
     -> Maybe Int
@@ -566,6 +697,19 @@ localSelectFilter =
     Filters.selectLocal
 
 
+{-| A filter for custom radio buttons.
+
+Filtering logic is applied through an external message.
+When `Nothing` is applied to the message, it means to clear the current filter.
+
+    remoteSelectFilter
+        [ "Option 1"
+        , "Option 2"
+        ]
+        (Just 1)
+        Msg.ApplyFilter
+
+-}
 remoteSelectFilter :
     List String
     -> Maybe Int
@@ -574,6 +718,31 @@ remoteSelectFilter :
     -> Filters msg item (T.Increase columns)
 remoteSelectFilter =
     Filters.selectRemote
+
+
+
+-- Periods
+
+
+{-| When comparing if dates are the same.
+-}
+periodSingle : PeriodComparison
+periodSingle =
+    DateInput.On
+
+
+{-| When comparing if some date is after another.
+-}
+pariodAfter : PeriodComparison
+pariodAfter =
+    DateInput.After
+
+
+{-| When comparing if some date is before another.
+-}
+periodBefore : PeriodComparison
+periodBefore =
+    DateInput.Before
 
 
 
