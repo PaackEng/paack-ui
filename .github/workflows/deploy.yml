@@ -20,5 +20,9 @@ jobs:
           yarn install
           yarn run build
 
-      - name:  Deploy
-        run: yarn run deploy
+      - name: Publish github pages
+        run: |
+          git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/paackeng/paack-ui.git
+          npx gh-pages -d dist -u "github-actions-bot <support+actions@github.com>"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
