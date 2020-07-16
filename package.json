@@ -9,7 +9,8 @@
   "scripts": {
     "analyse": "elm-analyse",
     "docs": "elm make --docs=dist/docs.json",
-    "build-showcase": "parcel build showcase/public/index.html",
+    "build": "parcel build showcase/public/index.html",
+    "postbuild": "cp ./showcase/public/.nojekyll ./dist/.nojekyll",
     "showcase": "parcel showcase/public/index.html",
     "test": "elm-test"
   },
