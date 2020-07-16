@@ -42,7 +42,7 @@ Futures discussions includes:
 styles =
     [ ( Text.heading1
             >> Text.withColor (Palette.color tonePrimary brightnessMiddle)
-      , "Heading1"
+      , "Is it working?"
       )
     , ( Text.heading2, "Heading2" )
     , ( Text.heading3, "Heading3" )
