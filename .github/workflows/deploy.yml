@@ -9,8 +9,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with:
-          persist-credentials: false
 
       - name: Setup Node
         uses: actions/setup-node@v1
@@ -18,11 +16,10 @@ jobs:
       - name: Install and Build
         run: |
           yarn install
-          yarn run build
+          yarn run predeploy
 
-      - name: Publish github pages
-        run: |
-          git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/paackeng/paack-ui.git
-          npx gh-pages -d dist -u "github-actions-bot <support+actions@github.com>"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist

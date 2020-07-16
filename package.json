@@ -11,7 +11,7 @@
     "docs": "elm make --docs=dist/docs.json",
     "build": "parcel build showcase/public/index.html --public-url ./",
     "predeploy": "parcel build showcase/public/index.html --public-url ./",
-    "deploy": "gh-pages -d dist",
+    "deploy": "gh-pages -d dist -u \"github-actions-bot <support+actions@github.com>\"",
     "showcase": "parcel showcase/public/index.html",
     "test": "elm-test"
   },
