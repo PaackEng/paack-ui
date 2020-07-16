@@ -44,7 +44,7 @@ styles =
             >> Text.withColor (Palette.color tonePrimary brightnessMiddle)
       , "Heading1"
       )
-    , ( Text.heading2, "TO BE UNDONE" )
+    , ( Text.heading2, "Heading2" )
     , ( Text.heading3, "Heading3" )
     , ( Text.heading4, "Heading4" )
     , ( Text.heading5, "Heading5" )
