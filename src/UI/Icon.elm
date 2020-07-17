@@ -225,6 +225,11 @@ add hint =
     Icon (Properties hint Add) defaultOptions
 
 
+{-| A check mark, commonly used inside checkboxes and radio buttons.
+
+    Icon.check "Done"
+
+-}
 check : String -> Icon
 check hint =
     Icon (Properties hint Check) defaultOptions

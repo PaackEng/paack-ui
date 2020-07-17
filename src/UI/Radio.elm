@@ -1,9 +1,6 @@
 module UI.Radio exposing (group)
 
-{-|
-
-
-# Grouped Elements
+{-| Accessible and uniform-styled implementation of a radio buttons.
 
 @docs group
 
@@ -22,6 +19,17 @@ import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element
 
 
+{-| An atomic function that defines the options, which one is selected, the selecting message, and renders it all to an Element.
+
+    Radio.group renderConfig
+        "Pick a favorite animal:"
+        (Just Felines)
+        [ ( Felines, "Felines" )
+        , ( Canines, "Canines" )
+        , ( Birds, "Birds" )
+        ]
+
+-}
 group : RenderConfig -> String -> (a -> msg) -> Maybe a -> List ( a, String ) -> Element msg
 group renderConfig label message selected buttons =
     buttons

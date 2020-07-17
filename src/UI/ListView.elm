@@ -174,7 +174,9 @@ type alias ToggleableConfig object msg =
 
 {-| What is displayed in a collapsed toggleable-list.
 
-    { title = "Some item", caption = "Created at 2020-06-10" }
+    { title = "Some item"
+    , caption = Just "Created at 2020-06-10"
+    }
 
 -}
 type alias ToggleableCover =
