@@ -9,7 +9,7 @@ import UI.Checkbox as Checkbox
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.Text as Text
 import UIExplorer exposing (storiesOf)
-import Utils exposing (iconsSvgSprite, storyWithModel)
+import Utils exposing (iconsSvgSprite, prettifyElmCode, storyWithModel)
 
 
 update : Checkboxes.Msg -> Checkboxes.Model -> Return Checkboxes.Msg Checkboxes.Model
@@ -73,10 +73,10 @@ boxDemo renderConfig =
                 , ifThenElse box3 0.75 0
                 ]
     in
-    storyWithModel ( "Checkboxes", view, { note = """
-This demo can be reproduced with the following code:
-
-```elm
+    storyWithModel
+        ( "Checkboxes"
+        , view
+        , { code = prettifyElmCode """
     Element.column [ Element.spacing 8 ]
         [ Checkbox.checkbox renderConfig
             Msg.Box1Set
@@ -97,4 +97,7 @@ This demo can be reproduced with the following code:
             |> Text.body1
             |> Text.renderElement renderConfig
         ]
-```""" } )
+"""
+          , note = ""
+          }
+        )

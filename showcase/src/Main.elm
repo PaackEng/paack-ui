@@ -24,7 +24,10 @@ import UI.ListView
 import UI.NavigationContainer
 import UI.RenderConfig exposing (RenderConfig)
 import UIExplorer exposing (Config, UIExplorerProgram, explore, logoFromHtml)
-import UIExplorer.Plugins.Note as Note
+import UIExplorer.Plugins.Code as CodePlugin
+import UIExplorer.Plugins.Note as NotePlugin
+import UIExplorer.Plugins.Tabs as TabsPlugin
+import UIExplorer.Plugins.Tabs.Icons as TabsIconsPlugin
 import Utils exposing (story)
 
 
@@ -33,21 +36,28 @@ import Utils exposing (story)
 
 
 type alias PluginOptions =
-    { note : String }
+    { note : String
+    , code : String
+    }
 
 
 config : Config Model Msg PluginOptions
 config =
     { customModel = Model.init
-    , customHeader =
-        Just
-            { title = ""
-            , logo = logoFromHtml logo
-            , titleColor = Just "#FFF"
-            , bgColor = Just "#1247D0"
-            }
+    , customHeader = Nothing
     , update = updateStories
-    , viewEnhancer = Note.viewEnhancer
+    , onModeChanged = Nothing
+    , viewEnhancer =
+        \m stories ->
+            Html.div []
+                [ stories
+                , TabsPlugin.view m.colorMode
+                    m.customModel.tabs
+                    [ ( "Code", CodePlugin.viewEnhancer m, TabsIconsPlugin.code )
+                    , ( "Notes", NotePlugin.viewEnhancer m, TabsIconsPlugin.note )
+                    ]
+                    TabMsg
+                ]
     , menuViewEnhancer = \_ v -> v
     , subscriptions = always Sub.none
     }
@@ -125,6 +135,9 @@ updateStories msg ({ customModel } as model) =
                 |> R.map (\t -> { customModel | radioStories = t })
                 |> R.map (\newCustomModel -> { model | customModel = newCustomModel })
                 |> Tuple.mapSecond (always Cmd.none)
+
+        TabMsg submsg ->
+            ( { model | customModel = { customModel | tabs = TabsPlugin.update submsg customModel.tabs } }, Cmd.none )
 
         NoOp ->
             ( model, Cmd.none )

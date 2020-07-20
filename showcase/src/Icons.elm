@@ -7,7 +7,7 @@ import Html
 import UI.Icon as Icon
 import UI.Palette as Palette
 import UIExplorer exposing (storiesOf)
-import Utils exposing (iconsSvgSprite)
+import Utils exposing (iconsSvgSprite, prettifyElmCode)
 
 
 stories cfg =
@@ -15,14 +15,14 @@ stories cfg =
         "Icons"
         [ ( "IconsExample"
           , \_ -> iconsView cfg
-          , { note =
-                """
-```elm
+          , { code =
+                prettifyElmCode
+                    """
 Icon.seeMore label
     |> Icon.withColor (Palette.color Palette.tonePrimary Palette.brightnessMiddle)
     |> Icon.renderElement cfg
-```
 """
+            , note = ""
             }
           )
         ]

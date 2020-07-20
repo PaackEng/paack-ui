@@ -13,7 +13,9 @@ stories =
         "Colors"
         [ ( "Colors"
           , \_ -> Element.layout [] colorsView
-          , { note = "" }
+          , { note = ""
+            , code = ""
+            }
           )
         ]
 

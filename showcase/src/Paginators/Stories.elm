@@ -7,7 +7,7 @@ import Paginators.Msg as Paginators
 import Return as R exposing (Return)
 import UI.Paginator as Paginator
 import UIExplorer exposing (storiesOf)
-import Utils exposing (iconsSvgSprite, story, storyWithModel)
+import Utils exposing (iconsSvgSprite, prettifyElmCode, story, storyWithModel)
 
 
 defaultPageSize : Int
@@ -53,10 +53,7 @@ nonNumericPaginator cfg =
                     |> List.map (\item -> Element.text item)
                     |> Element.column []
                 ]
-        , { note =
-                """
-```elm
-
+        , { code = prettifyElmCode """
 Paginator.nonNumeric
     { onNextButtonClicked = NextPage
     , onPreviousButtonClicked = PreviousPage
@@ -65,7 +62,7 @@ Paginator.nonNumeric
     , first = defaultPageSize
     }
     cfg
-```
 """
+          , note = ""
           }
         )

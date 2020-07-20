@@ -4,6 +4,7 @@ import Element
 import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
 import UI.Text as Text
 import UIExplorer exposing (storiesOf)
+import Utils exposing (prettifyElmCode)
 
 
 stories renderConfig =
@@ -11,8 +12,9 @@ stories renderConfig =
         "Texts"
         [ ( "Texts"
           , textsView renderConfig
-          , { note = """
-```elm
+          , { code =
+                prettifyElmCode
+                    """
 "Wherever You Will Go"
     |> Text.heading5
     |> Text.withColor (Palette.color Palette.toneGray Palette.brightnessDarkest)
@@ -28,13 +30,15 @@ Who will be there to take my place?
 \"\"\"
     |> Text.body1
     |> Text.renderElement renderConfig
-```
-
+"""
+            , note = """
 Futures discussions includes:
 * How we'll add responsives attributes (font-size may variate with device size).
 * * Maybe `Text.renderElement <device>`
 * is `Text.toEl` really necessary?
-""" }
+
+"""
+            }
           )
         ]
 

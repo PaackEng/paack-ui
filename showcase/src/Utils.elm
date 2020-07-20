@@ -1,5 +1,6 @@
 module Utils exposing
     ( iconsSvgSprite
+    , prettifyElmCode
     , story
     , storyList
     , storyWithModel
@@ -40,3 +41,15 @@ iconsSvgSprite =
             []
             []
         )
+
+
+prettifyElmCode : String -> String
+prettifyElmCode code =
+    """
+```elm
+"""
+        ++ code
+        ++ """
+```
+
+"""

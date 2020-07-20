@@ -2,7 +2,7 @@ module Badges exposing (stories)
 
 import UI.Badge as Badge
 import UIExplorer exposing (storiesOf)
-import Utils exposing (story)
+import Utils exposing (prettifyElmCode, story)
 
 
 stories cfg =
@@ -21,13 +21,11 @@ oneBadge cfg constructor str =
     story
         ( "Badge " ++ str
         , Badge.renderElement cfg <| constructor "123"
-        , { note =
-                """
-```elm
+        , { note = ""
+          , code = prettifyElmCode """
 Badge.""" ++ str ++ """ "123"
   |> Badge.renderElement renderCfg
 
-```
 """
           }
         )

@@ -5,6 +5,7 @@ import Checkboxes.Msg as Checkboxes
 import Paginators.Msg as Paginators
 import Radio.Msg as Radio
 import Tables.Msg as Tables
+import UIExplorer.Plugins.Tabs as TabsPlugin
 
 
 type Msg
@@ -13,4 +14,5 @@ type Msg
     | TablesStoriesMsg Tables.Msg
     | CheckboxesStoriesMsg Checkboxes.Msg
     | RadioStoriesMsg Radio.Msg
+    | TabMsg TabsPlugin.Msg
     | NoOp

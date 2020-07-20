@@ -3,7 +3,7 @@ module LoadingView exposing (stories)
 import Element exposing (..)
 import UI.LoadingView
 import UIExplorer exposing (storiesOf)
-import Utils exposing (story, storyList)
+import Utils exposing (prettifyElmCode, story, storyList)
 
 
 stories =
@@ -20,11 +20,9 @@ smallStory =
         ( "Small"
         , viewBase
             UI.LoadingView.small
-        , { note =
-                """
-```elm
-    LoadingView.small
-```
+        , { note = ""
+          , code = prettifyElmCode """
+LoadingView.small
 """
           }
         )
@@ -35,11 +33,9 @@ mediumStory =
         ( "Medium"
         , viewBase
             UI.LoadingView.medium
-        , { note =
-                """
-```elm
+        , { note = ""
+          , code = prettifyElmCode """
     LoadingView.medium
-```
 """
           }
         )
@@ -50,8 +46,10 @@ largeStory =
         ( "Large"
         , viewBase
             UI.LoadingView.large
-        , { note =
-                """
+        , { note = ""
+          , code =
+                prettifyElmCode
+                    """
 ```elm
     LoadingView.large
 ```

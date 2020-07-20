@@ -10,7 +10,7 @@ import UI.Icon as Icon
 import UI.Link as Link
 import UI.RenderConfig as RenderConfig
 import UIExplorer exposing (storiesOf)
-import Utils exposing (iconsSvgSprite, story, storyList, storyWithModel)
+import Utils exposing (iconsSvgSprite, prettifyElmCode, story, storyList, storyWithModel)
 
 
 update : Buttons.Msg -> Buttons.Model -> Return Buttons.Msg Buttons.Model
@@ -46,20 +46,25 @@ enabledStory renderConfig label tone toneStr =
                 |> Button.cmd Msg.NoOp tone
                 |> Button.renderElement renderConfig
           ]
-        , { note = """
-```elm
+        , { note = ""
+          , code =
+                prettifyElmCode
+                    """
 -- Text
 
 Button.fromLabel "Some Text"
-    |> Button.cmd YourMessage """ ++ toneStr ++ """
+    |> Button.cmd YourMessage """
+                    ++ toneStr
+                    ++ """
     |> Button.renderElement renderConfig
 
 
 -- Icon
 Button.fromIcon Icon.someIcon
-    |> Button.cmd YourMessage """ ++ toneStr ++ """
+    |> Button.cmd YourMessage """
+                    ++ toneStr
+                    ++ """
     |> Button.renderElement renderConfig
-```
 """
           }
         )
@@ -77,8 +82,10 @@ disabledButtonStory renderConfig =
                 |> Button.withDisabledIf True
                 |> Button.renderElement renderConfig
           ]
-        , { note = """
-```elm
+        , { note = ""
+          , code =
+                prettifyElmCode
+                    """
 -- Text
 
 Button.fromLabel "Some Text"
@@ -91,7 +98,6 @@ Button.fromIcon Icon.someIcon
     |> Button.cmd YourMessage
     |> Button.withDisabledIf True
     |> Button.renderElement renderConfig
-```
 """
           }
         )
@@ -123,8 +129,10 @@ successStory renderConfig =
                 |> Button.withSuccessIf True
                 |> Button.renderElement renderConfig
           ]
-        , { note = """
-```elm
+        , { note = ""
+          , code =
+                prettifyElmCode
+                    """
 -- Text
 
 Button.fromLabel "Some Text"
@@ -137,7 +145,6 @@ Button.fromIcon Icon.someIcon
     |> Button.cmd YourMessage
     |> Button.withSuccessIf True
     |> Button.renderElement renderConfig
-```
 """
           }
         )
@@ -163,13 +170,15 @@ linkStory renderConfig =
         , Button.fromLabel "Go to Blank"
             |> Button.redirect (Link.link "about:blank") Button.hyperlink
             |> Button.renderElement renderConfig
-        , { note = """
-```elm
+        , { note = ""
+          , code =
+                prettifyElmCode
+                    """
 Button.fromLabel "Go to Blank"
     |> Button.redirect (Link.link "about:blank") Button.hyperlink
     |> Button.renderElement renderConfig
-```
-""" }
+"""
+          }
         )
 
 
@@ -180,14 +189,16 @@ fullWidthStory renderConfig =
             |> Button.cmd Msg.NoOp Button.primary
             |> Button.withWidth Button.widthFull
             |> Button.renderElement renderConfig
-        , { note = """
-```elm
+        , { note = ""
+          , code =
+                prettifyElmCode
+                    """
 Button.fromLabel "Some Text"
     |> Button.cmd YourMessage Button.primary
     |> Button.withWidth Button.widthFull
     |> Button.renderElement renderConfig
-```
-""" }
+"""
+          }
         )
 
 
@@ -210,9 +221,14 @@ toggleStory renderConfig =
                     ]
     in
     storyWithModel
-        ( "Toggle", body, { note = """
-```elm
+        ( "Toggle"
+        , body
+        , { note = ""
+          , code =
+                prettifyElmCode
+                    """
 Button.toggle "Some Hint" YourMessage TrueOrFalse
     |> Button.renderElement renderConfig
-```
-""" } )
+"""
+          }
+        )

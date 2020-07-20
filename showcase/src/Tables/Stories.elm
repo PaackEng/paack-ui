@@ -43,7 +43,9 @@ desktopTableStory renderConfig =
     storyWithModel
         ( "Desktop"
         , \{ tablesStories } -> demoWithIcons renderConfig tablesStories
-        , { note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Tables-Stateful) for the exact code of this example." }
+        , { note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Tables-Stateful) for the exact code of this example."
+          , code = ""
+          }
         )
 
 
@@ -51,7 +53,9 @@ mobileTableStory =
     storyWithModel
         ( "Mobile"
         , \{ tablesStories } -> demoWithIcons mobileCfg tablesStories
-        , { note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Tables-Stateful) for the exact code of this example." }
+        , { note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Tables-Stateful) for the exact code of this example."
+          , code = ""
+          }
         )
 
 
@@ -115,7 +119,9 @@ statelessTableStory renderConfig =
     storyWithModel
         ( "Stateless"
         , \_ -> statelessDemoTable renderConfig
-        , { note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Tables-Stateless) for the exact code of this example." }
+        , { note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Tables-Stateless) for the exact code of this example."
+          , code = ""
+          }
         )
 
 

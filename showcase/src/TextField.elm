@@ -4,7 +4,7 @@ import Element exposing (..)
 import Msg as RootMsg
 import UI.TextField as TextField
 import UIExplorer exposing (storiesOf)
-import Utils exposing (story, storyWithModel)
+import Utils exposing (prettifyElmCode, story, storyWithModel)
 
 
 stories cfg =
@@ -26,8 +26,8 @@ defaultTextFieldStory cfg =
             |> TextField.withPlaceholder "Enter your info here"
             |> TextField.setLabelVisible True
             |> TextField.renderElement cfg
-        , { note = """
-```elm
+        , { note = ""
+          , code = prettifyElmCode """
 type Msg
     = OnTextFieldChanged String
     | ...
@@ -40,7 +40,6 @@ type Msg
     |> TextField.withPlaceholder "Enter your info here"
     |> TextField.setLabelVisible True
     |> TextField.renderElement renderCfg
-```
 """
           }
         )
@@ -54,8 +53,8 @@ usernameTextFieldStory cfg =
             "Value"
             |> TextField.setLabelVisible True
             |> TextField.renderElement cfg
-        , { note = """
-```elm
+        , { note = ""
+          , code = prettifyElmCode """
 type Msg
     = OnTextFieldChanged String
     | ...
@@ -67,7 +66,6 @@ TextField.username OnTextFieldChanged
         model.usernameValue
     |> TextField.setLabelVisible true
     |> TextField.renderElement renderCfg
-```
 """
           }
         )
@@ -81,8 +79,8 @@ passwordTextFieldStory cfg =
             "Value"
             |> TextField.setLabelVisible True
             |> TextField.renderElement cfg
-        , { note = """
-```elm
+        , { note = ""
+          , code = prettifyElmCode """
 type Msg
     = OnTextFieldChanged String
     | ...
@@ -94,7 +92,6 @@ TextField.currentPassword OnTextFieldChanged
         mode.passwordValue
     |> TextField.setLabelVisible True
     |> TextField.renderElement renderCfg
-```
 """
           }
         )
@@ -109,8 +106,8 @@ fullWidthStory cfg =
             |> TextField.setLabelVisible True
             |> TextField.withWidth TextField.widthFull
             |> TextField.renderElement cfg
-        , { note = """
-```elm
+        , { note = ""
+          , code = prettifyElmCode """
 type Msg
     = OnTextFieldChanged String
     | ...
@@ -123,7 +120,6 @@ TextField.singlelineText OnTextFieldChanged
     |> TextField.setLabelVisible True
     |> TextField.withWidth TextField.widthFull
     |> TextField.renderElement renderCfg
-```
 """
           }
         )

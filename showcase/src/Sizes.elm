@@ -10,7 +10,7 @@ import UI.Internal.Palette as Palette
 import UI.Size as Size
 import UI.TextField as TextField
 import UIExplorer exposing (storiesOf)
-import Utils exposing (iconsSvgSprite)
+import Utils exposing (iconsSvgSprite, prettifyElmCode)
 
 
 stories cfg =
@@ -18,19 +18,27 @@ stories cfg =
         "Sizes"
         [ ( "Large"
           , \_ -> sizeView cfg Size.large
-          , { note = notes "large" }
+          , { note = notes "large"
+            , code = ""
+            }
           )
         , ( "Medium"
           , \_ -> sizeView cfg Size.medium
-          , { note = notes "medium" }
+          , { note = notes "medium"
+            , code = ""
+            }
           )
         , ( "Small"
           , \_ -> sizeView cfg Size.small
-          , { note = notes "small" }
+          , { note = notes "small"
+            , code = ""
+            }
           )
         , ( "ExtraSmall"
           , \_ -> sizeView cfg Size.extraSmall
-          , { note = notes "extraSmall" }
+          , { note = notes "extraSmall"
+            , code = ""
+            }
           )
         ]
 

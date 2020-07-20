@@ -5,7 +5,7 @@ import Element.Background as Background
 import Msg as Msg
 import UI.Alert as Alert
 import UIExplorer exposing (storiesOf)
-import Utils exposing (story)
+import Utils exposing (prettifyElmCode, story)
 
 
 stories renderConfig =
@@ -23,11 +23,10 @@ primaryStory renderConfig =
         ( "Primary"
         , Alert.primary "Hey I just met you"
             |> baseView renderConfig
-        , { note = """
-```elm
+        , { code = ""
+          , note = prettifyElmCode """
 Alert.success "Hey I just met you"
     |> Alert.toEl
-```
 """
           }
         )
@@ -38,11 +37,10 @@ successStory renderConfig =
         ( "Success"
         , Alert.success "Hey I just met you"
             |> baseView renderConfig
-        , { note = """
-```elm
+        , { note = ""
+          , code = prettifyElmCode """
 Alert.success "Hey I just met you"
     |> Alert.toEl
-```
 """
           }
         )
@@ -53,11 +51,10 @@ warningStory renderConfig =
         ( "Warning"
         , Alert.warning "Hey I just met you"
             |> baseView renderConfig
-        , { note = """
-```elm
+        , { note = ""
+          , code = prettifyElmCode """
 Alert.warning "Hey I just met you"
     |> Alert.toEl
-```
 """
           }
         )
@@ -68,11 +65,10 @@ dangerStory renderConfig =
         ( "Danger"
         , Alert.danger "Hey I just met you"
             |> baseView renderConfig
-        , { note = """
-```elm
+        , { note = ""
+          , code = prettifyElmCode """
 Alert.danger "Hey I just met you"
     |> Alert.toEl
-```
 """
           }
         )
