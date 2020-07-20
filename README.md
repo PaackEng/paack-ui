@@ -75,6 +75,12 @@ loginTitle { t } cfg =
             ]
 ```
 
+## Showcase
+
+This module's repository includes a showcase that itself is not an example of the module's usage but demonstrates the components and their appearance.
+
+A published version of the showcase is available at (paackeng.github.io/paack-ui)[https://paackeng.github.io/paack-ui].
+
 ## Assets
 
 An external repository holds static assets used within this API.
