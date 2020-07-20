@@ -23,7 +23,15 @@ import Texts
 import UI.ListView
 import UI.NavigationContainer
 import UI.RenderConfig exposing (RenderConfig)
-import UIExplorer exposing (Config, UIExplorerProgram, explore, logoFromHtml)
+import UIExplorer
+    exposing
+        ( Config
+        , UIExplorerProgram
+        , category
+        , createCategories
+        , exploreWithCategories
+        , logoFromHtml
+        )
 import UIExplorer.Plugins.Code as CodePlugin
 import UIExplorer.Plugins.Note as NotePlugin
 import UIExplorer.Plugins.Tabs as TabsPlugin
@@ -72,22 +80,32 @@ main =
                 , height = 1080
                 }
     in
-    explore
+    exploreWithCategories
         config
-        [ Texts.stories renderConfig
-        , Icons.stories renderConfig
-        , Palette.stories
-        , Buttons.stories renderConfig
-        , Alerts.stories renderConfig
-        , Badges.stories renderConfig
-        , TextField.stories renderConfig
-        , LoadingView.stories
-        , Tables.stories renderConfig
-        , Paginators.stories renderConfig
-        , Sizes.stories renderConfig
-        , Checkboxes.stories renderConfig
-        , Radio.stories renderConfig
-        ]
+        (createCategories
+            |> category
+                "Styles"
+                [ Palette.stories
+                , Sizes.stories renderConfig
+                ]
+            |> category
+                "Basics"
+                [ Texts.stories renderConfig
+                , Icons.stories renderConfig
+                , Buttons.stories renderConfig
+                , Alerts.stories renderConfig
+                , Badges.stories renderConfig
+                , TextField.stories renderConfig
+                , LoadingView.stories
+                , Checkboxes.stories renderConfig
+                , Radio.stories renderConfig
+                ]
+            |> category
+                "Complex components"
+                [ Tables.stories renderConfig
+                , Paginators.stories renderConfig
+                ]
+        )
 
 
 logo : Html msg
