@@ -6,8 +6,8 @@ import Buttons.Stories as Buttons
 import Checkboxes.Stories as Checkboxes
 import Element exposing (Element)
 import Element.Font as Font
-import Html exposing (Html, i)
-import Html.Attributes exposing (class, style)
+import Html exposing (Html, div, img)
+import Html.Attributes exposing (src, style)
 import Icons
 import LoadingView as LoadingView
 import Model as Model exposing (Model)
@@ -48,7 +48,13 @@ import Utils exposing (story)
 config : Config Model Msg PluginOptions
 config =
     { customModel = Model.init
-    , customHeader = Nothing
+    , customHeader =
+        Just
+            { title = ""
+            , logo = logoFromHtml logo
+            , titleColor = Just "#000000"
+            , bgColor = Just "#f6f6f6"
+            }
     , update = updateStories
     , onModeChanged = Nothing
     , viewEnhancer =
@@ -106,15 +112,12 @@ main =
 
 logo : Html msg
 logo =
-    i
-        [ style "color" "white"
-        , style "height" "100%"
-        , style "font-size" "30px"
+    div
+        [ style "padding" "0 20px"
         , style "display" "flex"
         , style "align-items" "center"
-        , style "padding" "0 20px"
         ]
-        []
+        [ img [ src "logo.png" ] [] ]
 
 
 updateStories : Msg -> UIExplorer.Model Model Msg PluginOptions -> ( UIExplorer.Model Model Msg PluginOptions, Cmd Msg )
