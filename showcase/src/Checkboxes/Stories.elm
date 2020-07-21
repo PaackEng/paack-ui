@@ -4,12 +4,13 @@ import Checkboxes.Model as Checkboxes
 import Checkboxes.Msg as Checkboxes
 import Element
 import Msg
+import PluginOptions exposing (defaultWithoutMenu)
 import Return as R exposing (Return)
 import UI.Checkbox as Checkbox
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.Text as Text
 import UIExplorer exposing (storiesOf)
-import Utils exposing (iconsSvgSprite, storyWithModel)
+import Utils exposing (goToDocsCallToAction, iconsSvgSprite, prettifyElmCode, storyWithModel)
 
 
 update : Checkboxes.Msg -> Checkboxes.Model -> Return Checkboxes.Msg Checkboxes.Model
@@ -48,7 +49,7 @@ boxDemo renderConfig =
                 [ iconsSvgSprite
                 , Checkbox.checkbox renderConfig
                     (Checkboxes.Box1Set >> Msg.CheckboxesStoriesMsg)
-                    "Extra ketchup (+0.50 USD)"
+                    "Extra ketchup (Free)"
                     checkboxesStories.box1
                 , Checkbox.checkbox renderConfig
                     (Checkboxes.Box2Set >> Msg.CheckboxesStoriesMsg)
@@ -73,14 +74,15 @@ boxDemo renderConfig =
                 , ifThenElse box3 0.75 0
                 ]
     in
-    storyWithModel ( "Checkboxes", view, { note = """
-This demo can be reproduced with the following code:
-
-```elm
+    storyWithModel
+        ( "Checkboxes"
+        , view
+        , { defaultWithoutMenu
+            | code = prettifyElmCode """
     Element.column [ Element.spacing 8 ]
         [ Checkbox.checkbox renderConfig
             Msg.Box1Set
-            "Extra ketchup (+0.50 USD)"
+            "Extra ketchup (Free)"
             model.box1
         , Checkbox.checkbox renderConfig
             Msg.Box2Set
@@ -97,4 +99,7 @@ This demo can be reproduced with the following code:
             |> Text.body1
             |> Text.renderElement renderConfig
         ]
-```""" } )
+"""
+            , note = goToDocsCallToAction "Checkbox"
+          }
+        )

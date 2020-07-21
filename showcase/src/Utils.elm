@@ -1,5 +1,7 @@
 module Utils exposing
-    ( iconsSvgSprite
+    ( goToDocsCallToAction
+    , iconsSvgSprite
+    , prettifyElmCode
     , story
     , storyList
     , storyWithModel
@@ -40,3 +42,13 @@ iconsSvgSprite =
             []
             []
         )
+
+
+prettifyElmCode : String -> String
+prettifyElmCode code =
+    "```elm" ++ code ++ "\n```"
+
+
+goToDocsCallToAction : String -> String
+goToDocsCallToAction modulePath =
+    "For more information, check the [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-" ++ modulePath ++ ")."

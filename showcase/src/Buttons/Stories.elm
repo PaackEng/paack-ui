@@ -4,13 +4,22 @@ import Buttons.Model as Buttons
 import Buttons.Msg as Buttons
 import Element exposing (column, fill, row, spacing, text, width)
 import Msg as Msg
+import PluginOptions exposing (PluginOptions, defaultWithMenu)
 import Return as R exposing (Return)
 import UI.Button as Button
 import UI.Icon as Icon
 import UI.Link as Link
 import UI.RenderConfig as RenderConfig
 import UIExplorer exposing (storiesOf)
-import Utils exposing (iconsSvgSprite, story, storyList, storyWithModel)
+import Utils
+    exposing
+        ( goToDocsCallToAction
+        , iconsSvgSprite
+        , prettifyElmCode
+        , story
+        , storyList
+        , storyWithModel
+        )
 
 
 update : Buttons.Msg -> Buttons.Model -> Return Buttons.Msg Buttons.Model
@@ -46,22 +55,24 @@ enabledStory renderConfig label tone toneStr =
                 |> Button.cmd Msg.NoOp tone
                 |> Button.renderElement renderConfig
           ]
-        , { note = """
-```elm
+        , pluginOptions <|
+            """
 -- Text
 
 Button.fromLabel "Some Text"
-    |> Button.cmd YourMessage """ ++ toneStr ++ """
+    |> Button.cmd YourMessage """
+                ++ toneStr
+                ++ """
     |> Button.renderElement renderConfig
 
 
 -- Icon
 Button.fromIcon Icon.someIcon
-    |> Button.cmd YourMessage """ ++ toneStr ++ """
+    |> Button.cmd YourMessage """
+                ++ toneStr
+                ++ """
     |> Button.renderElement renderConfig
-```
 """
-          }
         )
 
 
@@ -77,8 +88,8 @@ disabledButtonStory renderConfig =
                 |> Button.withDisabledIf True
                 |> Button.renderElement renderConfig
           ]
-        , { note = """
-```elm
+        , pluginOptions
+            """
 -- Text
 
 Button.fromLabel "Some Text"
@@ -91,9 +102,7 @@ Button.fromIcon Icon.someIcon
     |> Button.cmd YourMessage
     |> Button.withDisabledIf True
     |> Button.renderElement renderConfig
-```
 """
-          }
         )
 
 
@@ -123,8 +132,8 @@ successStory renderConfig =
                 |> Button.withSuccessIf True
                 |> Button.renderElement renderConfig
           ]
-        , { note = """
-```elm
+        , pluginOptions
+            """
 -- Text
 
 Button.fromLabel "Some Text"
@@ -137,9 +146,7 @@ Button.fromIcon Icon.someIcon
     |> Button.cmd YourMessage
     |> Button.withSuccessIf True
     |> Button.renderElement renderConfig
-```
 """
-          }
         )
 
 
@@ -163,13 +170,12 @@ linkStory renderConfig =
         , Button.fromLabel "Go to Blank"
             |> Button.redirect (Link.link "about:blank") Button.hyperlink
             |> Button.renderElement renderConfig
-        , { note = """
-```elm
+        , pluginOptions
+            """
 Button.fromLabel "Go to Blank"
     |> Button.redirect (Link.link "about:blank") Button.hyperlink
     |> Button.renderElement renderConfig
-```
-""" }
+"""
         )
 
 
@@ -180,14 +186,13 @@ fullWidthStory renderConfig =
             |> Button.cmd Msg.NoOp Button.primary
             |> Button.withWidth Button.widthFull
             |> Button.renderElement renderConfig
-        , { note = """
-```elm
+        , pluginOptions
+            """
 Button.fromLabel "Some Text"
     |> Button.cmd YourMessage Button.primary
     |> Button.withWidth Button.widthFull
     |> Button.renderElement renderConfig
-```
-""" }
+"""
         )
 
 
@@ -210,9 +215,19 @@ toggleStory renderConfig =
                     ]
     in
     storyWithModel
-        ( "Toggle", body, { note = """
-```elm
+        ( "Toggle"
+        , body
+        , pluginOptions
+            """
 Button.toggle "Some Hint" YourMessage TrueOrFalse
     |> Button.renderElement renderConfig
-```
-""" } )
+"""
+        )
+
+
+pluginOptions : String -> PluginOptions
+pluginOptions code =
+    { defaultWithMenu
+        | code = prettifyElmCode code
+        , note = goToDocsCallToAction "Button"
+    }

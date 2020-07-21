@@ -2,6 +2,7 @@ module Radio.Stories exposing (stories, update)
 
 import Element
 import Msg
+import PluginOptions exposing (defaultWithoutMenu)
 import Radio.Model as RadioModel
 import Radio.Msg as RadioMsg
 import Return as R exposing (Return)
@@ -9,7 +10,7 @@ import UI.Internal.Basics exposing (ifThenElse)
 import UI.Radio as Radio
 import UI.Text as Text
 import UIExplorer exposing (storiesOf)
-import Utils exposing (iconsSvgSprite, storyWithModel)
+import Utils exposing (goToDocsCallToAction, iconsSvgSprite, prettifyElmCode, storyWithModel)
 
 
 update : RadioMsg.Msg -> RadioModel.Model -> Return RadioMsg.Msg RadioModel.Model
@@ -48,18 +49,22 @@ demo renderConfig =
                     ]
                 ]
     in
-    storyWithModel ( "Radio", view, { note = """
-This demo can be reproduced with the following code:
-
-```elm
-    Radio.group renderConfig
-        "Pick one classic rock band"
-        Msg.RadioSet
-        model.selected
-        [ ( Queen, "Queen" )
-        , ( Beatles, "Beatles" )
-        , ( ACDC, "AC/DC" )
-        , ( LedZeppelin, "Led Zeppelin" )
-        , ( PinkFloyd, "Pink Floyd" )
-        ]
-```""" } )
+    storyWithModel
+        ( "Radio"
+        , view
+        , { defaultWithoutMenu
+            | code = prettifyElmCode """
+Radio.group renderConfig
+    "Pick one classic rock band"
+    Msg.RadioSet
+    model.selected
+    [ ( Queen, "Queen" )
+    , ( Beatles, "Beatles" )
+    , ( ACDC, "AC/DC" )
+    , ( LedZeppelin, "Led Zeppelin" )
+    , ( PinkFloyd, "Pink Floyd" )
+    ]
+"""
+            , note = goToDocsCallToAction "Radio"
+          }
+        )

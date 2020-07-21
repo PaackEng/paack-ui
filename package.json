@@ -6,6 +6,7 @@
   "directories": {
     "doc": "docs"
   },
+  "assetsPath" : "showcase/public/assets/",
   "scripts": {
     "analyse": "elm-analyse",
     "docs": "elm make --docs=dist/docs.json",
@@ -30,7 +31,8 @@
     "elm-test": "^0.19.1-revision2",
     "node-elm-compiler": "^5.0.4",
     "paack-ui-assets": "^0.0.10",
-    "parcel-bundler": "^1.12.4"
+    "parcel-bundler": "^1.12.4",
+    "parcel-plugin-asset-copier": "^1.1.0"
   },
   "devDependencies": {}
 }

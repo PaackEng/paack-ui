@@ -4,13 +4,14 @@ import Element
 import Element.Background as Background
 import Element.Font as Font
 import Msg as Msg
+import PluginOptions exposing (PluginOptions, defaultWithMenu)
 import UI.Button as Button
 import UI.Icon as Icon
 import UI.Internal.Palette as Palette
 import UI.Size as Size
 import UI.TextField as TextField
 import UIExplorer exposing (storiesOf)
-import Utils exposing (iconsSvgSprite)
+import Utils exposing (goToDocsCallToAction, iconsSvgSprite, prettifyElmCode)
 
 
 stories cfg =
@@ -18,19 +19,19 @@ stories cfg =
         "Sizes"
         [ ( "Large"
           , \_ -> sizeView cfg Size.large
-          , { note = notes "large" }
+          , pluginOptions "large"
           )
         , ( "Medium"
           , \_ -> sizeView cfg Size.medium
-          , { note = notes "medium" }
+          , pluginOptions "medium"
           )
         , ( "Small"
           , \_ -> sizeView cfg Size.small
-          , { note = notes "small" }
+          , pluginOptions "small"
           )
         , ( "ExtraSmall"
           , \_ -> sizeView cfg Size.extraSmall
-          , { note = notes "extraSmall" }
+          , pluginOptions "extraSmall"
           )
         ]
 
@@ -93,20 +94,34 @@ sizeView cfg size =
         |> Element.layout []
 
 
-notes suffix =
-    """To achieve this size use:
+codeSample : String -> String
+codeSample suffix =
+    prettifyElmCode <|
+        """
+-- Buttons
 
-* Buttons
-```elm
---...
-    |> Button.withSize Size.""" ++ suffix ++ """
-    -- ...
-```
+submitButton = 
+    Button.fromLabel "Submit"
+        |> Button.cmd FormSend Button.primary
+        |> Button.withSize Size."""
+            ++ suffix
+            ++ """
+        |> Button.renderElement renderConfig
 
-* Icons
-```elm
---...
-    |> Icon.withSize Size.""" ++ suffix ++ """
-    -- ...
-```
-  """
+-- Icons
+
+logoutIcon = 
+    Icon.logout "Logout from this account"
+        |> Icon.withSize Size."""
+            ++ suffix
+            ++ """
+        |> Icon.renderElement renderConfig
+"""
+
+
+pluginOptions : String -> PluginOptions
+pluginOptions storyType =
+    { defaultWithMenu
+        | code = codeSample storyType
+        , note = goToDocsCallToAction "Size"
+    }

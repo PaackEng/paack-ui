@@ -4,10 +4,11 @@ import Element exposing (fill)
 import Msg
 import Paginators.Model as Paginators
 import Paginators.Msg as Paginators
+import PluginOptions exposing (defaultWithoutMenu)
 import Return as R exposing (Return)
 import UI.Paginator as Paginator
 import UIExplorer exposing (storiesOf)
-import Utils exposing (iconsSvgSprite, story, storyWithModel)
+import Utils exposing (goToDocsCallToAction, iconsSvgSprite, prettifyElmCode, story, storyWithModel)
 
 
 defaultPageSize : Int
@@ -53,10 +54,8 @@ nonNumericPaginator cfg =
                     |> List.map (\item -> Element.text item)
                     |> Element.column []
                 ]
-        , { note =
-                """
-```elm
-
+        , { defaultWithoutMenu
+            | code = prettifyElmCode """
 Paginator.nonNumeric
     { onNextButtonClicked = NextPage
     , onPreviousButtonClicked = PreviousPage
@@ -64,8 +63,8 @@ Paginator.nonNumeric
     , offset = paginatorsStories.offset
     , first = defaultPageSize
     }
-    cfg
-```
+    renderConfig
 """
+            , note = goToDocsCallToAction "Paginator"
           }
         )

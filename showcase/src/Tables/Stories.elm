@@ -2,6 +2,7 @@ module Tables.Stories exposing (stories, update)
 
 import Element exposing (Element, fill)
 import Msg
+import PluginOptions exposing (defaultWithMenu)
 import Return as R exposing (Return)
 import Tables.Model as Stories
 import Tables.Msg as Stories
@@ -43,7 +44,9 @@ desktopTableStory renderConfig =
     storyWithModel
         ( "Desktop"
         , \{ tablesStories } -> demoWithIcons renderConfig tablesStories
-        , { note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Tables-Stateful) for the exact code of this example." }
+        , { defaultWithMenu
+            | note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Tables-Stateful) for the exact code of this example."
+          }
         )
 
 
@@ -51,7 +54,9 @@ mobileTableStory =
     storyWithModel
         ( "Mobile"
         , \{ tablesStories } -> demoWithIcons mobileCfg tablesStories
-        , { note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Tables-Stateful) for the exact code of this example." }
+        , { defaultWithMenu
+            | note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Tables-Stateful) for the exact code of this example."
+          }
         )
 
 
@@ -115,7 +120,9 @@ statelessTableStory renderConfig =
     storyWithModel
         ( "Stateless"
         , \_ -> statelessDemoTable renderConfig
-        , { note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Tables-Stateless) for the exact code of this example." }
+        , { defaultWithMenu
+            | note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Tables-Stateless) for the exact code of this example."
+          }
         )
 
 
