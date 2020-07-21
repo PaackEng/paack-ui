@@ -33,13 +33,7 @@ Who will be there to take my place?
     |> Text.body1
     |> Text.renderElement renderConfig
 """
-                , note = """
-Futures discussions includes:
-* How we'll add responsives attributes (font-size may variate with device size).
-* * Maybe `Text.renderElement <device>`
-* is `Text.toEl` really necessary?
-
-"""
+                , note = ""
             }
           )
         ]
