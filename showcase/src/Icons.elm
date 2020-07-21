@@ -24,6 +24,7 @@ Icon.seeMore label
     |> Icon.withColor (Palette.color Palette.tonePrimary Palette.brightnessMiddle)
     |> Icon.renderElement cfg
 """
+                , note = "We name icons by their functionality and not their shapes."
             }
           )
         ]

@@ -51,9 +51,7 @@ largeStory =
             | code =
                 prettifyElmCode
                     """
-```elm
     LoadingView.large
-```
 """
           }
         )

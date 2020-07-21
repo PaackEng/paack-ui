@@ -49,7 +49,7 @@ boxDemo renderConfig =
                 [ iconsSvgSprite
                 , Checkbox.checkbox renderConfig
                     (Checkboxes.Box1Set >> Msg.CheckboxesStoriesMsg)
-                    "Extra ketchup (+0.50 USD)"
+                    "Extra ketchup (Free)"
                     checkboxesStories.box1
                 , Checkbox.checkbox renderConfig
                     (Checkboxes.Box2Set >> Msg.CheckboxesStoriesMsg)
@@ -82,7 +82,7 @@ boxDemo renderConfig =
     Element.column [ Element.spacing 8 ]
         [ Checkbox.checkbox renderConfig
             Msg.Box1Set
-            "Extra ketchup (+0.50 USD)"
+            "Extra ketchup (Free)"
             model.box1
         , Checkbox.checkbox renderConfig
             Msg.Box2Set

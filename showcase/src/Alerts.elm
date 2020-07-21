@@ -25,7 +25,7 @@ primaryStory renderConfig =
         , Alert.primary "Hey I just met you"
             |> baseView renderConfig
         , { defaultWithMenu
-            | note = prettifyElmCode """
+            | code = prettifyElmCode """
 Alert.success "Hey I just met you"
     |> Alert.toEl
 """
