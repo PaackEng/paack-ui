@@ -1,6 +1,7 @@
 module LoadingView exposing (stories)
 
 import Element exposing (..)
+import PluginOptions exposing (defaultWithMenu)
 import UI.LoadingView
 import UIExplorer exposing (storiesOf)
 import Utils exposing (prettifyElmCode, story, storyList)
@@ -20,8 +21,8 @@ smallStory =
         ( "Small"
         , viewBase
             UI.LoadingView.small
-        , { note = ""
-          , code = prettifyElmCode """
+        , { defaultWithMenu
+            | code = prettifyElmCode """
 LoadingView.small
 """
           }
@@ -33,8 +34,8 @@ mediumStory =
         ( "Medium"
         , viewBase
             UI.LoadingView.medium
-        , { note = ""
-          , code = prettifyElmCode """
+        , { defaultWithMenu
+            | code = prettifyElmCode """
     LoadingView.medium
 """
           }
@@ -46,8 +47,8 @@ largeStory =
         ( "Large"
         , viewBase
             UI.LoadingView.large
-        , { note = ""
-          , code =
+        , { defaultWithMenu
+            | code =
                 prettifyElmCode
                     """
 ```elm

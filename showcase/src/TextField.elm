@@ -2,6 +2,7 @@ module TextField exposing (stories)
 
 import Element exposing (..)
 import Msg as RootMsg
+import PluginOptions exposing (defaultWithMenu)
 import UI.TextField as TextField
 import UIExplorer exposing (storiesOf)
 import Utils exposing (prettifyElmCode, story, storyWithModel)
@@ -26,8 +27,8 @@ defaultTextFieldStory cfg =
             |> TextField.withPlaceholder "Enter your info here"
             |> TextField.setLabelVisible True
             |> TextField.renderElement cfg
-        , { note = ""
-          , code = prettifyElmCode """
+        , { defaultWithMenu
+            | code = prettifyElmCode """
 type Msg
     = OnTextFieldChanged String
     | ...
@@ -53,8 +54,8 @@ usernameTextFieldStory cfg =
             "Value"
             |> TextField.setLabelVisible True
             |> TextField.renderElement cfg
-        , { note = ""
-          , code = prettifyElmCode """
+        , { defaultWithMenu
+            | code = prettifyElmCode """
 type Msg
     = OnTextFieldChanged String
     | ...
@@ -79,8 +80,8 @@ passwordTextFieldStory cfg =
             "Value"
             |> TextField.setLabelVisible True
             |> TextField.renderElement cfg
-        , { note = ""
-          , code = prettifyElmCode """
+        , { defaultWithMenu
+            | code = prettifyElmCode """
 type Msg
     = OnTextFieldChanged String
     | ...
@@ -106,8 +107,8 @@ fullWidthStory cfg =
             |> TextField.setLabelVisible True
             |> TextField.withWidth TextField.widthFull
             |> TextField.renderElement cfg
-        , { note = ""
-          , code = prettifyElmCode """
+        , { defaultWithMenu
+            | code = prettifyElmCode """
 type Msg
     = OnTextFieldChanged String
     | ...

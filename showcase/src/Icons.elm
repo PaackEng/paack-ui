@@ -4,6 +4,7 @@ import Element
 import Element.Background as Background
 import Element.Font as Font
 import Html
+import PluginOptions exposing (defaultWithoutMenu)
 import UI.Icon as Icon
 import UI.Palette as Palette
 import UIExplorer exposing (storiesOf)
@@ -15,14 +16,14 @@ stories cfg =
         "Icons"
         [ ( "IconsExample"
           , \_ -> iconsView cfg
-          , { code =
-                prettifyElmCode
-                    """
+          , { defaultWithoutMenu
+                | code =
+                    prettifyElmCode
+                        """
 Icon.seeMore label
     |> Icon.withColor (Palette.color Palette.tonePrimary Palette.brightnessMiddle)
     |> Icon.renderElement cfg
 """
-            , note = ""
             }
           )
         ]

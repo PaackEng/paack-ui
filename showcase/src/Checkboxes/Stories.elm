@@ -4,6 +4,7 @@ import Checkboxes.Model as Checkboxes
 import Checkboxes.Msg as Checkboxes
 import Element
 import Msg
+import PluginOptions exposing (defaultWithoutMenu)
 import Return as R exposing (Return)
 import UI.Checkbox as Checkbox
 import UI.Internal.Basics exposing (ifThenElse)
@@ -76,7 +77,8 @@ boxDemo renderConfig =
     storyWithModel
         ( "Checkboxes"
         , view
-        , { code = prettifyElmCode """
+        , { defaultWithoutMenu
+            | code = prettifyElmCode """
     Element.column [ Element.spacing 8 ]
         [ Checkbox.checkbox renderConfig
             Msg.Box1Set
@@ -98,6 +100,5 @@ boxDemo renderConfig =
             |> Text.renderElement renderConfig
         ]
 """
-          , note = ""
           }
         )

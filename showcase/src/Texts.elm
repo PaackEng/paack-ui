@@ -1,6 +1,7 @@
 module Texts exposing (stories)
 
 import Element
+import PluginOptions exposing (defaultWithoutMenu)
 import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
 import UI.Text as Text
 import UIExplorer exposing (storiesOf)
@@ -12,9 +13,10 @@ stories renderConfig =
         "Texts"
         [ ( "Texts"
           , textsView renderConfig
-          , { code =
-                prettifyElmCode
-                    """
+          , { defaultWithoutMenu
+                | code =
+                    prettifyElmCode
+                        """
 "Wherever You Will Go"
     |> Text.heading5
     |> Text.withColor (Palette.color Palette.toneGray Palette.brightnessDarkest)
@@ -31,7 +33,7 @@ Who will be there to take my place?
     |> Text.body1
     |> Text.renderElement renderConfig
 """
-            , note = """
+                , note = """
 Futures discussions includes:
 * How we'll add responsives attributes (font-size may variate with device size).
 * * Maybe `Text.renderElement <device>`

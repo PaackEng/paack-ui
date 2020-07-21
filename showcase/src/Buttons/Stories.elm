@@ -4,6 +4,7 @@ import Buttons.Model as Buttons
 import Buttons.Msg as Buttons
 import Element exposing (column, fill, row, spacing, text, width)
 import Msg as Msg
+import PluginOptions exposing (defaultWithMenu)
 import Return as R exposing (Return)
 import UI.Button as Button
 import UI.Icon as Icon
@@ -46,24 +47,24 @@ enabledStory renderConfig label tone toneStr =
                 |> Button.cmd Msg.NoOp tone
                 |> Button.renderElement renderConfig
           ]
-        , { note = ""
-          , code =
-                prettifyElmCode
+        , { defaultWithMenu
+            | code =
+                prettifyElmCode <|
                     """
 -- Text
 
 Button.fromLabel "Some Text"
     |> Button.cmd YourMessage """
-                    ++ toneStr
-                    ++ """
+                        ++ toneStr
+                        ++ """
     |> Button.renderElement renderConfig
 
 
 -- Icon
 Button.fromIcon Icon.someIcon
     |> Button.cmd YourMessage """
-                    ++ toneStr
-                    ++ """
+                        ++ toneStr
+                        ++ """
     |> Button.renderElement renderConfig
 """
           }
@@ -82,8 +83,8 @@ disabledButtonStory renderConfig =
                 |> Button.withDisabledIf True
                 |> Button.renderElement renderConfig
           ]
-        , { note = ""
-          , code =
+        , { defaultWithMenu
+            | code =
                 prettifyElmCode
                     """
 -- Text
@@ -129,8 +130,8 @@ successStory renderConfig =
                 |> Button.withSuccessIf True
                 |> Button.renderElement renderConfig
           ]
-        , { note = ""
-          , code =
+        , { defaultWithMenu
+            | code =
                 prettifyElmCode
                     """
 -- Text
@@ -170,8 +171,8 @@ linkStory renderConfig =
         , Button.fromLabel "Go to Blank"
             |> Button.redirect (Link.link "about:blank") Button.hyperlink
             |> Button.renderElement renderConfig
-        , { note = ""
-          , code =
+        , { defaultWithMenu
+            | code =
                 prettifyElmCode
                     """
 Button.fromLabel "Go to Blank"
@@ -189,8 +190,8 @@ fullWidthStory renderConfig =
             |> Button.cmd Msg.NoOp Button.primary
             |> Button.withWidth Button.widthFull
             |> Button.renderElement renderConfig
-        , { note = ""
-          , code =
+        , { defaultWithMenu
+            | code =
                 prettifyElmCode
                     """
 Button.fromLabel "Some Text"
@@ -223,8 +224,8 @@ toggleStory renderConfig =
     storyWithModel
         ( "Toggle"
         , body
-        , { note = ""
-          , code =
+        , { defaultWithMenu
+            | code =
                 prettifyElmCode
                     """
 Button.toggle "Some Hint" YourMessage TrueOrFalse

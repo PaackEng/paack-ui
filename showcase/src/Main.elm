@@ -14,6 +14,7 @@ import Model as Model exposing (Model)
 import Msg exposing (Msg(..))
 import Paginators.Stories as Paginators
 import Palette
+import PluginOptions exposing (PluginOptions)
 import Radio.Stories as Radio
 import Return as R
 import Sizes
@@ -33,6 +34,7 @@ import UIExplorer
         , logoFromHtml
         )
 import UIExplorer.Plugins.Code as CodePlugin
+import UIExplorer.Plugins.MenuVisibility as MenuVisibility
 import UIExplorer.Plugins.Note as NotePlugin
 import UIExplorer.Plugins.Tabs as TabsPlugin
 import UIExplorer.Plugins.Tabs.Icons as TabsIconsPlugin
@@ -41,12 +43,6 @@ import Utils exposing (story)
 
 
 {- importing UI.NavigationContainer and UI.ListView mostly so they compile too -}
-
-
-type alias PluginOptions =
-    { note : String
-    , code : String
-    }
 
 
 config : Config Model Msg PluginOptions
@@ -66,7 +62,7 @@ config =
                     ]
                     TabMsg
                 ]
-    , menuViewEnhancer = \_ v -> v
+    , menuViewEnhancer = MenuVisibility.menuViewEnhancer
     , subscriptions = always Sub.none
     }
 

@@ -2,6 +2,7 @@ module Radio.Stories exposing (stories, update)
 
 import Element
 import Msg
+import PluginOptions exposing (defaultWithoutMenu)
 import Radio.Model as RadioModel
 import Radio.Msg as RadioMsg
 import Return as R exposing (Return)
@@ -51,7 +52,8 @@ demo renderConfig =
     storyWithModel
         ( "Radio"
         , view
-        , { code = prettifyElmCode """
+        , { defaultWithoutMenu
+            | code = prettifyElmCode """
 Radio.group renderConfig
     "Pick one classic rock band"
     Msg.RadioSet
@@ -63,6 +65,5 @@ Radio.group renderConfig
     , ( PinkFloyd, "Pink Floyd" )
     ]
 """
-          , note = ""
           }
         )

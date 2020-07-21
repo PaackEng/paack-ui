@@ -4,6 +4,7 @@ import Element exposing (Element, px)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
+import PluginOptions exposing (defaultWithoutMenu)
 import UI.Palette as Palette exposing (Brightness, Tone)
 import UIExplorer exposing (storiesOf)
 
@@ -13,9 +14,7 @@ stories =
         "Colors"
         [ ( "Colors"
           , \_ -> Element.layout [] colorsView
-          , { note = ""
-            , code = ""
-            }
+          , defaultWithoutMenu
           )
         ]
 

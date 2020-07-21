@@ -1,5 +1,6 @@
 module Badges exposing (stories)
 
+import PluginOptions exposing (defaultWithMenu)
 import UI.Badge as Badge
 import UIExplorer exposing (storiesOf)
 import Utils exposing (prettifyElmCode, story)
@@ -21,8 +22,8 @@ oneBadge cfg constructor str =
     story
         ( "Badge " ++ str
         , Badge.renderElement cfg <| constructor "123"
-        , { note = ""
-          , code = prettifyElmCode """
+        , { defaultWithMenu
+            | code = prettifyElmCode <| """
 Badge.""" ++ str ++ """ "123"
   |> Badge.renderElement renderCfg
 

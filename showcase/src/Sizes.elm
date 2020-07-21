@@ -4,6 +4,7 @@ import Element
 import Element.Background as Background
 import Element.Font as Font
 import Msg as Msg
+import PluginOptions exposing (defaultWithMenu)
 import UI.Button as Button
 import UI.Icon as Icon
 import UI.Internal.Palette as Palette
@@ -18,26 +19,26 @@ stories cfg =
         "Sizes"
         [ ( "Large"
           , \_ -> sizeView cfg Size.large
-          , { note = notes "large"
-            , code = ""
+          , { defaultWithMenu
+                | note = notes "large"
             }
           )
         , ( "Medium"
           , \_ -> sizeView cfg Size.medium
-          , { note = notes "medium"
-            , code = ""
+          , { defaultWithMenu
+                | note = notes "medium"
             }
           )
         , ( "Small"
           , \_ -> sizeView cfg Size.small
-          , { note = notes "small"
-            , code = ""
+          , { defaultWithMenu
+                | note = notes "small"
             }
           )
         , ( "ExtraSmall"
           , \_ -> sizeView cfg Size.extraSmall
-          , { note = notes "extraSmall"
-            , code = ""
+          , { defaultWithMenu
+                | note = notes "extraSmall"
             }
           )
         ]

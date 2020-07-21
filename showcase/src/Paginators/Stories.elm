@@ -64,5 +64,6 @@ Paginator.nonNumeric
     cfg
 """
           , note = ""
+          , hasMenu = False
           }
         )
