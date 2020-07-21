@@ -45,11 +45,4 @@ iconsSvgSprite =
 
 prettifyElmCode : String -> String
 prettifyElmCode code =
-    """
-```elm
-"""
-        ++ code
-        ++ """
-```
-
-"""
+    "```elm" ++ code ++ "\n```"
