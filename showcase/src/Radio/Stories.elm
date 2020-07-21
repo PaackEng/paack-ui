@@ -10,7 +10,7 @@ import UI.Internal.Basics exposing (ifThenElse)
 import UI.Radio as Radio
 import UI.Text as Text
 import UIExplorer exposing (storiesOf)
-import Utils exposing (iconsSvgSprite, prettifyElmCode, storyWithModel)
+import Utils exposing (goToDocsCallToAction, iconsSvgSprite, prettifyElmCode, storyWithModel)
 
 
 update : RadioMsg.Msg -> RadioModel.Model -> Return RadioMsg.Msg RadioModel.Model
@@ -65,5 +65,6 @@ Radio.group renderConfig
     , ( PinkFloyd, "Pink Floyd" )
     ]
 """
+            , note = goToDocsCallToAction "Radio"
           }
         )

@@ -4,14 +4,22 @@ import Buttons.Model as Buttons
 import Buttons.Msg as Buttons
 import Element exposing (column, fill, row, spacing, text, width)
 import Msg as Msg
-import PluginOptions exposing (defaultWithMenu)
+import PluginOptions exposing (PluginOptions, defaultWithMenu)
 import Return as R exposing (Return)
 import UI.Button as Button
 import UI.Icon as Icon
 import UI.Link as Link
 import UI.RenderConfig as RenderConfig
 import UIExplorer exposing (storiesOf)
-import Utils exposing (iconsSvgSprite, prettifyElmCode, story, storyList, storyWithModel)
+import Utils
+    exposing
+        ( goToDocsCallToAction
+        , iconsSvgSprite
+        , prettifyElmCode
+        , story
+        , storyList
+        , storyWithModel
+        )
 
 
 update : Buttons.Msg -> Buttons.Model -> Return Buttons.Msg Buttons.Model
@@ -47,27 +55,24 @@ enabledStory renderConfig label tone toneStr =
                 |> Button.cmd Msg.NoOp tone
                 |> Button.renderElement renderConfig
           ]
-        , { defaultWithMenu
-            | code =
-                prettifyElmCode <|
-                    """
+        , pluginOptions <|
+            """
 -- Text
 
 Button.fromLabel "Some Text"
     |> Button.cmd YourMessage """
-                        ++ toneStr
-                        ++ """
+                ++ toneStr
+                ++ """
     |> Button.renderElement renderConfig
 
 
 -- Icon
 Button.fromIcon Icon.someIcon
     |> Button.cmd YourMessage """
-                        ++ toneStr
-                        ++ """
+                ++ toneStr
+                ++ """
     |> Button.renderElement renderConfig
 """
-          }
         )
 
 
@@ -83,10 +88,8 @@ disabledButtonStory renderConfig =
                 |> Button.withDisabledIf True
                 |> Button.renderElement renderConfig
           ]
-        , { defaultWithMenu
-            | code =
-                prettifyElmCode
-                    """
+        , pluginOptions
+            """
 -- Text
 
 Button.fromLabel "Some Text"
@@ -100,7 +103,6 @@ Button.fromIcon Icon.someIcon
     |> Button.withDisabledIf True
     |> Button.renderElement renderConfig
 """
-          }
         )
 
 
@@ -130,10 +132,8 @@ successStory renderConfig =
                 |> Button.withSuccessIf True
                 |> Button.renderElement renderConfig
           ]
-        , { defaultWithMenu
-            | code =
-                prettifyElmCode
-                    """
+        , pluginOptions
+            """
 -- Text
 
 Button.fromLabel "Some Text"
@@ -147,7 +147,6 @@ Button.fromIcon Icon.someIcon
     |> Button.withSuccessIf True
     |> Button.renderElement renderConfig
 """
-          }
         )
 
 
@@ -171,15 +170,12 @@ linkStory renderConfig =
         , Button.fromLabel "Go to Blank"
             |> Button.redirect (Link.link "about:blank") Button.hyperlink
             |> Button.renderElement renderConfig
-        , { defaultWithMenu
-            | code =
-                prettifyElmCode
-                    """
+        , pluginOptions
+            """
 Button.fromLabel "Go to Blank"
     |> Button.redirect (Link.link "about:blank") Button.hyperlink
     |> Button.renderElement renderConfig
 """
-          }
         )
 
 
@@ -190,16 +186,13 @@ fullWidthStory renderConfig =
             |> Button.cmd Msg.NoOp Button.primary
             |> Button.withWidth Button.widthFull
             |> Button.renderElement renderConfig
-        , { defaultWithMenu
-            | code =
-                prettifyElmCode
-                    """
+        , pluginOptions
+            """
 Button.fromLabel "Some Text"
     |> Button.cmd YourMessage Button.primary
     |> Button.withWidth Button.widthFull
     |> Button.renderElement renderConfig
 """
-          }
         )
 
 
@@ -224,12 +217,17 @@ toggleStory renderConfig =
     storyWithModel
         ( "Toggle"
         , body
-        , { defaultWithMenu
-            | code =
-                prettifyElmCode
-                    """
+        , pluginOptions
+            """
 Button.toggle "Some Hint" YourMessage TrueOrFalse
     |> Button.renderElement renderConfig
 """
-          }
         )
+
+
+pluginOptions : String -> PluginOptions
+pluginOptions code =
+    { defaultWithMenu
+        | code = prettifyElmCode code
+        , note = goToDocsCallToAction "Button"
+    }

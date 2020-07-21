@@ -3,7 +3,7 @@ module Badges exposing (stories)
 import PluginOptions exposing (defaultWithMenu)
 import UI.Badge as Badge
 import UIExplorer exposing (storiesOf)
-import Utils exposing (prettifyElmCode, story)
+import Utils exposing (goToDocsCallToAction, prettifyElmCode, story)
 
 
 stories cfg =
@@ -26,7 +26,7 @@ oneBadge cfg constructor str =
             | code = prettifyElmCode <| """
 Badge.""" ++ str ++ """ "123"
   |> Badge.renderElement renderCfg
-
 """
+            , note = goToDocsCallToAction "Badge"
           }
         )

@@ -7,7 +7,7 @@ import Element.Font as Font
 import PluginOptions exposing (defaultWithoutMenu)
 import UI.Palette as Palette exposing (Brightness, Tone)
 import UIExplorer exposing (storiesOf)
-import Utils exposing (prettifyElmCode)
+import Utils exposing (goToDocsCallToAction, prettifyElmCode)
 
 
 stories =
@@ -33,7 +33,8 @@ myRedSquare =
         ]
         Element.none
         """
-                , note = """
+                , note =
+                    """
 You will generate colors using a combination of 2 types, `Tone` and `Brightness`, and a function that's returns Palette.Color, `Palette.color`.
 
 Example:
@@ -66,8 +67,8 @@ This is quite a specific use case and we try as much is possible avoid having to
 
 `UI.Palette` has 5 different tones (toneGray, tonePrimary, toneSuccess, toneWarning and toneDanger) and 5 different brightnesses (brightnessDarkest, brightnessMiddle, brightnessLight, brightnessLighter, brightnessLightest).
 
-For more information, check the [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Palette)
 """
+                        ++ goToDocsCallToAction "Palette"
             }
           )
         ]

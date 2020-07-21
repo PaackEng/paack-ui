@@ -5,7 +5,7 @@ import PluginOptions exposing (defaultWithoutMenu)
 import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
 import UI.Text as Text
 import UIExplorer exposing (storiesOf)
-import Utils exposing (prettifyElmCode)
+import Utils exposing (goToDocsCallToAction, prettifyElmCode)
 
 
 stories renderConfig =
@@ -33,7 +33,7 @@ Who will be there to take my place?
     |> Text.body1
     |> Text.renderElement renderConfig
 """
-                , note = ""
+                , note = goToDocsCallToAction "Text"
             }
           )
         ]

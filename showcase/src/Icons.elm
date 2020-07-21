@@ -8,7 +8,7 @@ import PluginOptions exposing (defaultWithoutMenu)
 import UI.Icon as Icon
 import UI.Palette as Palette
 import UIExplorer exposing (storiesOf)
-import Utils exposing (iconsSvgSprite, prettifyElmCode)
+import Utils exposing (goToDocsCallToAction, iconsSvgSprite, prettifyElmCode)
 
 
 stories cfg =
@@ -24,7 +24,12 @@ Icon.seeMore label
     |> Icon.withColor (Palette.color Palette.tonePrimary Palette.brightnessMiddle)
     |> Icon.renderElement cfg
 """
-                , note = "We name icons by their functionality and not their shapes."
+                , note =
+                    """
+We name icons by their functionality and not their shapes.
+
+"""
+                        ++ goToDocsCallToAction "Icon"
             }
           )
         ]

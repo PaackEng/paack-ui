@@ -4,14 +4,14 @@ import Element
 import Element.Background as Background
 import Element.Font as Font
 import Msg as Msg
-import PluginOptions exposing (defaultWithMenu)
+import PluginOptions exposing (PluginOptions, defaultWithMenu)
 import UI.Button as Button
 import UI.Icon as Icon
 import UI.Internal.Palette as Palette
 import UI.Size as Size
 import UI.TextField as TextField
 import UIExplorer exposing (storiesOf)
-import Utils exposing (iconsSvgSprite, prettifyElmCode)
+import Utils exposing (goToDocsCallToAction, iconsSvgSprite, prettifyElmCode)
 
 
 stories cfg =
@@ -19,27 +19,19 @@ stories cfg =
         "Sizes"
         [ ( "Large"
           , \_ -> sizeView cfg Size.large
-          , { defaultWithMenu
-                | code = codeSample "large"
-            }
+          , pluginOptions "large"
           )
         , ( "Medium"
           , \_ -> sizeView cfg Size.medium
-          , { defaultWithMenu
-                | code = codeSample "medium"
-            }
+          , pluginOptions "medium"
           )
         , ( "Small"
           , \_ -> sizeView cfg Size.small
-          , { defaultWithMenu
-                | code = codeSample "small"
-            }
+          , pluginOptions "small"
           )
         , ( "ExtraSmall"
           , \_ -> sizeView cfg Size.extraSmall
-          , { defaultWithMenu
-                | code = codeSample "extraSmall"
-            }
+          , pluginOptions "extraSmall"
           )
         ]
 
@@ -102,6 +94,7 @@ sizeView cfg size =
         |> Element.layout []
 
 
+codeSample : String -> String
 codeSample suffix =
     prettifyElmCode <|
         """
@@ -116,6 +109,7 @@ submitButton =
         |> Button.renderElement renderConfig
 
 -- Icons
+
 logoutIcon = 
     Icon.logout "Logout from this account"
         |> Icon.withSize Size."""
@@ -123,3 +117,11 @@ logoutIcon =
             ++ """
         |> Icon.renderElement renderConfig
 """
+
+
+pluginOptions : String -> PluginOptions
+pluginOptions storyType =
+    { defaultWithMenu
+        | code = codeSample storyType
+        , note = goToDocsCallToAction "Size"
+    }

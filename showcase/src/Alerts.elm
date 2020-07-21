@@ -3,10 +3,11 @@ module Alerts exposing (stories)
 import Element exposing (..)
 import Element.Background as Background
 import Msg as Msg
-import PluginOptions exposing (defaultWithMenu)
+import PluginOptions exposing (PluginOptions, defaultWithMenu)
 import UI.Alert as Alert
+import UI.RenderConfig exposing (RenderConfig)
 import UIExplorer exposing (storiesOf)
-import Utils exposing (prettifyElmCode, story)
+import Utils exposing (goToDocsCallToAction, prettifyElmCode, story)
 
 
 stories renderConfig =
@@ -22,58 +23,51 @@ stories renderConfig =
 primaryStory renderConfig =
     story
         ( "Primary"
-        , Alert.primary "Hey I just met you"
-            |> baseView renderConfig
-        , { defaultWithMenu
-            | code = prettifyElmCode """
-Alert.success "Hey I just met you"
-    |> Alert.toEl
-"""
-          }
+        , alert Alert.primary renderConfig
+        , pluginOptions "primary"
         )
 
 
 successStory renderConfig =
     story
         ( "Success"
-        , Alert.success "Hey I just met you"
-            |> baseView renderConfig
-        , { defaultWithMenu
-            | code = prettifyElmCode """
-Alert.success "Hey I just met you"
-    |> Alert.toEl
-"""
-          }
+        , alert Alert.success renderConfig
+        , pluginOptions "success"
         )
 
 
 warningStory renderConfig =
     story
         ( "Warning"
-        , Alert.warning "Hey I just met you"
-            |> baseView renderConfig
-        , { defaultWithMenu
-            | code = prettifyElmCode """
-Alert.warning "Hey I just met you"
-    |> Alert.toEl
-"""
-          }
+        , alert Alert.warning renderConfig
+        , pluginOptions "warning"
         )
 
 
 dangerStory renderConfig =
     story
         ( "Danger"
-        , Alert.danger "Hey I just met you"
-            |> baseView renderConfig
-        , { defaultWithMenu
-            | code = prettifyElmCode """
-Alert.danger "Hey I just met you"
-    |> Alert.toEl
-"""
-          }
+        , alert Alert.danger renderConfig
+        , pluginOptions "danger"
         )
 
 
-baseView renderConfig content =
-    Alert.renderElement renderConfig content
+alert : (String -> Alert.Alert msg) -> RenderConfig -> Element msg
+alert alertFn renderConfig =
+    alertFn "Hey I just met you"
+        |> Alert.renderElement renderConfig
+
+
+pluginOptions : String -> PluginOptions
+pluginOptions alertType =
+    { defaultWithMenu
+        | code =
+            prettifyElmCode <|
+                """
+Alert."""
+                    ++ alertType
+                    ++ """"Hey I just met you"
+    |> Alert.toEl
+"""
+        , note = goToDocsCallToAction "Alert"
+    }

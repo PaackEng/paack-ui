@@ -10,7 +10,7 @@ import UI.Checkbox as Checkbox
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.Text as Text
 import UIExplorer exposing (storiesOf)
-import Utils exposing (iconsSvgSprite, prettifyElmCode, storyWithModel)
+import Utils exposing (goToDocsCallToAction, iconsSvgSprite, prettifyElmCode, storyWithModel)
 
 
 update : Checkboxes.Msg -> Checkboxes.Model -> Return Checkboxes.Msg Checkboxes.Model
@@ -100,5 +100,6 @@ boxDemo renderConfig =
             |> Text.renderElement renderConfig
         ]
 """
+            , note = goToDocsCallToAction "Checkbox"
           }
         )

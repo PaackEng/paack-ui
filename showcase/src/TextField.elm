@@ -2,10 +2,10 @@ module TextField exposing (stories)
 
 import Element exposing (..)
 import Msg as RootMsg
-import PluginOptions exposing (defaultWithMenu)
+import PluginOptions exposing (PluginOptions, defaultWithMenu)
 import UI.TextField as TextField
 import UIExplorer exposing (storiesOf)
-import Utils exposing (prettifyElmCode, story, storyWithModel)
+import Utils exposing (goToDocsCallToAction, prettifyElmCode, story, storyWithModel)
 
 
 stories cfg =
@@ -27,8 +27,8 @@ defaultTextFieldStory cfg =
             |> TextField.withPlaceholder "Enter your info here"
             |> TextField.setLabelVisible True
             |> TextField.renderElement cfg
-        , { defaultWithMenu
-            | code = prettifyElmCode """
+        , pluginOptions
+            """
 type Msg
     = OnTextFieldChanged String
     | ...
@@ -42,7 +42,6 @@ type Msg
     |> TextField.setLabelVisible True
     |> TextField.renderElement renderCfg
 """
-          }
         )
 
 
@@ -54,8 +53,8 @@ usernameTextFieldStory cfg =
             "Value"
             |> TextField.setLabelVisible True
             |> TextField.renderElement cfg
-        , { defaultWithMenu
-            | code = prettifyElmCode """
+        , pluginOptions
+            """
 type Msg
     = OnTextFieldChanged String
     | ...
@@ -68,7 +67,6 @@ TextField.username OnTextFieldChanged
     |> TextField.setLabelVisible true
     |> TextField.renderElement renderCfg
 """
-          }
         )
 
 
@@ -80,8 +78,8 @@ passwordTextFieldStory cfg =
             "Value"
             |> TextField.setLabelVisible True
             |> TextField.renderElement cfg
-        , { defaultWithMenu
-            | code = prettifyElmCode """
+        , pluginOptions
+            """
 type Msg
     = OnTextFieldChanged String
     | ...
@@ -94,7 +92,6 @@ TextField.currentPassword OnTextFieldChanged
     |> TextField.setLabelVisible True
     |> TextField.renderElement renderCfg
 """
-          }
         )
 
 
@@ -107,8 +104,8 @@ fullWidthStory cfg =
             |> TextField.setLabelVisible True
             |> TextField.withWidth TextField.widthFull
             |> TextField.renderElement cfg
-        , { defaultWithMenu
-            | code = prettifyElmCode """
+        , pluginOptions
+            """
 type Msg
     = OnTextFieldChanged String
     | ...
@@ -122,5 +119,12 @@ TextField.singlelineText OnTextFieldChanged
     |> TextField.withWidth TextField.widthFull
     |> TextField.renderElement renderCfg
 """
-          }
         )
+
+
+pluginOptions : String -> PluginOptions
+pluginOptions code =
+    { defaultWithMenu
+        | code = prettifyElmCode code
+        , note = goToDocsCallToAction "TextField"
+    }

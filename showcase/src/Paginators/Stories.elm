@@ -8,7 +8,7 @@ import PluginOptions exposing (defaultWithoutMenu)
 import Return as R exposing (Return)
 import UI.Paginator as Paginator
 import UIExplorer exposing (storiesOf)
-import Utils exposing (iconsSvgSprite, prettifyElmCode, story, storyWithModel)
+import Utils exposing (goToDocsCallToAction, iconsSvgSprite, prettifyElmCode, story, storyWithModel)
 
 
 defaultPageSize : Int
@@ -65,5 +65,6 @@ Paginator.nonNumeric
     }
     renderConfig
 """
+            , note = goToDocsCallToAction "Paginator"
           }
         )
