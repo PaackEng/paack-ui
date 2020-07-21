@@ -5,6 +5,7 @@ import Element.Events as Events
 import UI.Icon as Icon
 import UI.Internal.Palette as Palette
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
+import UI.Size as Size
 import UI.Text as Text
 import UI.Utils.ARIA as ARIA exposing (roleButton)
 import UI.Utils.Element as Element exposing (RectangleSides)
@@ -123,13 +124,13 @@ titleText cfg padding title =
 closeButton : RenderConfig -> msg -> Element msg
 closeButton cfg close =
     Icon.close "Close dialog"
+        |> Icon.withSize Size.extraSmall
         |> Icon.renderElement cfg
         |> Element.el
             (ARIA.toElementAttributes ARIA.roleButton
                 ++ [ Events.onClick close
                    , Element.pointer
-                   , Element.width (px 20)
-                   , Element.paddingXY 20 10
+                   , Element.padding 12
                    , Element.height shrink
                    , Element.alignTop
                    ]
