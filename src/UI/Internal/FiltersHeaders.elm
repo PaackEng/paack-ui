@@ -222,18 +222,37 @@ filterEditingButton renderConfig applyMsg clearMsg applied current =
 dialogHeader : RenderConfig -> msg -> String -> Element msg
 dialogHeader renderConfig discardMsg label =
     Element.row
-        [ Element.paddingEach { top = 10, left = 12, right = 10, bottom = 7 }
+        [ Element.paddingEach { top = 10, left = 12, right = 10, bottom = 8 }
         , Element.width fill
         , Border.color Palette.gray.lighter
         , Border.widthEach { zeroPadding | bottom = 1 }
         ]
-        [ Text.overline label
-            |> Text.renderElement renderConfig
-        , Button.fromIcon (Icon.close "Close")
-            |> Button.cmd discardMsg Button.clear
-            |> Button.withSize Size.extraSmall
-            |> Button.renderElement renderConfig
+        [ dialogTitle label
+        , dialogClose renderConfig discardMsg
         ]
+
+
+dialogTitle : String -> Element msg
+dialogTitle label =
+    label
+        |> Element.text
+        |> Element.el [ Font.bold, Font.size 12 ]
+
+
+dialogClose : RenderConfig -> msg -> Element msg
+dialogClose renderConfig message =
+    Icon.close "Close"
+        |> Icon.withSize Size.extraSmall
+        |> Icon.renderElement renderConfig
+        |> Element.el
+            (ARIA.toElementAttributes ARIA.roleButton
+                ++ [ Events.onClick message
+                   , Element.pointer
+                   , Element.centerY
+                   , Element.height shrink
+                   , Element.alignRight
+                   ]
+            )
 
 
 dialog :
