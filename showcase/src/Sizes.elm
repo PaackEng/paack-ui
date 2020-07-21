@@ -20,25 +20,25 @@ stories cfg =
         [ ( "Large"
           , \_ -> sizeView cfg Size.large
           , { defaultWithMenu
-                | note = notes "large"
+                | code = codeSample "large"
             }
           )
         , ( "Medium"
           , \_ -> sizeView cfg Size.medium
           , { defaultWithMenu
-                | note = notes "medium"
+                | code = codeSample "medium"
             }
           )
         , ( "Small"
           , \_ -> sizeView cfg Size.small
           , { defaultWithMenu
-                | note = notes "small"
+                | code = codeSample "small"
             }
           )
         , ( "ExtraSmall"
           , \_ -> sizeView cfg Size.extraSmall
           , { defaultWithMenu
-                | note = notes "extraSmall"
+                | code = codeSample "extraSmall"
             }
           )
         ]
@@ -102,20 +102,24 @@ sizeView cfg size =
         |> Element.layout []
 
 
-notes suffix =
-    """To achieve this size use:
+codeSample suffix =
+    prettifyElmCode <|
+        """
+-- Buttons
 
-* Buttons
-```elm
---...
-    |> Button.withSize Size.""" ++ suffix ++ """
-    -- ...
-```
+submitButton = 
+    Button.fromLabel "Submit"
+        |> Button.cmd FormSend Button.primary
+        |> Button.withSize Size."""
+            ++ suffix
+            ++ """
+        |> Button.renderElement renderConfig
 
-* Icons
-```elm
---...
-    |> Icon.withSize Size.""" ++ suffix ++ """
-    -- ...
-```
-  """
+-- Icons
+logoutIcon = 
+    Icon.logout "Logout from this account"
+        |> Icon.withSize Size."""
+            ++ suffix
+            ++ """
+        |> Icon.renderElement renderConfig
+"""
