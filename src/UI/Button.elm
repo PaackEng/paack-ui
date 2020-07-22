@@ -69,7 +69,7 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import UI.Icon as Icon exposing (Icon)
-import UI.Internal.Basics exposing (lazyMap, maybeToList, pairUncurry, prependMaybe)
+import UI.Internal.Basics exposing (lazyMap, pairUncurry, prependMaybe)
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Size as Size exposing (Size)
@@ -739,8 +739,8 @@ textSize size =
 
 
 type alias ThemeTriple =
-    { background : Maybe Palette.Color
-    , border : Maybe Palette.Color
+    { background : Palette.Color
+    , border : Palette.Color
     , text : TextColor
     }
 
@@ -768,12 +768,10 @@ themeToAttributes theme =
 
 tripleToAttributes : ThemeTriple -> List (Element.Attr decorative msg)
 tripleToAttributes { background, border, text } =
-    text
-        |> Text.fontColor
-        |> Maybe.map Font.color
-        |> maybeToList
-        |> prependMaybe (Maybe.map (Palette.toElementColor >> Background.color) background)
-        |> prependMaybe (Maybe.map (Palette.toElementColor >> Border.color) border)
+    [ Background.color (Palette.toElementColor background)
+    , Border.color (Palette.toElementColor border)
+    ]
+        |> prependMaybe (Maybe.map Font.color (Text.fontColor text))
 
 
 
@@ -788,16 +786,16 @@ toggleTheme current =
 
         else
             { normal =
-                { background = Nothing
-                , border = Just <| Palette.color Palette.tonePrimary brightnessMiddle
+                { background = Palette.color Palette.tonePrimary brightnessMiddle
+                , border = Palette.color Palette.tonePrimary brightnessMiddle
                 , text =
                     Palette.color Palette.tonePrimary brightnessMiddle
                         |> Text.ColorPalette
                 }
             , hover =
                 Just
-                    { background = Just <| Palette.color Palette.tonePrimary brightnessLightest
-                    , border = Just <| Palette.color Palette.tonePrimary brightnessDarkest
+                    { background = Palette.color Palette.tonePrimary brightnessLightest
+                    , border = Palette.color Palette.tonePrimary brightnessDarkest
                     , text =
                         Palette.color Palette.tonePrimary brightnessDarkest
                             |> Text.ColorPalette
@@ -814,8 +812,8 @@ workingTheme tone =
 
             ToneDanger ->
                 { normal =
-                    { background = Just <| Palette.color Palette.toneDanger brightnessMiddle
-                    , border = Just <| Palette.color Palette.toneDanger brightnessMiddle
+                    { background = Palette.color Palette.toneDanger brightnessMiddle
+                    , border = Palette.color Palette.toneDanger brightnessMiddle
                     , text =
                         Palette.color Palette.toneDanger brightnessMiddle
                             |> Palette.setContrasting True
@@ -823,8 +821,8 @@ workingTheme tone =
                     }
                 , hover =
                     Just
-                        { background = Just <| Palette.color Palette.toneDanger brightnessDarkest
-                        , border = Just <| Palette.color Palette.toneDanger brightnessDarkest
+                        { background = Palette.color Palette.toneDanger brightnessDarkest
+                        , border = Palette.color Palette.toneDanger brightnessDarkest
                         , text =
                             Palette.color Palette.toneDanger brightnessDarkest
                                 |> Palette.setContrasting True
@@ -834,16 +832,16 @@ workingTheme tone =
 
             ToneLight ->
                 { normal =
-                    { background = Just <| Palette.color Palette.toneGray brightnessLightest
-                    , border = Just <| Palette.color Palette.toneGray brightnessLightest
+                    { background = Palette.color Palette.toneGray brightnessLightest
+                    , border = Palette.color Palette.toneGray brightnessLightest
                     , text =
                         Palette.color Palette.tonePrimary brightnessMiddle
                             |> Text.ColorPalette
                     }
                 , hover =
                     Just
-                        { background = Just <| Palette.color Palette.toneGray brightnessLighter
-                        , border = Just <| Palette.color Palette.toneGray brightnessLighter
+                        { background = Palette.color Palette.toneGray brightnessLighter
+                        , border = Palette.color Palette.toneGray brightnessLighter
                         , text =
                             Palette.color Palette.tonePrimary brightnessDarkest
                                 |> Text.ColorPalette
@@ -852,16 +850,20 @@ workingTheme tone =
 
             ToneClear ->
                 { normal =
-                    { background = Nothing
-                    , border = Nothing
+                    { background =
+                        Palette.color Palette.tonePrimary brightnessMiddle
+                            |> Palette.withAlpha 0
+                    , border =
+                        Palette.color Palette.tonePrimary brightnessMiddle
+                            |> Palette.withAlpha 0
                     , text =
                         Palette.color Palette.tonePrimary brightnessMiddle
                             |> Text.ColorPalette
                     }
                 , hover =
                     Just
-                        { background = Just <| Palette.color Palette.toneGray brightnessLightest
-                        , border = Just <| Palette.color Palette.toneGray brightnessLightest
+                        { background = Palette.color Palette.toneGray brightnessLightest
+                        , border = Palette.color Palette.toneGray brightnessLightest
                         , text =
                             Palette.color Palette.tonePrimary brightnessMiddle
                                 |> Text.ColorPalette
@@ -875,8 +877,8 @@ disabledTheme body =
         case body of
             BodyIcon _ ->
                 { normal =
-                    { background = Just <| Palette.color Palette.toneGray brightnessLightest
-                    , border = Just <| Palette.color Palette.toneGray brightnessLightest
+                    { background = Palette.color Palette.toneGray brightnessLightest
+                    , border = Palette.color Palette.toneGray brightnessLightest
                     , text =
                         Palette.color Palette.toneGray brightnessLight
                             |> Text.ColorPalette
@@ -886,8 +888,8 @@ disabledTheme body =
 
             BodyText _ ->
                 { normal =
-                    { background = Just <| Palette.color Palette.toneGray brightnessLight
-                    , border = Just <| Palette.color Palette.toneGray brightnessLight
+                    { background = Palette.color Palette.toneGray brightnessLight
+                    , border = Palette.color Palette.toneGray brightnessLight
                     , text =
                         Palette.color Palette.toneGray brightnessLight
                             |> Palette.setContrasting True
@@ -901,8 +903,8 @@ successTheme : ButtonBody -> List (Attribute msg)
 successTheme _ =
     themeToAttributes <|
         { normal =
-            { background = Just <| Palette.color Palette.toneSuccess brightnessMiddle
-            , border = Just <| Palette.color Palette.toneSuccess brightnessMiddle
+            { background = Palette.color Palette.toneSuccess brightnessMiddle
+            , border = Palette.color Palette.toneSuccess brightnessMiddle
             , text =
                 Palette.color Palette.toneSuccess brightnessMiddle
                     |> Palette.setContrasting True
@@ -910,8 +912,8 @@ successTheme _ =
             }
         , hover =
             Just
-                { background = Just <| Palette.color Palette.toneSuccess brightnessDarkest
-                , border = Just <| Palette.color Palette.toneSuccess brightnessDarkest
+                { background = Palette.color Palette.toneSuccess brightnessDarkest
+                , border = Palette.color Palette.toneSuccess brightnessDarkest
                 , text =
                     Palette.color Palette.toneSuccess brightnessDarkest
                         |> Palette.setContrasting True
@@ -923,8 +925,8 @@ successTheme _ =
 primaryTheme : ButtonTheme
 primaryTheme =
     { normal =
-        { background = Just <| Palette.color Palette.tonePrimary brightnessMiddle
-        , border = Just <| Palette.color Palette.tonePrimary brightnessMiddle
+        { background = Palette.color Palette.tonePrimary brightnessMiddle
+        , border = Palette.color Palette.tonePrimary brightnessMiddle
         , text =
             Palette.color Palette.tonePrimary brightnessMiddle
                 |> Palette.setContrasting True
@@ -932,8 +934,8 @@ primaryTheme =
         }
     , hover =
         Just
-            { background = Just <| Palette.color Palette.tonePrimary brightnessDarkest
-            , border = Just <| Palette.color Palette.tonePrimary brightnessDarkest
+            { background = Palette.color Palette.tonePrimary brightnessDarkest
+            , border = Palette.color Palette.tonePrimary brightnessDarkest
             , text =
                 Palette.color Palette.tonePrimary brightnessDarkest
                     |> Palette.setContrasting True
