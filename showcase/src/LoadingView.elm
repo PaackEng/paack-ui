@@ -51,6 +51,6 @@ pluginOptions : String -> PluginOptions
 pluginOptions loadingViewType =
     { defaultWithMenu
         | code =
-            prettifyElmCode ("\nLoadingView." ++ loadingViewType)
+            prettifyElmCode ("LoadingView." ++ loadingViewType)
         , note = goToDocsCallToAction "LoadingView"
     }
