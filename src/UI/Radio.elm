@@ -53,8 +53,8 @@ radioButton renderConfig message label state =
             [ Element.width (px 26)
             , Element.height (px 26)
             , Border.color Palette.primary.middle
-            , Border.width 3
-            , Border.rounded 26
+            , Border.width 2
+            , Border.rounded 8
             , Events.onClick message
             , Element.pointer
             ]

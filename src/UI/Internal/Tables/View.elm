@@ -1,4 +1,4 @@
-module UI.Internal.TableView exposing (..)
+module UI.Internal.Tables.View exposing (..)
 
 import Element exposing (Attribute, Element, fill, fillPortion, minimum, px, shrink)
 import Element.Background as Background
@@ -7,7 +7,7 @@ import UI.Button as Button
 import UI.Internal.NArray as NArray
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
-import UI.Internal.Table exposing (..)
+import UI.Internal.Tables.Common exposing (..)
 import UI.Palette as Palette exposing (brightnessMiddle, toneGray)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Tables.Common as Common exposing (..)

@@ -1,4 +1,4 @@
-module UI.Internal.Table exposing (..)
+module UI.Internal.Tables.Common exposing (..)
 
 import UI.Button exposing (Button)
 import UI.Text exposing (Text)

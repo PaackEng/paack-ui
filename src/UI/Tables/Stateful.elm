@@ -145,11 +145,11 @@ import Element exposing (Element, shrink)
 import Time
 import UI.Internal.Basics exposing (flip)
 import UI.Internal.DateInput as DateInput exposing (DateInput, PeriodDate, RangeDate)
-import UI.Internal.Filters as Filters
-import UI.Internal.FiltersHeaders as FiltersHeaders
 import UI.Internal.NArray as NArray exposing (NArray)
-import UI.Internal.Table exposing (..)
-import UI.Internal.TableView exposing (..)
+import UI.Internal.Tables.Common exposing (..)
+import UI.Internal.Tables.Filters as Filters
+import UI.Internal.Tables.FiltersView as FiltersView
+import UI.Internal.Tables.View exposing (..)
 import UI.ListView as ListView
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Tables.Common as Common exposing (..)
@@ -906,7 +906,7 @@ filterHeader :
     -> Int
     -> Element msg
 filterHeader renderConfig toExternalMsg selected (Column header { width }) filter index =
-    FiltersHeaders.header renderConfig
+    FiltersView.header renderConfig
         filter
         { openMsg = toExternalMsg <| FilterDialogOpen index
         , discardMsg = toExternalMsg <| FilterDialogClose

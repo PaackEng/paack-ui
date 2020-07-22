@@ -1,4 +1,4 @@
-module UI.Internal.Filters exposing (..)
+module UI.Internal.Tables.Filters exposing (..)
 
 import Array exposing (Array)
 import Task
