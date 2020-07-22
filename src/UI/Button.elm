@@ -69,7 +69,7 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import UI.Icon as Icon exposing (Icon)
-import UI.Internal.Basics exposing (lazyMap, maybeToList, pairUncurry, prependMaybe)
+import UI.Internal.Basics exposing (lazyMap, pairUncurry, prependMaybe)
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Size as Size exposing (Size)
