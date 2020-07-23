@@ -3,7 +3,6 @@ module UI.Internal.Text exposing (..)
 import Element exposing (Attribute, Element, fill)
 import Element.Font as Font
 import Html
-import Html.Attributes
 import List
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.Internal.Palette as Palette
