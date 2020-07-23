@@ -45,7 +45,7 @@ icons =
 iconView cfg size ( iconFn, label ) =
     Element.column
         [ Background.color Palette.gray.darkest
-        , Font.color Palette.contrastGray.darkest
+        , Font.color Palette.darkConstrast.darkest
         , Element.spacing 10
         , Element.padding 10
         ]

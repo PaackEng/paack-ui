@@ -297,7 +297,7 @@ contrastColors : Tone -> ToneColors
 contrastColors tone =
     case tone of
         ToneGray ->
-            contrastGray
+            darkConstrast
 
         TonePrimary ->
             contrastPrimary

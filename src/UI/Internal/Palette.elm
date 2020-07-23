@@ -71,8 +71,8 @@ warning =
 -- Contrasted Tones
 
 
-contrastGray : ToneColors
-contrastGray =
+darkConstrast : ToneColors
+darkConstrast =
     { darkest = rgb255 255 255 255 -- #FFF
     , middle = rgb255 255 255 255 -- #FFF
     , light = rgb255 255 255 255 -- #FFF
@@ -81,13 +81,8 @@ contrastGray =
     }
 
 
-contrastPrimary : ToneColors
-contrastPrimary =
-    contrastGray
-
-
-contrastSuccess : ToneColors
-contrastSuccess =
+lightContrast : ToneColors
+lightContrast =
     { darkest = rgb255 255 255 255 -- #FFF
     , middle = gray.darkest
     , light = gray.darkest
@@ -96,14 +91,24 @@ contrastSuccess =
     }
 
 
+contrastPrimary : ToneColors
+contrastPrimary =
+    darkConstrast
+
+
+contrastSuccess : ToneColors
+contrastSuccess =
+    lightContrast
+
+
 contrastDanger : ToneColors
 contrastDanger =
-    contrastGray
+    darkConstrast
 
 
 contrastWarning : ToneColors
 contrastWarning =
-    contrastGray
+    lightContrast
 
 
 
