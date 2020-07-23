@@ -179,6 +179,8 @@ ellipsis : List (Attribute msg)
 ellipsis =
     [ ( "text-overflow", "ellipsis" )
     , ( "white-space", "nowrap" )
+    , ( "overflow", "hidden" )
+    , ( "display", "block" )
     ]
         |> List.map stylePair
         |> (::) Element.clip

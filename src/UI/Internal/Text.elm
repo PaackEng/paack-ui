@@ -2,6 +2,8 @@ module UI.Internal.Text exposing (..)
 
 import Element exposing (Attribute, Element, fill)
 import Element.Font as Font
+import Html
+import Html.Attributes
 import List
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.Internal.Palette as Palette
@@ -105,7 +107,7 @@ attributes config size ellipsis color =
 
         ellipsisAttrs attrs =
             if ellipsis then
-                (oneLineHeight mobile size :: Element.ellipsis) ++ attrs
+                oneLineHeight mobile size :: attrs
 
             else
                 attrs
@@ -335,7 +337,7 @@ spanMapOptions applier (Span prop opt) =
 spanRenderEl : RenderConfig -> Span -> Element msg
 spanRenderEl cfg (Span { content, size } { color, oneLineEllipsis }) =
     content
-        |> Element.text
+        |> ifThenElse oneLineEllipsis ellipsizedText Element.text
         |> List.singleton
         |> Element.paragraph
             (attributes cfg size oneLineEllipsis color)
@@ -365,3 +367,11 @@ combinedAttrs { ellipsis } =
 
     else
         []
+
+
+ellipsizedText : String -> Element msg
+ellipsizedText content =
+    content
+        |> Html.text
+        |> Element.html
+        |> Element.el Element.ellipsis
