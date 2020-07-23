@@ -34,7 +34,7 @@ checkbox renderConfig message label state =
             [ Element.width (px 26)
             , Element.height (px 26)
             , Border.color Palette.primary.middle
-            , Border.width 3
+            , Border.width 2
             , Border.rounded 8
             , Events.onClick (message (not state))
             , Element.pointer
