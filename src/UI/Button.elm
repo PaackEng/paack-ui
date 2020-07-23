@@ -786,7 +786,9 @@ toggleTheme current =
 
         else
             { normal =
-                { background = Palette.color Palette.tonePrimary brightnessMiddle
+                { background =
+                    Palette.color Palette.tonePrimary brightnessMiddle
+                        |> Palette.setContrasting True
                 , border = Palette.color Palette.tonePrimary brightnessMiddle
                 , text =
                     Palette.color Palette.tonePrimary brightnessMiddle

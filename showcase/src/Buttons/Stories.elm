@@ -207,11 +207,12 @@ toggleStory renderConfig =
                     [ iconsSvgSprite
                     , Button.toggle "Toggle what's there" msg buttonsStories.demoSwitch
                         |> Button.renderElement renderConfig
+                    , Element.text "Click this Button!"
                     , if buttonsStories.demoSwitch then
-                        Element.text "Click this Button!"
+                        Element.text "Something is active."
 
                       else
-                        Element.text "Why did you do it?"
+                        Element.text "Something is disabled."
                     ]
     in
     storyWithModel
