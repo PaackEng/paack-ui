@@ -46,7 +46,7 @@ iconsSvgSprite =
 
 prettifyElmCode : String -> String
 prettifyElmCode code =
-    "```elm" ++ code ++ "\n```"
+    "```elm\n" ++ code ++ "\n```"
 
 
 goToDocsCallToAction : String -> String

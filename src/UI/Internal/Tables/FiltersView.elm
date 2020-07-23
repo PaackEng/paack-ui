@@ -1,4 +1,4 @@
-module UI.Internal.FiltersHeaders exposing (Config, header)
+module UI.Internal.Tables.FiltersView exposing (Config, header)
 
 import Array exposing (Array)
 import Element exposing (Attribute, Element, fill, minimum, shrink)
@@ -11,15 +11,14 @@ import UI.Button as Button
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (maybeNotThen)
 import UI.Internal.DateInput as DateInput exposing (DateInput(..), PeriodComparison(..), PeriodDate, RangeDate)
-import UI.Internal.Filters as Filters
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Size as Size exposing (Size)
+import UI.Internal.Tables.Filters as Filters
 import UI.Palette as Palette
 import UI.Radio as Radio
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
-import UI.Text as Text
 import UI.TextField as TextField exposing (TextField)
 import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element exposing (zeroPadding)
@@ -94,7 +93,7 @@ headerNormal : RenderConfig -> msg -> String -> Element msg
 headerNormal renderConfig openMsg label =
     -- Button.light
     Element.row (Element.onIndividualClick openMsg :: headerAttrs False)
-        [ Element.text label
+        [ filteredHeaderLabel label
         , Icon.filter label
             |> Icon.withSize size
             |> Icon.renderElement renderConfig
@@ -115,6 +114,11 @@ headerApplied renderConfig openMsg clearMsg clearHint label =
         ]
 
 
+headerPadX : Int
+headerPadX =
+    (36 - 16) // 2
+
+
 headerAttrs : Bool -> List (Attribute msg)
 headerAttrs isApplied =
     let
@@ -127,7 +131,7 @@ headerAttrs isApplied =
 
         paddingXY =
             Element.paddingXY
-                ((36 - 16) // 2)
+                headerPadX
                 ((36 - baseHeight) // 2)
 
         workingTheme =
@@ -222,18 +226,39 @@ filterEditingButton renderConfig applyMsg clearMsg applied current =
 dialogHeader : RenderConfig -> msg -> String -> Element msg
 dialogHeader renderConfig discardMsg label =
     Element.row
-        [ Element.paddingEach { top = 10, left = 12, right = 10, bottom = 7 }
+        [ Element.paddingEach { top = 10, left = headerPadX, right = 10, bottom = 9 }
         , Element.width fill
         , Border.color Palette.gray.lighter
         , Border.widthEach { zeroPadding | bottom = 1 }
         ]
-        [ Text.overline label
-            |> Text.renderElement renderConfig
-        , Button.fromIcon (Icon.close "Close")
-            |> Button.cmd discardMsg Button.clear
-            |> Button.withSize Size.extraSmall
-            |> Button.renderElement renderConfig
+        [ filteredHeaderLabel label
+        , dialogClose renderConfig discardMsg
         ]
+
+
+filteredHeaderLabel : String -> Element msg
+filteredHeaderLabel label =
+    label
+        |> Element.text
+        |> Element.el [ Font.bold, Font.size 12 ]
+
+
+dialogClose : RenderConfig -> msg -> Element msg
+dialogClose renderConfig message =
+    Icon.close "Close"
+        |> Icon.withColor (Palette.color Palette.toneGray Palette.brightnessLight)
+        |> Icon.withSize Size.extraSmall
+        |> Icon.renderElement renderConfig
+        |> Element.el
+            (ARIA.toElementAttributes ARIA.roleButton
+                ++ [ Events.onClick message
+                   , Element.pointer
+                   , Element.centerY
+                   , Element.paddingXY 3 3
+                   , Element.height shrink
+                   , Element.alignRight
+                   ]
+            )
 
 
 dialog :

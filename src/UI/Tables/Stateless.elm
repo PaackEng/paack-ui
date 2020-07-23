@@ -58,8 +58,8 @@ Where `Book` is:
 
 import Element exposing (Element, shrink)
 import UI.Internal.NArray as NArray
-import UI.Internal.Table exposing (..)
-import UI.Internal.TableView exposing (..)
+import UI.Internal.Tables.Common exposing (..)
+import UI.Internal.Tables.View exposing (..)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Tables.Common exposing (..)
 
