@@ -291,11 +291,11 @@ dialog renderConfig config filter clearMsg applyMsg content =
                 [ dialogHeader renderConfig config.discardMsg config.label
                 , Element.column
                     [ Element.width fill
-                    , Element.padding 12
-                    , Element.spacing 20
+                    , Element.spacing 12
                     ]
                     [ content
                     , filterEditingButton renderConfig applyMsg clearMsg applied current
+                        |> internalPaddingBox
                     ]
                 ]
         ]
@@ -338,6 +338,7 @@ singleTextFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
         |> TextField.withWidth TextField.widthFull
         |> TextField.withOnEnterPressed applyMsg
         |> TextField.renderElement renderConfig
+        |> internalPaddingBox
 
 
 multiTextFilterRender :
@@ -364,7 +365,7 @@ multiTextFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } edi
         |> Array.push ""
         |> Array.indexedMap rowField
         |> Array.toList
-        |> Element.column [ Element.width fill, Element.spacing 8 ]
+        |> Element.column [ Element.width fill, Element.spacing 8, internalPadding ]
 
 
 selectFilterRender :
@@ -374,11 +375,13 @@ selectFilterRender :
     -> Filters.Editable Int
     -> Element msg
 selectFilterRender renderConfig { fromFiltersMsg, index } list { current, applied } =
-    Radio.group renderConfig
+    Radio.group
         "Select option for filtering"
         (\subIndex -> fromFiltersMsg <| Filters.EditSelect { column = index, value = subIndex })
-        (maybeNotThen applied current)
-        (List.indexedMap Tuple.pair list)
+        |> Radio.withSelected (maybeNotThen applied current)
+        |> Radio.withButtons (List.indexedMap Radio.button list)
+        |> Radio.withWidth Radio.widthFull
+        |> Radio.renderElement renderConfig
 
 
 singleDateFilterRender :
@@ -396,6 +399,7 @@ singleDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
         |> Filters.editableWithDefault (DateInvalid "")
         |> dateInput applyMsg editMsg "DD/MM/YYYY" label
         |> TextField.renderElement renderConfig
+        |> internalPaddingBox
 
 
 rangeDateFilterRender :
@@ -420,6 +424,7 @@ rangeDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } edi
     Element.column
         [ Element.width fill
         , Element.spacing 8
+        , internalPadding
         ]
         [ current.from
             |> dateInput applyMsg editFromMsg "From: DD/MM/YYYY" label
@@ -449,23 +454,25 @@ periodDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
                 |> Filters.editableWithDefault { date = DateInvalid "", comparison = On }
 
         options =
-            [ ( On, "On" )
-            , ( Before, "Before" )
-            , ( After, "After" )
+            [ Radio.button On "On"
+            , Radio.button Before "Before"
+            , Radio.button After "After"
             ]
     in
     Element.column
         [ Element.width fill
-        , Element.spacing 8
         ]
         [ current.date
             |> dateInput applyMsg editDateMsg "DD/MM/YYYY" label
             |> TextField.renderElement renderConfig
-        , Radio.group renderConfig
+            |> internalPaddingBox
+        , Radio.group
             "Select period reference"
             editComparisonMsg
-            (Just current.comparison)
-            options
+            |> Radio.withSelected (Just current.comparison)
+            |> Radio.withButtons options
+            |> Radio.withWidth Radio.widthFull
+            |> Radio.renderElement renderConfig
         ]
 
 
@@ -481,3 +488,13 @@ dateInput applyMsg editMsg placeholder label current =
         |> TextField.withSize Size.extraSmall
         |> TextField.withWidth TextField.widthFull
         |> TextField.withOnEnterPressed applyMsg
+
+
+internalPadding : Attribute msg
+internalPadding =
+    Element.paddingXY 12 8
+
+
+internalPaddingBox : Element msg -> Element msg
+internalPaddingBox child =
+    Element.el [ internalPadding ] child

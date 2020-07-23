@@ -37,16 +37,18 @@ demo renderConfig =
                 [ iconsSvgSprite
                 , Text.body2 label
                     |> Text.renderElement renderConfig
-                , Radio.group renderConfig
+                , Radio.group
                     label
                     (RadioMsg.Set >> Msg.RadioStoriesMsg)
-                    radioStories.selected
-                    [ ( RadioModel.Queen, "Queen" )
-                    , ( RadioModel.Beatles, "Beatles" )
-                    , ( RadioModel.ACDC, "AC/DC" )
-                    , ( RadioModel.LedZeppelin, "Led Zeppelin" )
-                    , ( RadioModel.PinkFloyd, "Pink Floyd" )
-                    ]
+                    |> Radio.withSelected radioStories.selected
+                    |> Radio.withButtons
+                        [ Radio.button RadioModel.Queen "Queen"
+                        , Radio.button RadioModel.Beatles "Beatles"
+                        , Radio.button RadioModel.ACDC "AC/DC"
+                        , Radio.button RadioModel.LedZeppelin "Led Zeppelin"
+                        , Radio.button RadioModel.PinkFloyd "Pink Floyd"
+                        ]
+                    |> Radio.renderElement renderConfig
                 ]
     in
     storyWithModel
@@ -54,16 +56,18 @@ demo renderConfig =
         , view
         , { defaultWithoutMenu
             | code = prettifyElmCode """
-Radio.group renderConfig
+Radio.group
     "Pick one classic rock band"
     Msg.RadioSet
-    model.selected
-    [ ( Queen, "Queen" )
-    , ( Beatles, "Beatles" )
-    , ( ACDC, "AC/DC" )
-    , ( LedZeppelin, "Led Zeppelin" )
-    , ( PinkFloyd, "Pink Floyd" )
-    ]
+    |> Radio.withSelected model.selected
+    |> Radio.withButtons
+        [ Radio.button Model.Queen "Queen"
+        , Radio.button Model.Beatles "Beatles"
+        , Radio.button Model.ACDC "AC/DC"
+        , Radio.button Model.LedZeppelin "Led Zeppelin"
+        , Radio.button Model.PinkFloyd "Pink Floyd"
+        ]
+    |> Radio.renderElement renderConfig
 """
             , note = goToDocsCallToAction "Radio"
           }
