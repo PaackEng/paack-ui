@@ -1,7 +1,7 @@
 module UI.Utils.Element exposing
     ( colorSetOpacity, colorTransition
     , desktopMaximum
-    , svg, title, ellipsis, maxHeightVH, maxHeightPct
+    , svg, title, maxHeightVH, maxHeightPct
     , disabled, onEnterPressed, onIndividualClick
     , RectangleSides, zeroPadding
     )
@@ -21,7 +21,7 @@ module UI.Utils.Element exposing
 
 # HTML features
 
-@docs svg, title, ellipsis, maxHeightVH, maxHeightPct
+@docs svg, title, maxHeightVH, maxHeightPct
 
 
 # Input
@@ -40,6 +40,7 @@ import Html.Attributes as HtmlAttrs
 import Html.Events as HtmlEvents
 import Json.Decode as Decode
 import Svg
+import UI.Internal.Utils.Element exposing (style, tuplesToStyles)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Utils.ARIA as ARIA
 
@@ -97,7 +98,7 @@ colorTransition time =
     , ( "transition-duration", String.fromInt time ++ "ms" )
     , ( "transition-timing-function", "linear" )
     ]
-        |> List.map stylePair
+        |> List.map tuplesToStyles
 
 
 {-| Trigger message when the users press return-key while element is on-focus.
@@ -168,24 +169,6 @@ colorSetOpacity alpha color =
         |> Element.fromRgb
 
 
-{-| Applies required CSS values to have ellipsis on an element's text when width is not enough for displaying the whole content.
-
-    Element.el
-        (Element.width (px 200) :: Element.ellipsis)
-        (Element.text "Lorem ipsum dolor sit amet, consectetur adipiscing elit")
-
--}
-ellipsis : List (Attribute msg)
-ellipsis =
-    [ ( "text-overflow", "ellipsis" )
-    , ( "white-space", "nowrap" )
-    , ( "overflow", "hidden" )
-    , ( "display", "block" )
-    ]
-        |> List.map stylePair
-        |> (::) Element.clip
-
-
 {-| Limit [`Element.fill`](/packages/mdgriffith/elm-ui/latest/Element#fill) only when on desktop.
 
     Element.width (Element.desktopMaximum 640)
@@ -228,17 +211,3 @@ onIndividualClick message =
         |> Decode.map (\msg -> { message = msg, stopPropagation = True, preventDefault = True })
         |> HtmlEvents.custom "click"
         |> Element.htmlAttribute
-
-
-
--- Helpers
-
-
-style : String -> String -> Attribute msg
-style k v =
-    Element.htmlAttribute <| HtmlAttrs.style k v
-
-
-stylePair : ( String, String ) -> Attribute msg
-stylePair ( k, v ) =
-    Element.htmlAttribute <| HtmlAttrs.style k v

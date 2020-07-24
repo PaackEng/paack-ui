@@ -6,6 +6,7 @@ import Html
 import List
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.Internal.Palette as Palette
+import UI.Internal.Utils.Element exposing (tuplesToStyles)
 import UI.Palette as Palette exposing (brightnessDarkest, toneGray)
 import UI.RenderConfig exposing (RenderConfig, isMobile)
 import UI.Utils.Element as Element
@@ -104,7 +105,7 @@ attributes config size ellipsis color =
             else
                 deskAttributes size
 
-        ellipsisAttrs attrs =
+        heightAttr attrs =
             if ellipsis then
                 oneLineHeight mobile size :: attrs
 
@@ -120,7 +121,7 @@ attributes config size ellipsis color =
                     attrs
     in
     sizeAttrs
-        |> ellipsisAttrs
+        |> heightAttr
         |> colorAttr
 
 
@@ -336,7 +337,7 @@ spanMapOptions applier (Span prop opt) =
 spanRenderEl : RenderConfig -> Span -> Element msg
 spanRenderEl cfg (Span { content, size } { color, oneLineEllipsis }) =
     content
-        |> ifThenElse oneLineEllipsis ellipsizedText Element.text
+        |> ifThenElse oneLineEllipsis (ellipsizedText cfg size) Element.text
         |> List.singleton
         |> Element.paragraph
             (attributes cfg size oneLineEllipsis color)
@@ -368,9 +369,26 @@ combinedAttrs { ellipsis } =
         []
 
 
-ellipsizedText : String -> Element msg
-ellipsizedText content =
+ellipsizedText : RenderConfig -> TextSize -> String -> Element msg
+ellipsizedText cfg size content =
+    let
+        lineHeightSize =
+            lineHeight (isMobile cfg) size
+    in
     content
         |> Html.text
         |> Element.html
-        |> Element.el Element.ellipsis
+        |> Element.el
+            (ellipsisAttrs lineHeightSize)
+
+
+ellipsisAttrs : Int -> List (Attribute msg)
+ellipsisAttrs lineHeightSize =
+    [ ( "text-overflow", "ellipsis" )
+    , ( "white-space", "nowrap" )
+    , ( "overflow", "hidden" )
+    , ( "display", "block" )
+    , ( "line-height", String.fromInt lineHeightSize ++ "px" )
+    ]
+        |> List.map tuplesToStyles
+        |> (::) Element.clip
