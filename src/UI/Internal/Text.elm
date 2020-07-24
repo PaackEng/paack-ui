@@ -6,7 +6,7 @@ import Html
 import List
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.Internal.Palette as Palette
-import UI.Internal.Utils.Element exposing (tuplesToStyles)
+import UI.Internal.Utils.Element exposing (ellipsisAttrs)
 import UI.Palette as Palette exposing (brightnessDarkest, toneGray)
 import UI.RenderConfig exposing (RenderConfig, isMobile)
 import UI.Utils.Element as Element
@@ -380,15 +380,3 @@ ellipsizedText cfg size content =
         |> Element.html
         |> Element.el
             (ellipsisAttrs lineHeightSize)
-
-
-ellipsisAttrs : Int -> List (Attribute msg)
-ellipsisAttrs lineHeightSize =
-    [ ( "text-overflow", "ellipsis" )
-    , ( "white-space", "nowrap" )
-    , ( "overflow", "hidden" )
-    , ( "display", "block" )
-    , ( "line-height", String.fromInt lineHeightSize ++ "px" )
-    ]
-        |> List.map tuplesToStyles
-        |> (::) Element.clip
