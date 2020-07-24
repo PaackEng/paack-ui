@@ -2,9 +2,11 @@ module UI.Internal.Text exposing (..)
 
 import Element exposing (Attribute, Element, fill)
 import Element.Font as Font
+import Html
 import List
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.Internal.Palette as Palette
+import UI.Internal.Utils.Element exposing (ellipsisAttrs)
 import UI.Palette as Palette exposing (brightnessDarkest, toneGray)
 import UI.RenderConfig exposing (RenderConfig, isMobile)
 import UI.Utils.Element as Element
@@ -103,9 +105,9 @@ attributes config size ellipsis color =
             else
                 deskAttributes size
 
-        ellipsisAttrs attrs =
+        heightAttr attrs =
             if ellipsis then
-                (oneLineHeight mobile size :: Element.ellipsis) ++ attrs
+                oneLineHeight mobile size :: attrs
 
             else
                 attrs
@@ -119,7 +121,7 @@ attributes config size ellipsis color =
                     attrs
     in
     sizeAttrs
-        |> ellipsisAttrs
+        |> heightAttr
         |> colorAttr
 
 
@@ -335,7 +337,7 @@ spanMapOptions applier (Span prop opt) =
 spanRenderEl : RenderConfig -> Span -> Element msg
 spanRenderEl cfg (Span { content, size } { color, oneLineEllipsis }) =
     content
-        |> Element.text
+        |> ifThenElse oneLineEllipsis (ellipsizedText cfg size) Element.text
         |> List.singleton
         |> Element.paragraph
             (attributes cfg size oneLineEllipsis color)
@@ -365,3 +367,16 @@ combinedAttrs { ellipsis } =
 
     else
         []
+
+
+ellipsizedText : RenderConfig -> TextSize -> String -> Element msg
+ellipsizedText cfg size content =
+    let
+        lineHeightSize =
+            lineHeight (isMobile cfg) size
+    in
+    content
+        |> Html.text
+        |> Element.html
+        |> Element.el
+            (ellipsisAttrs lineHeightSize)
