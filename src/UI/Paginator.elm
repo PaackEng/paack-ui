@@ -47,6 +47,7 @@ import Element exposing (Element, fill)
 import UI.Button as Button exposing (Button)
 import UI.Icon as Icon exposing (Icon)
 import UI.RenderConfig exposing (RenderConfig)
+import UI.Size as Size
 import UI.Text as Text
 import UI.Utils.Element exposing (zeroPadding)
 
@@ -135,3 +136,4 @@ button msg isDisabled icon =
     Button.fromIcon icon
         |> Button.cmd msg Button.light
         |> Button.withDisabledIf isDisabled
+        |> Button.withSize Size.small
