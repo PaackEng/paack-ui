@@ -3075,7 +3075,7 @@ https-browserify@^1.0.0:
 
 i18n-json-to-elm@PedroHLC/i18n-json-to-elm:
   version "1.0.0"
-  resolved "https://codeload.github.com/PedroHLC/i18n-json-to-elm/tar.gz/3b34552594e6cb3d5d39b15af8e95900446823c3"
+  resolved "https://codeload.github.com/PedroHLC/i18n-json-to-elm/tar.gz/3a016b0ce09b3b60e4b274437d5ffe5ea08bd267"
   dependencies:
     elm-format "^0.8.3"
 
