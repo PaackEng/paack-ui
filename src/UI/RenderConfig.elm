@@ -1,6 +1,7 @@
 module UI.RenderConfig exposing
-    ( RenderConfig, fromWindow
-    , updateWindow
+    ( RenderConfig, init
+    , Locale, localeEnglishGB, localeSpanishES
+    , updateWindow, updateLocale
     , isMobile, isPortrait
     , elLayoutAttributes
     )
@@ -9,20 +10,26 @@ module UI.RenderConfig exposing
 
 The recommended approach is storing it in the app's Model, gathering the required init parameters using Elm's flags. For keeping it update, subscribe to [`Browser.onResize`](/packages/elm/browser/latest/Browser-Events#onResize) and apply update using [`RenderConfig.updateWindow`](UI-RenderConfig#updateWindow).
 
-    RenderConfig.fromWindow
+    RenderConfig.init
         { width = flags.innerWidth
         , height = flags.innerHeight
         }
+        RenderConfig.localeEnglishGB
 
 
 # Building
 
-@docs RenderConfig, fromWindow
+@docs RenderConfig, init
+
+
+# Locales
+
+@docs Locale, localeEnglishGB, localeSpanishES
 
 
 # Update
 
-@docs updateWindow
+@docs updateWindow, updateLocale
 
 
 # Responsivity
@@ -38,38 +45,56 @@ The recommended approach is storing it in the app's Model, gathering the require
 
 import Element exposing (Attribute)
 import Element.Font as Font
-
-
-type alias RenderConfigData =
-    { deviceClass : Element.DeviceClass
-    , deviceOrientation : Element.Orientation
-    }
+import I18n.Type as I18n
+import UI.Internal.RenderConfig as Internal
 
 
 {-| `RenderConfig.RenderConfig` upholds all the information required for the components to apply the responsivity and accessibility changes.
 -}
-type RenderConfig
-    = RenderConfig RenderConfigData
+type alias RenderConfig =
+    Internal.RenderConfig
 
 
-{-| `RenderConfig.fromWindow` builds a [`RenderConfig.RenderConfig`](UI-RenderConfig#RenderConfig) with the minimum necessary information for responsivity to work.
+{-| Define how to alterate text and dates to fit a localization profile.
+-}
+type alias Locale =
+    Internal.Locale
 
-    RenderConfig.fromWindow
+
+{-| Equivalent to en-US according to ISO 639.1 and ISO 3166.
+-}
+localeEnglishGB : Locale
+localeEnglishGB =
+    Internal.EnglishGB
+
+
+{-| Equivalent to es-ES according to ISO 639.1 and ISO 3166.
+-}
+localeSpanishES : Locale
+localeSpanishES =
+    Internal.SpanishES
+
+
+{-| `RenderConfig.init` builds a [`RenderConfig.RenderConfig`](UI-RenderConfig#RenderConfig) with the minimum necessary information for responsivity to work.
+
+    RenderConfig.init
         { width = 1920
         , height = 1080
         }
+        RenderConfig.localeEnglishGB
 
 -}
-fromWindow : { window | height : Int, width : Int } -> RenderConfig
-fromWindow window =
+init : { window | height : Int, width : Int } -> Locale -> RenderConfig
+init window locale =
     let
         ( class, orientation ) =
             classifyWindow window
     in
     { deviceClass = class
     , deviceOrientation = orientation
+    , locale = locale
     }
-        |> RenderConfig
+        |> Internal.RenderConfig
 
 
 {-| The subscribed event of resizing the browser should reflect on a `RenderConfig` update.
@@ -83,7 +108,7 @@ For that, use `RenderConfig.updateWindow`
 
 -}
 updateWindow : { window | height : Int, width : Int } -> RenderConfig -> RenderConfig
-updateWindow window (RenderConfig oldData) =
+updateWindow window (Internal.RenderConfig oldData) =
     let
         ( class, orientation ) =
             classifyWindow window
@@ -92,7 +117,25 @@ updateWindow window (RenderConfig oldData) =
         | deviceClass = class
         , deviceOrientation = orientation
     }
-        |> RenderConfig
+        |> Internal.RenderConfig
+
+
+{-| The subscribed event of resizing the browser should reflect on a `RenderConfig` update.
+For that, use `RenderConfig.updateWindow`
+
+    RenderConfig.updateWindow
+        { width = 1920
+        , height = 1080
+        }
+        oldRenderConfig
+
+-}
+updateLocale : Locale -> RenderConfig -> RenderConfig
+updateLocale locale (Internal.RenderConfig oldData) =
+    { oldData
+        | locale = locale
+    }
+        |> Internal.RenderConfig
 
 
 {-| `True` when the browser is a mobile browser.
@@ -104,7 +147,7 @@ updateWindow window (RenderConfig oldData) =
 
 -}
 isMobile : RenderConfig -> Bool
-isMobile (RenderConfig { deviceClass }) =
+isMobile (Internal.RenderConfig { deviceClass }) =
     deviceClass == Element.Phone
 
 
@@ -117,7 +160,7 @@ isMobile (RenderConfig { deviceClass }) =
 
 -}
 isPortrait : RenderConfig -> Bool
-isPortrait (RenderConfig { deviceOrientation }) =
+isPortrait (Internal.RenderConfig { deviceOrientation }) =
     deviceOrientation == Element.Portrait
 
 

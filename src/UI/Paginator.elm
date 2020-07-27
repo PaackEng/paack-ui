@@ -46,6 +46,7 @@ The following code applies the paginator to some simple list, and also applies p
 import Element exposing (Element, fill)
 import UI.Button as Button exposing (Button)
 import UI.Icon as Icon exposing (Icon)
+import UI.Internal.RenderConfig as RenderConfig
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
@@ -100,16 +101,18 @@ nonNumeric ({ first, offset, totalCount } as paginator) renderConfig =
 
         noNext =
             first + offset >= totalCount
+
+        strings =
+            RenderConfig.strings renderConfig
     in
     Element.row
         []
-        [ Text.body2
-            (firstItemCount
-                ++ "-"
-                ++ lastItemCount
-                ++ " of "
-                ++ String.fromInt totalCount
-            )
+        [ strings.paginator.format
+            { first = firstItemCount
+            , last = lastItemCount
+            , total = String.fromInt totalCount
+            }
+            |> Text.body2
             |> Text.renderElement renderConfig
             |> Element.el
                 [ Element.paddingEach
@@ -118,7 +121,7 @@ nonNumeric ({ first, offset, totalCount } as paginator) renderConfig =
                 ]
         , button paginator.onPreviousButtonClicked
             noPrevious
-            (Icon.previousContent "Previous")
+            (Icon.previousContent strings.common.previous)
             |> Button.renderElement renderConfig
             |> Element.el
                 [ Element.paddingEach
@@ -126,7 +129,7 @@ nonNumeric ({ first, offset, totalCount } as paginator) renderConfig =
                 ]
         , button paginator.onNextButtonClicked
             noNext
-            (Icon.nextContent "Next")
+            (Icon.nextContent strings.common.next)
             |> Button.renderElement renderConfig
         ]
 

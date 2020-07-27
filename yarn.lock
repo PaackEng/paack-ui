@@ -4244,7 +4244,7 @@ parcel-plugin-asset-copier@^1.1.0:
 
 parcel-plugin-elm-i18n@PedroHLC/parcel-plugin-elm-i18n:
   version "1.0.0"
-  resolved "https://codeload.github.com/PedroHLC/parcel-plugin-elm-i18n/tar.gz/f40d81643ea2fb5cf3035ce9df3c708b7d2f85c1"
+  resolved "https://codeload.github.com/PedroHLC/parcel-plugin-elm-i18n/tar.gz/2c6bae5f66b567c7b21bb4e9c83793b5c8958a3f"
 
 parse-asn1@^5.0.0:
   version "5.1.5"

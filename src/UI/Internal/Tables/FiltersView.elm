@@ -13,6 +13,7 @@ import UI.Internal.Basics exposing (maybeNotThen)
 import UI.Internal.DateInput as DateInput exposing (DateInput(..), PeriodComparison(..), PeriodDate, RangeDate)
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
+import UI.Internal.RenderConfig as RenderConfig
 import UI.Internal.Size as Size exposing (Size)
 import UI.Internal.Tables.Filters as Filters
 import UI.Palette as Palette
@@ -50,6 +51,9 @@ header renderConfig filter config =
         filterRender renderer editable =
             renderer renderConfig applyMsg config editable
                 |> dialog renderConfig config filter clearMsg applyMsg
+
+        strings =
+            RenderConfig.strings renderConfig
     in
     if config.isOpen then
         case filter of
@@ -76,7 +80,7 @@ header renderConfig filter config =
         headerApplied renderConfig
             config.openMsg
             clearMsg
-            "Clear"
+            strings.common.clear
             config.label
 
     else
@@ -197,13 +201,16 @@ overlayBackground onClickMsg =
 filterEditingButton : RenderConfig -> msg -> msg -> Bool -> Bool -> Element msg
 filterEditingButton renderConfig applyMsg clearMsg applied current =
     let
+        strings =
+            RenderConfig.strings renderConfig
+
         clearBtn =
-            Button.fromLabel "Clear"
+            Button.fromLabel strings.common.clear
                 |> Button.cmd clearMsg Button.danger
                 |> Button.withSize Size.extraSmall
 
         applyBtn =
-            Button.fromLabel "Apply"
+            Button.fromLabel strings.common.apply
                 |> Button.cmd applyMsg Button.primary
                 |> Button.withSize Size.extraSmall
 
@@ -245,7 +252,7 @@ filteredHeaderLabel label =
 
 dialogClose : RenderConfig -> msg -> Element msg
 dialogClose renderConfig message =
-    Icon.close "Close"
+    Icon.close (RenderConfig.strings renderConfig).common.close
         |> Icon.withColor (Palette.color Palette.toneGray Palette.brightnessLight)
         |> Icon.withSize Size.extraSmall
         |> Icon.renderElement renderConfig
@@ -376,7 +383,7 @@ selectFilterRender :
     -> Element msg
 selectFilterRender renderConfig { fromFiltersMsg, index } list { current, applied } =
     Radio.group
-        "Select option for filtering"
+        (RenderConfig.strings renderConfig).filters.select.description
         (\subIndex -> fromFiltersMsg <| Filters.EditSelect { column = index, value = subIndex })
         |> Radio.withSelected (maybeNotThen applied current)
         |> Radio.withButtons (List.indexedMap Radio.button list)
@@ -394,10 +401,13 @@ singleDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
     let
         editMsg str =
             fromFiltersMsg <| Filters.EditSingleDate { column = index, value = str }
+
+        strings =
+            RenderConfig.strings renderConfig
     in
     editable
         |> Filters.editableWithDefault (DateInvalid "")
-        |> dateInput applyMsg editMsg "DD/MM/YYYY" label
+        |> dateInput applyMsg editMsg strings.common.dateFormat label
         |> TextField.renderElement renderConfig
         |> internalPaddingBox
 
@@ -416,10 +426,19 @@ rangeDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } edi
         editToMsg str =
             fromFiltersMsg <| Filters.EditRangeToDate { column = index, value = str }
 
+        strings =
+            RenderConfig.strings renderConfig
+
         current =
             editable
                 |> Filters.editableWithDefault
                     { from = DateInvalid "", to = DateInvalid "" }
+
+        fromPlaceholder =
+            strings.filters.range.from { date = strings.common.dateFormat }
+
+        toPlaceholder =
+            strings.filters.range.to { date = strings.common.dateFormat }
     in
     Element.column
         [ Element.width fill
@@ -427,10 +446,10 @@ rangeDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } edi
         , internalPadding
         ]
         [ current.from
-            |> dateInput applyMsg editFromMsg "From: DD/MM/YYYY" label
+            |> dateInput applyMsg editFromMsg fromPlaceholder label
             |> TextField.renderElement renderConfig
         , current.to
-            |> dateInput applyMsg editToMsg "To: DD/MM/YYYY" label
+            |> dateInput applyMsg editToMsg toPlaceholder label
             |> TextField.renderElement renderConfig
         ]
 
@@ -453,21 +472,24 @@ periodDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
             editable
                 |> Filters.editableWithDefault { date = DateInvalid "", comparison = On }
 
+        strings =
+            RenderConfig.strings renderConfig
+
         options =
-            [ Radio.button On "On"
-            , Radio.button Before "Before"
-            , Radio.button After "After"
+            [ Radio.button On strings.filters.period.on
+            , Radio.button Before strings.filters.period.before
+            , Radio.button After strings.filters.period.after
             ]
     in
     Element.column
         [ Element.width fill
         ]
         [ current.date
-            |> dateInput applyMsg editDateMsg "DD/MM/YYYY" label
+            |> dateInput applyMsg editDateMsg strings.common.dateFormat label
             |> TextField.renderElement renderConfig
             |> internalPaddingBox
         , Radio.group
-            "Select period reference"
+            strings.filters.period.description
             editComparisonMsg
             |> Radio.withSelected (Just current.comparison)
             |> Radio.withButtons options

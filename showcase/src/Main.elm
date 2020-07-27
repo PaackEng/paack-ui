@@ -23,7 +23,7 @@ import TextField
 import Texts
 import UI.ListView
 import UI.NavigationContainer
-import UI.RenderConfig exposing (RenderConfig)
+import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UIExplorer
     exposing
         ( Config
@@ -77,10 +77,11 @@ main : UIExplorerProgram Model Msg PluginOptions
 main =
     let
         renderConfig =
-            UI.RenderConfig.fromWindow
+            RenderConfig.init
                 { width = 1920
                 , height = 1080
                 }
+                RenderConfig.localeEnglishGB
     in
     exploreWithCategories
         config

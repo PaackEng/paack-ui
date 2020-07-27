@@ -113,7 +113,7 @@ demoWithIcons renderConfig model =
 
 
 mobileCfg =
-    RenderConfig.fromWindow { width = 375, height = 667 }
+    RenderConfig.init { width = 375, height = 667 } RenderConfig.localeEnglishGB
 
 
 statelessTableStory renderConfig =
