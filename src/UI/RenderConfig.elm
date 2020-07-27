@@ -45,7 +45,6 @@ The recommended approach is storing it in the app's Model, gathering the require
 
 import Element exposing (Attribute)
 import Element.Font as Font
-import I18n.Type as I18n
 import UI.Internal.RenderConfig as Internal
 
 

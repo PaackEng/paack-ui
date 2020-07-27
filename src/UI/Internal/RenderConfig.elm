@@ -3,7 +3,7 @@ module UI.Internal.RenderConfig exposing (Locale(..), RenderConfig(..), RenderCo
 import Element
 import I18n.English as LangEnglish
 import I18n.Spanish as LangSpanish
-import I18n.Type as I18n
+import I18n.Types as I18n
 
 
 type alias RenderConfigData =
