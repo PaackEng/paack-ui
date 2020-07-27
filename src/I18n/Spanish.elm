@@ -1,6 +1,6 @@
 module I18n.Spanish exposing (..)
 
-import I18n.Type exposing (..)
+import I18n.Types exposing (..)
 
 
 common : Common

@@ -1194,7 +1194,7 @@ bindings@^1.5.0:
   dependencies:
     file-uri-to-path "1.0.0"
 
-binwrap@0.2.2:
+binwrap@0.2.2, binwrap@^0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/binwrap/-/binwrap-0.2.2.tgz#7d1ea74b28332f18dfdc75548aef993041ffafc9"
   integrity sha512-Y+Wvypk3JhH5GPZAvlwJAWOVH/OsOhQMSj37vySuWHwQivoALplPxfBA8b973rFJI7OS+O+1YmmYXIiEXVMAcw==
@@ -2264,6 +2264,13 @@ elm-analyse@^0.16.5:
     sums "0.2.4"
     ws "3.3.1"
 
+elm-format@^0.8.3:
+  version "0.8.3"
+  resolved "https://registry.yarnpkg.com/elm-format/-/elm-format-0.8.3.tgz#74a50a6aba69c757752700f9302ccf463c747453"
+  integrity sha512-shXOgfg8F5hDJagP91zJ3QT0PoMbusPfhgEeu3uRofTaN843cFpjZ8qlQip6pFQxtWyQE/P+NMg3vP6lyWI5Mg==
+  dependencies:
+    binwrap "^0.2.2"
+
 elm-hot@^1.1.4:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/elm-hot/-/elm-hot-1.1.4.tgz#4984592b3554670255ea4e08f4e98aa9103ab51f"
@@ -3065,6 +3072,12 @@ https-browserify@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/https-browserify/-/https-browserify-1.0.0.tgz#ec06c10e0a34c0f2faf199f7fd7fc78fffd03c73"
   integrity sha1-7AbBDgo0wPL68Zn3/X/Hj//QPHM=
+
+i18n-json-to-elm@PedroHLC/i18n-json-to-elm:
+  version "1.0.0"
+  resolved "https://codeload.github.com/PedroHLC/i18n-json-to-elm/tar.gz/3b34552594e6cb3d5d39b15af8e95900446823c3"
+  dependencies:
+    elm-format "^0.8.3"
 
 iconv-lite@0.4.19:
   version "0.4.19"
@@ -4241,10 +4254,6 @@ parcel-plugin-asset-copier@^1.1.0:
   integrity sha512-GrEBoQquhHoGXsIMuJw6F9oSNhzTe9TTFj4eDZjq4ahFfEG6Z7p1tfl+AlhGLn4c+yDjjsDHRR2PxJsNFWt8Jg==
   dependencies:
     recursive-copy "2.0.10"
-
-parcel-plugin-elm-i18n@PedroHLC/parcel-plugin-elm-i18n:
-  version "1.0.0"
-  resolved "https://codeload.github.com/PedroHLC/parcel-plugin-elm-i18n/tar.gz/2c6bae5f66b567c7b21bb4e9c83793b5c8958a3f"
 
 parse-asn1@^5.0.0:
   version "5.1.5"

@@ -1,4 +1,4 @@
-module I18n.Type exposing (..)
+module I18n.Types exposing (..)
 
 
 type alias Common =
