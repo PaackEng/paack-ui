@@ -11,21 +11,13 @@ import Test.Html.Selector as Selector
 import Tests.Utils.Element exposing (elementToHtml, hasIconInside)
 import Tests.Utils.ExtraEvents as ExtraEvents
 import Tests.Utils.ExtraSelectors as ExtraSelectors
-import UI.RenderConfig
+import Tests.Utils.RenderConfig exposing (desktopWindowConfig)
 import UI.TextField as TextField
 
 
 type Msg
     = OnTextFieldChanged String
     | OnEnterPressed
-
-
-fakeRenderConfig : UI.RenderConfig.RenderConfig
-fakeRenderConfig =
-    UI.RenderConfig.fromWindow
-        { width = 1920
-        , height = 1080
-        }
 
 
 tests =
@@ -42,7 +34,7 @@ labelTests =
     let
         testTextField input attribute labelValue =
             input OnTextFieldChanged labelValue "some text"
-                |> TextField.renderElement fakeRenderConfig
+                |> TextField.renderElement desktopWindowConfig
                 |> findTextField
                 |> Query.has [ ExtraSelectors.hasAttribute attribute labelValue ]
     in
@@ -67,7 +59,7 @@ textTests =
     let
         testTextField input value =
             input OnTextFieldChanged "some label" value
-                |> TextField.renderElement fakeRenderConfig
+                |> TextField.renderElement desktopWindowConfig
                 |> findTextField
                 |> Query.has [ ExtraSelectors.hasAttribute "value" value ]
     in
@@ -88,7 +80,7 @@ placeholderTests =
             input OnTextFieldChanged "some label" "some text"
                 |> TextField.setLabelVisible True
                 |> TextField.withPlaceholder placeholderValue
-                |> TextField.renderElement fakeRenderConfig
+                |> TextField.renderElement desktopWindowConfig
                 |> elementToHtml
                 |> Query.find [ Selector.tag "label" ]
                 |> Query.has [ Selector.text placeholderValue ]
@@ -112,14 +104,14 @@ eventsTests =
 
         testTextFieldForOnEnterPressed input =
             defaultTextField input
-                |> TextField.renderElement fakeRenderConfig
+                |> TextField.renderElement desktopWindowConfig
                 |> findTextField
                 |> Event.simulate ExtraEvents.enterKey
                 |> Event.expect OnEnterPressed
 
         testTextFieldForOnTextFieldChanged input =
             defaultTextField input
-                |> TextField.renderElement fakeRenderConfig
+                |> TextField.renderElement desktopWindowConfig
                 |> findTextField
                 |> Event.simulate (Event.input "holi")
                 |> Event.expect (OnTextFieldChanged "holi")

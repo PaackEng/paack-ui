@@ -1,11 +1,12 @@
 module Tests.Utils.RenderConfig exposing (desktopWindowConfig)
 
-import UI.RenderConfig exposing (RenderConfig)
+import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 
 
 desktopWindowConfig : RenderConfig
 desktopWindowConfig =
-    UI.RenderConfig.fromWindow
+    RenderConfig.init
         { width = 1920
         , height = 1080
         }
+        RenderConfig.localeEnglishGB

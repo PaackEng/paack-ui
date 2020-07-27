@@ -28,7 +28,7 @@ ifMobile =
         [ test "this is the maximum size considered mobile" <|
             \_ ->
                 window
-                    |> RenderConfig.fromWindow
+                    |> init
                     |> RenderConfig.isMobile
                     |> Expect.equal True
         ]
@@ -44,7 +44,7 @@ noLongerMobile =
         [ test "this is the mininum non-mobile size" <|
             \_ ->
                 window
-                    |> RenderConfig.fromWindow
+                    |> init
                     |> RenderConfig.isMobile
                     |> Expect.equal False
         ]
@@ -60,7 +60,7 @@ ifVeryBig =
         [ test "this is not mobile" <|
             \_ ->
                 window
-                    |> RenderConfig.fromWindow
+                    |> init
                     |> RenderConfig.isMobile
                     |> Expect.equal False
         ]
@@ -76,7 +76,7 @@ ifVerySmall =
         [ test "this is absolutely mobile" <|
             \_ ->
                 window
-                    |> RenderConfig.fromWindow
+                    |> init
                     |> RenderConfig.isMobile
                     |> Expect.equal True
         ]
@@ -92,7 +92,7 @@ ifPortrait =
         [ test "this is portrait" <|
             \_ ->
                 window
-                    |> RenderConfig.fromWindow
+                    |> init
                     |> RenderConfig.isPortrait
                     |> Expect.equal True
         ]
@@ -108,7 +108,7 @@ ifLandscape =
         [ test "this is landscape" <|
             \_ ->
                 window
-                    |> RenderConfig.fromWindow
+                    |> init
                     |> RenderConfig.isPortrait
                     |> Expect.equal False
         ]
@@ -124,7 +124,12 @@ ifSquare =
         [ test "a square is landscape" <|
             \_ ->
                 window
-                    |> RenderConfig.fromWindow
+                    |> init
                     |> RenderConfig.isPortrait
                     |> Expect.equal False
         ]
+
+
+init : { window | height : Int, width : Int } -> RenderConfig
+init window =
+    RenderConfig.init window RenderConfig.localeEnglishGB
