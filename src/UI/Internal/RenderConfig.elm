@@ -1,4 +1,4 @@
-module UI.Internal.RenderConfig exposing (Locale(..), RenderConfig(..), RenderConfigData, string, strings)
+module UI.Internal.RenderConfig exposing (Locale(..), RenderConfig(..), RenderConfigData, localeTerms)
 
 import Element
 import I18n.English as LangEnglish
@@ -13,8 +13,6 @@ type alias RenderConfigData =
     }
 
 
-{-| `RenderConfig.RenderConfig` upholds all the information required for the components to apply the responsivity and accessibility changes.
--}
 type RenderConfig
     = RenderConfig RenderConfigData
 
@@ -24,13 +22,8 @@ type Locale
     | SpanishES
 
 
-string : (I18n.Root -> String) -> RenderConfig -> String
-string getter cfg =
-    getter (strings cfg)
-
-
-strings : RenderConfig -> I18n.Root
-strings (RenderConfig { locale }) =
+localeTerms : RenderConfig -> I18n.Root
+localeTerms (RenderConfig { locale }) =
     case locale of
         EnglishGB ->
             LangEnglish.root

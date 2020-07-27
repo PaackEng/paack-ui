@@ -102,12 +102,12 @@ nonNumeric ({ first, offset, totalCount } as paginator) renderConfig =
         noNext =
             first + offset >= totalCount
 
-        strings =
-            RenderConfig.strings renderConfig
+        localeTerms =
+            RenderConfig.localeTerms renderConfig
     in
     Element.row
         []
-        [ strings.paginator.format
+        [ localeTerms.paginator.format
             { first = firstItemCount
             , last = lastItemCount
             , total = String.fromInt totalCount
@@ -121,7 +121,7 @@ nonNumeric ({ first, offset, totalCount } as paginator) renderConfig =
                 ]
         , button paginator.onPreviousButtonClicked
             noPrevious
-            (Icon.previousContent strings.common.previous)
+            (Icon.previousContent localeTerms.common.previous)
             |> Button.renderElement renderConfig
             |> Element.el
                 [ Element.paddingEach
@@ -129,7 +129,7 @@ nonNumeric ({ first, offset, totalCount } as paginator) renderConfig =
                 ]
         , button paginator.onNextButtonClicked
             noNext
-            (Icon.nextContent strings.common.next)
+            (Icon.nextContent localeTerms.common.next)
             |> Button.renderElement renderConfig
         ]
 

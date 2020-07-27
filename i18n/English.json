@@ -5,7 +5,8 @@
         "clear": "Clear",
         "apply": "Apply",
         "previous": "Previous",
-        "next": "Next"
+        "next": "Next",
+        "toggle": "Toggle"
     },
     "filters": {
         "period": {

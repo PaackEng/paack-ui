@@ -11,6 +11,7 @@ common =
     , apply = "Apply"
     , previous = "Previous"
     , next = "Next"
+    , toggle = "Toggle"
     }
 
 

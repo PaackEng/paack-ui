@@ -8,6 +8,7 @@ type alias Common =
     , apply : String
     , previous : String
     , next : String
+    , toggle : String
     }
 
 

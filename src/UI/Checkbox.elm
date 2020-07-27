@@ -12,6 +12,7 @@ import Element.Border as Border
 import Element.Events as Events
 import UI.Icon as Icon
 import UI.Internal.Palette as Palette
+import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
@@ -66,7 +67,8 @@ boxSelected =
 
 boxCheck : RenderConfig -> Element msg
 boxCheck renderConfig =
-    Icon.check "Toggle"
+    (renderConfig |> localeTerms >> .common >> .toggle)
+        |> Icon.check
         |> Icon.withCustomSize 14
         |> Icon.withColor
             (Palette.color
