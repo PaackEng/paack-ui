@@ -13,7 +13,7 @@
     "build": "parcel build showcase/public/index.html --public-url ./",
     "showcase": "parcel showcase/public/index.html",
     "test": "elm-test",
-    "i18n": "node -e 'require(\"./node_modules/parcel-plugin-elm-i18n/index\")()' && elm-format --yes .elm-i18n"
+    "i18n": "node -e 'require(\"./node_modules/parcel-plugin-elm-i18n/index\")()' && elm-format --yes src/I18n"
   },
   "repository": {
     "type": "git",
