@@ -4242,6 +4242,10 @@ parcel-plugin-asset-copier@^1.1.0:
   dependencies:
     recursive-copy "2.0.10"
 
+parcel-plugin-elm-i18n@PedroHLC/parcel-plugin-elm-i18n:
+  version "1.0.0"
+  resolved "https://codeload.github.com/PedroHLC/parcel-plugin-elm-i18n/tar.gz/f40d81643ea2fb5cf3035ce9df3c708b7d2f85c1"
+
 parse-asn1@^5.0.0:
   version "5.1.5"
   resolved "https://registry.yarnpkg.com/parse-asn1/-/parse-asn1-5.1.5.tgz#003271343da58dc94cace494faef3d2147ecea0e"

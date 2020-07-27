@@ -1,0 +1,9 @@
+{
+    "filters": {
+        "range": {
+            "after": "After",
+            "before": "Before",
+            "on": "On"
+        }
+    }
+}

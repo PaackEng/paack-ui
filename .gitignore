@@ -8,3 +8,4 @@ docs/elm-stuff/
 elm-stuff/
 
 dist/
+.elm-i18n
