@@ -16,5 +16,3 @@ type alias Filters =
 type alias Root =
     { filters : Filters
     }
-
-

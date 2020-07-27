@@ -1,6 +1,5 @@
 module I18n.English exposing (..)
 
-
 import I18n.Type exposing (..)
 
 
@@ -22,5 +21,3 @@ root : Root
 root =
     { filters = filters
     }
-
-
