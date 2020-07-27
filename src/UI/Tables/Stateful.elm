@@ -146,6 +146,7 @@ import Time
 import UI.Internal.Basics exposing (flip)
 import UI.Internal.DateInput as DateInput exposing (DateInput, PeriodDate, RangeDate)
 import UI.Internal.NArray as NArray exposing (NArray)
+import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.Tables.Common exposing (..)
 import UI.Internal.Tables.Filters as Filters
 import UI.Internal.Tables.FiltersView as FiltersView
@@ -793,9 +794,13 @@ mobileView :
     -> Responsive msg item columns
     -> Element msg
 mobileView renderConfig prop opt responsive =
+    let
+        detailsTerms =
+            renderConfig |> localeTerms >> .tables >> .details
+    in
     ListView.toggleableList
-        { detailsShowLabel = "Expand"
-        , detailsCollapseLabel = "Collapse"
+        { detailsShowLabel = detailsTerms.show
+        , detailsCollapseLabel = detailsTerms.collapse
         , toCover = Tuple.second >> responsive.toCover
         , toDetails =
             Tuple.second

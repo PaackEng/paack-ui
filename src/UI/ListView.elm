@@ -84,6 +84,7 @@ import Element.Font as Font
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Basics exposing (prependIf)
 import UI.Internal.Palette as Palette
+import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.ToggleableList as ToggleableList
 import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
@@ -421,7 +422,8 @@ searchFieldView cfg searchField =
                     |> TextField.search searchMsg label
                     |> TextField.withWidth TextField.widthFull
                     |> TextField.withPlaceholder label
-                    |> TextField.withIcon (Icon.search "Search")
+                    |> TextField.withIcon
+                        (cfg |> localeTerms >> .listView >> .search |> Icon.search)
                     |> TextField.renderElement cfg
                 ]
 

@@ -52,6 +52,7 @@ import Element.Border as Border
 import Element.Events as Events
 import UI.Icon as Icon
 import UI.Internal.Palette as Palette
+import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
@@ -231,7 +232,8 @@ radioSelected =
 
 radioCheck : RenderConfig -> Element msg
 radioCheck renderConfig =
-    Icon.check "Selected"
+    (renderConfig |> localeTerms >> .radio >> .select)
+        |> Icon.check
         |> Icon.withCustomSize 14
         |> Icon.withColor
             (Palette.color

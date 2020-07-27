@@ -67,7 +67,7 @@ boxSelected =
 
 boxCheck : RenderConfig -> Element msg
 boxCheck renderConfig =
-    (renderConfig |> localeTerms >> .common >> .toggle)
+    (renderConfig |> localeTerms >> .checkbox >> .toggle)
         |> Icon.check
         |> Icon.withCustomSize 14
         |> Icon.withColor
