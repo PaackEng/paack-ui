@@ -9,16 +9,16 @@ import Utils exposing (goToDocsCallToAction, prettifyElmCode, story)
 stories cfg =
     storiesOf
         "Badges"
-        [ oneBadge cfg Badge.grayLight "grayLight"
-        , oneBadge cfg Badge.primaryLight "primaryLight"
-        , oneBadge cfg Badge.warningLight "warningLight"
-        , oneBadge cfg Badge.dangerLight "dangerLight"
-        , oneBadge cfg Badge.successLight "successLight"
-        , oneBadge cfg Badge.grayDark "grayDark"
-        , oneBadge cfg Badge.primaryDark "primaryDark"
-        , oneBadge cfg Badge.warningDark "warningDark"
-        , oneBadge cfg Badge.dangerDark "dangerDark"
-        , oneBadge cfg Badge.successDark "successDark"
+        [ oneBadge cfg Badge.grayLight "Gray Light"
+        , oneBadge cfg Badge.primaryLight "Primary Light"
+        , oneBadge cfg Badge.warningLight "Warning Light"
+        , oneBadge cfg Badge.dangerLight "Danger Light"
+        , oneBadge cfg Badge.successLight "Success Light"
+        , oneBadge cfg Badge.grayDark "Gray Dark"
+        , oneBadge cfg Badge.primaryDark "Primary Dark"
+        , oneBadge cfg Badge.warningDark "Warning Dark"
+        , oneBadge cfg Badge.dangerDark "Danger Dark"
+        , oneBadge cfg Badge.successDark "Success Dark"
         ]
 
 
