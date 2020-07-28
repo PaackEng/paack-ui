@@ -18,15 +18,15 @@ type RenderConfig
 
 
 type Locale
-    = EnglishGB
-    | SpanishES
+    = English
+    | Spanish
 
 
 localeTerms : RenderConfig -> I18n.Root
 localeTerms (RenderConfig { locale }) =
     case locale of
-        EnglishGB ->
+        English ->
             LangEnglish.root
 
-        SpanishES ->
+        Spanish ->
             LangSpanish.root

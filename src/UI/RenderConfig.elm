@@ -1,6 +1,6 @@
 module UI.RenderConfig exposing
     ( RenderConfig, init
-    , Locale, localeEnglishGB, localeSpanishES
+    , Locale, localeEnglish, localeSpanish
     , updateWindow, updateLocale
     , isMobile, isPortrait
     , elLayoutAttributes
@@ -14,7 +14,7 @@ The recommended approach is storing it in the app's Model, gathering the require
         { width = flags.innerWidth
         , height = flags.innerHeight
         }
-        RenderConfig.localeEnglishGB
+        RenderConfig.localeEnglish
 
 
 # Building
@@ -24,7 +24,7 @@ The recommended approach is storing it in the app's Model, gathering the require
 
 # Locales
 
-@docs Locale, localeEnglishGB, localeSpanishES
+@docs Locale, localeEnglish, localeSpanish
 
 
 # Update
@@ -62,16 +62,16 @@ type alias Locale =
 
 {-| Equivalent to en-US according to ISO 639.1 and ISO 3166.
 -}
-localeEnglishGB : Locale
-localeEnglishGB =
-    Internal.EnglishGB
+localeEnglish : Locale
+localeEnglish =
+    Internal.English
 
 
 {-| Equivalent to es-ES according to ISO 639.1 and ISO 3166.
 -}
-localeSpanishES : Locale
-localeSpanishES =
-    Internal.SpanishES
+localeSpanish : Locale
+localeSpanish =
+    Internal.Spanish
 
 
 {-| `RenderConfig.init` builds a [`RenderConfig.RenderConfig`](UI-RenderConfig#RenderConfig) with the minimum necessary information for responsivity to work.
@@ -80,7 +80,7 @@ localeSpanishES =
         { width = 1920
         , height = 1080
         }
-        RenderConfig.localeEnglishGB
+        RenderConfig.localeEnglish
 
 -}
 init : { window | height : Int, width : Int } -> Locale -> RenderConfig

@@ -9,4 +9,4 @@ desktopWindowConfig =
         { width = 1920
         , height = 1080
         }
-        RenderConfig.localeEnglishGB
+        RenderConfig.localeEnglish

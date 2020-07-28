@@ -132,4 +132,4 @@ ifSquare =
 
 init : { window | height : Int, width : Int } -> RenderConfig
 init window =
-    RenderConfig.init window RenderConfig.localeEnglishGB
+    RenderConfig.init window RenderConfig.localeEnglish
