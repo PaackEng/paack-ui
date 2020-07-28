@@ -1,6 +1,7 @@
 module UI.Badge exposing
-    ( Badge, primary, success, warning, danger, light, dark
-    , withBrightness
+    ( Badge
+    , grayLight, primaryLight, successLight, warningLight, dangerLight
+    , grayDark, primaryDark, successDark, warningDark, dangerDark
     , renderElement
     )
 
@@ -13,7 +14,7 @@ A badge can be created and rendered as in the following pipeline:
 
     Element.row []
         [ -- Some cool content
-        , Badge.dark (String.fromInt (List.length someList))
+        , Badge.grayDark (String.fromInt (List.length someList))
             |> Badge.renderElement renderConfig
             |> Element.el [ Element.alignTop ]
         ]
@@ -21,7 +22,17 @@ A badge can be created and rendered as in the following pipeline:
 
 # Building
 
-@docs Badge, primary, success, warning, danger, light, dark
+@docs Badge
+
+
+## Light
+
+@docs grayLight, primaryLight, successLight, warningLight, dangerLight
+
+
+## Dark
+
+@docs grayDark, primaryDark, successDark, warningDark, dangerDark
 
 
 # Custom brightness
@@ -40,7 +51,7 @@ import Element.Background as Background
 import Element.Font as Font
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
-import UI.Palette as Palette exposing (brightnessDarkest, brightnessLight, brightnessLighter, toneDanger, toneGray, tonePrimary, toneSuccess, toneWarning)
+import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 
@@ -48,91 +59,127 @@ import UI.Text as Text
 {-| The `Badge` type is used for describing the component for later rendering.
 -}
 type Badge
-    = Badge Properties Options
+    = Badge Properties
 
 
 type alias Properties =
     { content : String
-    , tone : Palette.Tone
+    , tone : BadgeTone
+    , brightness : BadgeBrightness
     }
 
 
-type alias Options =
-    { brightness : Palette.Brightness
-    }
+type BadgeTone
+    = ToneGray
+    | TonePrimary
+    | ToneDanger
+    | ToneWarning
+    | ToneSuccess
+
+
+type BadgeBrightness
+    = Light
+    | Dark
 
 
 {-| A light grayish variation of the badge.
 
-    Badge.light "EMPTY"
+    Badge.grayLight "EMPTY"
 
 -}
-light : String -> Badge
-light content =
-    Badge { content = content, tone = toneGray } { defaultOptions | brightness = brightnessLighter }
+grayLight : String -> Badge
+grayLight content =
+    Badge { content = content, tone = ToneGray, brightness = Light }
+
+
+{-| A light primary-color variation of the badge.
+
+    Badge.primaryLight "NEW"
+
+-}
+primaryLight : String -> Badge
+primaryLight content =
+    Badge { content = content, tone = TonePrimary, brightness = Light }
+
+
+{-| A light variation of the badge with warning-tone.
+
+    Badge.warningLight "0"
+
+-}
+warningLight : String -> Badge
+warningLight content =
+    Badge { content = content, tone = ToneWarning, brightness = Light }
+
+
+{-| A light variation of the badge with danger-tone.
+
+    Badge.dangerLight "ERROR"
+
+-}
+dangerLight : String -> Badge
+dangerLight content =
+    Badge { content = content, tone = ToneDanger, brightness = Light }
+
+
+{-| A light variation of the badge with success-tone.
+
+    Badge.successLight "SENT"
+
+-}
+successLight : String -> Badge
+successLight content =
+    Badge { content = content, tone = ToneSuccess, brightness = Light }
 
 
 {-| A dark grayish variation of the badge.
 
-    Badge.dark "EMPTY"
+    Badge.grayDark "EMPTY"
 
 -}
-dark : String -> Badge
-dark content =
-    Badge { content = content, tone = toneGray } { defaultOptions | brightness = brightnessDarkest }
+grayDark : String -> Badge
+grayDark content =
+    Badge { content = content, tone = ToneGray, brightness = Dark }
 
 
 {-| A primary-color variation of the badge.
 
-    Badge.primary "NEW"
+    Badge.primaryDark "NEW"
 
 -}
-primary : String -> Badge
-primary content =
-    Badge { content = content, tone = tonePrimary } defaultOptions
+primaryDark : String -> Badge
+primaryDark content =
+    Badge { content = content, tone = TonePrimary, brightness = Dark }
 
 
 {-| A variation of the badge with warning-tone.
 
-    Badge.warning "0"
+    Badge.warningDark "0"
 
 -}
-warning : String -> Badge
-warning content =
-    Badge { content = content, tone = toneWarning } defaultOptions
+warningDark : String -> Badge
+warningDark content =
+    Badge { content = content, tone = ToneWarning, brightness = Dark }
 
 
 {-| A variation of the badge with danger-tone.
 
-    Badge.danger "ERROR"
+    Badge.dangerDark "ERROR"
 
 -}
-danger : String -> Badge
-danger content =
-    Badge { content = content, tone = toneDanger } defaultOptions
+dangerDark : String -> Badge
+dangerDark content =
+    Badge { content = content, tone = ToneDanger, brightness = Dark }
 
 
 {-| A variation of the badge with success-tone.
 
-    Badge.success "SENT"
+    Badge.successDark "SENT"
 
 -}
-success : String -> Badge
-success content =
-    Badge { content = content, tone = toneSuccess } defaultOptions
-
-
-{-| With `Badge.withBrightness`, you'll be able to apply a different brightness for any badge.
-See [`Palette.brightness*`](UI-Palette#brightnessMiddle) for acceptable values.
-
-    Badge.success "SENT"
-        |> Badge.withBrightness Palette.brightnessLight
-        |> Badge.renderElement renderConfig
-
--}
-withBrightness : Palette.Brightness -> Badge -> Badge
-withBrightness brightness (Badge prop opt) =
-    Badge prop { opt | brightness = brightness }
+successDark : String -> Badge
+successDark content =
+    Badge { content = content, tone = ToneSuccess, brightness = Dark }
 
 
 
@@ -143,13 +190,10 @@ withBrightness brightness (Badge prop opt) =
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
 renderElement : RenderConfig -> Badge -> Element msg
-renderElement cfg (Badge { content, tone } { brightness }) =
+renderElement cfg (Badge { content, tone, brightness }) =
     let
-        background =
-            Palette.color tone brightness
-
-        textColor =
-            Palette.setContrasting True background
+        ( background, textColor ) =
+            colors tone brightness
     in
     Text.overline content
         |> Text.withColor textColor
@@ -166,11 +210,55 @@ renderElement cfg (Badge { content, tone } { brightness }) =
             ]
 
 
+colors : BadgeTone -> BadgeBrightness -> ( Palette.Color, Palette.Color )
+colors tone brightness =
+    case ( brightness, tone ) of
+        ( Light, ToneGray ) ->
+            ( Palette.color Palette.toneGray Palette.brightnessLighter
+            , Palette.color Palette.toneGray Palette.brightnessDarkest
+            )
 
--- Internal
+        ( Light, TonePrimary ) ->
+            ( Palette.color Palette.tonePrimary Palette.brightnessLightest
+            , Palette.color Palette.tonePrimary Palette.brightnessDarkest
+            )
 
+        ( Light, ToneWarning ) ->
+            ( Palette.color Palette.toneWarning Palette.brightnessLightest
+            , Palette.color Palette.toneWarning Palette.brightnessDarkest
+            )
 
-defaultOptions : Options
-defaultOptions =
-    { brightness = brightnessLight
-    }
+        ( Light, ToneDanger ) ->
+            ( Palette.color Palette.toneWarning Palette.brightnessLightest
+            , Palette.color Palette.toneWarning Palette.brightnessDarkest
+            )
+
+        ( Light, ToneSuccess ) ->
+            ( Palette.color Palette.toneSuccess Palette.brightnessLightest
+            , Palette.color Palette.toneSuccess Palette.brightnessDarkest
+            )
+
+        ( Dark, ToneGray ) ->
+            ( Palette.color Palette.toneGray Palette.brightnessDarkest
+            , Palette.color Palette.toneGray Palette.brightnessLightest
+            )
+
+        ( Dark, TonePrimary ) ->
+            ( Palette.color Palette.tonePrimary Palette.brightnessDarkest
+            , Palette.color Palette.tonePrimary Palette.brightnessLightest
+            )
+
+        ( Dark, ToneWarning ) ->
+            ( Palette.color Palette.toneWarning Palette.brightnessDarkest
+            , Palette.color Palette.toneWarning Palette.brightnessLightest
+            )
+
+        ( Dark, ToneDanger ) ->
+            ( Palette.color Palette.toneWarning Palette.brightnessDarkest
+            , Palette.color Palette.toneWarning Palette.brightnessLightest
+            )
+
+        ( Dark, ToneSuccess ) ->
+            ( Palette.color Palette.toneSuccess Palette.brightnessDarkest
+            , Palette.color Palette.toneSuccess Palette.brightnessLightest
+            )
