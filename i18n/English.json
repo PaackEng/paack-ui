@@ -1,0 +1,52 @@
+{
+    "filters": {
+        "dateFormat": "DD/MM/YYYY",
+        "close": "Close",
+        "clear": "Clear",
+        "apply": "Apply",
+        "period": {
+            "after": "After",
+            "before": "Before",
+            "on": "On",
+            "description": "Select period reference"
+        },
+        "range": {
+            "from": "From: {{date}}",
+            "to": "To: {{date}}"
+        },
+        "select": {
+            "description": "Select option for filtering" 
+        }
+    },
+    "paginator": {
+        "format": "{{first}} - {{last}} of {{total}}", 
+        "previous": "Previous",
+        "next": "Next"
+    },
+    "checkbox": {
+        "toggle": "Toggle"
+    },
+    "listView": {
+        "search": "Search"
+    },
+    "radio": {
+        "select": "Select item"
+    },
+    "tables": {
+        "details": {
+            "show" : "Expand",
+            "collapse": "Collapse"
+        }
+    },
+    "dateInput": {
+        "invalid": "Invalid date format."
+    },
+    "dialog": {
+        "close": "Close dialog"
+    },
+    "sidebar": {
+        "expand": "Expand sidebar",
+        "collapse": "Minimize sidebar",
+        "previous": "Go back"
+    }
+}

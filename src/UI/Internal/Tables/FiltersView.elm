@@ -13,6 +13,7 @@ import UI.Internal.Basics exposing (maybeNotThen)
 import UI.Internal.DateInput as DateInput exposing (DateInput(..), PeriodComparison(..), PeriodDate, RangeDate)
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
+import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.Size as Size exposing (Size)
 import UI.Internal.Tables.Filters as Filters
 import UI.Palette as Palette
@@ -76,7 +77,7 @@ header renderConfig filter config =
         headerApplied renderConfig
             config.openMsg
             clearMsg
-            "Clear"
+            (renderConfig |> localeTerms >> .filters >> .clear)
             config.label
 
     else
@@ -197,13 +198,16 @@ overlayBackground onClickMsg =
 filterEditingButton : RenderConfig -> msg -> msg -> Bool -> Bool -> Element msg
 filterEditingButton renderConfig applyMsg clearMsg applied current =
     let
+        filtersTerms =
+            renderConfig |> localeTerms >> .filters
+
         clearBtn =
-            Button.fromLabel "Clear"
+            Button.fromLabel filtersTerms.clear
                 |> Button.cmd clearMsg Button.danger
                 |> Button.withSize Size.extraSmall
 
         applyBtn =
-            Button.fromLabel "Apply"
+            Button.fromLabel filtersTerms.apply
                 |> Button.cmd applyMsg Button.primary
                 |> Button.withSize Size.extraSmall
 
@@ -245,7 +249,8 @@ filteredHeaderLabel label =
 
 dialogClose : RenderConfig -> msg -> Element msg
 dialogClose renderConfig message =
-    Icon.close "Close"
+    (renderConfig |> localeTerms >> .filters >> .close)
+        |> Icon.close
         |> Icon.withColor (Palette.color Palette.toneGray Palette.brightnessLight)
         |> Icon.withSize Size.extraSmall
         |> Icon.renderElement renderConfig
@@ -376,7 +381,7 @@ selectFilterRender :
     -> Element msg
 selectFilterRender renderConfig { fromFiltersMsg, index } list { current, applied } =
     Radio.group
-        "Select option for filtering"
+        (renderConfig |> localeTerms >> .filters >> .select >> .description)
         (\subIndex -> fromFiltersMsg <| Filters.EditSelect { column = index, value = subIndex })
         |> Radio.withSelected (maybeNotThen applied current)
         |> Radio.withButtons (List.indexedMap Radio.button list)
@@ -394,10 +399,13 @@ singleDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
     let
         editMsg str =
             fromFiltersMsg <| Filters.EditSingleDate { column = index, value = str }
+
+        datePlaceholder =
+            renderConfig |> localeTerms >> .filters >> .dateFormat
     in
     editable
         |> Filters.editableWithDefault (DateInvalid "")
-        |> dateInput applyMsg editMsg "DD/MM/YYYY" label
+        |> dateInput renderConfig applyMsg editMsg datePlaceholder label
         |> TextField.renderElement renderConfig
         |> internalPaddingBox
 
@@ -416,10 +424,19 @@ rangeDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } edi
         editToMsg str =
             fromFiltersMsg <| Filters.EditRangeToDate { column = index, value = str }
 
+        filtersTerms =
+            renderConfig |> localeTerms >> .filters
+
         current =
             editable
                 |> Filters.editableWithDefault
                     { from = DateInvalid "", to = DateInvalid "" }
+
+        fromPlaceholder =
+            filtersTerms.range.from { date = filtersTerms.dateFormat }
+
+        toPlaceholder =
+            filtersTerms.range.to { date = filtersTerms.dateFormat }
     in
     Element.column
         [ Element.width fill
@@ -427,10 +444,10 @@ rangeDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } edi
         , internalPadding
         ]
         [ current.from
-            |> dateInput applyMsg editFromMsg "From: DD/MM/YYYY" label
+            |> dateInput renderConfig applyMsg editFromMsg fromPlaceholder label
             |> TextField.renderElement renderConfig
         , current.to
-            |> dateInput applyMsg editToMsg "To: DD/MM/YYYY" label
+            |> dateInput renderConfig applyMsg editToMsg toPlaceholder label
             |> TextField.renderElement renderConfig
         ]
 
@@ -453,21 +470,24 @@ periodDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
             editable
                 |> Filters.editableWithDefault { date = DateInvalid "", comparison = On }
 
+        filtersTerms =
+            renderConfig |> localeTerms >> .filters
+
         options =
-            [ Radio.button On "On"
-            , Radio.button Before "Before"
-            , Radio.button After "After"
+            [ Radio.button On filtersTerms.period.on
+            , Radio.button Before filtersTerms.period.before
+            , Radio.button After filtersTerms.period.after
             ]
     in
     Element.column
         [ Element.width fill
         ]
         [ current.date
-            |> dateInput applyMsg editDateMsg "DD/MM/YYYY" label
+            |> dateInput renderConfig applyMsg editDateMsg filtersTerms.dateFormat label
             |> TextField.renderElement renderConfig
             |> internalPaddingBox
         , Radio.group
-            "Select period reference"
+            filtersTerms.period.description
             editComparisonMsg
             |> Radio.withSelected (Just current.comparison)
             |> Radio.withButtons options
@@ -480,10 +500,10 @@ periodDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
 -- Internal
 
 
-dateInput : msg -> (String -> msg) -> String -> String -> DateInput -> TextField msg
-dateInput applyMsg editMsg placeholder label current =
+dateInput : RenderConfig -> msg -> (String -> msg) -> String -> String -> DateInput -> TextField msg
+dateInput cfg applyMsg editMsg placeholder label current =
     current
-        |> DateInput.toTextField Filters.dateSeparator editMsg label
+        |> DateInput.toTextField cfg Filters.dateSeparator editMsg label
         |> TextField.withPlaceholder placeholder
         |> TextField.withSize Size.extraSmall
         |> TextField.withWidth TextField.widthFull

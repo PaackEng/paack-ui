@@ -15,6 +15,8 @@ module UI.Internal.DateInput exposing
     )
 
 import Time
+import UI.Internal.RenderConfig exposing (localeTerms)
+import UI.RenderConfig exposing (RenderConfig)
 import UI.TextField as TextField exposing (TextField)
 
 
@@ -162,16 +164,19 @@ ifValid if_ then_ value =
             then_
 
 
-toTextField : String -> (String -> msg) -> String -> DateInput -> TextField msg
-toTextField separator editMsg label current =
+toTextField : RenderConfig -> String -> (String -> msg) -> String -> DateInput -> TextField msg
+toTextField cfg separator editMsg label current =
     let
         correct =
             current
                 |> toDD_MM_YYYY separator
                 |> TextField.singlelineText editMsg label
 
+        invalidTerm =
+            cfg |> localeTerms >> .dateInput >> .invalid
+
         invalid =
-            TextField.withError "Invalid date format." correct
+            TextField.withError invalidTerm correct
     in
     ifValid correct invalid current
 

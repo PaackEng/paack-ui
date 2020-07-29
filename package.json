@@ -6,13 +6,14 @@
   "directories": {
     "doc": "docs"
   },
-  "assetsPath" : "showcase/public/assets/",
+  "assetsPath": "showcase/public/assets/",
   "scripts": {
     "analyse": "elm-analyse",
     "docs": "elm make --docs=dist/docs.json",
     "build": "parcel build showcase/public/index.html --public-url ./",
     "showcase": "parcel showcase/public/index.html",
-    "test": "elm-test"
+    "test": "elm-test",
+    "i18n": "i18n-json-to-elm"
   },
   "repository": {
     "type": "git",
@@ -34,5 +35,7 @@
     "parcel-bundler": "^1.12.4",
     "parcel-plugin-asset-copier": "^1.1.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "i18n-json-to-elm": "PedroHLC/i18n-json-to-elm"
+  }
 }

@@ -9,6 +9,7 @@ import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Menu as Menu exposing (Menu)
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
+import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Link as Link exposing (Link)
 import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
@@ -94,14 +95,19 @@ mobileDrawer cfg page menu title maybeStack =
 viewHead : RenderConfig -> Menu msg -> String -> Maybe ( msg, List (Button msg) ) -> Element msg
 viewHead cfg (Menu.Menu prop _) title maybeStack =
     let
+        sidebarTerms =
+            cfg |> localeTerms >> .sidebar
+
         mobileHeadSandwich =
-            Icon.sandwichMenu "Expand sidebar"
+            sidebarTerms.expand
+                |> Icon.sandwichMenu
                 |> Icon.withSize Size.large
                 |> Icon.renderElement cfg
                 |> Element.el (headerButtonAttr (prop.toggleMsg True) 48 20)
 
         mobileHeadGoBack msg =
-            Icon.previousContent "Go back"
+            sidebarTerms.previous
+                |> Icon.previousContent
                 |> Icon.renderElement cfg
                 |> Element.el (headerButtonAttr msg 48 20)
     in
@@ -191,7 +197,8 @@ headerView cfg toggleMsg logo =
                     Element.none
 
         closeButton =
-            Icon.close "Minimize sidebar"
+            (cfg |> localeTerms >> .sidebar >> .collapse)
+                |> Icon.close
                 |> Icon.withSize Size.small
                 |> Icon.renderElement cfg
                 |> Element.el (headerButtonAttr toggleMsg 40 10)
@@ -205,7 +212,8 @@ headerView cfg toggleMsg logo =
 slimHeaderView : RenderConfig -> msg -> Maybe (Menu.Logo msg) -> Element msg
 slimHeaderView cfg toggleMsg _ =
     Element.column [ height (px (72 + 48)) ]
-        [ Icon.sandwichMenu "Expand sidebar"
+        [ (cfg |> localeTerms >> .sidebar >> .expand)
+            |> Icon.sandwichMenu
             |> Icon.withSize Size.large
             |> Icon.renderElement cfg
             |> Element.el (headerButtonAttr toggleMsg 48 14)

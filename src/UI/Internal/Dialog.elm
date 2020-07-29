@@ -4,6 +4,7 @@ import Element exposing (Element, fill, shrink)
 import Element.Events as Events
 import UI.Icon as Icon
 import UI.Internal.Palette as Palette
+import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
@@ -123,7 +124,8 @@ titleText cfg padding title =
 
 closeButton : RenderConfig -> msg -> Element msg
 closeButton cfg close =
-    Icon.close "Close dialog"
+    (cfg |> localeTerms >> .dialog >> .close)
+        |> Icon.close
         |> Icon.withSize Size.extraSmall
         |> Icon.renderElement cfg
         |> Element.el
