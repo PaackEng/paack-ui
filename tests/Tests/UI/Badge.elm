@@ -13,7 +13,7 @@ tests =
     describe "UI.Badge"
         [ fuzz Fuzz.string "sets the text content" <|
             \val ->
-                Badge.primary val
+                Badge.primaryDark val
                     |> Badge.renderElement desktopWindowConfig
                     |> elementToHtml
                     |> Query.has [ Selector.text val ]
