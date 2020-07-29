@@ -48,6 +48,7 @@ A badge can be created and rendered as in the following pipeline:
 
 import Element exposing (Element, px, shrink)
 import Element.Background as Background
+import Element.Border as Border
 import Element.Font as Font
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
@@ -204,9 +205,9 @@ renderElement cfg (Badge { content, tone, brightness }) =
             , background
                 |> Palette.toElementColor
                 |> Background.color
-            , Element.paddingEach { top = 4, bottom = 4, left = 5, right = 3 }
+            , Element.paddingEach { top = 4, bottom = 4, left = 7, right = 6 }
             , Element.height (px 20)
-            , Primitives.defaultRoundedBorders
+            , Border.rounded 10
             ]
 
 
