@@ -229,8 +229,8 @@ colors tone brightness =
             )
 
         ( Light, ToneDanger ) ->
-            ( Palette.color Palette.toneWarning Palette.brightnessLightest
-            , Palette.color Palette.toneWarning Palette.brightnessDarkest
+            ( Palette.color Palette.toneDanger Palette.brightnessLightest
+            , Palette.color Palette.toneDanger Palette.brightnessDarkest
             )
 
         ( Light, ToneSuccess ) ->
@@ -249,8 +249,8 @@ colors tone brightness =
             )
 
         ( Dark, ToneWarning ) ->
-            ( Palette.color Palette.toneWarning Palette.brightnessDarkest
-            , Palette.color Palette.toneWarning Palette.brightnessLightest
+            ( Palette.color Palette.toneDanger Palette.brightnessDarkest
+            , Palette.color Palette.toneDanger Palette.brightnessLightest
             )
 
         ( Dark, ToneDanger ) ->
