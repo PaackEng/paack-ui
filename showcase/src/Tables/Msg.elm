@@ -1,7 +1,9 @@
 module Tables.Msg exposing (Msg(..))
 
+import Tables.Book exposing (..)
 import UI.Tables.Stateful as Table
 
 
 type Msg
-    = ForComponent Table.Msg
+    = ForMain (Table.Msg Book)
+    | ForSelectable (Table.Msg Book)

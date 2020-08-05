@@ -10,6 +10,7 @@ module UI.Tables.Stateful exposing
     , periodSingle, pariodAfter, periodBefore, localPeriodDateFilter, remotePeriodDateFilter
     , localSelectFilter, remoteSelectFilter
     , withWidth
+    , stateWithSelection, stateIsSelected
     , renderElement
     )
 
@@ -135,15 +136,30 @@ And on model:
 @docs withWidth
 
 
+# Selection
+
+
+## Local
+
+@docs stateWithSelection, stateIsSelected
+
+
+## Remote
+
+TODO: withRemoteSelection
+
+
 # Rendering
 
 @docs renderElement
 
 -}
 
-import Element exposing (Element, shrink)
+import Element exposing (Element, fill, px, shrink)
+import Set exposing (Set)
 import Time
-import UI.Internal.Basics exposing (flip)
+import UI.Checkbox as Checkbox exposing (checkbox)
+import UI.Internal.Basics exposing (flip, ifThenElse, prependMaybe)
 import UI.Internal.DateInput as DateInput exposing (DateInput, PeriodDate, RangeDate)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Internal.RenderConfig exposing (localeTerms)
@@ -153,6 +169,7 @@ import UI.Internal.Tables.FiltersView as FiltersView
 import UI.Internal.Tables.View exposing (..)
 import UI.ListView as ListView
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
+import UI.Size as Size
 import UI.Tables.Common as Common exposing (..)
 import UI.Utils.TypeNumbers as T
 
@@ -182,7 +199,7 @@ See [`TypeNumbers`](UI-Utils-TypeNumbers) for how to compose its phantom type.
 type alias StatefulConfig msg item columns =
     { columns : Columns columns
     , toRow : ToRow msg item columns
-    , toExternalMsg : Msg -> msg
+    , toExternalMsg : Msg item -> msg
     , state : State msg item columns
     }
 
@@ -241,11 +258,13 @@ withItems items (Table prop opt) =
 
 {-| The `Stateful.Msg` handles stateful table's related messages.
 -}
-type Msg
+type Msg item
     = MobileToggle Int
     | ForFilters Filters.Msg
     | FilterDialogOpen Int
     | FilterDialogClose
+    | SelectionToggleAll
+    | SelectionSet item Bool
 
 
 {-| Keep this one in your Model, it holds the table's current state.
@@ -258,6 +277,19 @@ type alias StateModel msg item columns =
     { filters : Maybe (Filters msg item columns)
     , mobileSelected : Maybe Int
     , filterDialog : Maybe Int
+    , localSelection : Maybe (Selection item)
+    }
+
+
+type Selections
+    = Individual (Set String)
+    | All
+    | Except (Set String)
+
+
+type alias Selection item =
+    { identifier : item -> String
+    , checks : Selections
     }
 
 
@@ -271,7 +303,12 @@ type alias StateModel msg item columns =
 -}
 init : State msg item columns
 init =
-    State { filters = Nothing, mobileSelected = Nothing, filterDialog = Nothing }
+    State
+        { filters = Nothing
+        , mobileSelected = Nothing
+        , filterDialog = Nothing
+        , localSelection = Nothing
+        }
 
 
 {-| Given a message, apply an update to the [`Table.State`](#State).
@@ -281,39 +318,123 @@ Do not ignore the returned `Cmd`, it may include remote filter's messages.
         Table.update subMsg oldModel.tableState
 
 -}
-update : Msg -> State msg item columns -> ( State msg item columns, Cmd msg )
-update msg ((State state) as model) =
+update : Msg item -> State msg item columns -> ( State msg item columns, Cmd msg )
+update msg (State state) =
     case msg of
         MobileToggle index ->
-            ( State
-                { state
-                    | mobileSelected =
-                        if state.mobileSelected == Just index then
-                            Nothing
-
-                        else
-                            Just index
-                }
-            , Cmd.none
-            )
+            updateMobileToggle state index
 
         ForFilters subMsg ->
-            case state.filters of
-                Just filters ->
-                    filters
-                        |> Filters.update subMsg
-                        |> (\( newFilters, subCmd ) ->
-                                ( State { state | filters = Just newFilters }, subCmd )
-                           )
-
-                Nothing ->
-                    ( model, Cmd.none )
+            updateFilters state subMsg
 
         FilterDialogOpen index ->
             ( State { state | filterDialog = Just index }, Cmd.none )
 
         FilterDialogClose ->
             ( State { state | filterDialog = Nothing }, Cmd.none )
+
+        SelectionToggleAll ->
+            updateSelectionToggleAll state
+
+        SelectionSet item value ->
+            updateSelectionSet state item value
+
+
+updateMobileToggle : StateModel msg item columns -> Int -> ( State msg item columns, Cmd msg )
+updateMobileToggle state index =
+    ( State
+        { state
+            | mobileSelected =
+                if state.mobileSelected == Just index then
+                    Nothing
+
+                else
+                    Just index
+        }
+    , Cmd.none
+    )
+
+
+updateFilters : StateModel msg item columns -> Filters.Msg -> ( State msg item columns, Cmd msg )
+updateFilters state subMsg =
+    case state.filters of
+        Just filters ->
+            filters
+                |> Filters.update subMsg
+                |> (\( newFilters, subCmd ) ->
+                        ( State { state | filters = Just newFilters }, subCmd )
+                   )
+
+        Nothing ->
+            ( State state, Cmd.none )
+
+
+updateSelectionToggleAll : StateModel msg item columns -> ( State msg item columns, Cmd msg )
+updateSelectionToggleAll state =
+    let
+        invertAll old =
+            { old
+                | checks =
+                    case old.checks of
+                        Individual _ ->
+                            All
+
+                        All ->
+                            Individual Set.empty
+
+                        Except set ->
+                            if Set.isEmpty set then
+                                Individual Set.empty
+
+                            else
+                                All
+            }
+    in
+    ( State { state | localSelection = Maybe.map invertAll state.localSelection }
+    , Cmd.none
+    )
+
+
+updateSelectionSet : StateModel msg item columns -> item -> Bool -> ( State msg item columns, Cmd msg )
+updateSelectionSet state item value =
+    let
+        setItem old =
+            { old
+                | checks =
+                    case old.checks of
+                        Individual set ->
+                            selectIndividual old item value set
+
+                        All ->
+                            selectExcept old item value Set.empty
+
+                        Except set ->
+                            selectExcept old item value set
+            }
+    in
+    ( State { state | localSelection = Maybe.map setItem state.localSelection }
+    , Cmd.none
+    )
+
+
+selectIndividual : Selection item -> item -> Bool -> Set String -> Selections
+selectIndividual { identifier } item value set =
+    set
+        |> ifThenElse value
+            Set.insert
+            Set.remove
+            (identifier item)
+        |> Individual
+
+
+selectExcept : Selection item -> item -> Bool -> Set String -> Selections
+selectExcept { identifier } item value set =
+    set
+        |> ifThenElse value
+            Set.remove
+            Set.insert
+            (identifier item)
+        |> Except
 
 
 
@@ -445,6 +566,33 @@ type alias Filters msg item columns =
 stateWithFilters : Filters msg item columns -> State msg item columns -> State msg item columns
 stateWithFilters filters (State state) =
     State { state | filters = Just filters }
+
+
+stateWithSelection : (item -> String) -> Bool -> State msg item columns -> State msg item columns
+stateWithSelection identifier default (State state) =
+    State
+        { state
+            | localSelection =
+                Just
+                    { checks =
+                        if default then
+                            All
+
+                        else
+                            Individual Set.empty
+                    , identifier = identifier
+                    }
+        }
+
+
+stateIsSelected : item -> State msg item columns -> Bool
+stateIsSelected item (State state) =
+    case state.localSelection of
+        Just selection ->
+            internalIsSelected selection item
+
+        Nothing ->
+            False
 
 
 {-| An empty [`Filters`](#Filters) set.
@@ -839,27 +987,19 @@ desktopView renderConfig prop opt =
             NArray.toList prop.columns
 
         state =
-            case prop.state of
-                State state_ ->
-                    state_
+            unwrapState prop.state
 
         items =
-            case state.filters of
-                Just filtersArr ->
-                    filtersArr
-                        |> NArray.toList
-                        |> List.filterMap Filters.filterGet
-                        |> List.foldl Filters.filtersReduce (always True)
-                        |> flip List.filter opt.items
-
-                Nothing ->
-                    opt.items
+            viewGetItems state opt
 
         rows =
-            List.map (rowRender renderConfig prop.toRow columns) items
+            List.map (rowWithSelection renderConfig prop.toExternalMsg state prop.toRow columns) items
 
         padding =
             { top = 20, left = 20, right = 20, bottom = 0 }
+
+        selectionHeader =
+            viewSelectionHeader renderConfig state prop.toExternalMsg
 
         headers =
             headersRender renderConfig
@@ -867,6 +1007,7 @@ desktopView renderConfig prop opt =
                 state.filterDialog
                 state.filters
                 columns
+                selectionHeader
     in
     Element.column
         [ Element.spacing 2
@@ -876,14 +1017,67 @@ desktopView renderConfig prop opt =
         (headers :: rows)
 
 
+viewSelectionHeader : RenderConfig -> StateModel msg item columns -> (Msg item -> msg) -> Maybe (Element msg)
+viewSelectionHeader renderConfig state toExternalMsg =
+    Maybe.map
+        (SelectionToggleAll
+            |> toExternalMsg
+            |> FiltersView.headerSelectToggle renderConfig
+            |> always
+        )
+        state.localSelection
+
+
+viewGetItems : StateModel msg item columns -> Options msg item columns -> List item
+viewGetItems state opt =
+    case state.filters of
+        Just filtersArr ->
+            filtersArr
+                |> NArray.toList
+                |> List.filterMap Filters.filterGet
+                |> List.foldl Filters.filtersReduce (always True)
+                |> flip List.filter opt.items
+
+        Nothing ->
+            opt.items
+
+
+unwrapState : State msg item columns -> StateModel msg item columns
+unwrapState (State model) =
+    model
+
+
+rowWithSelection :
+    RenderConfig
+    -> (Msg item -> msg)
+    -> StateModel msg item columns
+    -> ToRow msg item columns
+    -> List Column
+    -> item
+    -> Element msg
+rowWithSelection renderConfig msgMap state toRow columns item =
+    rowBox <|
+        case state.localSelection of
+            Just selection ->
+                rowRender renderConfig toRow columns item
+                    |> (::)
+                        (selectionCell renderConfig selection item
+                            |> Element.map msgMap
+                        )
+
+            Nothing ->
+                rowRender renderConfig toRow columns item
+
+
 headersRender :
     RenderConfig
-    -> (Msg -> msg)
+    -> (Msg item -> msg)
     -> Maybe Int
     -> Maybe (Filters.Filters msg item columns)
     -> List Column
+    -> Maybe (Element msg)
     -> Element msg
-headersRender renderConfig toExternalMsg selected filters columns =
+headersRender renderConfig toExternalMsg selected filters columns selectionHeader =
     Element.row headersAttr <|
         case filters of
             Just filterArr ->
@@ -891,6 +1085,7 @@ headersRender renderConfig toExternalMsg selected filters columns =
                     |> NArray.toList
                     |> List.map2 (filterHeader renderConfig toExternalMsg selected) columns
                     |> List.indexedMap (\index val -> val index)
+                    |> prependMaybe selectionHeader
 
             Nothing ->
                 List.map
@@ -904,7 +1099,7 @@ headersRender renderConfig toExternalMsg selected filters columns =
 
 filterHeader :
     RenderConfig
-    -> (Msg -> msg)
+    -> (Msg item -> msg)
     -> Maybe Int
     -> Column
     -> Filters.Filter msg item
@@ -921,3 +1116,36 @@ filterHeader renderConfig toExternalMsg selected (Column header { width }) filte
         , isOpen = selected == Just index
         }
         |> topCellSpace width
+
+
+
+-- Selection
+
+
+internalIsSelected : Selection item -> item -> Bool
+internalIsSelected { identifier, checks } item =
+    case checks of
+        Individual set ->
+            Set.member (identifier item) set
+
+        All ->
+            True
+
+        Except set ->
+            set
+                |> Set.member (identifier item)
+                |> not
+
+
+selectionCell : RenderConfig -> Selection item -> item -> Element (Msg item)
+selectionCell renderConfig selection item =
+    item
+        |> internalIsSelected selection
+        |> checkbox "Select row" (SelectionSet item)
+        |> Checkbox.withLabelVisible False
+        |> Checkbox.withSize Size.small
+        |> Checkbox.renderElement renderConfig
+        |> Element.el
+            [ Element.centerX, Element.centerY ]
+        |> Element.el
+            [ Element.width (px 32), Element.height fill ]

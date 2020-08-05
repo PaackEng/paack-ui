@@ -1,7 +1,7 @@
-module UI.Internal.Tables.FiltersView exposing (Config, header)
+module UI.Internal.Tables.FiltersView exposing (Config, header, headerSelectToggle)
 
 import Array exposing (Array)
-import Element exposing (Attribute, Element, fill, minimum, shrink)
+import Element exposing (Attribute, Element, fill, minimum, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
@@ -84,6 +84,23 @@ header renderConfig filter config =
         headerNormal renderConfig
             config.openMsg
             config.label
+
+
+
+-- Selectable reuses filter background
+
+
+headerSelectToggle : RenderConfig -> msg -> Element msg
+headerSelectToggle renderConfig toggleMsg =
+    Icon.check ""
+        |> Icon.withSize Size.small
+        |> Icon.renderElement renderConfig
+        |> Element.el
+            (Element.onIndividualClick toggleMsg
+                :: headerAttrs False
+            )
+        |> Element.el
+            [ Element.width (px 32) ]
 
 
 
