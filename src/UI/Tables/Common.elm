@@ -143,7 +143,9 @@ cellFromButton text =
 
 
 {-| Creates a cell with an `Element msg` inside.
-    cellFromCustom <| Element.row [] [Element.text "Hello", Element.text "World"]
+
+    cellFromCustom <| Element.row [] [ Element.text "Hello", Element.text "World" ]
+
 -}
 cellFromCustom : Element msg -> Cell msg
 cellFromCustom element =
