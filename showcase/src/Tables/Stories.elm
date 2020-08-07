@@ -193,8 +193,12 @@ tableColumns =
 
 
 toTableRow renderConfig { author, title, year, acquired, read } =
+    let
+        titleCell =
+            Element.el [ underline, italic ] <| Text.renderElement renderConfig <| Text.body2 title
+    in
     rowEmpty
-        |> rowCellCustom (Element.el [ underline, italic ] <| Text.renderElement renderConfig <| Text.body2 title)
+        |> rowCellCustom titleCell
         |> rowCellText (Text.body2 author)
         |> rowCellText (Text.caption year)
         |> rowCellText (Text.caption <| DateInput.toDD_MM_YYYY "/" <| DateInput.fromPosix Time.utc acquired)
