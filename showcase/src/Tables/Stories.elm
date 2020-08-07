@@ -1,7 +1,7 @@
 module Tables.Stories exposing (stories, update)
 
 import Element exposing (Element, fill)
-import Element.Font exposing(underline, italic)
+import Element.Font exposing (italic, underline)
 import Msg
 import PluginOptions exposing (defaultWithMenu)
 import Return as R exposing (Return)
@@ -194,7 +194,7 @@ tableColumns =
 
 toTableRow renderConfig { author, title, year, acquired, read } =
     rowEmpty
-        |> rowCellCustom (Element.el [underline, italic] <| Text.renderElement renderConfig <| Text.body2 title)
+        |> rowCellCustom (Element.el [ underline, italic ] <| Text.renderElement renderConfig <| Text.body2 title)
         |> rowCellText (Text.body2 author)
         |> rowCellText (Text.caption year)
         |> rowCellText (Text.caption <| DateInput.toDD_MM_YYYY "/" <| DateInput.fromPosix Time.utc acquired)
