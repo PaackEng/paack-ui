@@ -1,9 +1,8 @@
 module UI.Tables.Common exposing
     ( Columns, columnsEmpty, column
     , ColumnWidth, columnWidthPortion, columnWidthPixels
-    , Row, ToRow, rowEmpty, rowCellText, rowCellButton
-    , Cell, cellFromText, cellFromButton
-    , cellFromCustom, rowCellCustom
+    , Row, ToRow, rowEmpty, rowCellText, rowCellButton, rowCellCustom
+    , Cell, cellFromText, cellFromButton, cellFromCustom
     )
 
 {-|
@@ -21,12 +20,12 @@ module UI.Tables.Common exposing
 
 ## Desktop rows
 
-@docs Row, ToRow, rowEmpty, rowCellText, rowCellButton
+@docs Row, ToRow, rowEmpty, rowCellText, rowCellButton, rowCellCustom
 
 
 # Individual cell
 
-@docs Cell, cellFromText, cellFromButton
+@docs Cell, cellFromText, cellFromButton, cellFromCustom
 
 -}
 
