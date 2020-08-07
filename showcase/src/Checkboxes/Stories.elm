@@ -47,18 +47,18 @@ boxDemo renderConfig =
         view { checkboxesStories } =
             Element.column [ Element.spacing 8 ]
                 [ iconsSvgSprite
-                , Checkbox.checkbox renderConfig
+                , Checkbox.checkbox "Extra ketchup (Free)"
                     (Checkboxes.Box1Set >> Msg.CheckboxesStoriesMsg)
-                    "Extra ketchup (Free)"
                     checkboxesStories.box1
-                , Checkbox.checkbox renderConfig
+                    |> Checkbox.renderElement renderConfig
+                , Checkbox.checkbox "Large french fries (+0.50 USD)"
                     (Checkboxes.Box2Set >> Msg.CheckboxesStoriesMsg)
-                    "Large french fries (+0.50 USD)"
                     checkboxesStories.box2
-                , Checkbox.checkbox renderConfig
+                    |> Checkbox.renderElement renderConfig
+                , Checkbox.checkbox "Heinz® Mayonnaise (+0.75 USD)"
                     (implicitMessages >> Msg.CheckboxesStoriesMsg)
-                    "Heinz® Mayonnaise (+0.75 USD)"
                     checkboxesStories.box3
+                    |> Checkbox.renderElement renderConfig
                 , ("Total: "
                     ++ (String.fromFloat <| totalPrice checkboxesStories)
                     ++ " USD"

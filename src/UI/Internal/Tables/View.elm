@@ -43,17 +43,22 @@ widthToEl width =
             px int
 
 
-rowRender : RenderConfig -> ToRow msg item columns -> List Column -> item -> Element msg
+rowRender : RenderConfig -> ToRow msg item columns -> List Column -> item -> List (Element msg)
 rowRender renderConfig toRow columns item =
     toRow item
         |> NArray.toList
         |> List.map2 (cellRender renderConfig) columns
-        |> Element.row
-            [ Element.spacing 8
-            , Primitives.defaultRoundedBorders
-            , Element.width fill
-            , Element.mouseOver [ Background.color Palette.gray.lightest ]
-            ]
+
+
+rowBox : List (Element msg) -> Element msg
+rowBox cells =
+    Element.row
+        [ Element.spacing 8
+        , Primitives.defaultRoundedBorders
+        , Element.width fill
+        , Element.mouseOver [ Background.color Palette.gray.lightest ]
+        ]
+        cells
 
 
 cellRender : RenderConfig -> Column -> Common.Cell msg -> Element msg

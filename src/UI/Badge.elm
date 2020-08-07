@@ -35,11 +35,6 @@ A badge can be created and rendered as in the following pipeline:
 @docs grayDark, primaryDark, successDark, warningDark, dangerDark
 
 
-# Custom brightness
-
-@docs withBrightness
-
-
 # Rendering
 
 @docs renderElement

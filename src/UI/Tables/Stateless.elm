@@ -175,7 +175,7 @@ desktopView renderConfig prop opt =
             headersRender renderConfig columns
 
         rows =
-            List.map (rowRender renderConfig prop.toRow columns) opt.items
+            List.map (rowRender renderConfig prop.toRow columns >> rowBox) opt.items
     in
     Element.column
         [ Element.spacing 2

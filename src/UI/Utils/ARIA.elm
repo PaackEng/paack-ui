@@ -1,20 +1,29 @@
 module UI.Utils.ARIA exposing
-    ( ElementSemantics, roleButton, roleImage, rolePresentation, roleCheckbox
+    ( ElementSemantics
+    , roleButton, roleImage, rolePresentation, roleCheckbox
     , roleRadioGroup, roleRadio
+    , withLabel
     , toElementAttributes
     )
 
 {-| Interface for [HTML's ARIA](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA).
 
+@docs ElementSemantics
+
 
 # Building
 
-@docs ElementSemantics, roleButton, roleImage, rolePresentation, roleCheckbox
+@docs roleButton, roleImage, rolePresentation, roleCheckbox
 
 
 ## Radio buttons
 
 @docs roleRadioGroup, roleRadio
+
+
+# Global options
+
+@docs withLabel
 
 
 # Rendering
@@ -25,21 +34,26 @@ module UI.Utils.ARIA exposing
 
 import Element exposing (Attribute)
 import Html.Attributes as HtmlAttrs
-import UI.Internal.Basics exposing (ifThenElse)
+import UI.Internal.Basics exposing (ifThenElse, prependMaybe)
 
 
-{-| Roles defines the type of UI element.
+{-| Use roles for creating ARIA element's semantics.
+Roles defines the type of UI element.
 
 See [MDN article](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Techniques#Roles).
 
 -}
-type ElementSemantics
+type alias ElementSemantics =
+    { role : Role, label : Maybe String }
+
+
+type Role
     = RoleButton
     | RoleCheckbox Bool
-    | RoleImage String
+    | RoleImage
     | RolePresentation
     | RoleRadio Bool
-    | RoleRadioGroup String
+    | RoleRadioGroup
 
 
 {-| "The button role should be used for clickable elements that trigger a response when activated by the user." - MDN
@@ -51,7 +65,7 @@ type ElementSemantics
 -}
 roleButton : ElementSemantics
 roleButton =
-    RoleButton
+    fromRole RoleButton
 
 
 {-| "The checkbox role is used for checkable interactive controls." -MDN
@@ -65,7 +79,7 @@ roleButton =
 -}
 roleCheckbox : Bool -> ElementSemantics
 roleCheckbox checked =
-    RoleCheckbox checked
+    fromRole (RoleCheckbox checked)
 
 
 {-| "Can be used to identify multiple elements inside page content that should be considered as a single image." - MDN
@@ -74,10 +88,12 @@ roleCheckbox checked =
         (ARIA.toElementAttributes <| ARIA.roleImage altText)
         [ Element.text "😺 Meow" ]
 
+**NOTE**: This role enforces aria-label option.
+
 -}
 roleImage : String -> ElementSemantics
 roleImage label =
-    RoleImage label
+    { role = RoleImage, label = Just label }
 
 
 {-| "An element whose content is completely presentational (like a spacer image, decorative graphic, or clearing element)" - W3C
@@ -89,7 +105,7 @@ roleImage label =
 -}
 rolePresentation : ElementSemantics
 rolePresentation =
-    RolePresentation
+    fromRole RolePresentation
 
 
 {-| "A checkable input in a group of elements with the same role, only one of which can be checked at a time." - W3C
@@ -103,7 +119,7 @@ rolePresentation =
 -}
 roleRadio : Bool -> ElementSemantics
 roleRadio checked =
-    RoleRadio checked
+    fromRole (RoleRadio checked)
 
 
 {-| "A radiogroup is a type of select list that can only have a single entry checked at any one time." - W3C
@@ -114,46 +130,61 @@ roleRadio checked =
         , strawberryIceCream
         ]
 
+**NOTE**: This role enforces aria-label option.
+
 -}
 roleRadioGroup : String -> ElementSemantics
 roleRadioGroup label =
-    RoleRadioGroup label
+    { role = RoleRadioGroup, label = Just label }
+
+
+{-| "Defines a string value that labels the current element" -W3C
+
+    ARIA.roleCheckbox False
+        |> ARIA.withLabel "I agree with the policy"
+        |> ARIA.toElementAttributes
+
+**NOTE**: This is a global optional parameter, roles builders enforce it when necessary.
+
+-}
+withLabel : String -> ElementSemantics -> ElementSemantics
+withLabel label semantics =
+    { semantics | label = Just label }
 
 
 {-| Transform a [`ElementSemantics`](#ElementSemantics) in a list of [`Element.Attribute`](/packages/mdgriffith/elm-ui/latest/Element#Attribute).
 -}
 toElementAttributes : ElementSemantics -> List (Attribute msg)
-toElementAttributes role =
-    case role of
-        RoleButton ->
-            [ roleAttr "button"
-            , pressedAttr "false"
-            , expandedAttr "undefined"
-            ]
+toElementAttributes { role, label } =
+    prependMaybe (Maybe.map labelAttr label) <|
+        case role of
+            RoleButton ->
+                [ roleAttr "button"
+                , pressedAttr "false"
+                , expandedAttr "undefined"
+                ]
 
-        RoleCheckbox checked ->
-            [ roleAttr "checkbox"
-            , checkedAttr checked
-            ]
+            RoleCheckbox checked ->
+                [ roleAttr "checkbox"
+                , checkedAttr checked
+                ]
 
-        RoleImage label ->
-            [ roleAttr "img"
-            , labelAttr label
-            ]
+            RoleImage ->
+                [ roleAttr "img"
+                ]
 
-        RolePresentation ->
-            [ roleAttr "presentation"
-            ]
+            RolePresentation ->
+                [ roleAttr "presentation"
+                ]
 
-        RoleRadio checked ->
-            [ roleAttr "radio"
-            , checkedAttr checked
-            ]
+            RoleRadio checked ->
+                [ roleAttr "radio"
+                , checkedAttr checked
+                ]
 
-        RoleRadioGroup label ->
-            [ roleAttr "radiogroup"
-            , labelAttr label
-            ]
+            RoleRadioGroup ->
+                [ roleAttr "radiogroup"
+                ]
 
 
 roleAttr : String -> Attribute msg
@@ -190,3 +221,8 @@ checkedAttr value =
         |> ifThenElse value "true"
         |> HtmlAttrs.attribute "aria-checked"
         |> Element.htmlAttribute
+
+
+fromRole : Role -> ElementSemantics
+fromRole role =
+    { role = role, label = Nothing }
