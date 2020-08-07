@@ -1,5 +1,7 @@
 module Tables.Book exposing (..)
 
+import Element exposing (Element)
+import Element.Font exposing (italic, underline)
 import Time exposing (millisToPosix)
 import UI.Internal.DateInput as DateInput
 import UI.Tables.Common exposing (..)

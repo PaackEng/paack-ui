@@ -1,7 +1,6 @@
 module Tables.Stories exposing (stories, update)
 
 import Element exposing (Element, fill)
-import Element.Font exposing (italic, underline)
 import Msg
 import PluginOptions exposing (defaultWithMenu)
 import Return as R exposing (Return)
@@ -39,7 +38,7 @@ stories renderConfig =
     storiesOf
         "Tables"
         [ desktopTableStory renderConfig
-        , mobileTableStory
+        , mobileTableStory renderConfig
         , statelessTableStory renderConfig
         , selectableTableStory renderConfig
         ]
@@ -48,29 +47,29 @@ stories renderConfig =
 desktopTableStory renderConfig =
     storyWithModel
         ( "Desktop"
-        , \{ tablesStories } -> withIcons renderConfig (demoTable tablesStories.mainTableState Stories.ForMain)
+        , \{ tablesStories } -> withIcons renderConfig (demoTable renderConfig tablesStories.mainTableState Stories.ForMain)
         , { defaultWithMenu
             | note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Tables-Stateful) for the exact code of this example."
           }
         )
 
 
-mobileTableStory =
+mobileTableStory renderConfig =
     storyWithModel
         ( "Mobile"
-        , \{ tablesStories } -> withIcons mobileCfg (demoTable tablesStories.mainTableState Stories.ForMain)
+        , \{ tablesStories } -> withIcons mobileCfg (demoTable renderConfig tablesStories.mainTableState Stories.ForMain)
         , { defaultWithMenu
             | note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Tables-Stateful) for the exact code of this example."
           }
         )
 
 
-demoTable state msg =
+demoTable renderConfig state msg =
     Stateful.table
         { toExternalMsg = msg >> Msg.TablesStoriesMsg
         , columns = Book.tableColumns
         , toRow = Book.toTableRow renderConfig
-        , state = model.tableState
+        , state = state
         }
         |> Stateful.withResponsive
             { toDetails = Book.toTableDetails
@@ -115,7 +114,7 @@ statelessDemoTable renderConfig =
 selectableTableStory renderConfig =
     storyWithModel
         ( "Selectable"
-        , \{ tablesStories } -> withIcons renderConfig (demoTable tablesStories.selecTableState Stories.ForSelectable)
+        , \{ tablesStories } -> withIcons renderConfig (demoTable renderConfig tablesStories.selecTableState Stories.ForSelectable)
         , { defaultWithMenu
             | note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Tables-Stateful) for the exact code of this example."
           }

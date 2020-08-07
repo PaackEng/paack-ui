@@ -568,6 +568,12 @@ stateWithFilters filters (State state) =
     State { state | filters = Just filters }
 
 
+{-| Apply selection defintion to a table's [`State`](#State).
+
+    model =
+        stateWithSelection Book.getISBN init
+
+-}
 stateWithSelection : (item -> String) -> Bool -> State msg item columns -> State msg item columns
 stateWithSelection identifier default (State state) =
     State
@@ -585,6 +591,12 @@ stateWithSelection identifier default (State state) =
         }
 
 
+{-| Resolves if one item's row is or not selected.
+
+    isHungerGamesSelected =
+        Table.stateIsSelected hungerGamesBook tableState
+
+-}
 stateIsSelected : item -> State msg item columns -> Bool
 stateIsSelected item (State state) =
     case state.localSelection of
