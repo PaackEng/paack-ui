@@ -22,4 +22,4 @@ type ColumnWidth
 type Cell msg
     = CellText Text
     | CellButton (Button msg)
-    | Custom (Element msg)
+    | CellCustom (Element msg)

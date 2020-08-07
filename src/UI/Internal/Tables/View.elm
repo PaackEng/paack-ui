@@ -29,7 +29,7 @@ cellContentRender renderConfig cell_ =
         CellButton button ->
             Button.renderElement renderConfig button
 
-        Custom element ->
+        CellCustom element ->
             element
 
 

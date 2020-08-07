@@ -149,7 +149,7 @@ cellFromButton text =
 -}
 cellFromCustom : Element msg -> Cell msg
 cellFromCustom element =
-    Custom element
+    CellCustom element
 
 
 
@@ -228,4 +228,4 @@ Similar to [`cellFromCustom`](#cellFromCustom) but infused for rows.
 -}
 rowCellCustom : Element msg -> Row msg columns -> Row msg (T.Increase columns)
 rowCellCustom element accu =
-    NArray.push (Custom element) accu
+    NArray.push (CellCustom element) accu
