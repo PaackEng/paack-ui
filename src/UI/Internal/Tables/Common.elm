@@ -1,5 +1,6 @@
 module UI.Internal.Tables.Common exposing (..)
 
+import Element exposing (Element)
 import UI.Button exposing (Button)
 import UI.Text exposing (Text)
 
@@ -21,3 +22,4 @@ type ColumnWidth
 type Cell msg
     = CellText Text
     | CellButton (Button msg)
+    | CellCustom (Element msg)

@@ -1,6 +1,7 @@
 module Tables.Stories exposing (stories, update)
 
 import Element exposing (Element, fill)
+import Element.Font exposing (italic, underline)
 import Msg
 import PluginOptions exposing (defaultWithMenu)
 import Return as R exposing (Return)
@@ -92,7 +93,7 @@ demoTable renderConfig model =
     Stateful.table
         { toExternalMsg = Stories.ForComponent >> Msg.TablesStoriesMsg
         , columns = tableColumns
-        , toRow = toTableRow
+        , toRow = toTableRow renderConfig
         , state = model.tableState
         }
         |> Stateful.withResponsive
@@ -129,7 +130,7 @@ statelessTableStory renderConfig =
 statelessDemoTable renderConfig =
     Stateless.table
         { columns = tableColumns
-        , toRow = toTableRow
+        , toRow = toTableRow renderConfig
         }
         |> Stateless.withWidth Element.shrink
         |> Stateless.withItems books
@@ -191,9 +192,13 @@ tableColumns =
         |> column "Read" (columnWidthPixels 180)
 
 
-toTableRow { author, title, year, acquired, read } =
+toTableRow renderConfig { author, title, year, acquired, read } =
+    let
+        titleCell =
+            Element.el [ underline, italic ] <| Text.renderElement renderConfig <| Text.body2 title
+    in
     rowEmpty
-        |> rowCellText (Text.body1 title)
+        |> rowCellCustom titleCell
         |> rowCellText (Text.body2 author)
         |> rowCellText (Text.caption year)
         |> rowCellText (Text.caption <| DateInput.toDD_MM_YYYY "/" <| DateInput.fromPosix Time.utc acquired)

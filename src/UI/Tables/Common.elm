@@ -1,8 +1,8 @@
 module UI.Tables.Common exposing
     ( Columns, columnsEmpty, column
     , ColumnWidth, columnWidthPortion, columnWidthPixels
-    , Row, ToRow, rowEmpty, rowCellText, rowCellButton
-    , Cell, cellFromText, cellFromButton
+    , Row, ToRow, rowEmpty, rowCellText, rowCellButton, rowCellCustom
+    , Cell, cellFromText, cellFromButton, cellFromCustom
     )
 
 {-|
@@ -20,15 +20,16 @@ module UI.Tables.Common exposing
 
 ## Desktop rows
 
-@docs Row, ToRow, rowEmpty, rowCellText, rowCellButton
+@docs Row, ToRow, rowEmpty, rowCellText, rowCellButton, rowCellCustom
 
 
 # Individual cell
 
-@docs Cell, cellFromText, cellFromButton
+@docs Cell, cellFromText, cellFromButton, cellFromCustom
 
 -}
 
+import Element exposing (Element)
 import UI.Button exposing (Button)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Internal.Tables.Common as Internal exposing (..)
@@ -112,7 +113,7 @@ columnWidthPixels value =
 
 
 {-| A singular cell of a table.
-Can hold texts and buttons by now.
+Can hold texts, buttons or any custom `Element msg`.
 -}
 type alias Cell msg =
     Internal.Cell msg
@@ -138,6 +139,16 @@ cellFromText text =
 cellFromButton : Button msg -> Cell msg
 cellFromButton text =
     CellButton text
+
+
+{-| Creates a cell with an `Element msg` inside.
+
+    cellFromCustom <| Element.row [] [ Element.text "Hello", Element.text "World" ]
+
+-}
+cellFromCustom : Element msg -> Cell msg
+cellFromCustom element =
+    CellCustom element
 
 
 
@@ -203,3 +214,17 @@ Similar to [`cellFromButton`](#cellFromButton) but infused for rows.
 rowCellButton : Button msg -> Row msg columns -> Row msg (T.Increase columns)
 rowCellButton btn accu =
     NArray.push (CellButton btn) accu
+
+
+{-| Transforms any `Element msg` into a cell appending it to a row.
+
+Similar to [`cellFromCustom`](#cellFromCustom) but infused for rows.
+
+    rowEmpty
+        |> rowCellText (Text.body1 "Aldebaran")
+        |> rowCellCustom (Element.text "Hello")
+
+-}
+rowCellCustom : Element msg -> Row msg columns -> Row msg (T.Increase columns)
+rowCellCustom element accu =
+    NArray.push (CellCustom element) accu

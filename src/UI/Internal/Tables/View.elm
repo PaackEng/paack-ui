@@ -29,6 +29,9 @@ cellContentRender renderConfig cell_ =
         CellButton button ->
             Button.renderElement renderConfig button
 
+        CellCustom element ->
+            element
+
 
 widthToEl : Common.ColumnWidth -> Element.Length
 widthToEl width =
