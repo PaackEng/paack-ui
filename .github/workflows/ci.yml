@@ -73,8 +73,13 @@ jobs:
 
        - name: Run tests
          run: yarn run test
+
+       - name: Build
+         run: yarn run build
        
-       - name: Run e2e tests
-         run: yarn run percy
+       - name: Percy test
+         uses: percy/snapshot-action@v0.1.1
+         with:
+          build-directory: "dist"
          env:
           PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
