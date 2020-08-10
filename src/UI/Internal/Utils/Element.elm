@@ -1,4 +1,4 @@
-module UI.Internal.Utils.Element exposing (ellipsisAttrs, style, tuplesToStyles)
+module UI.Internal.Utils.Element exposing (ellipsisAttrs, style, title, tuplesToStyles)
 
 import Element exposing (Attribute)
 import Html.Attributes as HtmlAttrs
@@ -14,8 +14,8 @@ tuplesToStyles ( k, v ) =
     Element.htmlAttribute <| HtmlAttrs.style k v
 
 
-ellipsisAttrs : Int -> List (Attribute msg)
-ellipsisAttrs lineHeightSize =
+ellipsisAttrs : Int -> String -> List (Attribute msg)
+ellipsisAttrs lineHeightSize titleContent =
     [ ( "text-overflow", "ellipsis" )
     , ( "white-space", "nowrap" )
     , ( "overflow", "hidden" )
@@ -24,3 +24,11 @@ ellipsisAttrs lineHeightSize =
     ]
         |> List.map tuplesToStyles
         |> (::) Element.clip
+        |> (::) (title titleContent)
+
+
+title : String -> Attribute msg
+title value =
+    value
+        |> HtmlAttrs.title
+        |> Element.htmlAttribute

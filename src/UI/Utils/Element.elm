@@ -40,7 +40,7 @@ import Html.Attributes as HtmlAttrs
 import Html.Events as HtmlEvents
 import Json.Decode as Decode
 import Svg
-import UI.Internal.Utils.Element exposing (style, tuplesToStyles)
+import UI.Internal.Utils.Element as Internal exposing (style, tuplesToStyles)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Utils.ARIA as ARIA
 
@@ -132,9 +132,7 @@ The information is most often shown as a tooltip text when the mouse moves over 
 -}
 title : String -> Attribute msg
 title value =
-    value
-        |> HtmlAttrs.title
-        |> Element.htmlAttribute
+    Internal.title value
 
 
 {-| Wrapper for CSS's `max-height: {{vaue}}vh`.

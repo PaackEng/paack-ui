@@ -19,11 +19,12 @@ cellContentRender renderConfig cell_ =
     case cell_ of
         CellText text ->
             text
+                |> Text.setEllipsis True
                 |> Text.renderElement renderConfig
                 |> Element.el
                     [ Element.width fill
                     , Element.clipX
-                    , Element.padding 8
+                    , Element.paddingXY 8 4
                     ]
 
         CellButton button ->

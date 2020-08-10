@@ -379,4 +379,4 @@ ellipsizedText cfg size content =
         |> Html.text
         |> Element.html
         |> Element.el
-            (ellipsisAttrs lineHeightSize)
+            (ellipsisAttrs lineHeightSize content)

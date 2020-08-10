@@ -1,7 +1,7 @@
 module Tables.Book exposing (..)
 
-import Element exposing (Element)
-import Element.Font exposing (italic, underline)
+import Element exposing (Element, fill)
+import Element.Font as Font
 import Time exposing (millisToPosix)
 import UI.Internal.DateInput as DateInput
 import UI.Tables.Common exposing (..)
@@ -94,6 +94,13 @@ books =
       , read = millisToPosix 969711330000
       , isbn = "9780062693662"
       }
+    , { author = "Clive Staples Lewis"
+      , title = "The Chronicles of Narnia: The Lion, the Witch and The Wardrobe"
+      , year = "1950"
+      , acquired = millisToPosix 968701330000
+      , read = millisToPosix 969210230000
+      , isbn = "9780064404990"
+      }
     ]
 
 
@@ -109,7 +116,15 @@ tableColumns =
 toTableRow renderConfig { author, title, year, acquired, read } =
     let
         titleCell =
-            Element.el [ underline, italic ] <| Text.renderElement renderConfig <| Text.body2 title
+            Text.body2 title
+                |> Text.setEllipsis True
+                |> Text.renderElement renderConfig
+                |> Element.el
+                    [ Font.underline
+                    , Font.italic
+                    , Element.width fill
+                    , Element.paddingXY 8 4
+                    ]
     in
     rowEmpty
         |> rowCellCustom titleCell
