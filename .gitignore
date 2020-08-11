@@ -8,3 +8,6 @@ docs/elm-stuff/
 elm-stuff/
 
 dist/
+
+cypress/screenshots
+cypress/videos

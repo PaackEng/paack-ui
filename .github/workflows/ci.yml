@@ -1,5 +1,5 @@
 name: CI
-on: [push, pull_request]
+on: [pull_request]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -11,6 +11,8 @@ jobs:
 
      - name: Setup Node
        uses: actions/setup-node@v1
+       with:
+        node-version: '12'
 
      - name: Get yarn cache directory path
        id: yarn-cache-dir-path
@@ -25,9 +27,7 @@ jobs:
           ${{ runner.os }}-yarn-
 
      - name: Install dependencies
-       uses: borales/actions-yarn@v2.0.0
-       with:
-         cmd: install
+       run: yarn install
 
      - name: Run linter
        run: npx elm-format --validate src/ showcase/
@@ -53,6 +53,8 @@ jobs:
 
        - name: Setup Node
          uses: actions/setup-node@v1
+         with:
+          node-version: '12'
        
        - name: Get yarn cache directory path
          id: yarn-cache-dir-path
@@ -67,9 +69,19 @@ jobs:
             ${{ runner.os }}-yarn-
 
        - name: Install dependencies
-         uses: borales/actions-yarn@v2.0.0
-         with:
-           cmd: install
+         run: yarn install
 
        - name: Run tests
          run: yarn run test
+
+       - name: Build
+         run: yarn run build
+       
+       - name: Percy test
+         uses: cypress-io/github-action@v2
+         with:
+          start: npm run showcase
+          wait-on: 'http://localhost:1234'
+          command-prefix: 'percy exec --'  
+         env:
+          PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}

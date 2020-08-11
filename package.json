@@ -13,7 +13,8 @@
     "build": "parcel build showcase/public/index.html --public-url ./",
     "showcase": "parcel showcase/public/index.html",
     "test": "elm-test",
-    "i18n": "i18n-json-to-elm"
+    "i18n": "i18n-json-to-elm",
+    "percy": "percy exec -- cypress run"
   },
   "repository": {
     "type": "git",
@@ -36,6 +37,8 @@
     "parcel-plugin-asset-copier": "^1.1.0"
   },
   "devDependencies": {
+    "@percy/cypress": "^2.3.1",
+    "cypress": "^4.12.1",
     "i18n-json-to-elm": "PedroHLC/i18n-json-to-elm"
   }
 }
