@@ -17,7 +17,7 @@ import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.Size as Size exposing (Size)
 import UI.Internal.Tables.Filters as Filters
 import UI.Internal.Text as Text
-import UI.Internal.Utils.Element exposing (positionFixed, zIndex)
+import UI.Internal.Utils.Element exposing (overlay, positionFixed, zIndex)
 import UI.Palette as Palette
 import UI.Radio as Radio
 import UI.RenderConfig exposing (RenderConfig)
@@ -209,21 +209,6 @@ size =
 -- Editing
 
 
-overlayBackground : msg -> Element msg
-overlayBackground onClickMsg =
-    Element.el
-        [ positionFixed -- Needs for starting at the top-left corner
-        , zIndex 8
-        , Palette.overlayBackground
-        , Element.htmlAttribute <| HtmlAttrs.style "top" "0"
-        , Element.htmlAttribute <| HtmlAttrs.style "left" "0"
-        , Element.htmlAttribute <| HtmlAttrs.style "width" "100vw"
-        , Element.htmlAttribute <| HtmlAttrs.style "height" "100vh"
-        , Events.onClick onClickMsg
-        ]
-        Element.none
-
-
 filterEditingButton : RenderConfig -> msg -> msg -> Bool -> Bool -> Element msg
 filterEditingButton renderConfig applyMsg clearMsg applied current =
     let
@@ -311,29 +296,24 @@ dialog renderConfig config filter clearMsg applyMsg content =
         current =
             Filters.isEdited filter
     in
-    Element.el
-        [ Element.width fill
-        , Element.height (shrink |> minimum 1)
-        , Element.inFront <|
-            Element.column
+    overlay config.discardMsg <|
+        Element.column
+            [ Element.width fill
+            , zIndex 9
+            , Element.alignTop
+            , Palette.mainBackground
+            , Primitives.defaultRoundedBorders
+            ]
+            [ dialogHeader renderConfig config.discardMsg config.label
+            , Element.column
                 [ Element.width fill
-                , zIndex 9
-                , Element.alignTop
-                , Palette.mainBackground
-                , Primitives.defaultRoundedBorders
+                , Element.spacing 12
                 ]
-                [ dialogHeader renderConfig config.discardMsg config.label
-                , Element.column
-                    [ Element.width fill
-                    , Element.spacing 12
-                    ]
-                    [ content
-                    , filterEditingButton renderConfig applyMsg clearMsg applied current
-                        |> internalPaddingBox
-                    ]
+                [ content
+                , filterEditingButton renderConfig applyMsg clearMsg applied current
+                    |> internalPaddingBox
                 ]
-        ]
-        (overlayBackground config.discardMsg)
+            ]
 
 
 

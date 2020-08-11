@@ -161,6 +161,7 @@ import Time
 import UI.Checkbox as Checkbox exposing (checkbox)
 import UI.Internal.Basics exposing (flip, ifThenElse, prependMaybe)
 import UI.Internal.DateInput as DateInput exposing (DateInput, PeriodDate, RangeDate)
+import UI.Internal.EllipsizableTooltip exposing (EllipsisHelper)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.Tables.Common exposing (..)
@@ -998,7 +999,7 @@ isSelected (State { mobileSelected }) position =
 
 detailView : RenderConfig -> Detail msg -> ( String, Element msg )
 detailView renderConfig { label, content } =
-    ( label, cellContentRender renderConfig -1 -1 content )
+    ( label, cellContentRender renderConfig Nothing content )
 
 
 
@@ -1078,6 +1079,17 @@ unwrapState (State model) =
     model
 
 
+ellipsisHelper : (Msg item -> msg) -> Int -> Maybe ( Int, Int ) -> Maybe (Int -> EllipsisHelper msg)
+ellipsisHelper msgMap row current =
+    Just
+        (\col ->
+            { expand = msgMap <| ExpandEllipsis row col
+            , collapse = msgMap CollapseEllipsis
+            , expanded = Just ( row, col ) == current
+            }
+        )
+
+
 rowWithSelection :
     RenderConfig
     -> (Msg item -> msg)
@@ -1091,14 +1103,14 @@ rowWithSelection renderConfig msgMap state toRow row columns item =
     rowBox <|
         case state.localSelection of
             Just selection ->
-                rowRender renderConfig toRow row columns item
+                rowRender renderConfig toRow (ellipsisHelper msgMap row state.expandedEllipsis) columns item
                     |> (::)
                         (selectionCell renderConfig selection item
                             |> Element.map msgMap
                         )
 
             Nothing ->
-                rowRender renderConfig toRow row columns item
+                rowRender renderConfig toRow (ellipsisHelper msgMap row state.expandedEllipsis) columns item
 
 
 headersRender :

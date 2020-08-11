@@ -1,7 +1,9 @@
 module UI.Internal.Utils.Element exposing (..)
 
-import Element exposing (Attribute)
+import Element exposing (Attribute, Element, fill, minimum, shrink)
+import Element.Events as Events
 import Html.Attributes as HtmlAttrs
+import UI.Internal.Palette as Palette
 
 
 style : String -> String -> Attribute msg
@@ -32,6 +34,31 @@ title value =
     value
         |> HtmlAttrs.title
         |> Element.htmlAttribute
+
+
+overlayBackground : msg -> Element msg
+overlayBackground onClickMsg =
+    Element.el
+        [ positionFixed -- Needs for starting at the top-left corner
+        , zIndex 8
+        , Palette.overlayBackground
+        , Element.htmlAttribute <| HtmlAttrs.style "top" "0"
+        , Element.htmlAttribute <| HtmlAttrs.style "left" "0"
+        , Element.htmlAttribute <| HtmlAttrs.style "width" "100vw"
+        , Element.htmlAttribute <| HtmlAttrs.style "height" "100vh"
+        , Events.onClick onClickMsg
+        ]
+        Element.none
+
+
+overlay : msg -> Element msg -> Element msg
+overlay closeMsg content =
+    Element.el
+        [ Element.width fill
+        , Element.height (shrink |> minimum 1)
+        , Element.inFront content
+        ]
+        (overlayBackground closeMsg)
 
 
 

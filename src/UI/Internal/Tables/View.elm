@@ -4,7 +4,7 @@ import Element exposing (Attribute, Element, fill, fillPortion, minimum, px, shr
 import Element.Background as Background
 import Element.Border as Border
 import UI.Button as Button
-import UI.Internal.EllipsizableTooltip as EllipsizableTooltip
+import UI.Internal.EllipsizableTooltip as EllipsizableTooltip exposing (EllipsisHelper)
 import UI.Internal.NArray as NArray
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
@@ -16,15 +16,19 @@ import UI.Tables.Common as Common exposing (..)
 import UI.Text as Text exposing (Text)
 
 
-cellContentRender : RenderConfig -> Int -> Int -> Common.Cell msg -> Element msg
-cellContentRender renderConfig row col cell_ =
+cellContentRender : RenderConfig -> Maybe (EllipsisHelper msg) -> Common.Cell msg -> Element msg
+cellContentRender renderConfig ellipsis cell_ =
     case cell_ of
         CellText text ->
             simpleText renderConfig text
 
         CellEllipsizableText chars text ->
             if InternalText.length text > chars then
-                ellipsisText renderConfig text
+                ellipsis
+                    |> Maybe.map
+                        (ellipsisText renderConfig text)
+                    |> Maybe.withDefault
+                        (simpleText renderConfig text)
 
             else
                 simpleText renderConfig text
@@ -48,10 +52,10 @@ simpleText renderConfig text =
             ]
 
 
-ellipsisText : RenderConfig -> Text -> Element msg
-ellipsisText renderConfig text =
+ellipsisText : RenderConfig -> Text -> EllipsisHelper msg -> Element msg
+ellipsisText renderConfig text helper =
     text
-        |> EllipsizableTooltip.view renderConfig
+        |> EllipsizableTooltip.view renderConfig helper
         |> Element.el
             [ Element.width fill
             , Element.clipX
@@ -69,12 +73,12 @@ widthToEl width =
             px int
 
 
-rowRender : RenderConfig -> ToRow msg item columns -> Int -> List Column -> item -> List (Element msg)
-rowRender renderConfig toRow row columns item =
+rowRender : RenderConfig -> ToRow msg item columns -> Maybe (Int -> EllipsisHelper msg) -> List Column -> item -> List (Element msg)
+rowRender renderConfig toRow ellipsis columns item =
     toRow item
         |> NArray.toList
-        |> List.map2 (\col cell_ i -> cellRender renderConfig row i col cell_) columns
-        |> List.indexedMap (\i renderer -> renderer i)
+        |> List.map2 (cellRender renderConfig) columns
+        |> List.indexedMap (\i renderer -> renderer (Maybe.map (\elli -> elli i) ellipsis))
 
 
 rowBox : List (Element msg) -> Element msg
@@ -88,10 +92,10 @@ rowBox cells =
         cells
 
 
-cellRender : RenderConfig -> Int -> Int -> Column -> Common.Cell msg -> Element msg
-cellRender renderConfig row col (Column _ { width }) cell =
+cellRender : RenderConfig -> Column -> Common.Cell msg -> Maybe (EllipsisHelper msg) -> Element msg
+cellRender renderConfig (Column _ { width }) cell ellipsis =
     cell
-        |> cellContentRender renderConfig row col
+        |> cellContentRender renderConfig ellipsis
         |> cellSpace width
 
 
@@ -120,7 +124,7 @@ simpleHeaderRender renderConfig header =
         |> Text.overline
         |> Text.withColor (Palette.color toneGray brightnessMiddle)
         |> cellFromText
-        |> cellContentRender renderConfig -1 -1
+        |> cellContentRender renderConfig Nothing
 
 
 headersAttr : List (Attribute msg)

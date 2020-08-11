@@ -128,7 +128,7 @@ toTableRow renderConfig { author, title, year, acquired, read } =
     in
     rowEmpty
         |> rowCellCustom titleCell
-        |> rowCellEllipsizableText 12 (Text.body2 author)
+        |> rowCellEllipsizableText 15 (Text.body2 author)
         |> rowCellText (Text.caption year)
         |> rowCellText (Text.caption <| DateInput.toDD_MM_YYYY "/" <| DateInput.fromPosix Time.utc acquired)
         |> rowCellText (Text.caption <| DateInput.toDD_MM_YYYY "/" <| DateInput.fromPosix Time.utc read)
