@@ -78,8 +78,10 @@ jobs:
          run: yarn run build
        
        - name: Percy test
-         uses: percy/snapshot-action@v0.1.1
+         uses: cypress-io/github-action@v2
          with:
-          build-directory: "dist"
+          start: npm start
+          wait-on: 'http://localhost:1234'
+          command-prefix: 'percy exec --'  
          env:
           PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
