@@ -265,6 +265,8 @@ type Msg item
     | FilterDialogClose
     | SelectionToggleAll
     | SelectionSet item Bool
+    | ExpandEllipsis Int Int
+    | CollapseEllipsis
 
 
 {-| Keep this one in your Model, it holds the table's current state.
@@ -278,6 +280,7 @@ type alias StateModel msg item columns =
     , mobileSelected : Maybe Int
     , filterDialog : Maybe Int
     , localSelection : Maybe (Selection item)
+    , expandedEllipsis : Maybe ( Int, Int )
     }
 
 
@@ -308,6 +311,7 @@ init =
         , mobileSelected = Nothing
         , filterDialog = Nothing
         , localSelection = Nothing
+        , expandedEllipsis = Nothing
         }
 
 
@@ -338,6 +342,12 @@ update msg (State state) =
 
         SelectionSet item value ->
             updateSelectionSet state item value
+
+        ExpandEllipsis row col ->
+            updateExpandEllipsis state row col
+
+        CollapseEllipsis ->
+            ( State { state | expandedEllipsis = Nothing }, Cmd.none )
 
 
 updateMobileToggle : StateModel msg item columns -> Int -> ( State msg item columns, Cmd msg )
@@ -413,6 +423,13 @@ updateSelectionSet state item value =
             }
     in
     ( State { state | localSelection = Maybe.map setItem state.localSelection }
+    , Cmd.none
+    )
+
+
+updateExpandEllipsis : StateModel msg item columns -> Int -> Int -> ( State msg item columns, Cmd msg )
+updateExpandEllipsis state row col =
+    ( State { state | expandedEllipsis = Just ( row, col ) }
     , Cmd.none
     )
 
@@ -981,7 +998,7 @@ isSelected (State { mobileSelected }) position =
 
 detailView : RenderConfig -> Detail msg -> ( String, Element msg )
 detailView renderConfig { label, content } =
-    ( label, cellContentRender renderConfig content )
+    ( label, cellContentRender renderConfig -1 -1 content )
 
 
 
@@ -1005,7 +1022,9 @@ desktopView renderConfig prop opt =
             viewGetItems state opt
 
         rows =
-            List.map (rowWithSelection renderConfig prop.toExternalMsg state prop.toRow columns) items
+            List.indexedMap
+                (\i -> rowWithSelection renderConfig prop.toExternalMsg state prop.toRow i columns)
+                items
 
         padding =
             { top = 20, left = 20, right = 20, bottom = 0 }
@@ -1064,21 +1083,22 @@ rowWithSelection :
     -> (Msg item -> msg)
     -> StateModel msg item columns
     -> ToRow msg item columns
+    -> Int
     -> List Column
     -> item
     -> Element msg
-rowWithSelection renderConfig msgMap state toRow columns item =
+rowWithSelection renderConfig msgMap state toRow row columns item =
     rowBox <|
         case state.localSelection of
             Just selection ->
-                rowRender renderConfig toRow columns item
+                rowRender renderConfig toRow row columns item
                     |> (::)
                         (selectionCell renderConfig selection item
                             |> Element.map msgMap
                         )
 
             Nothing ->
-                rowRender renderConfig toRow columns item
+                rowRender renderConfig toRow row columns item
 
 
 headersRender :

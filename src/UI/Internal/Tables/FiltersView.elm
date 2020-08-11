@@ -17,6 +17,7 @@ import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.Size as Size exposing (Size)
 import UI.Internal.Tables.Filters as Filters
 import UI.Internal.Text as Text
+import UI.Internal.Utils.Element exposing (positionFixed, zIndex)
 import UI.Palette as Palette
 import UI.Radio as Radio
 import UI.RenderConfig exposing (RenderConfig)
@@ -333,20 +334,6 @@ dialog renderConfig config filter clearMsg applyMsg content =
                 ]
         ]
         (overlayBackground config.discardMsg)
-
-
-
--- Some good-old CSS
-
-
-positionFixed : Attribute msg
-positionFixed =
-    Element.htmlAttribute <| HtmlAttrs.style "position" "fixed"
-
-
-zIndex : Int -> Attribute msg
-zIndex val =
-    Element.htmlAttribute <| HtmlAttrs.style "z-index" (String.fromInt val)
 
 
 

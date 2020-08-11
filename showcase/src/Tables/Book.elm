@@ -107,7 +107,7 @@ books =
 tableColumns =
     columnsEmpty
         |> column "Title" (columnWidthPixels 320)
-        |> column "Author" (columnWidthPixels 240)
+        |> column "Author" (columnWidthPixels 160)
         |> column "Year" (columnWidthPixels 120)
         |> column "Acquired" (columnWidthPixels 180)
         |> column "Read" (columnWidthPixels 180)
@@ -128,7 +128,7 @@ toTableRow renderConfig { author, title, year, acquired, read } =
     in
     rowEmpty
         |> rowCellCustom titleCell
-        |> rowCellText (Text.body2 author)
+        |> rowCellEllipsizableText 12 (Text.body2 author)
         |> rowCellText (Text.caption year)
         |> rowCellText (Text.caption <| DateInput.toDD_MM_YYYY "/" <| DateInput.fromPosix Time.utc acquired)
         |> rowCellText (Text.caption <| DateInput.toDD_MM_YYYY "/" <| DateInput.fromPosix Time.utc read)

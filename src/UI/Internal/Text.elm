@@ -380,3 +380,15 @@ ellipsizedText cfg size content =
         |> Element.html
         |> Element.el
             (ellipsisAttrs lineHeightSize content)
+
+
+spanLength : Span -> Int
+spanLength (Span { content } _) =
+    String.length content
+
+
+length : Text -> Int
+length (Text spans _) =
+    spans
+        |> List.map spanLength
+        |> List.sum

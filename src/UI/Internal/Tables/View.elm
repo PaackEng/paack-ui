@@ -4,34 +4,59 @@ import Element exposing (Attribute, Element, fill, fillPortion, minimum, px, shr
 import Element.Background as Background
 import Element.Border as Border
 import UI.Button as Button
+import UI.Internal.EllipsizableTooltip as EllipsizableTooltip
 import UI.Internal.NArray as NArray
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Tables.Common exposing (..)
+import UI.Internal.Text as InternalText
 import UI.Palette as Palette exposing (brightnessMiddle, toneGray)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Tables.Common as Common exposing (..)
-import UI.Text as Text
+import UI.Text as Text exposing (Text)
 
 
-cellContentRender : RenderConfig -> Common.Cell msg -> Element msg
-cellContentRender renderConfig cell_ =
+cellContentRender : RenderConfig -> Int -> Int -> Common.Cell msg -> Element msg
+cellContentRender renderConfig row col cell_ =
     case cell_ of
         CellText text ->
-            text
-                |> Text.setEllipsis True
-                |> Text.renderElement renderConfig
-                |> Element.el
-                    [ Element.width fill
-                    , Element.clipX
-                    , Element.paddingXY 8 4
-                    ]
+            simpleText renderConfig text
+
+        CellEllipsizableText chars text ->
+            if InternalText.length text > chars then
+                ellipsisText renderConfig text
+
+            else
+                simpleText renderConfig text
 
         CellButton button ->
             Button.renderElement renderConfig button
 
         CellCustom element ->
             element
+
+
+simpleText : RenderConfig -> Text -> Element msg
+simpleText renderConfig text =
+    text
+        |> Text.setEllipsis True
+        |> Text.renderElement renderConfig
+        |> Element.el
+            [ Element.width fill
+            , Element.clipX
+            , Element.paddingXY 8 4
+            ]
+
+
+ellipsisText : RenderConfig -> Text -> Element msg
+ellipsisText renderConfig text =
+    text
+        |> EllipsizableTooltip.view renderConfig
+        |> Element.el
+            [ Element.width fill
+            , Element.clipX
+            , Element.paddingXY 8 4
+            ]
 
 
 widthToEl : Common.ColumnWidth -> Element.Length
@@ -44,11 +69,12 @@ widthToEl width =
             px int
 
 
-rowRender : RenderConfig -> ToRow msg item columns -> List Column -> item -> List (Element msg)
-rowRender renderConfig toRow columns item =
+rowRender : RenderConfig -> ToRow msg item columns -> Int -> List Column -> item -> List (Element msg)
+rowRender renderConfig toRow row columns item =
     toRow item
         |> NArray.toList
-        |> List.map2 (cellRender renderConfig) columns
+        |> List.map2 (\col cell_ i -> cellRender renderConfig row i col cell_) columns
+        |> List.indexedMap (\i renderer -> renderer i)
 
 
 rowBox : List (Element msg) -> Element msg
@@ -62,10 +88,10 @@ rowBox cells =
         cells
 
 
-cellRender : RenderConfig -> Column -> Common.Cell msg -> Element msg
-cellRender renderConfig (Column _ { width }) cell =
+cellRender : RenderConfig -> Int -> Int -> Column -> Common.Cell msg -> Element msg
+cellRender renderConfig row col (Column _ { width }) cell =
     cell
-        |> cellContentRender renderConfig
+        |> cellContentRender renderConfig row col
         |> cellSpace width
 
 
@@ -94,7 +120,7 @@ simpleHeaderRender renderConfig header =
         |> Text.overline
         |> Text.withColor (Palette.color toneGray brightnessMiddle)
         |> cellFromText
-        |> cellContentRender renderConfig
+        |> cellContentRender renderConfig -1 -1
 
 
 headersAttr : List (Attribute msg)

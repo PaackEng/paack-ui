@@ -1,4 +1,4 @@
-module UI.Internal.Utils.Element exposing (ellipsisAttrs, style, title, tuplesToStyles)
+module UI.Internal.Utils.Element exposing (..)
 
 import Element exposing (Attribute)
 import Html.Attributes as HtmlAttrs
@@ -32,3 +32,17 @@ title value =
     value
         |> HtmlAttrs.title
         |> Element.htmlAttribute
+
+
+
+-- Some good-old CSS
+
+
+positionFixed : Attribute msg
+positionFixed =
+    Element.htmlAttribute <| HtmlAttrs.style "position" "fixed"
+
+
+zIndex : Int -> Attribute msg
+zIndex val =
+    Element.htmlAttribute <| HtmlAttrs.style "z-index" (String.fromInt val)
