@@ -62,3 +62,14 @@ maybeNotThen replacement primary =
 flip : (a -> b -> c) -> b -> a -> c
 flip applier b a =
     applier a b
+
+
+{-| When the boolean is true, returns `Just a`, otherwise Nothing
+-}
+assertToMaybe : a -> Bool -> Maybe a
+assertToMaybe object condition =
+    if condition then
+        Just object
+
+    else
+        Nothing
