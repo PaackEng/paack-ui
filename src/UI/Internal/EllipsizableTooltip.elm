@@ -3,16 +3,15 @@ module UI.Internal.EllipsizableTooltip exposing (EllipsisHelper, view)
 import Element exposing (Element, fill, shrink)
 import Element.Background as Background
 import Element.Border as Border
-import Element.Events as Events
 import Element.Keyed as Keyed
 import UI.Icon as Icon
-import UI.Internal.Basics exposing (assertToMaybe, ifThenElse, prependIf)
+import UI.Internal.Basics exposing (assertToMaybe, ifThenElse)
 import UI.Internal.Palette as Palette
 import UI.Internal.Utils.Element exposing (overlay, positionFixed, zIndex)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text exposing (Text)
-import UI.Utils.Element as Element exposing (zeroPadding)
+import UI.Utils.Element as Element
 
 
 type alias EllipsisHelper msg =

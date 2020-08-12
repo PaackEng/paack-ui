@@ -1,12 +1,11 @@
 module UI.Internal.Tables.FiltersView exposing (Config, header, headerSelectToggle)
 
 import Array exposing (Array)
-import Element exposing (Attribute, Element, fill, minimum, px, shrink)
+import Element exposing (Attribute, Element, fill, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
-import Html.Attributes as HtmlAttrs
 import UI.Button as Button
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (maybeNotThen)
@@ -17,7 +16,7 @@ import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.Size as Size exposing (Size)
 import UI.Internal.Tables.Filters as Filters
 import UI.Internal.Text as Text
-import UI.Internal.Utils.Element exposing (overlay, positionFixed, zIndex)
+import UI.Internal.Utils.Element exposing (overlay, zIndex)
 import UI.Palette as Palette
 import UI.Radio as Radio
 import UI.RenderConfig exposing (RenderConfig)
