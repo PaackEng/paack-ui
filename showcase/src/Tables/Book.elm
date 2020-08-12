@@ -101,6 +101,13 @@ books =
       , read = millisToPosix 969210230000
       , isbn = "9780064404990"
       }
+    , { author = "John Ronald Reuel Tolkien"
+      , title = "Lord of The Rings, Part 3, The Return of the King"
+      , year = "1955"
+      , acquired = millisToPosix 964701330000
+      , read = millisToPosix 965210230000
+      , isbn = "9780618002245"
+      }
     ]
 
 

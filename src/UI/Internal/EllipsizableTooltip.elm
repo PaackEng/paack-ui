@@ -1,17 +1,19 @@
 module UI.Internal.EllipsizableTooltip exposing (EllipsisHelper, view)
 
-import Element exposing (Element, fill, shrink)
+import Element exposing (Element, fill, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Keyed as Keyed
 import UI.Icon as Icon
-import UI.Internal.Basics exposing (assertToMaybe, ifThenElse)
+import UI.Internal.Basics exposing (ifThenElse)
 import UI.Internal.Palette as Palette
-import UI.Internal.Utils.Element exposing (overlay, positionFixed, zIndex)
+import UI.Internal.Text as InternalText
+import UI.Internal.Utils.Element exposing (borderTriangleUp, overlay, positionFixed, zIndex)
+import UI.Palette as Palette exposing (brightnessLighter, toneGray)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text exposing (Text)
-import UI.Utils.Element as Element
+import UI.Utils.Element as Element exposing (zeroPadding)
 
 
 type alias EllipsisHelper msg =
@@ -45,15 +47,10 @@ focusable renderConfig helper text =
         , Element.mouseOver
             [ Element.alpha 1.0 ]
         , Background.color Palette.gray.lightest
-        , Element.inFront (tooltip renderConfig helper.collapse text helper.expanded)
-        , Element.pointer
+        , Element.inFront (tooltipHelper renderConfig helper.collapse text helper.expanded)
         ]
         [ ( "short", short renderConfig text )
-        , ( "toggle"
-          , not helper.expanded
-                |> assertToMaybe helper.expand
-                |> toggle renderConfig
-          )
+        , ( "toggle", toggle renderConfig (Just helper.expand) )
         ]
 
 
@@ -85,31 +82,67 @@ toggle renderConfig maybeExpand =
                 |> Maybe.withDefault (Element.transparent True)
             , Element.paddingXY 10 0
             , Element.centerY
+            , Element.pointer
             ]
 
 
-tooltip : RenderConfig -> msg -> Text -> Bool -> Element msg
-tooltip renderConfig collapseMsg text visible =
+tooltipHelper : RenderConfig -> msg -> Text -> Bool -> Element msg
+tooltipHelper renderConfig collapseMsg text visible =
     if visible then
-        tooltipBalloon renderConfig collapseMsg text
+        tooltip renderConfig collapseMsg text
 
     else
         Element.none
 
 
-tooltipBalloon : RenderConfig -> msg -> Text -> Element msg
-tooltipBalloon renderConfig collapseMsg text =
-    overlay collapseMsg <|
-        Keyed.row
+tooltipBalloon : RenderConfig -> Text -> Element msg
+tooltipBalloon renderConfig text =
+    text
+        |> Text.setEllipsis False
+        |> Text.renderElement renderConfig
+        |> Element.el
             [ Background.color Palette.gray.lighter
             , Border.rounded 8
             , Element.paddingXY 8 8
             , zIndex 8
             , positionFixed
+            , Element.centerX
             ]
-            [ ( "text"
-              , text
-                    |> Text.setEllipsis False
-                    |> Text.renderElement renderConfig
-              )
+
+
+tooltip : RenderConfig -> msg -> Text -> Element msg
+tooltip renderConfig collapseMsg text =
+    text
+        |> tooltipBalloon renderConfig
+        |> Element.el
+            [ Element.paddingEach
+                { zeroPadding
+                    | top = InternalText.textSizePx renderConfig text
+                }
+            , Element.width fill
+            , Element.clipX
+            , Element.inFront arrow
             ]
+        |> overlay collapseMsg
+
+
+arrow : Element msg
+arrow =
+    Element.column
+        [ Element.width fill
+        , Element.alignBottom
+        ]
+        [ Element.el
+            [ Element.paddingXY 14 0
+            , Element.alignRight
+            ]
+          <|
+            Element.el
+                [ Element.width (px 0)
+                , Element.height (px 0)
+                , Border.widthEach { top = 0, left = 5, right = 5, bottom = 5 }
+                , borderTriangleUp (Palette.toCssColor <| Palette.color toneGray brightnessLighter)
+                , zIndex 8
+                ]
+                Element.none
+        ]

@@ -73,3 +73,8 @@ positionFixed =
 zIndex : Int -> Attribute msg
 zIndex val =
     Element.htmlAttribute <| HtmlAttrs.style "z-index" (String.fromInt val)
+
+
+borderTriangleUp : String -> Attribute msg
+borderTriangleUp cssColor =
+    style "border-color" ("transparent transparent " ++ cssColor ++ " transparent")

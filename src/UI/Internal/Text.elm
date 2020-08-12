@@ -392,3 +392,27 @@ length (Text spans _) =
     spans
         |> List.map spanLength
         |> List.sum
+
+
+spanSize : Span -> TextSize
+spanSize (Span { size } _) =
+    size
+
+
+textSize : Text -> Maybe TextSize
+textSize (Text spans _) =
+    case spans of
+        [ theOneAndOnly ] ->
+            Just (spanSize theOneAndOnly)
+
+        _ ->
+            Nothing
+
+
+textSizePx : RenderConfig -> Text -> Int
+textSizePx renderConfig text =
+    text
+        |> textSize
+        |> Maybe.withDefault SizeBody1
+        |> lineHeight
+            (isMobile renderConfig)
