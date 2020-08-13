@@ -161,7 +161,6 @@ import Time
 import UI.Checkbox as Checkbox exposing (checkbox)
 import UI.Internal.Basics exposing (flip, ifThenElse, prependMaybe)
 import UI.Internal.DateInput as DateInput exposing (DateInput, PeriodDate, RangeDate)
-import UI.Internal.EllipsizableTooltip exposing (EllipsisHelper)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.Tables.Common exposing (..)
@@ -266,8 +265,6 @@ type Msg item
     | FilterDialogClose
     | SelectionToggleAll
     | SelectionSet item Bool
-    | ExpandEllipsis Int Int
-    | CollapseEllipsis
 
 
 {-| Keep this one in your Model, it holds the table's current state.
@@ -281,7 +278,6 @@ type alias StateModel msg item columns =
     , mobileSelected : Maybe Int
     , filterDialog : Maybe Int
     , localSelection : Maybe (Selection item)
-    , expandedEllipsis : Maybe ( Int, Int )
     }
 
 
@@ -312,7 +308,6 @@ init =
         , mobileSelected = Nothing
         , filterDialog = Nothing
         , localSelection = Nothing
-        , expandedEllipsis = Nothing
         }
 
 
@@ -343,12 +338,6 @@ update msg (State state) =
 
         SelectionSet item value ->
             updateSelectionSet state item value
-
-        ExpandEllipsis row col ->
-            updateExpandEllipsis state row col
-
-        CollapseEllipsis ->
-            ( State { state | expandedEllipsis = Nothing }, Cmd.none )
 
 
 updateMobileToggle : StateModel msg item columns -> Int -> ( State msg item columns, Cmd msg )
@@ -424,13 +413,6 @@ updateSelectionSet state item value =
             }
     in
     ( State { state | localSelection = Maybe.map setItem state.localSelection }
-    , Cmd.none
-    )
-
-
-updateExpandEllipsis : StateModel msg item columns -> Int -> Int -> ( State msg item columns, Cmd msg )
-updateExpandEllipsis state row col =
-    ( State { state | expandedEllipsis = Just ( row, col ) }
     , Cmd.none
     )
 
@@ -999,7 +981,7 @@ isSelected (State { mobileSelected }) position =
 
 detailView : RenderConfig -> Detail msg -> ( String, Element msg )
 detailView renderConfig { label, content } =
-    ( label, cellContentRender renderConfig Nothing content )
+    ( label, cellContentRender renderConfig content )
 
 
 
@@ -1023,9 +1005,7 @@ desktopView renderConfig prop opt =
             viewGetItems state opt
 
         rows =
-            List.indexedMap
-                (\i -> rowWithSelection renderConfig prop.toExternalMsg state prop.toRow i columns)
-                items
+            List.map (rowWithSelection renderConfig prop.toExternalMsg state prop.toRow columns) items
 
         padding =
             { top = 20, left = 20, right = 20, bottom = 0 }
@@ -1079,38 +1059,26 @@ unwrapState (State model) =
     model
 
 
-ellipsisHelper : (Msg item -> msg) -> Int -> Maybe ( Int, Int ) -> Maybe (Int -> EllipsisHelper msg)
-ellipsisHelper msgMap row current =
-    Just
-        (\col ->
-            { expand = msgMap <| ExpandEllipsis row col
-            , collapse = msgMap CollapseEllipsis
-            , expanded = Just ( row, col ) == current
-            }
-        )
-
-
 rowWithSelection :
     RenderConfig
     -> (Msg item -> msg)
     -> StateModel msg item columns
     -> ToRow msg item columns
-    -> Int
     -> List Column
     -> item
     -> Element msg
-rowWithSelection renderConfig msgMap state toRow row columns item =
+rowWithSelection renderConfig msgMap state toRow columns item =
     rowBox <|
         case state.localSelection of
             Just selection ->
-                rowRender renderConfig toRow (ellipsisHelper msgMap row state.expandedEllipsis) columns item
+                rowRender renderConfig toRow columns item
                     |> (::)
                         (selectionCell renderConfig selection item
                             |> Element.map msgMap
                         )
 
             Nothing ->
-                rowRender renderConfig toRow (ellipsisHelper msgMap row state.expandedEllipsis) columns item
+                rowRender renderConfig toRow columns item
 
 
 headersRender :

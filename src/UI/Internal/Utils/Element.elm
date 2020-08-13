@@ -61,6 +61,14 @@ overlay closeMsg content =
         (overlayBackground closeMsg)
 
 
+tabIndex : Int -> Attribute msg
+tabIndex code =
+    -- -1 is disabled, 0 is following document flow, greater than 0 are priorities numbers
+    String.fromInt code
+        |> HtmlAttrs.attribute "tabindex"
+        |> Element.htmlAttribute
+
+
 
 -- Some good-old CSS
 
@@ -68,6 +76,21 @@ overlay closeMsg content =
 positionFixed : Attribute msg
 positionFixed =
     Element.htmlAttribute <| HtmlAttrs.style "position" "fixed"
+
+
+positionRelative : Attribute msg
+positionRelative =
+    Element.htmlAttribute <| HtmlAttrs.style "position" "relative"
+
+
+positionAbsolute : Attribute ms
+positionAbsolute =
+    Element.htmlAttribute <| HtmlAttrs.style "position" "absolute"
+
+
+overflowVisible : Attribute msg
+overflowVisible =
+    Element.htmlAttribute <| HtmlAttrs.style "overflow" "visible"
 
 
 zIndex : Int -> Attribute msg

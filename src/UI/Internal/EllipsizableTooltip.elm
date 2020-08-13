@@ -1,4 +1,4 @@
-module UI.Internal.EllipsizableTooltip exposing (EllipsisHelper, view)
+module UI.Internal.EllipsizableTooltip exposing (view)
 
 import Element exposing (Element, fill, px, shrink)
 import Element.Background as Background
@@ -8,49 +8,46 @@ import UI.Icon as Icon
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.Internal.Palette as Palette
 import UI.Internal.Text as InternalText
-import UI.Internal.Utils.Element exposing (borderTriangleUp, overlay, positionFixed, zIndex)
-import UI.Palette as Palette exposing (brightnessLighter, toneGray)
+import UI.Internal.Utils.Element as InternalElement exposing (borderTriangleUp, tabIndex, zIndex)
+import UI.Palette as Palette exposing (brightnessLight, brightnessLighter, toneGray)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text exposing (Text)
 import UI.Utils.Element as Element exposing (zeroPadding)
 
 
-type alias EllipsisHelper msg =
-    { expand : msg
-    , collapse : msg
-    , expanded : Bool
-    }
-
-
-view : RenderConfig -> EllipsisHelper msg -> Text -> Element msg
-view renderConfig helper text =
+view : RenderConfig -> Text -> Element msg
+view renderConfig text =
     Keyed.row
         [ Element.width fill
         , Element.height shrink
-        , Element.inFront (focusable renderConfig helper text)
+        , Element.inFront (focusableView renderConfig text)
+        , InternalElement.overflowVisible
         ]
         [ ( "short", short renderConfig text )
-        , ( "toggle", toggle renderConfig Nothing )
+        , ( "toggle", toggle renderConfig True )
         ]
 
 
-focusable : RenderConfig -> EllipsisHelper msg -> Text -> Element msg
-focusable renderConfig helper text =
+focusableView : RenderConfig -> Text -> Element msg
+focusableView renderConfig text =
     Keyed.row
         [ Element.width fill
         , Element.height shrink
         , Border.rounded 8
-        , Element.alpha (ifThenElse helper.expanded 1.0 0.0)
-        , Element.mouseDown
-            [ Element.alpha 1.0 ]
+        , Element.alpha 0.0
         , Element.mouseOver
             [ Element.alpha 1.0 ]
+        , Element.focused
+            [ Element.alpha 1.0 ]
+        , tabIndex 0
+        , Element.pointer
         , Background.color Palette.gray.lightest
-        , Element.inFront (tooltipHelper renderConfig helper.collapse text helper.expanded)
+        , Element.inFront (tooltip renderConfig text)
+        , InternalElement.overflowVisible
         ]
         [ ( "short", short renderConfig text )
-        , ( "toggle", toggle renderConfig (Just helper.expand) )
+        , ( "toggle", toggle renderConfig False )
         ]
 
 
@@ -62,37 +59,29 @@ short renderConfig text =
         |> Element.el
             [ Element.width fill
             , Element.clipX
-            , Element.spacing 14
+            , Element.paddingXY 8 0
             ]
 
 
-toggle : RenderConfig -> Maybe msg -> Element msg
-toggle renderConfig maybeExpand =
+
+--, Element.inFront (tooltipHelper renderConfig helper.collapse text helper.expanded)
+
+
+toggle renderConfig transparent =
     Icon.seeMore "View more"
         |> Icon.withSize Size.extraSmall
+        |> Icon.withColor (Palette.color toneGray brightnessLight |> Palette.setContrasting True)
         |> Icon.renderElement renderConfig
         |> Element.el
             [ Element.padding 4
             , Border.rounded 20
-            , Background.color Palette.gray.lighter
+            , Background.color Palette.gray.light
             ]
         |> Element.el
-            [ maybeExpand
-                |> Maybe.map Element.onIndividualClick
-                |> Maybe.withDefault (Element.transparent True)
-            , Element.paddingXY 10 0
+            [ Element.transparent transparent
+            , Element.paddingXY 8 4
             , Element.centerY
-            , Element.pointer
             ]
-
-
-tooltipHelper : RenderConfig -> msg -> Text -> Bool -> Element msg
-tooltipHelper renderConfig collapseMsg text visible =
-    if visible then
-        tooltip renderConfig collapseMsg text
-
-    else
-        Element.none
 
 
 tooltipBalloon : RenderConfig -> Text -> Element msg
@@ -104,14 +93,15 @@ tooltipBalloon renderConfig text =
             [ Background.color Palette.gray.lighter
             , Border.rounded 8
             , Element.paddingXY 8 8
-            , zIndex 8
-            , positionFixed
-            , Element.centerX
+            , tabIndex -1
+            , zIndex 1
+            , InternalElement.positionFixed
+            , Element.clipX
             ]
 
 
-tooltip : RenderConfig -> msg -> Text -> Element msg
-tooltip renderConfig collapseMsg text =
+tooltip : RenderConfig -> Text -> Element msg
+tooltip renderConfig text =
     text
         |> tooltipBalloon renderConfig
         |> Element.el
@@ -120,10 +110,11 @@ tooltip renderConfig collapseMsg text =
                     | top = InternalText.textSizePx renderConfig text
                 }
             , Element.width fill
+            , Element.height fill
             , Element.clipX
             , Element.inFront arrow
+            , Background.color Palette.danger.middle
             ]
-        |> overlay collapseMsg
 
 
 arrow : Element msg
@@ -133,7 +124,7 @@ arrow =
         , Element.alignBottom
         ]
         [ Element.el
-            [ Element.paddingXY 14 0
+            [ Element.paddingXY 12 0
             , Element.alignRight
             ]
           <|

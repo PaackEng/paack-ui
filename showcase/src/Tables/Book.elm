@@ -121,20 +121,8 @@ tableColumns =
 
 
 toTableRow renderConfig { author, title, year, acquired, read } =
-    let
-        titleCell =
-            Text.body2 title
-                |> Text.setEllipsis True
-                |> Text.renderElement renderConfig
-                |> Element.el
-                    [ Font.underline
-                    , Font.italic
-                    , Element.width fill
-                    , Element.paddingXY 8 4
-                    ]
-    in
     rowEmpty
-        |> rowCellCustom titleCell
+        |> rowCellEllipsizableText 32 (Text.body1 title)
         |> rowCellEllipsizableText 15 (Text.body2 author)
         |> rowCellText (Text.caption year)
         |> rowCellText (Text.caption <| DateInput.toDD_MM_YYYY "/" <| DateInput.fromPosix Time.utc acquired)
