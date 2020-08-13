@@ -5,7 +5,6 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Keyed as Keyed
 import UI.Icon as Icon
-import UI.Internal.Basics exposing (ifThenElse)
 import UI.Internal.Palette as Palette
 import UI.Internal.Text as InternalText
 import UI.Internal.Utils.Element as InternalElement exposing (borderTriangleUp, tabIndex, zIndex)
@@ -66,6 +65,7 @@ short renderConfig text =
 --, Element.inFront (tooltipHelper renderConfig helper.collapse text helper.expanded)
 
 
+toggle : RenderConfig -> Bool -> Element msg
 toggle renderConfig transparent =
     Icon.seeMore "View more"
         |> Icon.withSize Size.extraSmall
