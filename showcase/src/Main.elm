@@ -19,6 +19,7 @@ import Radio.Stories as Radio
 import Return as R
 import Sizes
 import Tables.Stories as Tables
+import Tabs.Stories as Tabs
 import TextField
 import Texts
 import UI.ListView
@@ -102,6 +103,7 @@ main =
                 , LoadingView.stories
                 , Checkboxes.stories renderConfig
                 , Radio.stories renderConfig
+                , Tabs.stories renderConfig
                 ]
             |> category
                 "Complex components"
@@ -151,6 +153,12 @@ updateStories msg ({ customModel } as model) =
         RadioStoriesMsg subMsg ->
             Radio.update subMsg customModel.radioStories
                 |> R.map (\t -> { customModel | radioStories = t })
+                |> R.map (\newCustomModel -> { model | customModel = newCustomModel })
+                |> Tuple.mapSecond (always Cmd.none)
+
+        TabsStoriesMsg subMsg ->
+            Tabs.update subMsg customModel.tabsStories
+                |> R.map (\t -> { customModel | tabsStories = t })
                 |> R.map (\newCustomModel -> { model | customModel = newCustomModel })
                 |> Tuple.mapSecond (always Cmd.none)
 
