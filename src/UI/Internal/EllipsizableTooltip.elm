@@ -22,7 +22,6 @@ view renderConfig text =
         [ Element.width fill
         , Element.height shrink
         , Element.inFront (focusableView renderConfig text)
-        , InternalElement.overflowVisible
         ]
         [ ( "short", short renderConfig text )
         , ( "toggle", toggle renderConfig True )
@@ -44,7 +43,6 @@ focusableView renderConfig text =
         , Element.pointer
         , Background.color Palette.gray.lightest
         , Element.inFront (tooltip renderConfig text)
-        , InternalElement.overflowVisible
         ]
         [ ( "short", short renderConfig text )
         , ( "toggle", toggle renderConfig False )
@@ -60,6 +58,7 @@ short renderConfig text =
             [ Element.width fill
             , Element.clipX
             , Element.paddingXY 8 0
+            , Element.centerY
             ]
 
 
@@ -95,8 +94,9 @@ tooltipBalloon renderConfig text =
             , Element.paddingXY 8 8
             , tabIndex -1
             , zIndex 1
-            , InternalElement.positionFixed
-            , Element.clipX
+            , InternalElement.positionAbsolute
+            , InternalElement.positionAbsoluteTop
+            , InternalElement.positionAbsoluteLeft
             ]
 
 
@@ -111,9 +111,9 @@ tooltip renderConfig text =
                 }
             , Element.width fill
             , Element.height fill
-            , Element.clipX
             , Element.inFront arrow
-            , Background.color Palette.danger.middle
+            , InternalElement.positionRelative
+            , InternalElement.overflowVisible
             ]
 
 

@@ -10,6 +10,7 @@ import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Tables.Common exposing (..)
 import UI.Internal.Text as InternalText
+import UI.Internal.Utils.Element as InternalElement
 import UI.Palette as Palette exposing (brightnessMiddle, toneGray)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Tables.Common as Common exposing (..)
@@ -54,7 +55,7 @@ ellipsisText renderConfig text =
         |> EllipsizableTooltip.view renderConfig
         |> Element.el
             [ Element.width fill
-            , Element.clipX
+            , InternalElement.overflowVisible
             ]
 
 

@@ -88,6 +88,16 @@ positionAbsolute =
     Element.htmlAttribute <| HtmlAttrs.style "position" "absolute"
 
 
+positionAbsoluteTop : Attribute ms
+positionAbsoluteTop =
+    Element.htmlAttribute <| HtmlAttrs.style "top" "1"
+
+
+positionAbsoluteLeft : Attribute ms
+positionAbsoluteLeft =
+    Element.htmlAttribute <| HtmlAttrs.style "left" "1"
+
+
 overflowVisible : Attribute msg
 overflowVisible =
     Element.htmlAttribute <| HtmlAttrs.style "overflow" "visible"
