@@ -1,6 +1,6 @@
 module UI.Utils.ARIA exposing
     ( ElementSemantics
-    , roleButton, roleImage, rolePresentation, roleCheckbox
+    , roleButton, roleImage, rolePresentation, roleCheckbox, roleTab
     , roleRadioGroup, roleRadio
     , withLabel
     , toElementAttributes
@@ -13,7 +13,7 @@ module UI.Utils.ARIA exposing
 
 # Building
 
-@docs roleButton, roleImage, rolePresentation, roleCheckbox
+@docs roleButton, roleImage, rolePresentation, roleCheckbox, roleTab
 
 
 ## Radio buttons
@@ -54,6 +54,7 @@ type Role
     | RolePresentation
     | RoleRadio Bool
     | RoleRadioGroup
+    | RoleTab Bool
 
 
 {-| "The button role should be used for clickable elements that trigger a response when activated by the user." - MDN
@@ -138,6 +139,34 @@ roleRadioGroup label =
     { role = RoleRadioGroup, label = Just label }
 
 
+{-| "The ARIA tab role indicates an interactive element inside a tablist." -MDN
+
+    Element.row []
+        [ Element.el
+            (ARIA.roleTab True
+                |> ARIA.toElementAttributes
+                |> (::) tabIndex 0
+                |> (::) Event.onClick (Msg.SetTab TabFirst)
+            )
+            (Element.text "Tab label")
+        , Element.el
+            (ARIA.roleTab False
+                |> ARIA.toElementAttributes
+                |> (::) tabIndex -1
+                |> (::) Event.onClick (Msg.SetTab TabSecond)
+            )
+            (Element.text "Another tab")
+        ]
+
+**NOTE**: We're missing `aria-controls`.
+And MDN recomends using `tabindex` as `0` on selected tab and `-1` on non-active tabs.
+
+-}
+roleTab : Bool -> ElementSemantics
+roleTab selected =
+    fromRole (RoleTab selected)
+
+
 {-| "Defines a string value that labels the current element" -W3C
 
     ARIA.roleCheckbox False
@@ -186,6 +215,11 @@ toElementAttributes { role, label } =
                 [ roleAttr "radiogroup"
                 ]
 
+            RoleTab selected ->
+                [ roleAttr "tab"
+                , selectedAttr selected
+                ]
+
 
 roleAttr : String -> Attribute msg
 roleAttr role =
@@ -226,3 +260,11 @@ checkedAttr value =
 fromRole : Role -> ElementSemantics
 fromRole role =
     { role = role, label = Nothing }
+
+
+selectedAttr : Bool -> Attribute msg
+selectedAttr value =
+    "false"
+        |> ifThenElse value "true"
+        |> HtmlAttrs.attribute "aria-selected"
+        |> Element.htmlAttribute

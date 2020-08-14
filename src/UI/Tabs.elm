@@ -23,9 +23,11 @@ import Element.Events as Events
 import Element.Font as Font
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.Internal.Palette as Palette
+import UI.Internal.Utils.Element as Element
 import UI.Link as Link exposing (Link)
 import UI.RenderConfig exposing (RenderConfig)
-import UI.Utils.Element exposing (zeroPadding)
+import UI.Utils.ARIA as ARIA
+import UI.Utils.Element as Element exposing (zeroPadding)
 
 
 type Tabs msg
@@ -105,7 +107,11 @@ labelBaseAttrs isCurrent =
     , Element.pointer
     , Element.inFront
         (ifThenElse isCurrent currentBorder Element.none)
+    , Element.tabIndex
+        -- Recommendation from MDN
+        (ifThenElse isCurrent 0 -1)
     ]
+        ++ (ARIA.toElementAttributes <| ARIA.roleTab isCurrent)
 
 
 currentBorder : Element msg
