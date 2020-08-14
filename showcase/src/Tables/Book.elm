@@ -1,7 +1,7 @@
 module Tables.Book exposing (..)
 
-import Element exposing (Element)
-import Element.Font exposing (italic, underline)
+import Element exposing (Element, fill)
+import Element.Font as Font
 import Time exposing (millisToPosix)
 import UI.Internal.DateInput as DateInput
 import UI.Tables.Common exposing (..)
@@ -94,26 +94,36 @@ books =
       , read = millisToPosix 969711330000
       , isbn = "9780062693662"
       }
+    , { author = "Clive Staples Lewis"
+      , title = "The Chronicles of Narnia: The Lion, the Witch and The Wardrobe"
+      , year = "1950"
+      , acquired = millisToPosix 968701330000
+      , read = millisToPosix 969210230000
+      , isbn = "9780064404990"
+      }
+    , { author = "John Ronald Reuel Tolkien"
+      , title = "Lord of The Rings, Part 3, The Return of the King"
+      , year = "1955"
+      , acquired = millisToPosix 964701330000
+      , read = millisToPosix 965210230000
+      , isbn = "9780618002245"
+      }
     ]
 
 
 tableColumns =
     columnsEmpty
         |> column "Title" (columnWidthPixels 320)
-        |> column "Author" (columnWidthPixels 240)
+        |> column "Author" (columnWidthPixels 160)
         |> column "Year" (columnWidthPixels 120)
         |> column "Acquired" (columnWidthPixels 180)
         |> column "Read" (columnWidthPixels 180)
 
 
 toTableRow renderConfig { author, title, year, acquired, read } =
-    let
-        titleCell =
-            Element.el [ underline, italic ] <| Text.renderElement renderConfig <| Text.body2 title
-    in
     rowEmpty
-        |> rowCellCustom titleCell
-        |> rowCellText (Text.body2 author)
+        |> rowCellEllipsizableText 32 (Text.body1 title)
+        |> rowCellEllipsizableText 15 (Text.body2 author)
         |> rowCellText (Text.caption year)
         |> rowCellText (Text.caption <| DateInput.toDD_MM_YYYY "/" <| DateInput.fromPosix Time.utc acquired)
         |> rowCellText (Text.caption <| DateInput.toDD_MM_YYYY "/" <| DateInput.fromPosix Time.utc read)

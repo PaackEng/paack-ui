@@ -1,12 +1,11 @@
 module UI.Internal.Tables.FiltersView exposing (Config, header, headerSelectToggle)
 
 import Array exposing (Array)
-import Element exposing (Attribute, Element, fill, minimum, px, shrink)
+import Element exposing (Attribute, Element, fill, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
-import Html.Attributes as HtmlAttrs
 import UI.Button as Button
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (maybeNotThen)
@@ -16,6 +15,8 @@ import UI.Internal.Primitives as Primitives
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.Size as Size exposing (Size)
 import UI.Internal.Tables.Filters as Filters
+import UI.Internal.Text as Text
+import UI.Internal.Utils.Element exposing (overlay, zIndex)
 import UI.Palette as Palette
 import UI.Radio as Radio
 import UI.RenderConfig exposing (RenderConfig)
@@ -111,7 +112,7 @@ headerNormal : RenderConfig -> msg -> String -> Element msg
 headerNormal renderConfig openMsg label =
     -- Button.light
     Element.row (Element.onIndividualClick openMsg :: headerAttrs False)
-        [ filteredHeaderLabel label
+        [ headerText renderConfig label
         , Icon.filter label
             |> Icon.withSize size
             |> Icon.renderElement renderConfig
@@ -123,13 +124,23 @@ headerApplied : RenderConfig -> msg -> msg -> String -> String -> Element msg
 headerApplied renderConfig openMsg clearMsg clearHint label =
     -- Button.primary
     Element.row (Element.onIndividualClick openMsg :: headerAttrs True)
-        [ Element.text label
+        [ headerText renderConfig label
         , Button.fromIcon (Icon.close clearHint)
             |> Button.cmd clearMsg Button.primary
             |> Button.withSize Size.ExtraSmall
             |> Button.renderElement renderConfig
             |> Element.el [ Element.alignRight ]
         ]
+
+
+headerText : RenderConfig -> String -> Element msg
+headerText renderConfig label =
+    label
+        |> Text.ellipsizedText renderConfig Text.SizeCaption
+        |> Element.el
+            [ Element.width fill
+            , Element.clipX
+            ]
 
 
 headerPadX : Int
@@ -195,21 +206,6 @@ size =
 
 
 -- Editing
-
-
-overlayBackground : msg -> Element msg
-overlayBackground onClickMsg =
-    Element.el
-        [ positionFixed -- Needs for starting at the top-left corner
-        , zIndex 8
-        , Palette.overlayBackground
-        , Element.htmlAttribute <| HtmlAttrs.style "top" "0"
-        , Element.htmlAttribute <| HtmlAttrs.style "left" "0"
-        , Element.htmlAttribute <| HtmlAttrs.style "width" "100vw"
-        , Element.htmlAttribute <| HtmlAttrs.style "height" "100vh"
-        , Events.onClick onClickMsg
-        ]
-        Element.none
 
 
 filterEditingButton : RenderConfig -> msg -> msg -> Bool -> Bool -> Element msg
@@ -299,43 +295,24 @@ dialog renderConfig config filter clearMsg applyMsg content =
         current =
             Filters.isEdited filter
     in
-    Element.el
-        [ Element.width fill
-        , Element.height (shrink |> minimum 1)
-        , Element.inFront <|
-            Element.column
+    overlay config.discardMsg <|
+        Element.column
+            [ Element.width fill
+            , zIndex 9
+            , Element.alignTop
+            , Palette.mainBackground
+            , Primitives.defaultRoundedBorders
+            ]
+            [ dialogHeader renderConfig config.discardMsg config.label
+            , Element.column
                 [ Element.width fill
-                , zIndex 9
-                , Element.alignTop
-                , Palette.mainBackground
-                , Primitives.defaultRoundedBorders
+                , Element.spacing 12
                 ]
-                [ dialogHeader renderConfig config.discardMsg config.label
-                , Element.column
-                    [ Element.width fill
-                    , Element.spacing 12
-                    ]
-                    [ content
-                    , filterEditingButton renderConfig applyMsg clearMsg applied current
-                        |> internalPaddingBox
-                    ]
+                [ content
+                , filterEditingButton renderConfig applyMsg clearMsg applied current
+                    |> internalPaddingBox
                 ]
-        ]
-        (overlayBackground config.discardMsg)
-
-
-
--- Some good-old CSS
-
-
-positionFixed : Attribute msg
-positionFixed =
-    Element.htmlAttribute <| HtmlAttrs.style "position" "fixed"
-
-
-zIndex : Int -> Attribute msg
-zIndex val =
-    Element.htmlAttribute <| HtmlAttrs.style "z-index" (String.fromInt val)
+            ]
 
 
 

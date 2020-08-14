@@ -21,5 +21,6 @@ type ColumnWidth
 
 type Cell msg
     = CellText Text
+    | CellEllipsizableText Int Text
     | CellButton (Button msg)
     | CellCustom (Element msg)
