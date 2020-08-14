@@ -1,6 +1,14 @@
-module UI.Tabs exposing (Item, Tabs, cmd, fromList, redirect, renderElement)
+module UI.Tabs exposing
+    ( Item, fromList
+    , Tabs, cmd, redirect
+    , renderElement
+    )
 
-{-| Example of usage:
+{-| Tab allows visually selecting a page in a horizontal list.
+
+This does not includes the logic of detecting current page, neither the logic to replace the contents.
+
+Example of usage:
 
     Tabs.fromList
         [ Tab.redirect "Soccer"
@@ -14,6 +22,21 @@ module UI.Tabs exposing (Item, Tabs, cmd, fromList, redirect, renderElement)
             (currentPage == Page.BowlingResults)
         ]
         |> Tabs.renderElement renderConfig
+
+
+# Building
+
+@docs Item, fromList
+
+
+# Items
+
+@docs Tabs, cmd, redirect
+
+
+# Rendering
+
+@docs renderElement
 
 -}
 
@@ -30,10 +53,14 @@ import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element exposing (zeroPadding)
 
 
+{-| The `Tabs msg` type is used for describing the component for later rendering.
+-}
 type Tabs msg
     = Tabs (List (Item msg))
 
 
+{-| A single element in a tab list.
+-}
 type Item msg
     = Item ItemConfig (ItemAction msg)
 
@@ -49,21 +76,40 @@ type ItemAction msg
     | ActionMsg msg
 
 
+{-| Transform a list of [`Item msg`](#Item) in a [`Tabs msg`](#Tabs).
+-}
 fromList : List (Item msg) -> Tabs msg
 fromList list =
     Tabs list
 
 
+{-| When this tab is selected the user is redirected to a new page.
+
+    Tabs.redirect "News"
+        (Link.link "/news")
+        (currentPage == Page.News)
+
+-}
 redirect : String -> Link -> Bool -> Item msg
 redirect label link isCurrent =
     Item { label = label, isCurrent = isCurrent } <| ActionRedirect link
 
 
+{-| When this tab is selected a message is triggered.
+
+    Tabs.cmd "News"
+        (Msg.TabSelect TabNews)
+        (currentTab == TabNews)
+
+-}
 cmd : String -> msg -> Bool -> Item msg
 cmd label onClick isCurrent =
     Item { label = label, isCurrent = isCurrent } <| ActionMsg onClick
 
 
+{-| End of the builder's life.
+The result of this function is a ready-to-insert Elm UI's Element.
+-}
 renderElement : RenderConfig -> Tabs msg -> Element msg
 renderElement renderConfig (Tabs list) =
     list

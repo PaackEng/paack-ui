@@ -129,6 +129,11 @@ cellFromText text =
     CellText text
 
 
+{-| Creates a cell with some text content, forcedly implementing a tooltip to help with ellipsis.
+
+    cellFromEllipsizableText 12 <| Text.body2 "Only watermelon is not big enougth."
+
+-}
 cellFromEllipsizableText : Int -> Text -> Cell msg
 cellFromEllipsizableText chars text =
     CellEllipsizableText chars text
@@ -202,6 +207,15 @@ rowCellText text accu =
     NArray.push (CellText text) accu
 
 
+{-| Transforms a `UI.Text` into a cell, forcedly implementing a tooltip to help with ellipsis.
+
+Similar to [`cellFromEllipsizableText`](#cellFromEllipsizableText) but infused for rows.
+
+    rowEmpty
+        |> rowCellEllipsizableText 15 (Text.body1 "San Fernando del Valle de Catamarca")
+        |> rowCellText (Text.body2 "Argentina")
+
+-}
 rowCellEllipsizableText : Int -> Text -> Row msg columns -> Row msg (T.Increase columns)
 rowCellEllipsizableText chars text accu =
     NArray.push (CellEllipsizableText chars text) accu
