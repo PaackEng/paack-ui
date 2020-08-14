@@ -39,36 +39,24 @@ artistsStory renderConfig =
 artistsTabs : RenderConfig -> Stories.TabsDemo -> Element Msg.Msg
 artistsTabs renderConfig selected =
     Tabs.fromList
-        [ Tabs.cmd "About"
-            (select Stories.About)
-            (selected == Stories.About)
-        , Tabs.cmd "Corey Taylor"
-            (select Stories.CoreyTaylor)
-            (selected == Stories.CoreyTaylor)
-        , Tabs.cmd "Matt Bellamy"
-            (select Stories.MattBellamy)
-            (selected == Stories.MattBellamy)
-        , Tabs.cmd "Dave Ghrowl"
-            (select Stories.DaveGhrowl)
-            (selected == Stories.DaveGhrowl)
-        , Tabs.cmd "Brandon Flowers"
-            (select Stories.BrandonFlowers)
-            (selected == Stories.BrandonFlowers)
-        , Tabs.cmd "Julian Casablancas"
-            (select Stories.JulianCasablancas)
-            (selected == Stories.JulianCasablancas)
-        , Tabs.cmd "Chris Martin"
-            (select Stories.ChrisMartin)
-            (selected == Stories.ChrisMartin)
-        , Tabs.cmd "Alex Turner"
-            (select Stories.AlexTurner)
-            (selected == Stories.AlexTurner)
-        , Tabs.cmd "Gerard Way"
-            (select Stories.GerardWay)
-            (selected == Stories.GerardWay)
+        [ tab selected "About" Stories.About
+        , tab selected "Corey Taylor" Stories.CoreyTaylor
+        , tab selected "Matt Bellamy" Stories.MattBellamy
+        , tab selected "Dave Ghrowl" Stories.DaveGhrowl
+        , tab selected "Brandon Flowers" Stories.BrandonFlowers
+        , tab selected "Julian Casablancas" Stories.JulianCasablancas
+        , tab selected "Chris Martin" Stories.ChrisMartin
+        , tab selected "Alex Turner" Stories.AlexTurner
+        , tab selected "Gerard Way" Stories.GerardWay
         ]
         |> Tabs.renderElement renderConfig
 
 
 select =
     Stories.Select >> Msg.TabsStoriesMsg
+
+
+tab selected name item =
+    Tabs.cmd name
+        (select item)
+        (selected == item)
