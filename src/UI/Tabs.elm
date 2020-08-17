@@ -44,6 +44,7 @@ import Element exposing (Attribute, Element, fill, shrink)
 import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
+import Element.Input as Input
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.Internal.Palette as Palette
 import UI.Internal.Utils.Element as Element
@@ -127,14 +128,18 @@ renderElement renderConfig (Tabs list) =
 
 itemView : RenderConfig -> Item msg -> Element msg
 itemView renderConfig (Item { label, isCurrent } action) =
-    itemLabel label isCurrent
-        |> (case action of
-                ActionMsg onClick ->
-                    Element.el [ Events.onClick onClick ]
+    case action of
+        ActionMsg onClick ->
+            Input.button []
+                { onPress = Just onClick
+                , label = itemLabel label isCurrent
+                }
 
-                ActionRedirect link ->
-                    Link.wrapElement renderConfig [] link
-           )
+        ActionRedirect link ->
+            Input.button []
+                { onPress = Nothing
+                , label = Link.wrapElement renderConfig [] link <| itemLabel label isCurrent
+                }
 
 
 itemLabel : String -> Bool -> Element msg
@@ -153,9 +158,6 @@ labelBaseAttrs isCurrent =
     , Element.pointer
     , Element.inFront
         (ifThenElse isCurrent currentBorder Element.none)
-    , Element.tabIndex
-        -- Recommendation from MDN
-        (ifThenElse isCurrent 0 -1)
     ]
         ++ (ARIA.toElementAttributes <| ARIA.roleTab isCurrent)
 
