@@ -35,7 +35,6 @@ import Element.Input as Input
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.Internal.Palette as Palette
 import UI.Internal.Utils.Element as Element
-import UI.Link as Link exposing (Link)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element exposing (zeroPadding)
@@ -98,7 +97,7 @@ renderElement renderConfig (TabList { selectMsg, items, label, current }) =
 
 
 itemView : RenderConfig -> msg -> String -> Bool -> Element msg
-itemView renderConfig selectMsg label isCurrent =
+itemView _ selectMsg label isCurrent =
     Input.button (buttonAttributes isCurrent)
         { onPress =
             if isCurrent then
