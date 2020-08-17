@@ -40,7 +40,7 @@ Example of usage:
 
 -}
 
-import Element exposing (Attribute, Element, fill, shrink)
+import Element exposing (Attribute, Decoration, Element, fill, shrink)
 import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
@@ -130,13 +130,13 @@ itemView : RenderConfig -> Item msg -> Element msg
 itemView renderConfig (Item { label, isCurrent } action) =
     case action of
         ActionMsg onClick ->
-            Input.button []
+            Input.button (focusNotCurrent isCurrent)
                 { onPress = Just onClick
                 , label = itemLabel label isCurrent
                 }
 
         ActionRedirect link ->
-            Input.button []
+            Input.button (focusNotCurrent isCurrent)
                 { onPress = Nothing
                 , label = Link.wrapElement renderConfig [] link <| itemLabel label isCurrent
                 }
@@ -147,6 +147,15 @@ itemLabel label isCurrent =
     label
         |> Element.text
         |> Element.el (labelBaseAttrs isCurrent)
+
+
+focusNotCurrent : Bool -> List (Attribute msg)
+focusNotCurrent isCurrent =
+    if isCurrent then
+        [ Element.focused [] ]
+
+    else
+        []
 
 
 labelBaseAttrs : Bool -> List (Attribute msg)
