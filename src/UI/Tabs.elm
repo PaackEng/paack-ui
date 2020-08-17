@@ -1,37 +1,25 @@
 module UI.Tabs exposing
-    ( Item, fromList
-    , Tabs, cmd, redirect
+    ( TabList, tabList
     , renderElement
     )
 
 {-| Tab allows visually selecting a page in a horizontal list.
 
-This does not includes the logic of detecting current page, neither the logic to replace the contents.
-
 Example of usage:
 
-    Tabs.fromList
-        [ Tab.redirect "Soccer"
-            (Link.link "/soccer/results")
-            (currentPage == Page.SoccerResults)
-        , Tab.cmd "Basketball"
-            Msg.GoToBasketball
-            (currentPage == Page.BasketballResults)
-        , Tab.redirect "Bowling"
-            (Link.link "/bowl/results")
-            (currentPage == Page.BowlingResults)
+    TabList.tabList Msg.SportSelect
+        Sports.toString
+        [ Sports.Soccer
+        , Sports.Basket
+        , Sports.Bowling
         ]
-        |> Tabs.renderElement renderConfig
+        model.sportSelected
+        |> TabList.renderElement renderConfig
 
 
 # Building
 
-@docs Item, fromList
-
-
-# Items
-
-@docs Tabs, cmd, redirect
+@docs TabList, tabList
 
 
 # Rendering
@@ -53,67 +41,51 @@ import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element exposing (zeroPadding)
 
 
-{-| The `Tabs msg` type is used for describing the component for later rendering.
+{-| The `TabList msg a` type is used for describing the component for later rendering.
 -}
-type Tabs msg
-    = Tabs (List (Item msg))
+type TabList msg a
+    = TabList (Properties msg a)
 
 
-{-| A single element in a tab list.
--}
-type Item msg
-    = Item ItemConfig (ItemAction msg)
-
-
-type alias ItemConfig =
-    { label : String
-    , isCurrent : Bool
+type alias Properties msg a =
+    { selectMsg : a -> msg
+    , label : a -> String
+    , items : List a
+    , current : a
     }
 
 
-type ItemAction msg
-    = ActionRedirect Link
-    | ActionMsg msg
+{-| Describes everything required to create a [`TabList msg a`](#TabList).
 
-
-{-| Transform a list of [`Item msg`](#Item) in a [`Tabs msg`](#Tabs).
--}
-fromList : List (Item msg) -> Tabs msg
-fromList list =
-    Tabs list
-
-
-{-| When this tab is selected the user is redirected to a new page.
-
-    Tabs.redirect "News"
-        (Link.link "/news")
-        (currentPage == Page.News)
+    Tabs.tabList Msg.TabSelect
+        tabToString
+        [ TabOne, TabTwo ]
+        model.tabSelected
 
 -}
-redirect : String -> Link -> Bool -> Item msg
-redirect label link isCurrent =
-    Item { label = label, isCurrent = isCurrent } <| ActionRedirect link
-
-
-{-| When this tab is selected a message is triggered.
-
-    Tabs.cmd "News"
-        (Msg.TabSelect TabNews)
-        (currentTab == TabNews)
-
--}
-cmd : String -> msg -> Bool -> Item msg
-cmd label onClick isCurrent =
-    Item { label = label, isCurrent = isCurrent } <| ActionMsg onClick
+tabList : (a -> msg) -> (a -> String) -> List a -> a -> TabList msg a
+tabList selectMsg label items current =
+    TabList
+        { selectMsg = selectMsg
+        , label = label
+        , items = items
+        , current = current
+        }
 
 
 {-| End of the builder's life.
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
-renderElement : RenderConfig -> Tabs msg -> Element msg
-renderElement renderConfig (Tabs list) =
-    list
-        |> List.map (itemView renderConfig)
+renderElement : RenderConfig -> TabList msg a -> Element msg
+renderElement renderConfig (TabList { selectMsg, items, label, current }) =
+    items
+        |> List.map
+            (\item ->
+                itemView renderConfig
+                    (selectMsg item)
+                    (label item)
+                    (current == item)
+            )
         |> Element.row
             [ Element.spacing 20
             , Element.behindContent normalBorder
@@ -125,20 +97,17 @@ renderElement renderConfig (Tabs list) =
             ]
 
 
-itemView : RenderConfig -> Item msg -> Element msg
-itemView renderConfig (Item { label, isCurrent } action) =
-    case action of
-        ActionMsg onClick ->
-            Input.button (focusNotCurrent isCurrent)
-                { onPress = Just onClick
-                , label = itemLabel label isCurrent
-                }
+itemView : RenderConfig -> msg -> String -> Bool -> Element msg
+itemView renderConfig selectMsg label isCurrent =
+    Input.button (buttonAttributes isCurrent)
+        { onPress =
+            if isCurrent then
+                Nothing
 
-        ActionRedirect link ->
-            Input.button (focusNotCurrent isCurrent)
-                { onPress = Nothing
-                , label = Link.wrapElement renderConfig [] link <| itemLabel label isCurrent
-                }
+            else
+                Just selectMsg
+        , label = itemLabel label isCurrent
+        }
 
 
 itemLabel : String -> Bool -> Element msg
@@ -148,13 +117,15 @@ itemLabel label isCurrent =
         |> Element.el (labelBaseAttrs isCurrent)
 
 
-focusNotCurrent : Bool -> List (Attribute msg)
-focusNotCurrent isCurrent =
+buttonAttributes : Bool -> List (Attribute msg)
+buttonAttributes isCurrent =
     if isCurrent then
-        [ Element.focused [] ]
+        ARIA.roleTab True
+            |> ARIA.toElementAttributes
+            |> (::) (Element.focused [])
 
     else
-        []
+        ARIA.toElementAttributes <| ARIA.roleTab False
 
 
 labelBaseAttrs : Bool -> List (Attribute msg)
@@ -167,7 +138,6 @@ labelBaseAttrs isCurrent =
     , Element.inFront
         (ifThenElse isCurrent currentBorder Element.none)
     ]
-        ++ (ARIA.toElementAttributes <| ARIA.roleTab isCurrent)
 
 
 currentBorder : Element msg

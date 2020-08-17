@@ -38,17 +38,19 @@ artistsStory renderConfig =
 
 artistsTabs : RenderConfig -> Stories.TabsDemo -> Element Msg.Msg
 artistsTabs renderConfig selected =
-    Tabs.fromList
-        [ tab selected "About" Stories.About
-        , tab selected "Corey Taylor" Stories.CoreyTaylor
-        , tab selected "Matt Bellamy" Stories.MattBellamy
-        , tab selected "Dave Grohl" Stories.DaveGrohl
-        , tab selected "Brandon Flowers" Stories.BrandonFlowers
-        , tab selected "Julian Casablancas" Stories.JulianCasablancas
-        , tab selected "Chris Martin" Stories.ChrisMartin
-        , tab selected "Alex Turner" Stories.AlexTurner
-        , tab selected "Gerard Way" Stories.GerardWay
+    Tabs.tabList select
+        toString
+        [ Stories.About
+        , Stories.CoreyTaylor
+        , Stories.MattBellamy
+        , Stories.DaveGrohl
+        , Stories.BrandonFlowers
+        , Stories.JulianCasablancas
+        , Stories.ChrisMartin
+        , Stories.AlexTurner
+        , Stories.GerardWay
         ]
+        selected
         |> Tabs.renderElement renderConfig
 
 
@@ -56,7 +58,31 @@ select =
     Stories.Select >> Msg.TabsStoriesMsg
 
 
-tab selected name item =
-    Tabs.cmd name
-        (select item)
-        (selected == item)
+toString item =
+    case item of
+        Stories.About ->
+            "About"
+
+        Stories.CoreyTaylor ->
+            "Corey Taylor"
+
+        Stories.MattBellamy ->
+            "Matt Bellamy"
+
+        Stories.DaveGrohl ->
+            "Dave Grohl"
+
+        Stories.BrandonFlowers ->
+            "Brandon Flowers"
+
+        Stories.JulianCasablancas ->
+            "Julian Casablancas"
+
+        Stories.ChrisMartin ->
+            "Chris Martin"
+
+        Stories.AlexTurner ->
+            "Alex Turner"
+
+        Stories.GerardWay ->
+            "Gerard Way"
