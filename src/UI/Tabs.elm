@@ -40,9 +40,8 @@ Example of usage:
 
 -}
 
-import Element exposing (Attribute, Decoration, Element, fill, shrink)
+import Element exposing (Attribute, Element, fill, shrink)
 import Element.Border as Border
-import Element.Events as Events
 import Element.Font as Font
 import Element.Input as Input
 import UI.Internal.Basics exposing (ifThenElse)
