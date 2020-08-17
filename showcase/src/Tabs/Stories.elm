@@ -42,7 +42,7 @@ artistsTabs renderConfig selected =
         [ tab selected "About" Stories.About
         , tab selected "Corey Taylor" Stories.CoreyTaylor
         , tab selected "Matt Bellamy" Stories.MattBellamy
-        , tab selected "Dave Ghrowl" Stories.DaveGhrowl
+        , tab selected "Dave Grohl" Stories.DaveGrohl
         , tab selected "Brandon Flowers" Stories.BrandonFlowers
         , tab selected "Julian Casablancas" Stories.JulianCasablancas
         , tab selected "Chris Martin" Stories.ChrisMartin

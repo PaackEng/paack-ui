@@ -5,7 +5,7 @@ type TabsDemo
     = About
     | CoreyTaylor
     | MattBellamy
-    | DaveGhrowl
+    | DaveGrohl
     | BrandonFlowers
     | JulianCasablancas
     | ChrisMartin
