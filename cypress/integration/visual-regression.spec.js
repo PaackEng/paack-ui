@@ -56,6 +56,11 @@ describe('Percy Snapshots', () => {
       cy.visit('/#Basics/Radio/Radio')
       cy.percySnapshot('Radio')
     })
+
+    it('Creates the Tabs page snapshot', () => {
+      cy.visit('/#Basics/Tabs/Tabs')
+      cy.percySnapshot('Tabs')
+    })
   })
 
   describe('Complex components', () => {
