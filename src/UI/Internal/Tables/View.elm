@@ -63,7 +63,7 @@ widthToEl : Common.ColumnWidth -> Element.Length
 widthToEl width =
     case width of
         WidthPortion int ->
-            fillPortion int
+            fillPortion int |> minimum 0
 
         WidthPixels int ->
             px int
