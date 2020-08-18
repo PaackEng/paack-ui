@@ -64,9 +64,26 @@ describe('Percy Snapshots', () => {
   })
 
   describe('Complex components', () => {
-    it('Creates the Tables page snapshot', () => {
-      cy.visit('/#Complex%20components/Tables/Desktop')
-      cy.percySnapshot('Tables')
+    describe('Tables', () => {
+      it('Creates the Desktop Tables page snapshot', () => {
+        cy.visit('/#Complex%20components/Tables/Desktop')
+        cy.percySnapshot('Tables Desktop')
+      })
+
+      it('Creates the Mobile Tables page snapshot', () => {
+        cy.visit('/#Complex%20components/Tables/Mobile')
+        cy.percySnapshot('Tables Mobile')
+      })
+
+      it('Creates the Stateless Tables page snapshot', () => {
+        cy.visit('/#Complex%20components/Tables/Stateless')
+        cy.percySnapshot('Tables Stateless')
+      })
+
+      it('Creates the Portion Column Tables page snapshot', () => {
+        cy.visit('/#Complex%20components/Tables/Portion%20Column')
+        cy.percySnapshot('Tables Portion Column')
+      })
     })
 
     it('Creates the Paginators page snapshot', () => {
