@@ -115,7 +115,15 @@ statelessDemoTable renderConfig =
 selectableTableStory renderConfig =
     storyWithModel
         ( "Selectable"
-        , \{ tablesStories } -> withIcons renderConfig (demoTable renderConfig Book.tablePixelColumns tablesStories.selecTableState Stories.ForSelectable)
+        , \{ tablesStories } ->
+            withIcons
+                renderConfig
+                (demoTable
+                    renderConfig
+                    Book.tablePixelColumns
+                    tablesStories.selecTableState
+                    Stories.ForSelectable
+                )
         , { defaultWithMenu
             | note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Tables-Stateful) for the exact code of this example."
           }
@@ -125,7 +133,15 @@ selectableTableStory renderConfig =
 portionColumnsTable renderConfig =
     storyWithModel
         ( "Portion Columns"
-        , \{ tablesStories } -> withIcons renderConfig (demoTable renderConfig Book.tablePortionColumns tablesStories.selecTableState Stories.ForSelectable)
+        , \{ tablesStories } ->
+            withIcons
+                renderConfig
+                (demoTable
+                    renderConfig
+                    Book.tablePortionColumns
+                    tablesStories.selecTableState
+                    Stories.ForSelectable
+                )
         , { defaultWithMenu
             | note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Tables-Stateful) for the exact code of this example."
           }
