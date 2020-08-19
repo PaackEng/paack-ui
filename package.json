@@ -39,6 +39,7 @@
   "devDependencies": {
     "@percy/cypress": "^2.3.1",
     "cypress": "^4.12.1",
+    "elm-format": "^0.8.3",
     "i18n-json-to-elm": "PedroHLC/i18n-json-to-elm"
   }
 }

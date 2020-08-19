@@ -111,13 +111,22 @@ books =
     ]
 
 
-tableColumns =
+tablePixelColumns =
     columnsEmpty
         |> column "Title" (columnWidthPixels 320)
         |> column "Author" (columnWidthPixels 160)
         |> column "Year" (columnWidthPixels 120)
         |> column "Acquired" (columnWidthPixels 180)
         |> column "Read" (columnWidthPixels 180)
+
+
+tablePortionColumns =
+    columnsEmpty
+        |> column "Title" (columnWidthPortion 20)
+        |> column "Author" (columnWidthPortion 10)
+        |> column "Year" (columnWidthPortion 8)
+        |> column "Acquired" (columnWidthPortion 12)
+        |> column "Read" (columnWidthPortion 12)
 
 
 toTableRow renderConfig { author, title, year, acquired, read } =
