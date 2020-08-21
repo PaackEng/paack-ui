@@ -1,8 +1,8 @@
 module UI.Tables.Common exposing
     ( Columns, columnsEmpty, column
     , ColumnWidth, columnWidthPortion, columnWidthPixels
-    , Row, ToRow, rowEmpty, rowCellText, rowCellButton, rowCellCustom, rowCellEllipsizableText
-    , Cell, cellFromText, cellFromButton, cellFromCustom, cellFromEllipsizableText
+    , Row, ToRow, rowEmpty, rowCellText, rowCellButton, rowCellCustom
+    , Cell, cellFromText, cellFromButton, cellFromCustom
     )
 
 {-|
@@ -20,12 +20,12 @@ module UI.Tables.Common exposing
 
 ## Desktop rows
 
-@docs Row, ToRow, rowEmpty, rowCellText, rowCellButton, rowCellCustom, rowCellEllipsizableText
+@docs Row, ToRow, rowEmpty, rowCellText, rowCellButton, rowCellCustom
 
 
 # Individual cell
 
-@docs Cell, cellFromText, cellFromButton, cellFromCustom, cellFromEllipsizableText
+@docs Cell, cellFromText, cellFromButton, cellFromCustom
 
 -}
 
@@ -129,16 +129,6 @@ cellFromText text =
     CellText text
 
 
-{-| Creates a cell with some text content, forcedly implementing a tooltip to help with ellipsis.
-
-    cellFromEllipsizableText 12 <| Text.body2 "Only watermelon is not big enougth."
-
--}
-cellFromEllipsizableText : Int -> Text -> Cell msg
-cellFromEllipsizableText chars text =
-    CellEllipsizableText chars text
-
-
 {-| Creates a cell with a button inside.
 
     Button.fromText "Delete"
@@ -205,20 +195,6 @@ Similar to [`cellFromText`](#cellFromText) but infused for rows.
 rowCellText : Text -> Row msg columns -> Row msg (T.Increase columns)
 rowCellText text accu =
     NArray.push (CellText text) accu
-
-
-{-| Transforms a `UI.Text` into a cell, forcedly implementing a tooltip to help with ellipsis.
-
-Similar to [`cellFromEllipsizableText`](#cellFromEllipsizableText) but infused for rows.
-
-    rowEmpty
-        |> rowCellEllipsizableText 15 (Text.body1 "San Fernando del Valle de Catamarca")
-        |> rowCellText (Text.body2 "Argentina")
-
--}
-rowCellEllipsizableText : Int -> Text -> Row msg columns -> Row msg (T.Increase columns)
-rowCellEllipsizableText chars text accu =
-    NArray.push (CellEllipsizableText chars text) accu
 
 
 {-| Transforms a `UI.Button` into a cell appending it to a row.
