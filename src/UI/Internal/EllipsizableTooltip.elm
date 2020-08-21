@@ -33,8 +33,6 @@ focusableView renderConfig text =
             , Element.alpha 0.0
             , Element.mouseOver
                 [ Element.alpha 1.0 ]
-            , Element.focused
-                [ Element.alpha 1.0 ]
             , tabIndex 0
             , Element.pointer
             , Element.inFront (tooltip renderConfig text)
