@@ -131,8 +131,8 @@ tablePortionColumns =
 
 toTableRow renderConfig { author, title, year, acquired, read } =
     rowEmpty
-        |> rowCellEllipsizableText 32 (Text.body1 title)
-        |> rowCellEllipsizableText 15 (Text.body2 author)
+        |> rowCellText (Text.body2 title)
+        |> rowCellText (Text.body2 author)
         |> rowCellText (Text.caption year)
         |> rowCellText (Text.caption <| DateInput.toDD_MM_YYYY "/" <| DateInput.fromPosix Time.utc acquired)
         |> rowCellText (Text.caption <| DateInput.toDD_MM_YYYY "/" <| DateInput.fromPosix Time.utc read)
