@@ -101,7 +101,7 @@ viewHead cfg (Menu.Menu prop _) title maybeStack =
         mobileHeadSandwich =
             sidebarTerms.expand
                 |> Icon.sandwichMenu
-                |> Icon.withSize Size.large
+                |> Icon.withSize Size.medium
                 |> Icon.renderElement cfg
                 |> Element.el (headerButtonAttr (prop.toggleMsg True) 48 20)
 

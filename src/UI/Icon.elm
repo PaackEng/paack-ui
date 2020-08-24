@@ -1,6 +1,6 @@
 module UI.Icon exposing
     ( svgSpriteImport
-    , Icon, add, check, close, edit, eventLog, previousContent, logout, notifications, paackSpaces, packages, print, nextContent, sandwichMenu, search, seeMore, toggle, toggleDown, toggleUp, warning, filter
+    , Icon, add, check, close, edit, eventLog, previousContent, logout, notifications, paackSpaces, packages, print, nextContent, sandwichMenu, search, seeMore, toggle, toggleDown, toggleUp, warning, filter, groups, download, expand, collapse, searchSpace
     , getHint
     , withColor
     , withSize, withCustomSize
@@ -30,7 +30,7 @@ An icon can be created and rendered as in the following pipeline:
 
 # Building
 
-@docs Icon, add, check, close, edit, eventLog, previousContent, logout, notifications, paackSpaces, packages, print, nextContent, sandwichMenu, search, seeMore, toggle, toggleDown, toggleUp, warning, filter
+@docs Icon, add, check, close, edit, eventLog, previousContent, logout, notifications, paackSpaces, packages, print, nextContent, sandwichMenu, search, seeMore, toggle, toggleDown, toggleUp, warning, filter, groups, download, expand, collapse, searchSpace
 
 
 # Disassemble
@@ -110,6 +110,11 @@ type IconGlyph
     | SeeMore
     | Warning
     | Filter
+    | Groups
+    | Download
+    | Expand
+    | Collapse
+    | SearchSpace
 
 
 
@@ -369,6 +374,56 @@ filter hint =
     Icon (Properties hint Filter) defaultOptions
 
 
+{-| A set of dots aligned as a six-sided polygon
+
+    Icon.groups "Groups"
+
+-}
+groups : String -> Icon
+groups hint =
+    Icon (Properties hint Groups) defaultOptions
+
+
+{-| A group of squares acting as files with an arrow pointing to the bottom
+
+    Icon.download "Download CSV"
+
+-}
+download : String -> Icon
+download hint =
+    Icon (Properties hint Download) defaultOptions
+
+
+{-| 2 Arrows from the center to the border
+
+    Icon.expand "Expand view"
+
+-}
+expand : String -> Icon
+expand hint =
+    Icon (Properties hint Expand) defaultOptions
+
+
+{-| 2 Arrows from the border to the center
+
+    Icon.collapse "Collapse view"
+
+-}
+collapse : String -> Icon
+collapse hint =
+    Icon (Properties hint Collapse) defaultOptions
+
+
+{-| The space icon with a search icon in the right-bottom.
+
+    Icon.searchSpace "Search Space"
+
+-}
+searchSpace : String -> Icon
+searchSpace hint =
+    Icon (Properties hint SearchSpace) defaultOptions
+
+
 
 -- Rendering
 
@@ -402,22 +457,22 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
     Element.el attrs <|
         case glyph of
             Add ->
-                svgIcon "Add1"
+                svgIcon "Add"
 
             Toggle ->
-                svgIcon "Map1"
+                svgIcon "Map"
 
             UpArrow ->
-                svgIcon "UpArrow1"
+                svgIcon "Chevron.Up"
 
             DownArrow ->
-                svgIcon "DownArrow1"
+                svgIcon "Chevron.Down"
 
             Check ->
-                svgIcon "Check1"
+                svgIcon "Checkmark"
 
             Close ->
-                svgIcon "Close1"
+                svgIcon "Close"
 
             SandwichMenu ->
                 svgIcon "Hamburger"
@@ -426,43 +481,58 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
                 svgIcon "Bell"
 
             PaackSpaces ->
-                svgIcon "Shelves1"
+                svgIcon "Space"
 
             Packages ->
-                svgIcon "Map1"
+                svgIcon "Box.Outlined"
 
             EventLog ->
-                svgIcon "Messages1"
+                svgIcon "Message"
 
             Logout ->
-                svgIcon "Person1"
+                svgIcon "Logout"
 
             Search ->
-                svgIcon "Search1"
+                svgIcon "Search"
 
             Print ->
-                svgIcon "Print"
+                svgIcon "Printer"
 
             Edit ->
                 svgIcon "Edit"
 
             BackwardContent ->
-                svgIcon "LeftArrow1"
+                svgIcon "Chevron.Left"
 
             LeftArrow ->
-                svgIcon "LeftArrow1"
+                svgIcon "Chevron.Left"
 
             RightArrow ->
-                svgIcon "RightArrow1"
+                svgIcon "Chevron.Right"
 
             SeeMore ->
-                svgIcon "More1"
+                svgIcon "Ellipsis"
 
             Warning ->
-                svgIcon "Warning1"
+                svgIcon "Warning"
 
             Filter ->
-                svgIcon "Filter1"
+                svgIcon "Filter"
+
+            Groups ->
+                svgIcon "Groups"
+
+            Download ->
+                svgIcon "Download"
+
+            Expand ->
+                svgIcon "Expand"
+
+            Collapse ->
+                svgIcon "Collapse"
+
+            SearchSpace ->
+                svgIcon "Space.Search"
 
 
 
@@ -553,13 +623,13 @@ sizeToInt : Size -> Int
 sizeToInt size =
     case size of
         Size.Large ->
-            24
+            40
 
         Size.Medium ->
-            20
+            32
 
         Size.Small ->
-            16
+            24
 
         Size.ExtraSmall ->
-            10
+            16
