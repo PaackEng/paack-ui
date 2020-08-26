@@ -3,6 +3,7 @@ module UI.Internal.EllipsizableTooltip exposing (view)
 import Element exposing (Element, fill, shrink)
 import Element.Background as Background
 import Element.Border as Border
+import Html.Attributes
 import UI.Internal.Palette as Palette
 import UI.Internal.Text as InternalText
 import UI.Internal.Utils.Element as InternalElement exposing (tabIndex, zIndex)
@@ -18,7 +19,6 @@ view renderConfig text =
         |> Element.el
             [ Element.width fill
             , Element.height shrink
-            , Element.inFront (focusableView renderConfig text)
             ]
 
 
@@ -35,7 +35,6 @@ focusableView renderConfig text =
                 [ Element.alpha 1.0 ]
             , tabIndex 0
             , Element.pointer
-            , Element.inFront (tooltip renderConfig text)
             ]
 
 
@@ -52,34 +51,33 @@ textView renderConfig text =
             ]
 
 
-tooltipBalloon : RenderConfig -> Text -> Element msg
-tooltipBalloon renderConfig text =
-    text
-        |> Text.setEllipsis False
-        |> Text.renderElement renderConfig
-        |> Element.el
-            [ Background.color Palette.gray.lighter
-            , Border.rounded 8
-            , Element.paddingXY 8 8
-            , tabIndex -1
-            , zIndex 1
-            , InternalElement.positionAbsolute
-            , InternalElement.positionAbsoluteTop
-            , InternalElement.positionAbsoluteLeft
-            ]
 
-
-tooltip : RenderConfig -> Text -> Element msg
-tooltip renderConfig text =
-    text
-        |> tooltipBalloon renderConfig
-        |> Element.el
-            [ Element.paddingEach
-                { zeroPadding
-                    | top = InternalText.textSizePx renderConfig text
-                }
-            , Element.width fill
-            , Element.height fill
-            , InternalElement.positionRelative
-            , InternalElement.overflowVisible
-            ]
+-- tooltipBalloon : RenderConfig -> Text -> Element msg
+-- tooltipBalloon renderConfig text =
+--     text
+--         |> Text.setEllipsis False
+--         |> Text.renderElement renderConfig
+--         |> Element.el
+--             [ Background.color Palette.gray.lighter
+--             , Border.rounded 8
+--             , Element.paddingXY 8 8
+--             , tabIndex -1
+--             , zIndex 1
+--             , InternalElement.positionAbsolute
+--             , InternalElement.positionAbsoluteTop
+--             , InternalElement.positionAbsoluteLeft
+--             ]
+-- tooltip : RenderConfig -> Text -> Element msg
+-- tooltip renderConfig text =
+--     text
+--         |> tooltipBalloon renderConfig
+--         |> Element.el
+--             [ Element.paddingEach
+--                 { zeroPadding
+--                     | top = InternalText.textSizePx renderConfig text
+--                 }
+--             , Element.width fill
+--             , Element.height fill
+--             , InternalElement.positionRelative
+--             , InternalElement.overflowVisible
+--             ]

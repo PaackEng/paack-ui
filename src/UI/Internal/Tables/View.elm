@@ -3,6 +3,8 @@ module UI.Internal.Tables.View exposing (..)
 import Element exposing (Attribute, Element, fill, fillPortion, minimum, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
+import Html
+import Html.Attributes
 import UI.Button as Button
 import UI.Internal.EllipsizableTooltip as EllipsizableTooltip
 import UI.Internal.NArray as NArray
@@ -32,7 +34,15 @@ cellContentRender renderConfig cell_ =
 simpleText : RenderConfig -> Text -> Element msg
 simpleText renderConfig text =
     text
-        |> EllipsizableTooltip.view renderConfig
+        |> Text.setEllipsis True
+        |> Text.renderElement renderConfig
+        |> Element.el
+            [ Element.width fill
+            , Element.clipX
+            , Element.paddingXY 8 0
+            , Element.centerY
+            , InternalElement.overflowVisible
+            ]
         |> Element.el
             [ Element.width fill
             , InternalElement.overflowVisible

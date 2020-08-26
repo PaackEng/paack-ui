@@ -46,7 +46,7 @@ someFilters =
 
 books : List Book
 books =
-    [ { author = "Dan Brown"
+    [ { author = "Dan Lorem ipsum dolor sit amet consectetur adipisicing elit. "
       , title = "Angels & Demons"
       , year = "2000"
       , acquired = millisToPosix 1118405730000
