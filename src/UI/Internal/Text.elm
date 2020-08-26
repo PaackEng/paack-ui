@@ -2,8 +2,7 @@ module UI.Internal.Text exposing (..)
 
 import Element exposing (Attribute, Element, fill)
 import Element.Font as Font
-import Html
-import Html.Attributes
+import Html exposing (Html)
 import List
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.Internal.Palette as Palette
@@ -377,14 +376,15 @@ ellipsizedText cfg size content =
             lineHeight (isMobile cfg) size
     in
     content
-        |> ellipsizableText
+        |> ellipsizableNode
         |> Element.html
         |> Element.el
             (ellipsisAttrs lineHeightSize content)
 
 
-ellipsizableText content =
-    Html.node "ellipsizable-cell"
+ellipsizableNode : String -> Html msg
+ellipsizableNode content =
+    Html.node "ellipsizable-text"
         []
         [ Html.text content ]
 

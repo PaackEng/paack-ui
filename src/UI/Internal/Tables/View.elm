@@ -3,10 +3,7 @@ module UI.Internal.Tables.View exposing (..)
 import Element exposing (Attribute, Element, fill, fillPortion, minimum, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
-import Html
-import Html.Attributes
 import UI.Button as Button
-import UI.Internal.EllipsizableTooltip as EllipsizableTooltip
 import UI.Internal.NArray as NArray
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives

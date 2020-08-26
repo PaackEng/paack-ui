@@ -66,7 +66,7 @@ const template = Object.assign(document.createElement('template'), {
   `,
 })
 
-class EllipsizableCell extends HTMLElement {
+class EllipsizableText extends HTMLElement {
   constructor() {
     super()
     this.attachShadow({ mode: 'open' })
@@ -93,7 +93,7 @@ class EllipsizableCell extends HTMLElement {
   }
 }
 
-window.customElements.define('ellipsizable-cell', EllipsizableCell)
+window.customElements.define('ellipsizable-text', EllipsizableText)
 
 const app = Elm.Main.init({
   node: document.getElementById('root'),
