@@ -1,15 +1,14 @@
 module Alerts exposing (stories)
 
-import Element exposing (..)
-import Element.Background as Background
-import Msg as Msg
+import Element exposing (Element)
 import PluginOptions exposing (PluginOptions, defaultWithMenu)
 import UI.Alert as Alert
 import UI.RenderConfig exposing (RenderConfig)
 import UIExplorer exposing (storiesOf)
-import Utils exposing (goToDocsCallToAction, prettifyElmCode, story)
+import Utils exposing (ExplorerStory, ExplorerUI, goToDocsCallToAction, prettifyElmCode, story)
 
 
+stories : RenderConfig -> ExplorerUI
 stories renderConfig =
     storiesOf
         "Alerts"
@@ -20,6 +19,7 @@ stories renderConfig =
         ]
 
 
+primaryStory : RenderConfig -> ExplorerStory
 primaryStory renderConfig =
     story
         ( "Primary"
@@ -28,6 +28,7 @@ primaryStory renderConfig =
         )
 
 
+successStory : RenderConfig -> ExplorerStory
 successStory renderConfig =
     story
         ( "Success"
@@ -36,6 +37,7 @@ successStory renderConfig =
         )
 
 
+warningStory : RenderConfig -> ExplorerStory
 warningStory renderConfig =
     story
         ( "Warning"
@@ -44,6 +46,7 @@ warningStory renderConfig =
         )
 
 
+dangerStory : RenderConfig -> ExplorerStory
 dangerStory renderConfig =
     story
         ( "Danger"
@@ -54,20 +57,23 @@ dangerStory renderConfig =
 
 alert : (String -> Alert.Alert msg) -> RenderConfig -> Element msg
 alert alertFn renderConfig =
-    alertFn "Hey I just met you"
+    alertFn "Lorem ipsum dolor sit amet."
         |> Alert.renderElement renderConfig
 
 
 pluginOptions : String -> PluginOptions
 pluginOptions alertType =
     { defaultWithMenu
-        | code =
-            prettifyElmCode <|
-                """
-Alert."""
-                    ++ alertType
-                    ++ """"Hey I just met you"
-    |> Alert.toEl
-"""
+        | code = code alertType
         , note = goToDocsCallToAction "Alert"
     }
+
+
+code : String -> String
+code alertType =
+    prettifyElmCode """
+Alert."""
+        ++ alertType
+        ++ """"Hey I just met you"
+    |> Alert.toEl
+"""

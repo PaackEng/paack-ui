@@ -1,40 +1,49 @@
 module Icons exposing (stories)
 
-import Element
-import Element.Background as Background
+import Element exposing (Element)
 import Element.Font as Font
-import Html
+import Html exposing (Html)
 import PluginOptions exposing (defaultWithoutMenu)
-import UI.Icon as Icon
+import UI.Icon as Icon exposing (Icon)
 import UI.Palette as Palette
+import UI.RenderConfig exposing (RenderConfig)
 import UIExplorer exposing (storiesOf)
-import Utils exposing (goToDocsCallToAction, iconsSvgSprite, prettifyElmCode)
+import Utils exposing (ExplorerUI, goToDocsCallToAction, iconsSvgSprite, prettifyElmCode)
 
 
+stories : RenderConfig -> ExplorerUI
 stories cfg =
     storiesOf
         "Icons"
         [ ( "IconsExample"
           , \_ -> iconsView cfg
           , { defaultWithoutMenu
-                | code =
-                    prettifyElmCode
-                        """
-Icon.seeMore label
-    |> Icon.withColor (Palette.color Palette.tonePrimary Palette.brightnessMiddle)
-    |> Icon.renderElement cfg
-"""
-                , note =
-                    """
-We name icons by their functionality and not their shapes.
-
-"""
-                        ++ goToDocsCallToAction "Icon"
+                | code = code
+                , note = note
             }
           )
         ]
 
 
+code : String
+code =
+    prettifyElmCode """
+Icon.seeMore label
+    |> Icon.withColor (Palette.color Palette.tonePrimary Palette.brightnessMiddle)
+    |> Icon.renderElement cfg
+"""
+
+
+note : String
+note =
+    """
+We name icons by their functionality and not their shapes.
+
+"""
+        ++ goToDocsCallToAction "Icon"
+
+
+icons : List ( String -> Icon, String )
 icons =
     [ ( Icon.add, "Add" )
     , ( Icon.close, "close" )
@@ -58,6 +67,7 @@ icons =
     ]
 
 
+iconView : RenderConfig -> Palette.Color -> ( String -> Icon, String ) -> Element msg
 iconView cfg color ( iconFn, label ) =
     Element.column
         [ Element.spacing 10
@@ -73,6 +83,7 @@ iconView cfg color ( iconFn, label ) =
         ]
 
 
+iconsGroup : RenderConfig -> Palette.Color -> Element msg
 iconsGroup cfg color =
     icons
         |> List.map (iconView cfg color)
@@ -82,6 +93,7 @@ iconsGroup cfg color =
             ]
 
 
+iconsView : RenderConfig -> Html msg
 iconsView cfg =
     Element.layout [] <|
         Element.column

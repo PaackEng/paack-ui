@@ -2,14 +2,14 @@ module Palette exposing (stories)
 
 import Element exposing (Element, px)
 import Element.Background as Background
-import Element.Border as Border
 import Element.Font as Font
 import PluginOptions exposing (defaultWithoutMenu)
-import UI.Palette as Palette exposing (Brightness, Tone)
+import UI.Palette as Palette exposing (Tone)
 import UIExplorer exposing (storiesOf)
-import Utils exposing (goToDocsCallToAction, prettifyElmCode)
+import Utils exposing (ExplorerUI, goToDocsCallToAction, prettifyElmCode)
 
 
+stories : ExplorerUI
 stories =
     storiesOf
         "Colors"
@@ -17,8 +17,17 @@ stories =
           , \_ -> Element.layout [] colorsView
           , { defaultWithoutMenu
                 | code =
-                    prettifyElmCode
-                        """
+                    prettifyElmCode code
+                , note =
+                    note
+            }
+          )
+        ]
+
+
+code : String
+code =
+    """
 import UI.Palette as Palette
 
 myRedSquare =
@@ -32,9 +41,12 @@ myRedSquare =
         , Font.size 14
         ]
         Element.none
-        """
-                , note =
-                    """
+"""
+
+
+note : String
+note =
+    """
 You will generate colors using a combination of 2 types, `Tone` and `Brightness`, and a function that's returns Palette.Color, `Palette.color`.
 
 Example:
@@ -68,10 +80,7 @@ This is quite a specific use case and we try as much is possible avoid having to
 `UI.Palette` has 5 different tones (toneGray, tonePrimary, toneSuccess, toneWarning and toneDanger) and 5 different brightnesses (brightnessDarkest, brightnessMiddle, brightnessLight, brightnessLighter, brightnessLightest).
 
 """
-                        ++ goToDocsCallToAction "Palette"
-            }
-          )
-        ]
+        ++ goToDocsCallToAction "Palette"
 
 
 tones : List ( String, Palette.Tone )

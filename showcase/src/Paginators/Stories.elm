@@ -1,14 +1,24 @@
 module Paginators.Stories exposing (stories, update)
 
-import Element exposing (fill)
-import Msg
+import Element exposing (Element)
+import Model exposing (Model)
+import Msg exposing (Msg)
 import Paginators.Model as Paginators
 import Paginators.Msg as Paginators
 import PluginOptions exposing (defaultWithoutMenu)
-import Return as R exposing (Return)
+import Return exposing (Return)
 import UI.Paginator as Paginator
+import UI.RenderConfig exposing (RenderConfig)
 import UIExplorer exposing (storiesOf)
-import Utils exposing (goToDocsCallToAction, iconsSvgSprite, prettifyElmCode, story, storyWithModel)
+import Utils
+    exposing
+        ( ExplorerStory
+        , ExplorerUI
+        , goToDocsCallToAction
+        , iconsSvgSprite
+        , prettifyElmCode
+        , storyWithModel
+        )
 
 
 defaultPageSize : Int
@@ -26,6 +36,7 @@ update msg model =
             ( { model | offset = model.offset + defaultPageSize }, Cmd.none )
 
 
+stories : RenderConfig -> ExplorerUI
 stories cfg =
     storiesOf
         "Paginators"
@@ -33,29 +44,21 @@ stories cfg =
         ]
 
 
+nonNumericPaginator : RenderConfig -> ExplorerStory
 nonNumericPaginator cfg =
     storyWithModel
         ( "NonNumeric"
-        , \{ paginatorsStories } ->
-            Element.column
-                [ Element.spacing 20 ]
-                [ iconsSvgSprite
-                , Paginator.nonNumeric
-                    { onNextButtonClicked = Msg.PaginatorsStoriesMsg Paginators.NextPage
-                    , onPreviousButtonClicked = Msg.PaginatorsStoriesMsg Paginators.PreviousPage
-                    , totalCount = List.length paginatorsStories.items
-                    , offset = paginatorsStories.offset
-                    , first = defaultPageSize
-                    }
-                    cfg
-                , paginatorsStories.items
-                    |> List.take (paginatorsStories.offset + defaultPageSize)
-                    |> List.drop paginatorsStories.offset
-                    |> List.map (\item -> Element.text item)
-                    |> Element.column []
-                ]
+        , view cfg
         , { defaultWithoutMenu
-            | code = prettifyElmCode """
+            | code = code
+            , note = goToDocsCallToAction "Paginator"
+          }
+        )
+
+
+code : String
+code =
+    prettifyElmCode """
 Paginator.nonNumeric
     { onNextButtonClicked = NextPage
     , onPreviousButtonClicked = PreviousPage
@@ -65,6 +68,24 @@ Paginator.nonNumeric
     }
     renderConfig
 """
-            , note = goToDocsCallToAction "Paginator"
-          }
-        )
+
+
+view : RenderConfig -> Model -> Element Msg
+view renderConfig { paginatorsStories } =
+    Element.column
+        [ Element.spacing 20 ]
+        [ iconsSvgSprite
+        , Paginator.nonNumeric
+            { onNextButtonClicked = Msg.PaginatorsStoriesMsg Paginators.NextPage
+            , onPreviousButtonClicked = Msg.PaginatorsStoriesMsg Paginators.PreviousPage
+            , totalCount = List.length paginatorsStories.items
+            , offset = paginatorsStories.offset
+            , first = defaultPageSize
+            }
+            renderConfig
+        , paginatorsStories.items
+            |> List.take (paginatorsStories.offset + defaultPageSize)
+            |> List.drop paginatorsStories.offset
+            |> List.map (\item -> Element.text item)
+            |> Element.column []
+        ]

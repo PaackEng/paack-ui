@@ -1,22 +1,32 @@
 module Texts exposing (stories)
 
-import Element
+import Element exposing (Element)
+import Html exposing (Html)
 import PluginOptions exposing (defaultWithoutMenu)
 import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
-import UI.Text as Text
+import UI.RenderConfig exposing (RenderConfig)
+import UI.Text as Text exposing (Text)
 import UIExplorer exposing (storiesOf)
-import Utils exposing (goToDocsCallToAction, prettifyElmCode)
+import Utils exposing (ExplorerModel, ExplorerUI, goToDocsCallToAction, prettifyElmCode)
 
 
+stories : RenderConfig -> ExplorerUI
 stories renderConfig =
     storiesOf
         "Texts"
         [ ( "Texts"
           , textsView renderConfig
           , { defaultWithoutMenu
-                | code =
-                    prettifyElmCode
-                        """
+                | code = code
+                , note = goToDocsCallToAction "Text"
+            }
+          )
+        ]
+
+
+code : String
+code =
+    prettifyElmCode """
 "Wherever You Will Go"
     |> Text.heading5
     |> Text.withColor (Palette.color Palette.toneGray Palette.brightnessDarkest)
@@ -33,15 +43,13 @@ Who will be there to take my place?
     |> Text.body1
     |> Text.renderElement renderConfig
 """
-                , note = goToDocsCallToAction "Text"
-            }
-          )
-        ]
 
 
+styles : List ( String -> Text, String )
 styles =
     [ ( Text.heading1
-            >> Text.withColor (Palette.color tonePrimary brightnessMiddle)
+            >> Text.withColor
+                (Palette.color tonePrimary brightnessMiddle)
       , "Heading1"
       )
     , ( Text.heading2, "Heading2" )
@@ -58,13 +66,15 @@ styles =
     ]
 
 
+styleView : RenderConfig -> ( String -> Text, String ) -> Element msg
 styleView renderConfig ( component, label ) =
     label
         |> component
         |> Text.renderElement renderConfig
 
 
-textsView renderConfig content =
+textsView : RenderConfig -> ExplorerModel -> Html msg
+textsView renderConfig _ =
     styles
         |> List.map (styleView renderConfig)
         |> Element.column

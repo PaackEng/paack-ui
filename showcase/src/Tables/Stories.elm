@@ -1,23 +1,25 @@
 module Tables.Stories exposing (stories, update)
 
 import Element exposing (Element, fill)
-import Msg
-import PluginOptions exposing (defaultWithMenu)
-import Return as R exposing (Return)
-import Tables.Book as Book
+import Msg exposing (Msg)
+import Return exposing (Return)
+import Tables.Book as Book exposing (Book)
 import Tables.Model as Stories
 import Tables.Msg as Stories
-import Time
-import UI.Internal.Basics exposing (maybeNotThen)
-import UI.Internal.DateInput as DateInput
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
-import UI.Tables.Stateful as Stateful
+import UI.Tables.Common as Tables
+import UI.Tables.Stateful as Stateful exposing (StatefulTable)
 import UI.Tables.Stateless as Stateless
-import UI.Text as Text exposing (Text)
-import UI.TextField as TextField
 import UI.Utils.TypeNumbers as T
 import UIExplorer exposing (storiesOf)
-import Utils exposing (iconsSvgSprite, story, storyWithModel)
+import Utils
+    exposing
+        ( ExplorerStory
+        , ExplorerUI
+        , iconsSvgSprite
+        , reducedToDocs
+        , storyWithModel
+        )
 
 
 update : Stories.Msg -> Stories.Model -> Return Msg.Msg Stories.Model
@@ -34,42 +36,56 @@ update msg ({ mainTableState, selecTableState } as model) =
                 |> Tuple.mapFirst (\s -> { model | selecTableState = s })
 
 
+stories : RenderConfig -> ExplorerUI
 stories renderConfig =
     storiesOf
         "Tables"
         [ desktopTableStory renderConfig
-        , mobileTableStory renderConfig
+        , mobileTableStory
         , statelessTableStory renderConfig
         , selectableTableStory renderConfig
         , portionColumnsTable renderConfig
         ]
 
 
+desktopTableStory : RenderConfig -> ExplorerStory
 desktopTableStory renderConfig =
     storyWithModel
         ( "Desktop"
-        , \{ tablesStories } -> withIcons renderConfig (demoTable renderConfig Book.tablePixelColumns tablesStories.mainTableState Stories.ForMain)
-        , { defaultWithMenu
-            | note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Tables-Stateful) for the exact code of this example."
-          }
+        , \{ tablesStories } ->
+            demoTable
+                Book.tablePixelColumns
+                tablesStories.mainTableState
+                Stories.ForMain
+                |> withIcons renderConfig
+        , reducedToDocs "Tables-Stateful"
         )
 
 
-mobileTableStory renderConfig =
+mobileTableStory : ExplorerStory
+mobileTableStory =
     storyWithModel
         ( "Mobile"
-        , \{ tablesStories } -> withIcons mobileCfg (demoTable renderConfig Book.tablePixelColumns tablesStories.mainTableState Stories.ForMain)
-        , { defaultWithMenu
-            | note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Tables-Stateful) for the exact code of this example."
-          }
+        , \{ tablesStories } ->
+            demoTable
+                Book.tablePixelColumns
+                tablesStories.mainTableState
+                Stories.ForMain
+                |> withIcons mobileCfg
+        , reducedToDocs "Tables-Stateful"
         )
 
 
-demoTable renderConfig columns state msg =
+demoTable :
+    Tables.Columns T.Five
+    -> Stateful.State Msg Book T.Five
+    -> (Stateful.Msg Book -> Stories.Msg)
+    -> StatefulTable Msg Book T.Five
+demoTable columns state msg =
     Stateful.table
         { toExternalMsg = msg >> Msg.TablesStoriesMsg
         , columns = columns
-        , toRow = Book.toTableRow renderConfig
+        , toRow = Book.toTableRow
         , state = state
         }
         |> Stateful.withResponsive
@@ -80,6 +96,7 @@ demoTable renderConfig columns state msg =
         |> Stateful.withItems Book.books
 
 
+withIcons : RenderConfig -> StatefulTable Msg Book T.Five -> Element Msg
 withIcons renderConfig table =
     table
         |> Stateful.renderElement renderConfig
@@ -88,30 +105,34 @@ withIcons renderConfig table =
         |> Element.wrappedRow [ Element.width fill ]
 
 
+mobileCfg : RenderConfig
 mobileCfg =
-    RenderConfig.init { width = 375, height = 667 } RenderConfig.localeEnglish
+    RenderConfig.init
+        { width = 375, height = 667 }
+        RenderConfig.localeEnglish
 
 
+statelessTableStory : RenderConfig -> ExplorerStory
 statelessTableStory renderConfig =
     storyWithModel
         ( "Stateless"
         , \_ -> statelessDemoTable renderConfig
-        , { defaultWithMenu
-            | note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Tables-Stateless) for the exact code of this example."
-          }
+        , reducedToDocs "Tables-Stateless"
         )
 
 
+statelessDemoTable : RenderConfig -> Element Msg
 statelessDemoTable renderConfig =
     Stateless.table
         { columns = Book.tablePixelColumns
-        , toRow = Book.toTableRow renderConfig
+        , toRow = Book.toTableRow
         }
         |> Stateless.withWidth Element.shrink
         |> Stateless.withItems Book.books
         |> Stateless.renderElement renderConfig
 
 
+selectableTableStory : RenderConfig -> ExplorerStory
 selectableTableStory renderConfig =
     storyWithModel
         ( "Selectable"
@@ -119,30 +140,23 @@ selectableTableStory renderConfig =
             withIcons
                 renderConfig
                 (demoTable
-                    renderConfig
                     Book.tablePixelColumns
                     tablesStories.selecTableState
                     Stories.ForSelectable
                 )
-        , { defaultWithMenu
-            | note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Tables-Stateful) for the exact code of this example."
-          }
+        , reducedToDocs "Tables-Stateful"
         )
 
 
+portionColumnsTable : RenderConfig -> ExplorerStory
 portionColumnsTable renderConfig =
     storyWithModel
         ( "Portion Columns"
         , \{ tablesStories } ->
-            withIcons
-                renderConfig
-                (demoTable
-                    renderConfig
-                    Book.tablePortionColumns
-                    tablesStories.selecTableState
-                    Stories.ForSelectable
-                )
-        , { defaultWithMenu
-            | note = "See [docs](https://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Tables-Stateful) for the exact code of this example."
-          }
+            demoTable
+                Book.tablePortionColumns
+                tablesStories.selecTableState
+                Stories.ForSelectable
+                |> withIcons renderConfig
+        , reducedToDocs "Tables-Stateful"
         )

@@ -1,11 +1,13 @@
 module Badges exposing (stories)
 
 import PluginOptions exposing (defaultWithMenu)
-import UI.Badge as Badge
+import UI.Badge as Badge exposing (Badge)
+import UI.RenderConfig exposing (RenderConfig)
 import UIExplorer exposing (storiesOf)
-import Utils exposing (goToDocsCallToAction, prettifyElmCode, storyList)
+import Utils exposing (ExplorerStory, ExplorerUI, goToDocsCallToAction, prettifyElmCode, storyList)
 
 
+stories : RenderConfig -> ExplorerUI
 stories cfg =
     storiesOf
         "Badges"
@@ -17,21 +19,34 @@ stories cfg =
         ]
 
 
-oneBadge cfg constructorLight constructorDark str =
+oneBadge :
+    RenderConfig
+    -> (String -> Badge)
+    -> (String -> Badge)
+    -> String
+    -> ExplorerStory
+oneBadge cfg constructorLight constructorDark variation =
     storyList
-        ( "Badge " ++ str
-        , [ constructorLight "123", constructorDark "456" ]
-            |> List.map (Badge.renderElement cfg)
+        ( "Badge " ++ variation
+        , List.map (Badge.renderElement cfg)
+            [ constructorLight "123"
+            , constructorDark "456"
+            ]
         , { defaultWithMenu
-            | code = prettifyElmCode <| """
-lightOne renderConfig =
-    Badge.""" ++ str ++ """Light "123"
-      |> Badge.renderElement renderConfig
-
-darkOne renderConfig =
-    Badge.""" ++ str ++ """Dark "456"
-      |> Badge.renderElement renderConfig
-"""
+            | code = code variation
             , note = goToDocsCallToAction "Badge"
           }
         )
+
+
+code : String -> String
+code variation =
+    prettifyElmCode """
+lightOne renderConfig =
+    Badge.""" ++ variation ++ """Light "123"
+      |> Badge.renderElement renderConfig
+
+darkOne renderConfig =
+    Badge.""" ++ variation ++ """Dark "456"
+      |> Badge.renderElement renderConfig
+"""
