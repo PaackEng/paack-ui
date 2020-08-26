@@ -1,5 +1,5 @@
 import { Elm } from './../src/Main.elm'
-import paackSvgIconSprite from 'paack-ui-assets/js/paackSvgIconSprite'
+import 'paack-ui-assets/js/paackSvgIconSprite'
 
 const template = Object.assign(document.createElement('template'), {
   innerHTML: `
@@ -66,6 +66,8 @@ const template = Object.assign(document.createElement('template'), {
   `,
 })
 
+const runDelayed = window.requestIdleCallback || window.requestAnimationFrame
+
 class EllipsizableText extends HTMLElement {
   constructor() {
     super()
@@ -78,23 +80,28 @@ class EllipsizableText extends HTMLElement {
     const text = this.shadowRoot.querySelector('.text')
 
     text.textContent = textContent
+    text.classList.add('text--overflown')
 
-    if (text.offsetWidth > this.parentElement.offsetWidth) {
-      text.classList.add('text--overflown')
-      text.setAttribute('tabIndex', 0)
+    runDelayed(() => {
+      if (text.offsetWidth > this.parentElement.offsetWidth) {
+        text.setAttribute('tabIndex', 0)
+        text.classList.add('text--overflown')
 
-      const tooltip = text.cloneNode(true)
+        const tooltip = text.cloneNode(true)
 
-      tooltip.setAttribute('tabIndex', 0)
+        tooltip.setAttribute('tabIndex', 0)
 
-      tooltip.className = 'tooltip'
-      this.shadowRoot.appendChild(tooltip)
-    }
+        tooltip.className = 'tooltip'
+        this.shadowRoot.appendChild(tooltip)
+      } else {
+        text.classList.remove('text-overflown')
+      }
+    })
   }
 }
 
 window.customElements.define('ellipsizable-text', EllipsizableText)
 
-const app = Elm.Main.init({
+Elm.Main.init({
   node: document.getElementById('root'),
 })
