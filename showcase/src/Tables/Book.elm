@@ -22,7 +22,7 @@ someFilters : Stateful.Filters msg Book T.Five
 someFilters =
     Stateful.filtersEmpty
         |> Stateful.localMultiTextFilter [] .title
-        |> Stateful.localMultiTextFilter [ "Dan" ] .author
+        |> Stateful.localMultiTextFilter [] .author
         |> Stateful.localSelectFilter
             [ "Last Decade", "New Millennium", "Old Century" ]
             Nothing
@@ -46,7 +46,7 @@ someFilters =
 
 books : List Book
 books =
-    [ { author = "Dan Lorem ipsum dolor sit amet consectetur adipisicing elit. "
+    [ { author = "Dan Brown"
       , title = "Angels & Demons"
       , year = "2000"
       , acquired = millisToPosix 1118405730000
