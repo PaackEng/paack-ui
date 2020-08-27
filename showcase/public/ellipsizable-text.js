@@ -50,7 +50,6 @@ const template = Object.assign(document.createElement('template'), {
           background: transparent;
         }
   
-        .tooltip:hover,
         .tooltip:focus,
         .text--overflown:focus + .tooltip,
         .text--overflown:hover + .tooltip {
