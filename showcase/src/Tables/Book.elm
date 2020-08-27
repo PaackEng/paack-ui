@@ -1,12 +1,11 @@
 module Tables.Book exposing (..)
 
-import Element exposing (Element, fill)
-import Element.Font as Font
 import Time exposing (millisToPosix)
 import UI.Internal.DateInput as DateInput
-import UI.Tables.Common exposing (..)
-import UI.Tables.Stateful as Table exposing (detailHidden, detailShown, detailsEmpty)
-import UI.Text as Text exposing (Text)
+import UI.Tables.Common as Tables exposing (cellFromText, column, columnWidthPixels, columnWidthPortion, columnsEmpty, rowCellText, rowEmpty)
+import UI.Tables.Stateful as Stateful exposing (detailHidden, detailShown, detailsEmpty)
+import UI.Text as Text
+import UI.Utils.TypeNumbers as T
 
 
 type alias Book =
@@ -19,11 +18,12 @@ type alias Book =
     }
 
 
+someFilters : Stateful.Filters msg Book T.Five
 someFilters =
-    Table.filtersEmpty
-        |> Table.localMultiTextFilter [] .title
-        |> Table.localMultiTextFilter [ "Dan" ] .author
-        |> Table.localSelectFilter
+    Stateful.filtersEmpty
+        |> Stateful.localMultiTextFilter [] .title
+        |> Stateful.localMultiTextFilter [ "Dan" ] .author
+        |> Stateful.localSelectFilter
             [ "Last Decade", "New Millennium", "Old Century" ]
             Nothing
             (\item selected ->
@@ -40,10 +40,11 @@ someFilters =
                     _ ->
                         False
             )
-        |> Table.localRangeDateFilter Time.utc Nothing Nothing .acquired
-        |> Table.localPeriodDateFilter Time.utc Nothing Nothing .read
+        |> Stateful.localRangeDateFilter Time.utc Nothing Nothing .acquired
+        |> Stateful.localPeriodDateFilter Time.utc Nothing Nothing .read
 
 
+books : List Book
 books =
     [ { author = "Dan Brown"
       , title = "Angels & Demons"
@@ -111,6 +112,7 @@ books =
     ]
 
 
+tablePixelColumns : Tables.Columns T.Five
 tablePixelColumns =
     columnsEmpty
         |> column "Title" (columnWidthPixels 320)
@@ -120,6 +122,7 @@ tablePixelColumns =
         |> column "Read" (columnWidthPixels 180)
 
 
+tablePortionColumns : Tables.Columns T.Five
 tablePortionColumns =
     columnsEmpty
         |> column "Title" (columnWidthPortion 20)
@@ -129,7 +132,8 @@ tablePortionColumns =
         |> column "Read" (columnWidthPortion 12)
 
 
-toTableRow renderConfig { author, title, year, acquired, read } =
+toTableRow : Book -> Tables.Row msg T.Five
+toTableRow { author, title, year, acquired, read } =
     rowEmpty
         |> rowCellText (Text.body2 title)
         |> rowCellText (Text.body2 author)
@@ -138,7 +142,8 @@ toTableRow renderConfig { author, title, year, acquired, read } =
         |> rowCellText (Text.caption <| DateInput.toDD_MM_YYYY "/" <| DateInput.fromPosix Time.utc read)
 
 
-toTableDetails { author, title, acquired, read } =
+toTableDetails : Book -> Stateful.Details msg T.Five
+toTableDetails { author, acquired, read } =
     detailsEmpty
         |> detailHidden
         |> detailShown { label = "Author", content = cellFromText <| Text.body2 author }
@@ -163,5 +168,6 @@ toTableDetails { author, title, acquired, read } =
             }
 
 
+toTableCover : Book -> Stateful.Cover
 toTableCover { title, year } =
     { title = title, caption = Just year }

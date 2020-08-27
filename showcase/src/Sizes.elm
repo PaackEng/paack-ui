@@ -1,19 +1,22 @@
 module Sizes exposing (stories)
 
-import Element
+import Element exposing (Element)
 import Element.Background as Background
 import Element.Font as Font
-import Msg as Msg
+import Html exposing (Html)
+import Msg as Msg exposing (Msg)
 import PluginOptions exposing (PluginOptions, defaultWithMenu)
-import UI.Button as Button
-import UI.Icon as Icon
+import UI.Button as Button exposing (ButtonBody)
+import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Palette as Palette
-import UI.Size as Size
+import UI.RenderConfig exposing (RenderConfig)
+import UI.Size as Size exposing (Size)
 import UI.TextField as TextField
 import UIExplorer exposing (storiesOf)
-import Utils exposing (goToDocsCallToAction, iconsSvgSprite, prettifyElmCode)
+import Utils exposing (ExplorerUI, goToDocsCallToAction, iconsSvgSprite, prettifyElmCode)
 
 
+stories : RenderConfig -> ExplorerUI
 stories cfg =
     storiesOf
         "Sizes"
@@ -36,12 +39,14 @@ stories cfg =
         ]
 
 
+icons : List ( String -> Icon, String )
 icons =
     [ ( Icon.close, "Close" )
     , ( Icon.toggle, "Toggle" )
     ]
 
 
+iconView : RenderConfig -> Size -> ( String -> Icon, String ) -> Element msg
 iconView cfg size ( iconFn, label ) =
     Element.column
         [ Background.color Palette.gray.darkest
@@ -61,12 +66,14 @@ iconView cfg size ( iconFn, label ) =
         ]
 
 
+buttons : List ButtonBody
 buttons =
     [ Button.fromLabel "Prompt"
     , Button.fromIcon <| Icon.toggle "Toggle"
     ]
 
 
+buttonView : RenderConfig -> Size -> ButtonBody -> Element Msg
 buttonView cfg size body =
     body
         |> Button.cmd Msg.NoOp Button.primary
@@ -74,6 +81,7 @@ buttonView cfg size body =
         |> Button.renderElement cfg
 
 
+sizeView : RenderConfig -> Size -> Html Msg
 sizeView cfg size =
     [ List.map (iconView cfg size) icons
     , List.map (buttonView cfg size) buttons

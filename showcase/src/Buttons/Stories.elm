@@ -2,18 +2,21 @@ module Buttons.Stories exposing (stories, update)
 
 import Buttons.Model as Buttons
 import Buttons.Msg as Buttons
-import Element exposing (column, fill, row, spacing, text, width)
-import Msg as Msg
+import Element exposing (Element, column, spacing, text)
+import Model exposing (Model)
+import Msg as Msg exposing (Msg)
 import PluginOptions exposing (PluginOptions, defaultWithMenu)
-import Return as R exposing (Return)
-import UI.Button as Button
+import Return exposing (Return)
+import UI.Button as Button exposing (ButtonStyle)
 import UI.Icon as Icon
 import UI.Link as Link
-import UI.RenderConfig as RenderConfig
+import UI.RenderConfig exposing (RenderConfig)
 import UIExplorer exposing (storiesOf)
 import Utils
     exposing
-        ( goToDocsCallToAction
+        ( ExplorerStory
+        , ExplorerUI
+        , goToDocsCallToAction
         , iconsSvgSprite
         , prettifyElmCode
         , story
@@ -29,6 +32,7 @@ update msg model =
             ( { model | demoSwitch = newValue }, Cmd.none )
 
 
+stories : RenderConfig -> ExplorerUI
 stories renderConfig =
     storiesOf
         "Buttons"
@@ -44,6 +48,7 @@ stories renderConfig =
         ]
 
 
+enabledStory : RenderConfig -> String -> ButtonStyle -> String -> ExplorerStory
 enabledStory renderConfig label tone toneStr =
     storyList
         ( label
@@ -55,27 +60,32 @@ enabledStory renderConfig label tone toneStr =
                 |> Button.cmd Msg.NoOp tone
                 |> Button.renderElement renderConfig
           ]
-        , pluginOptions <|
-            """
+        , toneStr |> enabledCode |> pluginOptions
+        )
+
+
+enabledCode : String -> String
+enabledCode toneStr =
+    """
 -- Text
 
 Button.fromLabel "Some Text"
     |> Button.cmd YourMessage """
-                ++ toneStr
-                ++ """
+        ++ toneStr
+        ++ """
     |> Button.renderElement renderConfig
 
 
 -- Icon
 Button.fromIcon Icon.someIcon
     |> Button.cmd YourMessage """
-                ++ toneStr
-                ++ """
+        ++ toneStr
+        ++ """
     |> Button.renderElement renderConfig
 """
-        )
 
 
+disabledButtonStory : RenderConfig -> ExplorerStory
 disabledButtonStory renderConfig =
     storyList
         ( "Disabled"
@@ -88,8 +98,13 @@ disabledButtonStory renderConfig =
                 |> Button.withDisabledIf True
                 |> Button.renderElement renderConfig
           ]
-        , pluginOptions
-            """
+        , pluginOptions disabledButtonCode
+        )
+
+
+disabledButtonCode : String
+disabledButtonCode =
+    """
 -- Text
 
 Button.fromLabel "Some Text"
@@ -103,9 +118,9 @@ Button.fromIcon Icon.someIcon
     |> Button.withDisabledIf True
     |> Button.renderElement renderConfig
 """
-        )
 
 
+primaryStory : RenderConfig -> ExplorerStory
 primaryStory cfg =
     enabledStory cfg
         "Primary"
@@ -113,6 +128,7 @@ primaryStory cfg =
         "Button.primary"
 
 
+dangerStory : RenderConfig -> ExplorerStory
 dangerStory cfg =
     enabledStory cfg
         "Danger"
@@ -120,6 +136,7 @@ dangerStory cfg =
         "Button.danger"
 
 
+successStory : RenderConfig -> ExplorerStory
 successStory renderConfig =
     storyList
         ( "Success"
@@ -132,8 +149,13 @@ successStory renderConfig =
                 |> Button.withSuccessIf True
                 |> Button.renderElement renderConfig
           ]
-        , pluginOptions
-            """
+        , pluginOptions successCode
+        )
+
+
+successCode : String
+successCode =
+    """
 -- Text
 
 Button.fromLabel "Some Text"
@@ -147,9 +169,9 @@ Button.fromIcon Icon.someIcon
     |> Button.withSuccessIf True
     |> Button.renderElement renderConfig
 """
-        )
 
 
+lightStory : RenderConfig -> ExplorerStory
 lightStory cfg =
     enabledStory cfg
         "Light"
@@ -157,6 +179,7 @@ lightStory cfg =
         "Button.light"
 
 
+clearStory : RenderConfig -> ExplorerStory
 clearStory cfg =
     enabledStory cfg
         "Clear"
@@ -164,21 +187,27 @@ clearStory cfg =
         "Button.clear"
 
 
+linkStory : RenderConfig -> ExplorerStory
 linkStory renderConfig =
     story
         ( "Link"
         , Button.fromLabel "Go to Blank"
             |> Button.redirect (Link.link "about:blank") Button.hyperlink
             |> Button.renderElement renderConfig
-        , pluginOptions
-            """
+        , pluginOptions linkCode
+        )
+
+
+linkCode : String
+linkCode =
+    """
 Button.fromLabel "Go to Blank"
     |> Button.redirect (Link.link "about:blank") Button.hyperlink
     |> Button.renderElement renderConfig
 """
-        )
 
 
+fullWidthStory : RenderConfig -> ExplorerStory
 fullWidthStory renderConfig =
     story
         ( "Full Width"
@@ -186,44 +215,52 @@ fullWidthStory renderConfig =
             |> Button.cmd Msg.NoOp Button.primary
             |> Button.withWidth Button.widthFull
             |> Button.renderElement renderConfig
-        , pluginOptions
-            """
+        , pluginOptions fullWidthCode
+        )
+
+
+fullWidthCode : String
+fullWidthCode =
+    """
 Button.fromLabel "Some Text"
     |> Button.cmd YourMessage Button.primary
     |> Button.withWidth Button.widthFull
     |> Button.renderElement renderConfig
 """
+
+
+toggleStory : RenderConfig -> ExplorerStory
+toggleStory renderConfig =
+    storyWithModel
+        ( "Toggle"
+        , toggleView renderConfig
+        , pluginOptions toggleCode
         )
 
 
-toggleStory renderConfig =
-    let
-        msg =
-            Msg.ButtonsStoriesMsg << Buttons.SetDemoSwitch
+toggleView : RenderConfig -> Model -> Element Msg
+toggleView renderConfig { buttonsStories } =
+    Element.column [ Element.spacing 20 ]
+        [ iconsSvgSprite
+        , Button.toggle "Toggle what's there"
+            (Msg.ButtonsStoriesMsg << Buttons.SetDemoSwitch)
+            buttonsStories.demoSwitch
+            |> Button.renderElement renderConfig
+        , Element.text "Click this Button!"
+        , if buttonsStories.demoSwitch then
+            Element.text "Something is active."
 
-        body =
-            \{ buttonsStories } ->
-                Element.column [ Element.spacing 20 ]
-                    [ iconsSvgSprite
-                    , Button.toggle "Toggle what's there" msg buttonsStories.demoSwitch
-                        |> Button.renderElement renderConfig
-                    , Element.text "Click this Button!"
-                    , if buttonsStories.demoSwitch then
-                        Element.text "Something is active."
+          else
+            Element.text "Something is disabled."
+        ]
 
-                      else
-                        Element.text "Something is disabled."
-                    ]
-    in
-    storyWithModel
-        ( "Toggle"
-        , body
-        , pluginOptions
-            """
+
+toggleCode : String
+toggleCode =
+    """
 Button.toggle "Some Hint" YourMessage TrueOrFalse
     |> Button.renderElement renderConfig
 """
-        )
 
 
 pluginOptions : String -> PluginOptions

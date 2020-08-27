@@ -1,12 +1,13 @@
 module LoadingView exposing (stories)
 
-import Element exposing (..)
+import Element exposing (Element, el, fill, height, px, width)
 import PluginOptions exposing (PluginOptions, defaultWithMenu)
-import UI.LoadingView
+import UI.LoadingView as LoadingView
 import UIExplorer exposing (storiesOf)
-import Utils exposing (goToDocsCallToAction, prettifyElmCode, story, storyList)
+import Utils exposing (ExplorerStory, ExplorerUI, goToDocsCallToAction, prettifyElmCode, story)
 
 
+stories : ExplorerUI
 stories =
     storiesOf
         "Loading"
@@ -16,33 +17,37 @@ stories =
         ]
 
 
+smallStory : ExplorerStory
 smallStory =
     story
         ( "Small"
         , viewBase
-            UI.LoadingView.small
+            LoadingView.small
         , pluginOptions "small"
         )
 
 
+mediumStory : ExplorerStory
 mediumStory =
     story
         ( "Medium"
         , viewBase
-            UI.LoadingView.medium
+            LoadingView.medium
         , pluginOptions "medium"
         )
 
 
+largeStory : ExplorerStory
 largeStory =
     story
         ( "Large"
         , viewBase
-            UI.LoadingView.large
+            LoadingView.large
         , pluginOptions "large"
         )
 
 
+viewBase : Element msg -> Element msg
 viewBase content =
     el [ width fill, height (px 300) ] content
 
@@ -50,7 +55,13 @@ viewBase content =
 pluginOptions : String -> PluginOptions
 pluginOptions loadingViewType =
     { defaultWithMenu
-        | code =
-            prettifyElmCode ("LoadingView." ++ loadingViewType)
+        | code = code loadingViewType
         , note = goToDocsCallToAction "LoadingView"
     }
+
+
+code : String -> String
+code loadingViewType =
+    loadingViewType
+        |> (++) "LoadingView."
+        |> prettifyElmCode

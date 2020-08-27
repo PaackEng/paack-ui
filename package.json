@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "Paack's Design System applied over Elm UI",
   "main": "index.js",
-  "directories": {
-    "doc": "docs"
-  },
   "assetsPath": "showcase/public/assets/",
   "scripts": {
     "analyse": "elm-analyse",
