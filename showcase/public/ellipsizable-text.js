@@ -62,37 +62,37 @@ const template = Object.assign(document.createElement('template'), {
       </style>
       <span class="text"></span>
     `,
-})
+});
 
-const runDelayed = window.requestIdleCallback || window.requestAnimationFrame
+const runDelayed = window.requestIdleCallback || window.requestAnimationFrame;
 
 class EllipsizableText extends HTMLElement {
   constructor() {
-    super()
-    this.attachShadow({ mode: 'open' })
-    this.shadowRoot.appendChild(template.content.cloneNode(true))
+    super();
+    this.attachShadow({ mode: 'open' });
+    this.shadowRoot.appendChild(template.content.cloneNode(true));
   }
 
   connectedCallback() {
-    const { textContent } = this
-    const text = this.shadowRoot.querySelector('.text')
+    const { textContent } = this;
+    const text = this.shadowRoot.querySelector('.text');
 
-    text.textContent = textContent
+    text.textContent = textContent;
 
     runDelayed(() => {
       if (text.offsetWidth < text.scrollWidth) {
-        text.setAttribute('tabIndex', 0)
-        text.classList.add('text--overflown')
+        text.setAttribute('tabIndex', 0);
+        text.classList.add('text--overflown');
 
-        const tooltip = text.cloneNode(true)
+        const tooltip = text.cloneNode(true);
 
-        tooltip.setAttribute('tabIndex', 0)
+        tooltip.setAttribute('tabIndex', 0);
 
-        tooltip.className = 'tooltip'
-        this.shadowRoot.appendChild(tooltip)
+        tooltip.className = 'tooltip';
+        this.shadowRoot.appendChild(tooltip);
       }
-    })
+    });
   }
 }
 
-window.customElements.define('ellipsizable-text', EllipsizableText)
+window.customElements.define('ellipsizable-text', EllipsizableText);
