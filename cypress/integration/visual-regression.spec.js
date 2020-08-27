@@ -155,7 +155,7 @@ describe('Percy Snapshots', () => {
     })
 
     it('Creates a snapshot for full-width text field', () => {
-      cy.visit('/#Basics/TextField/Full&20Width')
+      cy.visit('/#Basics/TextField/Full%20Width')
       cy.percySnapshot('Full-width text field')
     })
   })
@@ -220,7 +220,7 @@ describe('Percy Snapshots', () => {
     })
 
     it('Creates the Portion Column Tables page snapshot', () => {
-      cy.visit('/#Complex%20components/Tables/Portion%20Column')
+      cy.visit('/#Complex%20components/Tables/Portion%20Columns')
       cy.percySnapshot('Tables Portion Column')
     })
   })
