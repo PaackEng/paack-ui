@@ -1,6 +1,6 @@
 module UI.Internal.Text exposing (..)
 
-import Element exposing (Attribute, Element, fill, shrink)
+import Element exposing (Attribute, Element, fill)
 import Element.Font as Font
 import Html
 import List
