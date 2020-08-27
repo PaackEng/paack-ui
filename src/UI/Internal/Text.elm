@@ -1,6 +1,6 @@
 module UI.Internal.Text exposing (..)
 
-import Element exposing (Attribute, Element, fill)
+import Element exposing (Attribute, Element, fill, shrink)
 import Element.Font as Font
 import Html
 import List
@@ -363,7 +363,7 @@ setEllipsis val text =
 combinedAttrs : TextOptions -> List (Attribute msg)
 combinedAttrs { ellipsis } =
     if ellipsis then
-        [ Element.width fill, Element.clipX ]
+        [ Element.width fill ]
 
     else
         []
