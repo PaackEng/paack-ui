@@ -3,13 +3,13 @@ const template = Object.assign(document.createElement('template'), {
       <style>
         .text {
           white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          display: block;
         }
   
         .text--overflown {
           cursor: pointer;
-          text-overflow: ellipsis;
-          overflow: hidden;
-          display: block;
         }
   
         .tooltip {
@@ -26,6 +26,7 @@ const template = Object.assign(document.createElement('template'), {
           opacity: 0;
           width: 0;
           clip: rect(0, 0, 0, 0);
+          word-break: break-all;
         }
   
         .tooltip::before {
@@ -79,7 +80,7 @@ class EllipsizableText extends HTMLElement {
     text.textContent = textContent
 
     runDelayed(() => {
-      if (text.offsetWidth > this.parentElement.offsetWidth) {
+      if (text.offsetWidth < text.scrollWidth) {
         text.setAttribute('tabIndex', 0)
         text.classList.add('text--overflown')
 
