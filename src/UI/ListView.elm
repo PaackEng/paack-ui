@@ -200,10 +200,10 @@ Click an element, and it will be selected.
 -}
 selectList :
     (object -> msg)
-    -> (RenderConfig -> Bool -> object -> Element msg)
+    -> (Bool -> object -> Element msg)
     -> ListView object msg
 selectList selectMsg renderItem =
-    SelectList (Properties selectMsg renderItem)
+    SelectList (Properties selectMsg (always renderItem))
         defaultOptions
 
 
@@ -239,7 +239,8 @@ toggleableList config =
             else
                 ToggleableList.defaultRow parentCfg config selected item
     in
-    selectList config.selectMsg toggleableItemView
+    SelectList (Properties config.selectMsg toggleableItemView)
+        defaultOptions
 
 
 
@@ -349,9 +350,7 @@ renderElement cfg (SelectList prop opt) =
                     False
     in
     Element.column
-        [ Border.widthEach { bottom = 0, left = 0, right = 1, top = 0 }
-        , Border.color Palette.gray.lightest
-        , Element.width opt.width
+        [ Element.width opt.width
         , Element.height fill
         , Element.scrollbarY
         ]
