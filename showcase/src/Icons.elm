@@ -64,6 +64,11 @@ icons =
     , ( Icon.seeMore, "seeMore" )
     , ( Icon.warning, "warning" )
     , ( Icon.filter, "filter" )
+    , ( Icon.groups, "groups" )
+    , ( Icon.download, "download" )
+    , ( Icon.expand, "expand" )
+    , ( Icon.collapse, "collapse" )
+    , ( Icon.searchSpace, "searchSpace" )
     ]
 
 

@@ -11,7 +11,7 @@ import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Link as Link exposing (Link)
-import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
+import UI.Palette as Palette exposing (brightnessLight, brightnessMiddle, toneGray, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
@@ -101,7 +101,7 @@ viewHead cfg (Menu.Menu prop _) title maybeStack =
         mobileHeadSandwich =
             sidebarTerms.expand
                 |> Icon.sandwichMenu
-                |> Icon.withSize Size.large
+                |> Icon.withSize Size.medium
                 |> Icon.renderElement cfg
                 |> Element.el (headerButtonAttr (prop.toggleMsg True) 48 20)
 
@@ -200,6 +200,7 @@ headerView cfg toggleMsg logo =
             (cfg |> localeTerms >> .sidebar >> .collapse)
                 |> Icon.close
                 |> Icon.withSize Size.small
+                |> Icon.withColor (Palette.color toneGray brightnessLight)
                 |> Icon.renderElement cfg
                 |> Element.el (headerButtonAttr toggleMsg 40 10)
     in
@@ -214,7 +215,7 @@ slimHeaderView cfg toggleMsg _ =
     Element.column [ height (px (72 + 48)) ]
         [ (cfg |> localeTerms >> .sidebar >> .expand)
             |> Icon.sandwichMenu
-            |> Icon.withSize Size.large
+            |> Icon.withSize Size.small
             |> Icon.renderElement cfg
             |> Element.el (headerButtonAttr toggleMsg 48 14)
         ]
@@ -255,7 +256,7 @@ pagesView cfg pages navExpanded =
 
         spacingAttr =
             if navExpanded then
-                spacing 8
+                spacing 14
 
             else
                 spacing 12
@@ -292,7 +293,7 @@ actionsView cfg actions navExpanded =
                     { top = 0
                     , left = 4
                     , right = 7
-                    , bottom = 8
+                    , bottom = 16
                     }
 
               else
@@ -300,7 +301,7 @@ actionsView cfg actions navExpanded =
                     { top = 0
                     , left = 0
                     , right = 0
-                    , bottom = 8
+                    , bottom = 16
                     }
             ]
 
@@ -347,7 +348,7 @@ pageItem cfg icon link isSelected =
 slimPageItem : RenderConfig -> Icon -> Link -> Bool -> Element msg
 slimPageItem cfg icon link isSelected =
     icon
-        |> Icon.withSize Size.large
+        |> Icon.withSize Size.small
         |> Icon.withColor (slimIconColor isSelected)
         |> Icon.renderElement cfg
         |> Element.el slimIconAttr
@@ -381,7 +382,7 @@ actionItem cfg icon msg =
 slimActionItem : RenderConfig -> Icon -> msg -> Element msg
 slimActionItem cfg icon msg =
     icon
-        |> Icon.withSize Size.large
+        |> Icon.withSize Size.small
         |> Icon.withColor (slimIconColor True)
         |> Icon.renderElement cfg
         |> Element.el
@@ -404,7 +405,6 @@ iconAttr =
 slimIconAttr : List (Attribute msg)
 slimIconAttr =
     [ width (px 48)
-    , paddingXY 0 14
     , Font.center
     ]
 

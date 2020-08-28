@@ -5,6 +5,7 @@ import Element.Events as Events
 import UI.Icon as Icon
 import UI.Internal.Palette as Palette
 import UI.Internal.RenderConfig exposing (localeTerms)
+import UI.Palette as Palette exposing (brightnessLight, toneGray)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
@@ -126,7 +127,8 @@ closeButton : RenderConfig -> msg -> Element msg
 closeButton cfg close =
     (cfg |> localeTerms >> .dialog >> .close)
         |> Icon.close
-        |> Icon.withSize Size.extraSmall
+        |> Icon.withSize Size.small
+        |> Icon.withColor (Palette.color Palette.toneGray Palette.brightnessLight)
         |> Icon.renderElement cfg
         |> Element.el
             (ARIA.toElementAttributes ARIA.roleButton

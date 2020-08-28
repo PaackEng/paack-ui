@@ -661,16 +661,16 @@ iconLayout size =
         paddingXY =
             case size of
                 Size.Large ->
-                    ( (60 - 24) // 2 - border, (60 - 24) // 2 - border )
+                    ( 10 - border, 10 - border )
 
                 Size.Medium ->
-                    ( (48 - 20) // 2 - border, (48 - 20) // 2 - border )
+                    ( 8 - border, 8 - border )
 
                 Size.Small ->
-                    ( (36 - 16) // 2 - border, (36 - 16) // 2 - border )
+                    ( 6 - border, 6 - border )
 
                 Size.ExtraSmall ->
-                    ( (24 - 10) // 2 - border, (24 - 10) // 2 - border )
+                    ( 4 - border, 4 - border )
     in
     ( pairUncurry Element.paddingXY paddingXY
     , Border.width border
