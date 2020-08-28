@@ -2,11 +2,11 @@ module UI.Internal.Text exposing (..)
 
 import Element exposing (Attribute, Element, fill)
 import Element.Font as Font
-import Html
+import Html exposing (Html)
 import List
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.Internal.Palette as Palette
-import UI.Internal.Utils.Element exposing (ellipsisAttrs)
+import UI.Internal.Utils.Element exposing (ellipsisAttrs, overflowVisible)
 import UI.Palette as Palette exposing (brightnessDarkest, toneGray)
 import UI.RenderConfig exposing (RenderConfig, isMobile)
 import UI.Utils.Element as Element
@@ -107,7 +107,7 @@ attributes config size ellipsis color =
 
         heightAttr attrs =
             if ellipsis then
-                oneLineHeight mobile size :: attrs
+                overflowVisible :: oneLineHeight mobile size :: attrs
 
             else
                 attrs
@@ -376,10 +376,17 @@ ellipsizedText cfg size content =
             lineHeight (isMobile cfg) size
     in
     content
-        |> Html.text
+        |> ellipsizableNode
         |> Element.html
         |> Element.el
             (ellipsisAttrs lineHeightSize content)
+
+
+ellipsizableNode : String -> Html msg
+ellipsizableNode content =
+    Html.node "ellipsizable-text"
+        []
+        [ Html.text content ]
 
 
 spanLength : Span -> Int

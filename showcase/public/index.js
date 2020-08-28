@@ -1,6 +1,7 @@
 import { Elm } from './../src/Main.elm';
-import paackSvgIconSprite from 'paack-ui-assets/js/paackSvgIconSprite';
+import 'paack-ui-assets/js/paackSvgIconSprite';
+import 'paack-ui-assets/js/ellipsizableText';
 
-const app = Elm.Main.init({
+Elm.Main.init({
   node: document.getElementById('root'),
 });

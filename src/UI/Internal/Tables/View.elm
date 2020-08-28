@@ -4,7 +4,6 @@ import Element exposing (Attribute, Element, fill, fillPortion, minimum, px, shr
 import Element.Background as Background
 import Element.Border as Border
 import UI.Button as Button
-import UI.Internal.EllipsizableTooltip as EllipsizableTooltip
 import UI.Internal.NArray as NArray
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
@@ -32,7 +31,15 @@ cellContentRender renderConfig cell_ =
 simpleText : RenderConfig -> Text -> Element msg
 simpleText renderConfig text =
     text
-        |> EllipsizableTooltip.view renderConfig
+        |> Text.setEllipsis True
+        |> Text.renderElement renderConfig
+        |> Element.el
+            [ Element.width fill
+            , Element.clipX
+            , Element.paddingXY 8 0
+            , Element.centerY
+            , InternalElement.overflowVisible
+            ]
         |> Element.el
             [ Element.width fill
             , InternalElement.overflowVisible

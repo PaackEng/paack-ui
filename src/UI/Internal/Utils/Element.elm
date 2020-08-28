@@ -18,10 +18,9 @@ tuplesToStyles ( k, v ) =
 
 ellipsisAttrs : Int -> String -> List (Attribute msg)
 ellipsisAttrs lineHeightSize titleContent =
-    [ ( "text-overflow", "ellipsis" )
-    , ( "white-space", "nowrap" )
-    , ( "overflow", "hidden" )
+    [ ( "overflow", "visible" )
     , ( "display", "block" )
+    , ( "white-space", "normal" )
     , ( "line-height", String.fromInt lineHeightSize ++ "px" )
     ]
         |> List.map tuplesToStyles

@@ -22,7 +22,7 @@ someFilters : Stateful.Filters msg Book T.Five
 someFilters =
     Stateful.filtersEmpty
         |> Stateful.localMultiTextFilter [] .title
-        |> Stateful.localMultiTextFilter [ "Dan" ] .author
+        |> Stateful.localMultiTextFilter [] .author
         |> Stateful.localSelectFilter
             [ "Last Decade", "New Millennium", "Old Century" ]
             Nothing
