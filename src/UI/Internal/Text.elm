@@ -363,7 +363,7 @@ setEllipsis val text =
 combinedAttrs : TextOptions -> List (Attribute msg)
 combinedAttrs { ellipsis } =
     if ellipsis then
-        [ Element.width fill, Element.clipX ]
+        [ Element.width fill ]
 
     else
         []
