@@ -5,7 +5,7 @@ import Element.Events as Events
 import UI.Icon as Icon
 import UI.Internal.Palette as Palette
 import UI.Internal.RenderConfig exposing (localeTerms)
-import UI.Palette as Palette exposing (brightnessLight, brightnessMiddle, toneGray, tonePrimary)
+import UI.Palette as Palette exposing (brightnessLight, toneGray)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
