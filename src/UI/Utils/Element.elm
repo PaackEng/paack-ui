@@ -1,7 +1,7 @@
 module UI.Utils.Element exposing
     ( colorSetOpacity, colorTransition
     , desktopMaximum
-    , svg, title, maxHeightVH, maxHeightPct
+    , svg, title, maxHeightVH, maxHeightPct, minHeightVH
     , disabled, onEnterPressed, onIndividualClick
     , RectangleSides, zeroPadding
     )
@@ -21,7 +21,7 @@ module UI.Utils.Element exposing
 
 # HTML features
 
-@docs svg, title, maxHeightVH, maxHeightPct
+@docs svg, title, maxHeightVH, maxHeightPct, minHeightVH
 
 
 # Input
@@ -153,6 +153,16 @@ maxHeightVH value =
 maxHeightPct : Float -> Attribute msg
 maxHeightPct value =
     style "max-height" (String.fromFloat value ++ "%")
+
+
+{-| Wrapper for CSS's `min-height: {{vaue}}vh`.
+
+    Element.el [ Element.minHeightVH 50 ] someChildElement
+
+-}
+minHeightVH : Int -> Attribute msg
+minHeightVH value =
+    style "min-height" (String.fromInt value ++ "vh")
 
 
 {-| Overwrite alpha value in an [`Element.Color`](/packages/mdgriffith/elm-ui/latest/Element#Color).

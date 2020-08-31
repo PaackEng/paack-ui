@@ -170,8 +170,8 @@ anyOptionTag =
     "OPT"
 
 
-mockView : RenderConfig -> Bool -> Whatever -> Element Msg
-mockView _ isSelected { label } =
+mockView : Bool -> Whatever -> Element Msg
+mockView isSelected { label } =
     if isSelected then
         Element.text <| selectedPseudoTag ++ " " ++ label ++ " " ++ anyOptionTag
 
