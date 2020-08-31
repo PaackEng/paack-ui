@@ -92,7 +92,7 @@ import UI.Size as Size
 import UI.Text as Text
 import UI.TextField as TextField
 import UI.Utils.ARIA as ARIA
-import UI.Utils.Element as Element
+import UI.Utils.Element as Element exposing (zeroPadding)
 
 
 type alias Options object msg =
@@ -440,7 +440,7 @@ itemView cfg { select, renderItem } selected obj =
         ([ Events.onClick (select obj)
          , Element.pointer
          , Element.width fill
-         , Border.widthEach { bottom = 1, left = 0, right = 0, top = 0 }
+         , Border.widthEach { zeroPadding | bottom = 1 }
          , Border.color Palette.gray.lightest
          ]
             |> prependIf selected selectedBg
