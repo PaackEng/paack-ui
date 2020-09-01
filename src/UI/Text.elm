@@ -6,9 +6,8 @@ module UI.Text exposing
     , caption, overline
     , multiline, combination
     , withColor
-    , withOverflow
+    , withOverflow, ellipsize, ellipsizeWithTooltip, wrap
     , renderElement
-    , ellipsize, ellipsizeWithTooltip, wrap
     )
 
 {-| `UI.Text` is a component to specify how text to display text. It applies font size, weight, letter-spacing, and color.
@@ -63,7 +62,7 @@ A text can be created and rendered as in the following pipeline:
 
 # Overflow
 
-@docs withOverflow
+@docs withOverflow, ellipsize, ellipsizeWithTooltip, wrap
 
 
 # Rendering
