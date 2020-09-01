@@ -206,7 +206,7 @@ wrap =
     Internal.Wrap
 
 
-{-| Determinines how the text overflow is handled.
+{-| Determines how the text overflow is handled.
 
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         |> Text.heading3
