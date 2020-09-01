@@ -6,7 +6,7 @@ import Html exposing (Html)
 import List
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.Internal.Palette as Palette
-import UI.Internal.Utils.Element exposing (ellipsisAttrs, overflowVisible)
+import UI.Internal.Utils.Element exposing (overflowAttrs, overflowVisible)
 import UI.Palette as Palette exposing (brightnessDarkest, toneGray)
 import UI.RenderConfig exposing (RenderConfig, isMobile)
 import UI.Utils.Element as Element
@@ -22,7 +22,6 @@ type Span
 
 type alias Options =
     { color : TextColor
-    , oneLineEllipsis : Bool
     }
 
 
@@ -33,7 +32,7 @@ type alias SpanProperties =
 
 
 type alias TextOptions =
-    { ellipsis : Bool }
+    { overflow : TextOverflow }
 
 
 type TextSize
@@ -57,6 +56,12 @@ type TextColor
     | ColorInherit
 
 
+type TextOverflow
+    = Ellipsize
+    | EllipsizeWithTooltip
+    | Wrap
+
+
 defaultText : TextSize -> String -> Text
 defaultText size content =
     Text [ Span (SpanProperties content size) spanDefaultOptions ] textDefaultOptions
@@ -65,13 +70,12 @@ defaultText size content =
 spanDefaultOptions : Options
 spanDefaultOptions =
     { color = defaultColor
-    , oneLineEllipsis = False
     }
 
 
 textDefaultOptions : TextOptions
 textDefaultOptions =
-    { ellipsis = False }
+    { overflow = Wrap }
 
 
 defaultColor : TextColor
@@ -92,8 +96,8 @@ fontColor color =
             Nothing
 
 
-attributes : RenderConfig -> TextSize -> Bool -> TextColor -> List (Attribute msg)
-attributes config size ellipsis color =
+attributes : RenderConfig -> TextSize -> TextOverflow -> TextColor -> List (Attribute msg)
+attributes config size overflow color =
     let
         mobile =
             isMobile config
@@ -106,7 +110,7 @@ attributes config size ellipsis color =
                 deskAttributes size
 
         heightAttr attrs =
-            if ellipsis then
+            if shouldEllipsize overflow then
                 overflowVisible :: oneLineHeight mobile size :: attrs
 
             else
@@ -334,13 +338,26 @@ spanMapOptions applier (Span prop opt) =
     Span prop (applier opt)
 
 
-spanRenderEl : RenderConfig -> Span -> Element msg
-spanRenderEl cfg (Span { content, size } { color, oneLineEllipsis }) =
+spanRenderEl : RenderConfig -> TextOptions -> Span -> Element msg
+spanRenderEl cfg { overflow } (Span { content, size } { color }) =
     content
-        |> ifThenElse oneLineEllipsis (ellipsizedText cfg size) Element.text
+        |> renderText cfg overflow size
         |> List.singleton
         |> Element.paragraph
-            (attributes cfg size oneLineEllipsis color)
+            (attributes cfg size overflow color)
+
+
+renderText : RenderConfig -> TextOverflow -> TextSize -> String -> Element msg
+renderText cfg overflow size text =
+    case overflow of
+        Wrap ->
+            Element.text text
+
+        Ellipsize ->
+            ellipsizedText cfg size text
+
+        EllipsizeWithTooltip ->
+            ellipsizedTextWithTooltip cfg size text
 
 
 getSpans : Text -> List Span
@@ -353,33 +370,59 @@ textMapOptions applier (Text spans combo) =
     Text spans (applier combo)
 
 
-setEllipsis : Bool -> Text -> Text
-setEllipsis val text =
-    text
-        |> mapOptions (\opt -> { opt | oneLineEllipsis = val })
-        |> textMapOptions (\opt -> { opt | ellipsis = val })
+withOverflow : TextOverflow -> Text -> Text
+withOverflow overflow text =
+    textMapOptions (\opt -> { opt | overflow = overflow }) text
+
+
+shouldEllipsize : TextOverflow -> Bool
+shouldEllipsize overflow =
+    overflow == Ellipsize || overflow == EllipsizeWithTooltip
 
 
 combinedAttrs : TextOptions -> List (Attribute msg)
-combinedAttrs { ellipsis } =
-    if ellipsis then
+combinedAttrs { overflow } =
+    if shouldEllipsize overflow then
         [ Element.width fill ]
 
     else
         []
 
 
-ellipsizedText : RenderConfig -> TextSize -> String -> Element msg
-ellipsizedText cfg size content =
+ellipsizedTextWith : RenderConfig -> (String -> Html msg) -> List ( String, String ) -> TextSize -> String -> Element msg
+ellipsizedTextWith cfg toHtml attrs size content =
     let
         lineHeightSize =
             lineHeight (isMobile cfg) size
     in
     content
-        |> ellipsizableNode
+        |> toHtml
         |> Element.html
         |> Element.el
-            (ellipsisAttrs lineHeightSize content)
+            (overflowAttrs lineHeightSize attrs content)
+
+
+ellipsizedText : RenderConfig -> TextSize -> String -> Element msg
+ellipsizedText cfg size content =
+    ellipsizedTextWith cfg
+        Html.text
+        [ ( "text-overflow", "ellipsis" )
+        , ( "white-space", "nowrap" )
+        , ( "overflow", "hidden" )
+        ]
+        size
+        content
+
+
+ellipsizedTextWithTooltip : RenderConfig -> TextSize -> String -> Element msg
+ellipsizedTextWithTooltip cfg size content =
+    ellipsizedTextWith cfg
+        ellipsizableNode
+        [ ( "white-space", "normal" )
+        , ( "overflow", "visible" )
+        ]
+        size
+        content
 
 
 ellipsizableNode : String -> Html msg

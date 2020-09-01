@@ -6,7 +6,7 @@ module UI.Text exposing
     , caption, overline
     , multiline, combination
     , withColor
-    , setEllipsis
+    , withOverflow, ellipsize, ellipsizeWithTooltip, wrap
     , renderElement
     )
 
@@ -20,7 +20,7 @@ A text can be created and rendered as in the following pipeline:
         |> Text.body1
         |> Text.withColor
             (Palette.color tonePrimary brightnessDarkest)
-        |> Text.setEllipsis True
+        |> Text.withOverflow ellipsize
         |> Text.renderElement renderConfig
         |> Element.el [ Element.width (px 200) ]
 
@@ -60,9 +60,9 @@ A text can be created and rendered as in the following pipeline:
 @docs withColor
 
 
-# Ellipsis
+# Overflow
 
-@docs setEllipsis
+@docs withOverflow, ellipsize, ellipsizeWithTooltip, wrap
 
 
 # Rendering
@@ -73,7 +73,7 @@ A text can be created and rendered as in the following pipeline:
 
 import Element exposing (Element)
 import List
-import UI.Internal.Text as Internal exposing (TextSize(..), defaultText, mapOptions)
+import UI.Internal.Text as Internal exposing (TextOverflow, TextSize(..), defaultText, mapOptions)
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 
@@ -183,18 +183,40 @@ withColor color text =
     mapOptions (\opt -> { opt | color = Internal.ColorPalette color }) text
 
 
-{-| If `True`, drop the text instead of wrapping it to a new line, append an ellipsis at the end.
+{-| Truncates the text and adds the ellipsis.
+-}
+ellipsize : TextOverflow
+ellipsize =
+    Internal.Ellipsize
+
+
+{-| Truncates the text, adds the ellipsis and displays a tooltip with the whole content.
+-}
+ellipsizeWithTooltip : TextOverflow
+ellipsizeWithTooltip =
+    Internal.EllipsizeWithTooltip
+
+
+{-| Lets the text break lines to prevent overflow.
+Default behavior.
+-}
+wrap : TextOverflow
+wrap =
+    Internal.Wrap
+
+
+{-| Determines how the text overflow is handled.
 
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         |> Text.heading3
-        |> Text.setEllipsis True
+        |> Text.withOverflow ellipsize
         |> Text.renderElement renderConfig
         |> Element.el [ Element.width (px 42) ]
 
 -}
-setEllipsis : Bool -> Text -> Text
-setEllipsis val text =
-    Internal.setEllipsis val text
+withOverflow : TextOverflow -> Text -> Text
+withOverflow overflow text =
+    Internal.withOverflow overflow text
 
 
 {-| End of the builder's life.
@@ -207,10 +229,10 @@ renderElement cfg (Internal.Text spans opt) =
             Element.none
 
         [ theOne ] ->
-            Internal.spanRenderEl cfg theOne
+            Internal.spanRenderEl cfg opt theOne
 
         _ ->
-            List.map (Internal.spanRenderEl cfg) spans
+            List.map (Internal.spanRenderEl cfg opt) spans
                 |> Element.column (Internal.combinedAttrs opt)
 
 
