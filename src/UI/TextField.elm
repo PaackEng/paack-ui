@@ -700,7 +700,7 @@ textAttrs cfg size =
                 Size.ExtraSmall ->
                     Text.SizeCaption
     in
-    Text.attributes cfg textSize False Text.ColorInherit
+    Text.attributes cfg textSize Text.wrap Text.ColorInherit
 
 
 genericAttr : String -> Bool -> Bool -> TextFieldWidth -> Size -> List (Attribute msg)

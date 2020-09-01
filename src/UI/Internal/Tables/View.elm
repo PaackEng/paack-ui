@@ -12,7 +12,7 @@ import UI.Internal.Utils.Element as InternalElement
 import UI.Palette as Palette exposing (brightnessMiddle, toneGray)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Tables.Common as Common exposing (..)
-import UI.Text as Text exposing (Text)
+import UI.Text as Text exposing (Text, ellipsizeWithTooltip)
 
 
 cellContentRender : RenderConfig -> Common.Cell msg -> Element msg
@@ -31,7 +31,7 @@ cellContentRender renderConfig cell_ =
 simpleText : RenderConfig -> Text -> Element msg
 simpleText renderConfig text =
     text
-        |> Text.setEllipsis True
+        |> Text.withOverflow ellipsizeWithTooltip
         |> Text.renderElement renderConfig
         |> Element.el
             [ Element.width fill

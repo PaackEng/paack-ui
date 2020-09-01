@@ -6,8 +6,8 @@ module UI.Text exposing
     , caption, overline
     , multiline, combination
     , withColor
-    , setEllipsis
     , renderElement
+    , ellipsize, ellipsizeWithTooltip, withOverflow, wrap
     )
 
 {-| `UI.Text` is a component to specify how text to display text. It applies font size, weight, letter-spacing, and color.
@@ -73,7 +73,7 @@ A text can be created and rendered as in the following pipeline:
 
 import Element exposing (Element)
 import List
-import UI.Internal.Text as Internal exposing (TextSize(..), defaultText, mapOptions)
+import UI.Internal.Text as Internal exposing (TextOverflow, TextSize(..), defaultText, mapOptions)
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 
@@ -183,6 +183,21 @@ withColor color text =
     mapOptions (\opt -> { opt | color = Internal.ColorPalette color }) text
 
 
+ellipsize : TextOverflow
+ellipsize =
+    Internal.Ellipsize
+
+
+ellipsizeWithTooltip : TextOverflow
+ellipsizeWithTooltip =
+    Internal.EllipsizeWithTooltip
+
+
+wrap : TextOverflow
+wrap =
+    Internal.Wrap
+
+
 {-| If `True`, drop the text instead of wrapping it to a new line, append an ellipsis at the end.
 
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
@@ -192,9 +207,9 @@ withColor color text =
         |> Element.el [ Element.width (px 42) ]
 
 -}
-setEllipsis : Bool -> Text -> Text
-setEllipsis val text =
-    Internal.setEllipsis val text
+withOverflow : TextOverflow -> Text -> Text
+withOverflow overflow text =
+    Internal.withOverflow overflow text
 
 
 {-| End of the builder's life.
@@ -207,10 +222,10 @@ renderElement cfg (Internal.Text spans opt) =
             Element.none
 
         [ theOne ] ->
-            Internal.spanRenderEl cfg theOne
+            Internal.spanRenderEl cfg opt theOne
 
         _ ->
-            List.map (Internal.spanRenderEl cfg) spans
+            List.map (Internal.spanRenderEl cfg opt) spans
                 |> Element.column (Internal.combinedAttrs opt)
 
 

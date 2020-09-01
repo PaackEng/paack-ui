@@ -9,7 +9,7 @@ import UI.Internal.Basics exposing (ifThenElse)
 import UI.Palette as Palette exposing (brightnessDarkest, brightnessLight, brightnessLighter, brightnessLightest, brightnessMiddle, toneGray, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
-import UI.Text as Text
+import UI.Text as Text exposing (ellipsize)
 import UI.Utils.Element exposing (zeroPadding)
 
 
@@ -72,7 +72,7 @@ detailItem renderConfig ( label, content ) =
         [ label
             |> Text.overline
             |> Text.withColor (Palette.color toneGray brightnessLight)
-            |> Text.setEllipsis True
+            |> Text.withOverflow ellipsize
             |> Text.renderElement renderConfig
         , content
         ]
@@ -138,6 +138,6 @@ coverView cfg { title, caption } selected =
                     titleComponent
     in
     captionApplied
-        |> Text.setEllipsis True
+        |> Text.withOverflow ellipsize
         |> Text.renderElement cfg
         |> Element.el [ Element.width fill, Element.clipX ]
