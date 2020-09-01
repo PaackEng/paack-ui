@@ -378,8 +378,7 @@ textMapOptions applier (Text spans combo) =
 
 withOverflow : TextOverflow -> Text -> Text
 withOverflow overflow text =
-    text
-        |> textMapOptions (\opt -> { opt | overflow = overflow })
+    textMapOptions (\opt -> { opt | overflow = overflow }) text
 
 
 shouldEllipsize : TextOverflow -> Bool
