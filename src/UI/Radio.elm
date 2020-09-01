@@ -191,8 +191,8 @@ renderButton : RenderConfig -> msg -> String -> Bool -> Element msg
 renderButton renderConfig message label state =
     let
         radioAttrs =
-            Element.width (px 26)
-                :: Element.height (px 26)
+            Element.width (px 20)
+                :: Element.height (px 20)
                 :: Border.color Palette.primary.middle
                 :: Border.width 2
                 :: Border.rounded 8

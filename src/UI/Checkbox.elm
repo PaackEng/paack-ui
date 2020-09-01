@@ -183,13 +183,13 @@ pxSize : Size -> Int
 pxSize size =
     case size of
         Size.ExtraSmall ->
-            16
+            10
 
         Size.Small ->
-            20
+            16
 
         Size.Medium ->
-            26
+            20
 
         Size.Large ->
-            32
+            26

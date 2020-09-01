@@ -33,6 +33,13 @@ title value =
         |> Element.htmlAttribute
 
 
+dialogWidthAttrs : List (Attribute msg)
+dialogWidthAttrs =
+    [ tuplesToStyles ( "width", "min-content" )
+    , tuplesToStyles ( "min-width", "100%" )
+    ]
+
+
 overlayBackground : msg -> Element msg
 overlayBackground onClickMsg =
     Element.el
