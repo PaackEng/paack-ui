@@ -6,8 +6,9 @@ module UI.Text exposing
     , caption, overline
     , multiline, combination
     , withColor
+    , withOverflow
     , renderElement
-    , ellipsize, ellipsizeWithTooltip, withOverflow, wrap
+    , ellipsize, ellipsizeWithTooltip, wrap
     )
 
 {-| `UI.Text` is a component to specify how text to display text. It applies font size, weight, letter-spacing, and color.
@@ -20,7 +21,7 @@ A text can be created and rendered as in the following pipeline:
         |> Text.body1
         |> Text.withColor
             (Palette.color tonePrimary brightnessDarkest)
-        |> Text.setEllipsis True
+        |> Text.withOverflow ellipsize
         |> Text.renderElement renderConfig
         |> Element.el [ Element.width (px 200) ]
 
@@ -60,9 +61,9 @@ A text can be created and rendered as in the following pipeline:
 @docs withColor
 
 
-# Ellipsis
+# Overflow
 
-@docs setEllipsis
+@docs withOverflow
 
 
 # Rendering
@@ -183,26 +184,33 @@ withColor color text =
     mapOptions (\opt -> { opt | color = Internal.ColorPalette color }) text
 
 
+{-| Truncates the text and adds the ellipsis.
+-}
 ellipsize : TextOverflow
 ellipsize =
     Internal.Ellipsize
 
 
+{-| Truncates the text, adds the ellipsis and displays a tooltip with the whole content.
+-}
 ellipsizeWithTooltip : TextOverflow
 ellipsizeWithTooltip =
     Internal.EllipsizeWithTooltip
 
 
+{-| Lets the text break lines to prevent overflow.
+Default behavior.
+-}
 wrap : TextOverflow
 wrap =
     Internal.Wrap
 
 
-{-| If `True`, drop the text instead of wrapping it to a new line, append an ellipsis at the end.
+{-| Determinines how the text overflow is handled.
 
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         |> Text.heading3
-        |> Text.setEllipsis True
+        |> Text.withOverflow ellipsize
         |> Text.renderElement renderConfig
         |> Element.el [ Element.width (px 42) ]
 
