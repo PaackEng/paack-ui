@@ -16,8 +16,8 @@ tuplesToStyles ( k, v ) =
     Element.htmlAttribute <| HtmlAttrs.style k v
 
 
-oveflowAttrs : Int -> List ( String, String ) -> String -> List (Attribute msg)
-oveflowAttrs lineHeightSize attrs titleContent =
+overflowAttrs : Int -> List ( String, String ) -> String -> List (Attribute msg)
+overflowAttrs lineHeightSize attrs titleContent =
     attrs
         |> (::) ( "line-height", String.fromInt lineHeightSize ++ "px" )
         |> List.map tuplesToStyles

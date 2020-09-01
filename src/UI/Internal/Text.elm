@@ -6,7 +6,7 @@ import Html exposing (Html)
 import List
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.Internal.Palette as Palette
-import UI.Internal.Utils.Element exposing (oveflowAttrs, overflowVisible)
+import UI.Internal.Utils.Element exposing (overflowAttrs, overflowVisible)
 import UI.Palette as Palette exposing (brightnessDarkest, toneGray)
 import UI.RenderConfig exposing (RenderConfig, isMobile)
 import UI.Utils.Element as Element
@@ -360,7 +360,7 @@ renderText cfg overflow size text =
             ellipsizedTextWith cfg
                 ellipsizableNode
                 [ ( "white-space", "normal" )
-                , ( "oveflow", "visible" )
+                , ( "overflow", "visible" )
                 ]
                 size
                 text
@@ -405,7 +405,7 @@ ellipsizedTextWith cfg toHtml attrs size content =
         |> toHtml
         |> Element.html
         |> Element.el
-            (oveflowAttrs lineHeightSize attrs content)
+            (overflowAttrs lineHeightSize attrs content)
 
 
 ellipsizedText : RenderConfig -> TextSize -> String -> Element msg
@@ -414,7 +414,7 @@ ellipsizedText cfg size content =
         Html.text
         [ ( "text-overflow", "ellipsis" )
         , ( "white-space", "nowrap" )
-        , ( "oveflow", "hidden" )
+        , ( "overflow", "hidden" )
         ]
         size
         content
