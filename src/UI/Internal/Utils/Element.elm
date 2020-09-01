@@ -19,10 +19,8 @@ tuplesToStyles ( k, v ) =
 overflowAttrs : Int -> List ( String, String ) -> String -> List (Attribute msg)
 overflowAttrs lineHeightSize attrs titleContent =
     attrs
-        |> (++)
-            [ ( "display", "block" )
-            , ( "line-height", String.fromInt lineHeightSize ++ "px" )
-            ]
+        |> (::) ( "display", "block" )
+        |> (::) ( "line-height", String.fromInt lineHeightSize ++ "px" )
         |> List.map tuplesToStyles
         |> (::) Element.clip
         |> (::) (title titleContent)
