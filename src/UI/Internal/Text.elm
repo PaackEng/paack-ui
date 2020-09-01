@@ -357,13 +357,7 @@ renderText cfg overflow size text =
             ellipsizedText cfg size text
 
         EllipsizeWithTooltip ->
-            ellipsizedTextWith cfg
-                ellipsizableNode
-                [ ( "white-space", "normal" )
-                , ( "overflow", "visible" )
-                ]
-                size
-                text
+            ellipsizedTextWithTooltip cfg size text
 
 
 getSpans : Text -> List Span
@@ -415,6 +409,17 @@ ellipsizedText cfg size content =
         [ ( "text-overflow", "ellipsis" )
         , ( "white-space", "nowrap" )
         , ( "overflow", "hidden" )
+        ]
+        size
+        content
+
+
+ellipsizedTextWithTooltip : RenderConfig -> TextSize -> String -> Element msg
+ellipsizedTextWithTooltip cfg size content =
+    ellipsizedTextWith cfg
+        ellipsizableNode
+        [ ( "white-space", "normal" )
+        , ( "overflow", "visible" )
         ]
         size
         content
