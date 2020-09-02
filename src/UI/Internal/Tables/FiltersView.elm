@@ -1,5 +1,7 @@
 module UI.Internal.Tables.FiltersView exposing (Config, header, headerSelectToggle)
 
+-- WARNING: Don't use any other Size.* beyond "contextSize"
+
 import Array exposing (Array)
 import Element exposing (Attribute, Element, fill, px, shrink)
 import Element.Background as Background
@@ -94,7 +96,7 @@ header renderConfig filter config =
 headerSelectToggle : RenderConfig -> msg -> Element msg
 headerSelectToggle renderConfig toggleMsg =
     Icon.check ""
-        |> Icon.withSize Size.small
+        |> Icon.withSize contextSize
         |> Icon.renderElement renderConfig
         |> Element.el
             (Element.onIndividualClick toggleMsg
@@ -221,12 +223,12 @@ filterEditingButton renderConfig applyMsg clearMsg applied current =
         clearBtn =
             Button.fromLabel filtersTerms.clear
                 |> Button.cmd clearMsg Button.danger
-                |> Button.withSize Size.extraSmall
+                |> Button.withSize contextSize
 
         applyBtn =
             Button.fromLabel filtersTerms.apply
                 |> Button.cmd applyMsg Button.primary
-                |> Button.withSize Size.extraSmall
+                |> Button.withSize contextSize
 
         disabledBtn =
             applyBtn |> Button.withDisabledIf True
@@ -337,7 +339,7 @@ singleTextFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
     editable
         |> Filters.editableWithDefault ""
         |> TextField.singlelineText editMsg label
-        |> TextField.withSize Size.extraSmall
+        |> TextField.withSize contextSize
         |> TextField.withWidth TextField.widthFull
         |> TextField.withOnEnterPressed applyMsg
         |> TextField.renderElement renderConfig
@@ -358,7 +360,7 @@ multiTextFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } edi
         rowField subIndex line =
             line
                 |> TextField.singlelineText (editMsg subIndex) label
-                |> TextField.withSize Size.extraSmall
+                |> TextField.withSize contextSize
                 |> TextField.withWidth TextField.widthFull
                 |> TextField.withOnEnterPressed applyMsg
                 |> TextField.renderElement renderConfig
@@ -503,7 +505,7 @@ dateInput cfg applyMsg editMsg placeholder label current =
     current
         |> DateInput.toTextField cfg Filters.dateSeparator editMsg label
         |> TextField.withPlaceholder placeholder
-        |> TextField.withSize Size.extraSmall
+        |> TextField.withSize contextSize
         |> TextField.withWidth TextField.widthFull
         |> TextField.withOnEnterPressed applyMsg
 
