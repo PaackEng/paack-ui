@@ -114,7 +114,7 @@ headerNormal renderConfig openMsg label =
     Element.row (Element.onIndividualClick openMsg :: headerAttrs False)
         [ headerText renderConfig label
         , Icon.filter label
-            |> Icon.withSize size
+            |> Icon.withSize contextSize
             |> Icon.renderElement renderConfig
             |> Element.el [ Element.alignRight ]
         ]
@@ -127,7 +127,7 @@ headerApplied renderConfig openMsg clearMsg clearHint label =
         [ headerText renderConfig label
         , Button.fromIcon (Icon.close clearHint)
             |> Button.cmd clearMsg Button.primary
-            |> Button.withSize Size.ExtraSmall
+            |> Button.withSize contextSize
             |> Button.renderElement renderConfig
             |> Element.el [ Element.alignRight ]
         ]
@@ -182,7 +182,7 @@ headerAttrs isApplied =
                 ]
                     ++ Element.colorTransition 100
     in
-    [ Primitives.roundedBorders size
+    [ Primitives.roundedBorders contextSize
     , Element.width Element.fill
     , paddingXY
     , Element.spacing 8
@@ -194,14 +194,18 @@ headerAttrs isApplied =
         ++ workingTheme
 
 
+
+-- Standard size used for headers
+
+
 textSize : Int
 textSize =
     12
 
 
-size : Size
-size =
-    Size.Small
+contextSize : Size
+contextSize =
+    Size.ExtraSmall
 
 
 
@@ -257,7 +261,7 @@ filteredHeaderLabel : String -> Element msg
 filteredHeaderLabel label =
     label
         |> Element.text
-        |> Element.el [ Font.bold, Font.size 12 ]
+        |> Element.el [ Font.bold, Font.size textSize ]
 
 
 dialogClose : RenderConfig -> msg -> Element msg
@@ -265,14 +269,13 @@ dialogClose renderConfig message =
     (renderConfig |> localeTerms >> .filters >> .close)
         |> Icon.close
         |> Icon.withColor (Palette.color Palette.toneGray Palette.brightnessLight)
-        |> Icon.withSize Size.extraSmall
+        |> Icon.withSize contextSize
         |> Icon.renderElement renderConfig
         |> Element.el
             (ARIA.toElementAttributes ARIA.roleButton
                 ++ [ Events.onClick message
                    , Element.pointer
                    , Element.centerY
-                   , Element.paddingXY 3 3
                    , Element.height shrink
                    , Element.alignRight
                    ]
