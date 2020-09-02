@@ -16,7 +16,7 @@ import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.Size as Size exposing (Size)
 import UI.Internal.Tables.Filters as Filters
 import UI.Internal.Text as Text
-import UI.Internal.Utils.Element exposing (overlay, zIndex)
+import UI.Internal.Utils.Element exposing (overlay, tuplesToStyles, zIndex)
 import UI.Palette as Palette
 import UI.Radio as Radio
 import UI.RenderConfig exposing (RenderConfig)
@@ -297,11 +297,12 @@ dialog renderConfig config filter clearMsg applyMsg content =
     in
     overlay config.discardMsg <|
         Element.column
-            [ Element.width fill
-            , zIndex 9
+            [ zIndex 9
             , Element.alignTop
             , Palette.mainBackground
             , Primitives.defaultRoundedBorders
+            , tuplesToStyles ( "min-width", "100%" )
+            , tuplesToStyles ( "width", "min-content" )
             ]
             [ dialogHeader renderConfig config.discardMsg config.label
             , Element.column

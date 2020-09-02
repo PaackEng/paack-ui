@@ -169,7 +169,6 @@ import UI.Internal.Tables.FiltersView as FiltersView
 import UI.Internal.Tables.View exposing (..)
 import UI.ListView as ListView
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
-import UI.Size as Size
 import UI.Tables.Common as Common exposing (..)
 import UI.Utils.TypeNumbers as T
 
@@ -1155,7 +1154,6 @@ selectionCell renderConfig selection item =
         |> internalIsSelected selection
         |> checkbox "Select row" (SelectionSet item)
         |> Checkbox.withLabelVisible False
-        |> Checkbox.withSize Size.small
         |> Checkbox.renderElement renderConfig
         |> Element.el
             [ Element.centerX, Element.centerY ]

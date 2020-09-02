@@ -1,7 +1,6 @@
 module UI.Checkbox exposing
     ( Checkbox, checkbox
     , withLabelVisible
-    , withSize
     , renderElement
     )
 
@@ -43,7 +42,6 @@ import Element.Events as Events
 import UI.Icon as Icon
 import UI.Internal.Palette as Palette
 import UI.Internal.RenderConfig exposing (localeTerms)
-import UI.Internal.Size as Size exposing (Size)
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
@@ -66,7 +64,6 @@ type alias Properties msg =
 
 type alias Options =
     { labelVisible : Bool
-    , size : Size
     }
 
 
@@ -80,7 +77,7 @@ type alias Options =
 checkbox : String -> (Bool -> msg) -> Bool -> Checkbox msg
 checkbox label message state =
     Checkbox { message = message, label = label, state = state }
-        { labelVisible = True, size = Size.default }
+        { labelVisible = True }
 
 
 {-| Show or hide the checkbox's label.
@@ -93,34 +90,15 @@ withLabelVisible bool (Checkbox prop opt) =
     Checkbox prop { opt | labelVisible = bool }
 
 
-{-| With `Checkbox.withSize`, you'll be able to scale the box between the [standard sizes][size].
-
-[size]: UI-Size
-
-The sizes (in height) are: Large - 32px; Medium - 26px; Small - 20px; Extra Small - 16px.
-
-    TextField.withSize Size.large someField
-
-**NOTE**: Checkbox's default size is [`Size.medium`](UI-Size#medium)
-
--}
-withSize : Size -> Checkbox msg -> Checkbox msg
-withSize size (Checkbox prop opt) =
-    Checkbox prop { opt | size = size }
-
-
 {-| End of the builder's life.
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
 renderElement : RenderConfig -> Checkbox msg -> Element msg
-renderElement renderConfig (Checkbox { message, label, state } { labelVisible, size }) =
+renderElement renderConfig (Checkbox { message, label, state } { labelVisible }) =
     let
-        sizeSide =
-            pxSize size
-
         boxAttrs =
-            [ Element.width (px sizeSide)
-            , Element.height (px sizeSide)
+            [ Element.width (px 20)
+            , Element.height (px 20)
             , Border.color Palette.primary.middle
             , Border.width 2
             , Border.rounded 8
@@ -177,19 +155,3 @@ boxCheck renderConfig =
             [ Element.centerY
             , Element.centerX
             ]
-
-
-pxSize : Size -> Int
-pxSize size =
-    case size of
-        Size.ExtraSmall ->
-            16
-
-        Size.Small ->
-            20
-
-        Size.Medium ->
-            26
-
-        Size.Large ->
-            32
