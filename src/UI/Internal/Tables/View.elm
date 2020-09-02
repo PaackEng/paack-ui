@@ -3,6 +3,7 @@ module UI.Internal.Tables.View exposing (..)
 import Element exposing (Attribute, Element, fill, fillPortion, minimum, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
+import Element.Keyed as Keyed
 import UI.Button as Button
 import UI.Internal.NArray as NArray
 import UI.Internal.Palette as Palette
@@ -56,29 +57,35 @@ widthToEl width =
             px int
 
 
-rowRender : RenderConfig -> ToRow msg item columns -> List Column -> item -> List (Element msg)
+rowRender : RenderConfig -> ToRow msg item columns -> List Column -> item -> ( String, List ( String, Element msg ) )
 rowRender renderConfig toRow columns item =
     toRow item
-        |> NArray.toList
-        |> List.map2 (cellRender renderConfig) columns
+        |> Tuple.mapSecond
+            (NArray.toList
+                >> List.map2 (cellRender renderConfig) columns
+            )
 
 
-rowBox : List (Element msg) -> Element msg
-rowBox cells =
-    Element.row
+rowBox : ( String, List ( String, Element msg ) ) -> ( String, Element msg )
+rowBox ( key, cells ) =
+    ( "#" ++ key
+    , Keyed.row
         [ Element.spacing 8
         , Primitives.defaultRoundedBorders
         , Element.width fill
         , Element.mouseOver [ Background.color Palette.gray.lightest ]
         ]
         cells
+    )
 
 
-cellRender : RenderConfig -> Column -> Common.Cell msg -> Element msg
-cellRender renderConfig (Column _ { width }) cell =
-    cell
+cellRender : RenderConfig -> Column -> Common.Cell msg -> ( String, Element msg )
+cellRender renderConfig (Column label { width }) cell =
+    ( "#" ++ label
+    , cell
         |> cellContentRender renderConfig
         |> cellSpace width
+    )
 
 
 cellSpace : Common.ColumnWidth -> Element msg -> Element msg

@@ -156,6 +156,7 @@ TODO: withRemoteSelection
 -}
 
 import Element exposing (Element, fill, px, shrink)
+import Element.Keyed as Keyed
 import Set exposing (Set)
 import Time
 import UI.Checkbox as Checkbox exposing (checkbox)
@@ -1020,7 +1021,7 @@ desktopView renderConfig prop opt =
                 columns
                 selectionHeader
     in
-    Element.column
+    Keyed.column
         [ Element.spacing 2
         , Element.width opt.width
         , Element.paddingEach padding
@@ -1065,15 +1066,19 @@ rowWithSelection :
     -> ToRow msg item columns
     -> List Column
     -> item
-    -> Element msg
+    -> ( String, Element msg )
 rowWithSelection renderConfig msgMap state toRow columns item =
     rowBox <|
         case state.localSelection of
             Just selection ->
-                rowRender renderConfig toRow columns item
-                    |> (::)
-                        (selectionCell renderConfig selection item
-                            |> Element.map msgMap
+                item
+                    |> rowRender renderConfig toRow columns
+                    |> Tuple.mapSecond
+                        ((::)
+                            (item
+                                |> selectionCell renderConfig selection
+                                |> Tuple.mapSecond (Element.map msgMap)
+                            )
                         )
 
             Nothing ->
@@ -1087,9 +1092,10 @@ headersRender :
     -> Maybe (Filters.Filters msg item columns)
     -> List Column
     -> Maybe (Element msg)
-    -> Element msg
+    -> ( String, Element msg )
 headersRender renderConfig toExternalMsg selected filters columns selectionHeader =
-    Element.row headersAttr <|
+    ( "@headers"
+    , Element.row headersAttr <|
         case filters of
             Just filterArr ->
                 filterArr
@@ -1106,6 +1112,7 @@ headersRender renderConfig toExternalMsg selected filters columns selectionHeade
                             |> cellSpace width
                     )
                     columns
+    )
 
 
 filterHeader :
@@ -1148,7 +1155,7 @@ internalIsSelected { identifier, checks } item =
                 |> not
 
 
-selectionCell : RenderConfig -> Selection item -> item -> Element (Msg item)
+selectionCell : RenderConfig -> Selection item -> item -> ( String, Element (Msg item) )
 selectionCell renderConfig selection item =
     item
         |> internalIsSelected selection
@@ -1159,3 +1166,4 @@ selectionCell renderConfig selection item =
             [ Element.centerX, Element.centerY ]
         |> Element.el
             [ Element.width (px 32), Element.height fill ]
+        |> Tuple.pair "@select"
