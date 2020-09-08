@@ -45,6 +45,6 @@
     "source-directories": [
         "src",
         "showcase/src",
-		"tests"
+        "tests"
     ]
 }
