@@ -10,7 +10,6 @@ module Tests.Utils.ExtraSelectors exposing
     )
 
 import Html.Attributes as HtmlAttrs
-import Test.Html.Query as Query
 import Test.Html.Selector as Selector
 
 

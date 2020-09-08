@@ -44,6 +44,7 @@
     },
     "source-directories": [
         "src",
-        "showcase/src"
+        "showcase/src",
+		"tests"
     ]
 }

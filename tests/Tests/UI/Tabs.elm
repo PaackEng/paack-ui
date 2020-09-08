@@ -2,7 +2,7 @@ module Tests.UI.Tabs exposing (tests)
 
 import Expect exposing (Expectation)
 import Html.Attributes as HtmlAttr
-import Test exposing (..)
+import Test exposing (Test, describe, test)
 import Test.Html.Event as Event
 import Test.Html.Query as Query
 import Test.Html.Selector as Selector
@@ -24,6 +24,7 @@ type SelectTab
     | TabFive
 
 
+tests : Test
 tests =
     describe "UI.Tabs"
         [ tabindexTests

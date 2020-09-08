@@ -1,14 +1,12 @@
 module Tests.UI.TextField exposing (tests)
 
 import Element exposing (Element)
-import Element.Events as Events
 import Fuzz
-import Html.Attributes
-import Test exposing (..)
+import Test exposing (Test, describe, fuzz, test)
 import Test.Html.Event as Event
 import Test.Html.Query as Query
 import Test.Html.Selector as Selector
-import Tests.Utils.Element exposing (elementToHtml, hasIconInside)
+import Tests.Utils.Element exposing (elementToHtml)
 import Tests.Utils.ExtraEvents as ExtraEvents
 import Tests.Utils.ExtraSelectors as ExtraSelectors
 import Tests.Utils.RenderConfig exposing (desktopWindowConfig)
@@ -20,6 +18,7 @@ type Msg
     | OnEnterPressed
 
 
+tests : Test
 tests =
     describe "UI.TextField"
         [ labelTests
