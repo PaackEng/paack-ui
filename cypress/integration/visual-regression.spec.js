@@ -8,23 +8,8 @@ describe('Percy Snapshots', () => {
 
   describe('Sizes', () => {
     it('Creates a snapshot of large size', () => {
-      cy.visit('/#Styles/Sizes/Large')
-      cy.percySnapshot('Large size')
-    })
-
-    it('Creates a snapshot of medium size', () => {
-      cy.visit('/#Styles/Sizes/Medium')
-      cy.percySnapshot('Medium size')
-    })
-
-    it('Creates a snapshot of small size', () => {
-      cy.visit('/#Styles/Sizes/Small')
-      cy.percySnapshot('Small size')
-    })
-
-    it('Creates a snapshot of medium size', () => {
-      cy.visit('/#Styles/Sizes/ExtraSmall')
-      cy.percySnapshot('Extra small size')
+      cy.visit('/#Styles/Sizes/United')
+      cy.percySnapshot('All sizes')
     })
   })
 
@@ -44,138 +29,32 @@ describe('Percy Snapshots', () => {
 
   describe('Buttons', () => {
     it('Creates a snapshot for primary variation of a button', () => {
-      cy.visit('/#Basics/Buttons/Primary')
-      cy.percySnapshot('Primary button')
-    })
-
-    it('Creates a snapshot for disabled variation of a button', () => {
-      cy.visit('/#Basics/Buttons/Disabled')
-      cy.percySnapshot('Disabled button')
-    })
-
-    it('Creates a snapshot for success variation of a button', () => {
-      cy.visit('/#Basics/Buttons/Success')
-      cy.percySnapshot('Success button')
-    })
-
-    it('Creates a snapshot for danger variation of a button', () => {
-      cy.visit('/#Basics/Buttons/Danger')
-      cy.percySnapshot('Danger button')
-    })
-
-    it('Creates a snapshot for light variation of a button', () => {
-      cy.visit('/#Basics/Buttons/Light')
-      cy.percySnapshot('Light button')
-    })
-
-    it('Creates a snapshot for clear variation of a button', () => {
-      cy.visit('/#Basics/Buttons/Clear')
-      cy.percySnapshot('Clear button')
-    })
-
-    it('Creates a snapshot for link variation of a button', () => {
-      cy.visit('/#Basics/Buttons/Link')
-      cy.percySnapshot('Link button')
-    })
-
-    it('Creates a snapshot for full-width variation of a button', () => {
-      cy.visit('/#Basics/Buttons/Full%20Width')
-      cy.percySnapshot('Full-width button')
-    })
-
-    it('Creates a snapshot for toggle variation of a button', () => {
-      cy.visit('/#Basics/Buttons/Toggle')
-      cy.percySnapshot('Toggle button')
+      cy.visit('/#Basics/Buttons/United')
+      cy.percySnapshot('All buttons')
     })
   })
 
   describe('Alerts', () => {
     it('Creates a snapshot for primary variation of an alert', () => {
-      cy.visit('/#Basics/Alerts/Primary')
-      cy.percySnapshot('Primary alert')
-    })
-
-    it('Creates a snapshot for success variation of an alert', () => {
-      cy.visit('/#Basics/Alerts/Success')
-      cy.percySnapshot('Success alert')
-    })
-
-    it('Creates a snapshot for warning variation of an alert', () => {
-      cy.visit('/#Basics/Alerts/Warning')
-      cy.percySnapshot('Warning alert')
-    })
-
-    it('Creates a snapshot for danger variation of an alert', () => {
-      cy.visit('/#Basics/Alerts/Danger')
-      cy.percySnapshot('Danger alert')
+      cy.visit('/#Basics/Alerts/United')
+      cy.percySnapshot('All alerts')
     })
   })
 
   describe('Badges', () => {
     it('Creates a snapshot for gray variation of a badge', () => {
-      cy.visit('/#Basics/Badges/Badge%20gray')
-      cy.percySnapshot('Badge gray')
-    })
-
-    it('Creates a snapshot for primary variation of a badge', () => {
-      cy.visit('/#Basics/Badges/Badge%20primary')
-      cy.percySnapshot('Badge primary')
-    })
-
-    it('Creates a snapshot for warning variation of a badge', () => {
-      cy.visit('/#Basics/Badges/Badge%20warning')
-      cy.percySnapshot('Badge warning')
-    })
-
-    it('Creates a snapshot for danger variation of a badge', () => {
-      cy.visit('/#Basics/Badges/Badge%20danger')
-      cy.percySnapshot('Badge danger')
-    })
-
-    it('Creates a snapshot for success variation of a badge', () => {
-      cy.visit('/#Basics/Badges/Badge%20success')
-      cy.percySnapshot('Badge success')
+      cy.visit('/#Basics/Badges/United')
+      cy.percySnapshot('All badge')
     })
   })
 
   describe('Text fields', () => {
     it('Creates a snapshot for default text field', () => {
-      cy.visit('/#Basics/TextField/Default')
-      cy.percySnapshot('Default text field')
-    })
-
-    it('Creates a snapshot for username text field', () => {
-      cy.visit('/#Basics/TextField/Username')
-      cy.percySnapshot('Username text field')
-    })
-
-    it('Creates a snapshot for password text field', () => {
-      cy.visit('/#Basics/TextField/Password')
-      cy.percySnapshot('Password text field')
-    })
-
-    it('Creates a snapshot for full-width text field', () => {
-      cy.visit('/#Basics/TextField/Full%20Width')
-      cy.percySnapshot('Full-width text field')
+      cy.visit('/#Basics/TextField/United')
+      cy.percySnapshot('All text fields')
     })
   })
 
-  describe('Loading spinners', () => {
-    it('creates a snapshot for small loading spinners', () => {
-      cy.visit('/#Basics/Loading/Small')
-      cy.percySnapshot('Small loading spinner')
-    })
-
-    it('creates a snapshot for medium loading spinners', () => {
-      cy.visit('/#Basics/Loading/Medium')
-      cy.percySnapshot('Medium loading spinner')
-    })
-
-    it('creates a snapshot for large loading spinners', () => {
-      cy.visit('/#Basics/Loading/Large')
-      cy.percySnapshot('Large loading spinner')
-    })
-  })
 
   describe('Checkboxes', () => {
     it('Creates the Checkboxes page snapshot', () => {

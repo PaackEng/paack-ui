@@ -1,6 +1,6 @@
 module Alerts exposing (stories)
 
-import Element exposing (Element)
+import Element exposing (Element, fill)
 import PluginOptions exposing (PluginOptions, defaultWithMenu)
 import UI.Alert as Alert
 import UI.RenderConfig exposing (RenderConfig)
@@ -16,6 +16,7 @@ stories renderConfig =
         , successStory renderConfig
         , warningStory renderConfig
         , dangerStory renderConfig
+        , unitedStory renderConfig
         ]
 
 
@@ -55,6 +56,20 @@ dangerStory renderConfig =
         )
 
 
+unitedStory : RenderConfig -> ExplorerStory
+unitedStory renderConfig =
+    story
+        ( "United"
+        , Element.column [ Element.width fill, Element.spacing 8 ]
+            [ alert Alert.primary renderConfig
+            , alert Alert.success renderConfig
+            , alert Alert.warning renderConfig
+            , alert Alert.danger renderConfig
+            ]
+        , defaultWithMenu
+        )
+
+
 alert : (String -> Alert.Alert msg) -> RenderConfig -> Element msg
 alert alertFn renderConfig =
     alertFn "Lorem ipsum dolor sit amet."
@@ -71,9 +86,9 @@ pluginOptions alertType =
 
 code : String -> String
 code alertType =
-    prettifyElmCode """
-Alert."""
-        ++ alertType
-        ++ """"Hey I just met you"
+    prettifyElmCode <|
+        """Alert."""
+            ++ alertType
+            ++ """ "Hey I just met you"
     |> Alert.toEl
 """

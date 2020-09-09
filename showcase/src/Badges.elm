@@ -1,10 +1,11 @@
 module Badges exposing (stories)
 
+import Element exposing (Element)
 import PluginOptions exposing (defaultWithMenu)
 import UI.Badge as Badge exposing (Badge)
 import UI.RenderConfig exposing (RenderConfig)
 import UIExplorer exposing (storiesOf)
-import Utils exposing (ExplorerStory, ExplorerUI, goToDocsCallToAction, prettifyElmCode, storyList)
+import Utils exposing (ExplorerStory, ExplorerUI, goToDocsCallToAction, prettifyElmCode, story, storyList)
 
 
 stories : RenderConfig -> ExplorerUI
@@ -16,6 +17,7 @@ stories cfg =
         , oneBadge cfg Badge.warningLight Badge.warningDark "warning"
         , oneBadge cfg Badge.dangerLight Badge.dangerDark "danger"
         , oneBadge cfg Badge.successLight Badge.successDark "success"
+        , allBadge cfg
         ]
 
 
@@ -39,14 +41,40 @@ oneBadge cfg constructorLight constructorDark variation =
         )
 
 
+allBadge : RenderConfig -> ExplorerStory
+allBadge cfg =
+    story
+        ( "United"
+        , [ [ Badge.primaryLight, Badge.primaryDark ]
+          , [ Badge.warningLight, Badge.warningDark ]
+          , [ Badge.dangerLight, Badge.dangerDark ]
+          , [ Badge.successLight, Badge.successDark ]
+          ]
+            |> List.map (uniteVariation cfg)
+            |> Element.column [ Element.spacing 8 ]
+        , defaultWithMenu
+        )
+
+
+uniteVariation : RenderConfig -> List (String -> Badge) -> Element msg
+uniteVariation cfg constructors =
+    constructors
+        |> List.map (\constructor -> Badge.renderElement cfg (constructor "987"))
+        |> Element.row [ Element.spacing 8 ]
+
+
 code : String -> String
 code variation =
-    prettifyElmCode """
-lightOne renderConfig =
-    Badge.""" ++ variation ++ """Light "123"
+    prettifyElmCode <|
+        """lightOne renderConfig =
+    Badge."""
+            ++ variation
+            ++ """Light "123"
       |> Badge.renderElement renderConfig
 
 darkOne renderConfig =
-    Badge.""" ++ variation ++ """Dark "456"
+    Badge."""
+            ++ variation
+            ++ """Dark "456"
       |> Badge.renderElement renderConfig
 """

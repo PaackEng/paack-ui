@@ -2,7 +2,7 @@ module Buttons.Stories exposing (stories, update)
 
 import Buttons.Model as Buttons
 import Buttons.Msg as Buttons
-import Element exposing (Element, column, spacing, text)
+import Element exposing (Element, fill)
 import Model exposing (Model)
 import Msg as Msg exposing (Msg)
 import PluginOptions exposing (PluginOptions, defaultWithMenu)
@@ -45,6 +45,7 @@ stories renderConfig =
         , linkStory renderConfig
         , fullWidthStory renderConfig
         , toggleStory renderConfig
+        , unitedStory renderConfig
         ]
 
 
@@ -52,16 +53,21 @@ enabledStory : RenderConfig -> String -> ButtonStyle -> String -> ExplorerStory
 enabledStory renderConfig label tone toneStr =
     storyList
         ( label
-        , [ iconsSvgSprite
-          , Button.fromLabel "Prompt"
-                |> Button.cmd Msg.NoOp tone
-                |> Button.renderElement renderConfig
-          , Button.fromIcon (Icon.toggle "Toggle")
-                |> Button.cmd Msg.NoOp tone
-                |> Button.renderElement renderConfig
-          ]
+        , enabledView renderConfig tone
+            |> (::) iconsSvgSprite
         , toneStr |> enabledCode |> pluginOptions
         )
+
+
+enabledView : RenderConfig -> ButtonStyle -> List (Element Msg)
+enabledView renderConfig tone =
+    [ Button.fromLabel "Prompt"
+        |> Button.cmd Msg.NoOp tone
+        |> Button.renderElement renderConfig
+    , Button.fromIcon (Icon.toggle "Toggle")
+        |> Button.cmd Msg.NoOp tone
+        |> Button.renderElement renderConfig
+    ]
 
 
 enabledCode : String -> String
@@ -140,17 +146,21 @@ successStory : RenderConfig -> ExplorerStory
 successStory renderConfig =
     storyList
         ( "Success"
-        , [ iconsSvgSprite
-          , Button.fromLabel "Prompt"
-                |> Button.success
-                |> Button.renderElement renderConfig
-          , Button.fromIcon (Icon.toggle "Toggle")
-                |> Button.cmd Msg.NoOp Button.primary
-                |> Button.withSuccessIf True
-                |> Button.renderElement renderConfig
-          ]
+        , successView renderConfig |> (::) iconsSvgSprite
         , pluginOptions successCode
         )
+
+
+successView : RenderConfig -> List (Element Msg)
+successView renderConfig =
+    [ Button.fromLabel "Prompt"
+        |> Button.success
+        |> Button.renderElement renderConfig
+    , Button.fromIcon (Icon.toggle "Toggle")
+        |> Button.cmd Msg.NoOp Button.primary
+        |> Button.withSuccessIf True
+        |> Button.renderElement renderConfig
+    ]
 
 
 successCode : String
@@ -191,11 +201,16 @@ linkStory : RenderConfig -> ExplorerStory
 linkStory renderConfig =
     story
         ( "Link"
-        , Button.fromLabel "Go to Blank"
-            |> Button.redirect (Link.link "about:blank") Button.hyperlink
-            |> Button.renderElement renderConfig
+        , linkView renderConfig
         , pluginOptions linkCode
         )
+
+
+linkView : RenderConfig -> Element Msg
+linkView renderConfig =
+    Button.fromLabel "Go to Blank"
+        |> Button.redirect (Link.link "about:blank") Button.hyperlink
+        |> Button.renderElement renderConfig
 
 
 linkCode : String
@@ -211,12 +226,17 @@ fullWidthStory : RenderConfig -> ExplorerStory
 fullWidthStory renderConfig =
     story
         ( "Full Width"
-        , Button.fromLabel "Super Long Prompt"
-            |> Button.cmd Msg.NoOp Button.primary
-            |> Button.withWidth Button.widthFull
-            |> Button.renderElement renderConfig
+        , fullWidthView renderConfig
         , pluginOptions fullWidthCode
         )
+
+
+fullWidthView : RenderConfig -> Element Msg
+fullWidthView renderConfig =
+    Button.fromLabel "Super Long Prompt"
+        |> Button.cmd Msg.NoOp Button.primary
+        |> Button.withWidth Button.widthFull
+        |> Button.renderElement renderConfig
 
 
 fullWidthCode : String
@@ -242,10 +262,8 @@ toggleView : RenderConfig -> Model -> Element Msg
 toggleView renderConfig { buttonsStories } =
     Element.column [ Element.spacing 20 ]
         [ iconsSvgSprite
-        , Button.toggle "Toggle what's there"
-            (Msg.ButtonsStoriesMsg << Buttons.SetDemoSwitch)
+        , toggleButtonView renderConfig
             buttonsStories.demoSwitch
-            |> Button.renderElement renderConfig
         , Element.text "Click this Button!"
         , if buttonsStories.demoSwitch then
             Element.text "Something is active."
@@ -253,6 +271,14 @@ toggleView renderConfig { buttonsStories } =
           else
             Element.text "Something is disabled."
         ]
+
+
+toggleButtonView : RenderConfig -> Bool -> Element Msg
+toggleButtonView renderConfig state =
+    Button.toggle "Toggle what's there"
+        (Msg.ButtonsStoriesMsg << Buttons.SetDemoSwitch)
+        state
+        |> Button.renderElement renderConfig
 
 
 toggleCode : String
@@ -269,3 +295,33 @@ pluginOptions code =
         | code = prettifyElmCode code
         , note = goToDocsCallToAction "Button"
     }
+
+
+unitedStory : RenderConfig -> ExplorerStory
+unitedStory renderConfig =
+    story
+        ( "United"
+        , unitedView renderConfig
+        , defaultWithMenu
+        )
+
+
+unitedView : RenderConfig -> Element Msg
+unitedView renderConfig =
+    Element.column [ Element.spacing 8, Element.width fill ]
+        [ iconsSvgSprite
+        , unitedItem <| enabledView renderConfig Button.primary
+        , unitedItem <| enabledView renderConfig Button.danger
+        , unitedItem <| enabledView renderConfig Button.light
+        , unitedItem <| enabledView renderConfig Button.clear
+        , unitedItem <| successView renderConfig
+        , unitedItem <| [ linkView renderConfig ]
+        , unitedItem <| [ fullWidthView renderConfig ]
+        , unitedItem <| [ toggleButtonView renderConfig False, toggleButtonView renderConfig True ]
+        ]
+
+
+unitedItem : List (Element msg) -> Element msg
+unitedItem content =
+    Element.row [ Element.spacing 8 ]
+        content

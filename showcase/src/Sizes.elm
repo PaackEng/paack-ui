@@ -3,7 +3,6 @@ module Sizes exposing (stories)
 import Element exposing (Element)
 import Element.Background as Background
 import Element.Font as Font
-import Html exposing (Html)
 import Msg as Msg exposing (Msg)
 import PluginOptions exposing (PluginOptions, defaultWithMenu)
 import UI.Button as Button exposing (ButtonBody)
@@ -21,21 +20,45 @@ stories cfg =
     storiesOf
         "Sizes"
         [ ( "Large"
-          , \_ -> sizeView cfg Size.large
+          , \_ ->
+                sizeView cfg Size.large
+                    |> Element.layout []
           , pluginOptions "large"
           )
         , ( "Medium"
-          , \_ -> sizeView cfg Size.medium
+          , \_ ->
+                sizeView cfg Size.medium
+                    |> Element.layout []
           , pluginOptions "medium"
           )
         , ( "Small"
-          , \_ -> sizeView cfg Size.small
+          , \_ ->
+                sizeView cfg Size.small
+                    |> Element.layout []
           , pluginOptions "small"
           )
         , ( "ExtraSmall"
-          , \_ -> sizeView cfg Size.extraSmall
+          , \_ ->
+                sizeView cfg Size.extraSmall
+                    |> Element.layout []
           , pluginOptions "extraSmall"
           )
+        , ( "United"
+          , \_ ->
+                united cfg
+                    |> Element.layout []
+          , defaultWithMenu
+          )
+        ]
+
+
+united : RenderConfig -> Element Msg
+united cfg =
+    Element.column [ Element.spacing 8 ]
+        [ sizeView cfg Size.large
+        , sizeView cfg Size.medium
+        , sizeView cfg Size.small
+        , sizeView cfg Size.extraSmall
         ]
 
 
@@ -81,7 +104,7 @@ buttonView cfg size body =
         |> Button.renderElement cfg
 
 
-sizeView : RenderConfig -> Size -> Html Msg
+sizeView : RenderConfig -> Size -> Element Msg
 sizeView cfg size =
     [ List.map (iconView cfg size) icons
     , List.map (buttonView cfg size) buttons
@@ -99,7 +122,6 @@ sizeView cfg size =
         |> Element.wrappedRow
             [ Element.spacing 10
             ]
-        |> Element.layout []
 
 
 codeSample : String -> String
