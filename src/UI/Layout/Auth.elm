@@ -1,8 +1,8 @@
-module UI.Layout.Login exposing (view)
+module UI.Layout.Auth exposing (view)
 
 import Element exposing (Element, fill, maximum, minimum, shrink)
 import UI.Button as Button exposing (Button)
-import UI.Palette as Palette exposing (brightnessMiddle, toneGray, tonePrimary)
+import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UI.TextField as TextField exposing (TextField)
@@ -11,7 +11,7 @@ import UI.TextField as TextField exposing (TextField)
 type alias Config msg =
     { emailField : TextField msg
     , passwordField : TextField msg
-    , logoSrc : String
+    , logo : Element msg
     , title : String
     , submitMsg : msg
     , submitButton : Button msg
@@ -28,7 +28,7 @@ titleSpace cfg =
 
 
 view : RenderConfig -> Config msg -> Element msg
-view renderConfig { title, logoSrc, emailField, passwordField, submitMsg, submitButton } =
+view renderConfig { title, logo, emailField, passwordField, submitMsg, submitButton } =
     Element.column
         [ Element.centerY
         , Element.centerX
@@ -41,10 +41,7 @@ view renderConfig { title, logoSrc, emailField, passwordField, submitMsg, submit
             , Element.spaceEvenly
             , Element.spacingXY 0 0
             ]
-            [ Element.image []
-                { src = logoSrc
-                , description = "logo"
-                }
+            [ logo
             , title
                 |> String.split "\n"
                 |> Text.multiline Text.heading5
