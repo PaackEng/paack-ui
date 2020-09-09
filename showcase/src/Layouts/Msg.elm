@@ -2,4 +2,6 @@ module Layouts.Msg exposing (Msg(..))
 
 
 type Msg
-    = NoOp
+    = SetEmail String
+    | SetPassword String
+    | NoOp
