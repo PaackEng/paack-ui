@@ -3,6 +3,7 @@ module UI.Internal.Text exposing (..)
 import Element exposing (Attribute, Element, fill)
 import Element.Font as Font
 import Html exposing (Html)
+import Html.Attributes exposing (attribute)
 import List
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.Internal.Palette as Palette
@@ -428,8 +429,8 @@ ellipsizedTextWithTooltip cfg size content =
 ellipsizableNode : String -> Html msg
 ellipsizableNode content =
     Html.node "ellipsizable-text"
+        [ attribute "text" content ]
         []
-        [ Html.text content ]
 
 
 spanLength : Span -> Int
