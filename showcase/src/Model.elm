@@ -5,10 +5,10 @@ module Model exposing
 
 import Buttons.Model as Buttons
 import Checkboxes.Model as Checkboxes
+import Layouts.Model as Layouts
 import Paginators.Model as Paginators
 import Radio.Model as Radio
 import Tables.Model as Tables
-import Layouts.Model as Layouts
 import Tabs.Model as Tabs
 import UIExplorer.Plugins.Tabs as TabsPlugin
 

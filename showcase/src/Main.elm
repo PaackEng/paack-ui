@@ -7,6 +7,7 @@ import Checkboxes.Stories as Checkboxes
 import Html exposing (Html, div, img)
 import Html.Attributes exposing (src, style)
 import Icons
+import Layouts.Stories as Layouts
 import LoadingView as LoadingView
 import Model as Model exposing (Model)
 import Msg exposing (Msg(..))
@@ -18,7 +19,6 @@ import Return as R
 import Sizes
 import Tables.Stories as Tables
 import Tabs.Stories as Tabs
-import Layouts.Stories as Layouts   
 import TextField
 import Texts
 import UI.ListView exposing (ListView)
@@ -172,10 +172,10 @@ updateStories msg ({ customModel } as model) =
             TabsPlugin.update submsg customModel.tabs
                 |> (\t -> ( { customModel | tabs = t }, Cmd.none ))
                 |> finishCustomUpdate model
-       
+
         LayoutsStoriesMsg submsg ->
             Layouts.update submsg customModel.layoutsStories
-                |> R.map (\t -> ( { customModel | layoutsStories = t } ))
+                |> R.map (\t -> { customModel | layoutsStories = t })
                 |> finishCustomUpdate model
 
         NoOp ->
