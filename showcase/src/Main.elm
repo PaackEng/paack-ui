@@ -18,6 +18,7 @@ import Return as R
 import Sizes
 import Tables.Stories as Tables
 import Tabs.Stories as Tabs
+import Layouts.Stories as Layouts   
 import TextField
 import Texts
 import UI.ListView exposing (ListView)
@@ -114,6 +115,7 @@ main =
             , Checkboxes.stories renderConfig
             , Radio.stories renderConfig
             , Tabs.stories renderConfig
+            , Layouts.stories renderConfig
             ]
         |> category
             "Complex components"
@@ -169,6 +171,11 @@ updateStories msg ({ customModel } as model) =
         TabMsg submsg ->
             TabsPlugin.update submsg customModel.tabs
                 |> (\t -> ( { customModel | tabs = t }, Cmd.none ))
+                |> finishCustomUpdate model
+       
+        LayoutsStoriesMsg submsg ->
+            Layouts.update submsg {}
+                |> (\t -> ( customModel, Cmd.none ))
                 |> finishCustomUpdate model
 
         NoOp ->
