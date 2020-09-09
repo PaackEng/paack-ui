@@ -174,8 +174,8 @@ updateStories msg ({ customModel } as model) =
                 |> finishCustomUpdate model
        
         LayoutsStoriesMsg submsg ->
-            Layouts.update submsg {}
-                |> (\t -> ( customModel, Cmd.none ))
+            Layouts.update submsg customModel.layoutsStories
+                |> R.map (\t -> ( { customModel | layoutsStories = t } ))
                 |> finishCustomUpdate model
 
         NoOp ->
