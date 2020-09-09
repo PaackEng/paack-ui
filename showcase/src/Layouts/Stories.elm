@@ -7,13 +7,12 @@ import Model exposing (Model)
 import Msg exposing (Msg)
 import PluginOptions exposing (defaultWithoutMenu)
 import Return exposing (Return)
-import UI.Badge as Badge exposing (Badge)
 import UI.Button as Button
 import UI.Layout.Auth as Auth
 import UI.RenderConfig exposing (RenderConfig)
 import UI.TextField as TextField
 import UIExplorer exposing (storiesOf)
-import Utils exposing (ExplorerStory, ExplorerUI, goToDocsCallToAction, prettifyElmCode, storyList, storyWithModel)
+import Utils exposing (ExplorerStory, ExplorerUI, goToDocsCallToAction, prettifyElmCode, storyWithModel)
 
 
 update : LayoutsMsg.Msg -> LayoutsModel.Model -> Return LayoutsMsg.Msg LayoutsModel.Model
