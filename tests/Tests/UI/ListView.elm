@@ -1,18 +1,15 @@
 module Tests.UI.ListView exposing (tests)
 
 import Element as Element exposing (Element)
-import Expect
 import Html.Attributes as HtmlAttr
-import Test exposing (..)
+import Test exposing (Test, describe, test)
 import Test.Html.Event as Event
 import Test.Html.Query as Query
 import Test.Html.Selector as Selector
-import Tests.Utils.Element exposing (cursorPointer, elementToHtml, hasIconInside)
+import Tests.Utils.Element exposing (cursorPointer, elementToHtml)
 import Tests.Utils.RenderConfig exposing (desktopWindowConfig)
 import UI.Icon as Icon
-import UI.Link as Link
 import UI.ListView as ListView
-import UI.RenderConfig exposing (RenderConfig)
 
 
 type Msg

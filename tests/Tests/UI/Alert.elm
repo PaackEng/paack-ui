@@ -1,18 +1,12 @@
 module Tests.UI.Alert exposing (tests)
 
 import Fuzz
-import Test exposing (..)
-import Test.Html.Event as Event
+import Test exposing (Test, describe, fuzz)
 import Test.Html.Query as Query
 import Test.Html.Selector as Selector
 import Tests.Utils.Element exposing (elementToHtml)
-import Tests.Utils.ExtraSelectors as ExtraSelectors
 import Tests.Utils.RenderConfig exposing (desktopWindowConfig)
 import UI.Alert as Alert exposing (Alert)
-
-
-type Msg
-    = OnCloseBtnClicked
 
 
 tests : Test

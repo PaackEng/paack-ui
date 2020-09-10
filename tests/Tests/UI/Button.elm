@@ -1,6 +1,5 @@
 module Tests.UI.Button exposing (tests)
 
-import Element as El
 import Expect
 import Html.Attributes as HtmlAttr
 import Test exposing (..)
