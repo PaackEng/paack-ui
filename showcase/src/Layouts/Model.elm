@@ -1,10 +1,11 @@
 module Layouts.Model exposing (Model, initModel)
 
+import Tables.Book exposing (Book)
 
 type alias Model =
-    { email : String, password : String }
+    { selected : Maybe Book }
 
 
 initModel : Model
 initModel =
-    { email = "", password = "" }
+    { selected = Nothing }
