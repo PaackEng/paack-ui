@@ -5,8 +5,7 @@ module UI.NavigationContainer exposing
     , Content, contentSingle, StackChild, contentStackChild
     , withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages, MenuPage, menuPage
     , Dialog, dialog
-    , toBrowserDocument
-    , toShowcaseElement
+    , toBrowserDocument, toShowcaseElement
     )
 
 {-| The `UI.NavigationContainer` (abbreviated as `Nav`) is a page presenter.
@@ -78,7 +77,7 @@ Example of usage:
 
 # Rendering
 
-@docs toBrowserDocument
+@docs toBrowserDocument, toShowcaseElement
 
 -}
 
@@ -516,6 +515,16 @@ toBrowserDocument cfg page (Navigator model) =
     }
 
 
+{-| End of the builder's life.
+The result of this function is a ready-to-insert Elm UI's Element.
+
+**NOTE**: This is a way to work around the NavigationContainer to display only the content of the container. It's meant to be used in the project's showcase and only works for desktop.
+
+    someView
+        |> Nav.contentSingle
+        |> Nav.toShowcaseElement
+
+-}
 toShowcaseElement : Content msg -> Element msg
 toShowcaseElement content =
     case content of

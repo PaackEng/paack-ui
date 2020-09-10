@@ -5,7 +5,7 @@ import Element.Border as Border
 import Element.Keyed as Keyed
 import UI.Button exposing (Button)
 import UI.ListView as ListView exposing (ListView)
-import UI.NavigationContainer as Nav exposing (Container)
+import UI.NavigationContainer as Nav
 import UI.Palette as Palette
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Utils.Element as Element exposing (zeroPadding)
