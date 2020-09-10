@@ -11,6 +11,7 @@ import Tables.Book exposing (Book, books)
 import UI.Layout.SplitSelectable as SplitSelectable
 import UI.ListView as ListView exposing (ListView)
 import UI.NavigationContainer as Nav
+import UI.Internal.NavigationContainer
 import UI.Palette as Palette exposing (brightnessLighter, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.SummaryListItem as Summary
@@ -55,7 +56,7 @@ view renderConfig { layoutsStories } =
         , selected = Maybe.map .isbn layoutsStories.selected
         , selectedView = selectedView renderConfig layoutsStories
         }
-        |> Nav.toShowcaseElement
+        |> UI.Internal.NavigationContainer.toShowcaseElement
 
 
 selectedView : RenderConfig -> LayoutsModel.Model -> Element msg
