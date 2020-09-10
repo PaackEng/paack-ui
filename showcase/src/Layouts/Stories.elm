@@ -8,7 +8,6 @@ import Msg exposing (Msg)
 import PluginOptions exposing (defaultWithoutMenu)
 import Return exposing (Return)
 import Tables.Book exposing (Book, books)
-import UI.Button as Button
 import UI.Layout.SplitSelectable as SplitSelectable
 import UI.ListView as ListView exposing (ListView)
 import UI.NavigationContainer as Nav
@@ -16,9 +15,8 @@ import UI.Palette as Palette exposing (brightnessLighter, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.SummaryListItem as Summary
 import UI.Text as Text
-import UI.TextField as TextField
 import UIExplorer exposing (storiesOf)
-import Utils exposing (ExplorerStory, ExplorerUI, goToDocsCallToAction, prettifyElmCode, storyWithModel)
+import Utils exposing (ExplorerStory, ExplorerUI, prettifyElmCode, storyWithModel)
 
 
 update : LayoutsMsg.Msg -> LayoutsModel.Model -> Return LayoutsMsg.Msg LayoutsModel.Model
@@ -50,14 +48,10 @@ demo renderConfig =
 
 view : RenderConfig -> Model -> Element Msg
 view renderConfig { layoutsStories } =
-    let
-        msg =
-            Msg.LayoutsStoriesMsg
-    in
     SplitSelectable.desktop renderConfig
         { getKey = .isbn
         , items = books
-        , listView = listView renderConfig layoutsStories
+        , listView = listView renderConfig
         , selected = Maybe.map .isbn layoutsStories.selected
         , selectedView = selectedView renderConfig layoutsStories
         }
@@ -100,8 +94,8 @@ selectedView renderConfig model =
             Element.none
 
 
-listView : RenderConfig -> LayoutsModel.Model -> ListView Book Msg
-listView renderConfig model =
+listView : RenderConfig -> ListView Book Msg
+listView renderConfig  =
     listItemView renderConfig
         |> ListView.selectList (Msg.LayoutsStoriesMsg << LayoutsMsg.Select)
 
