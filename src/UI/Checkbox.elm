@@ -24,11 +24,6 @@ module UI.Checkbox exposing
 @docs withLabelVisible
 
 
-# Size
-
-@docs withSize
-
-
 # Rendering
 
 @docs renderElement

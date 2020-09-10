@@ -1,5 +1,6 @@
 module TextField exposing (stories)
 
+import Element exposing (Element)
 import Msg as RootMsg
 import PluginOptions exposing (PluginOptions, defaultWithMenu)
 import UI.RenderConfig exposing (RenderConfig)
@@ -23,6 +24,7 @@ stories cfg =
         , usernameTextFieldStory cfg
         , passwordTextFieldStory cfg
         , fullWidthStory cfg
+        , unitedStory cfg
         ]
 
 
@@ -30,14 +32,19 @@ defaultTextFieldStory : RenderConfig -> ExplorerStory
 defaultTextFieldStory cfg =
     story
         ( "Default"
-        , TextField.singlelineText (always RootMsg.NoOp)
-            "My cool default"
-            "Value"
-            |> TextField.withPlaceholder "Enter your info here"
-            |> TextField.setLabelVisible True
-            |> TextField.renderElement cfg
+        , defaultTextFieldView cfg
         , pluginOptions defaultTextFieldCode
         )
+
+
+defaultTextFieldView : RenderConfig -> Element RootMsg.Msg
+defaultTextFieldView cfg =
+    TextField.singlelineText (always RootMsg.NoOp)
+        "My cool default"
+        "Value"
+        |> TextField.withPlaceholder "Enter your info here"
+        |> TextField.setLabelVisible True
+        |> TextField.renderElement cfg
 
 
 defaultTextFieldCode : String
@@ -57,13 +64,18 @@ usernameTextFieldStory : RenderConfig -> ExplorerStory
 usernameTextFieldStory cfg =
     story
         ( "Username"
-        , TextField.username (always RootMsg.NoOp)
-            "Enter your username"
-            "Value"
-            |> TextField.setLabelVisible True
-            |> TextField.renderElement cfg
+        , usernameTextFieldView cfg
         , pluginOptions usernameTextFieldCode
         )
+
+
+usernameTextFieldView : RenderConfig -> Element RootMsg.Msg
+usernameTextFieldView cfg =
+    TextField.username (always RootMsg.NoOp)
+        "Enter your username"
+        "Value"
+        |> TextField.setLabelVisible True
+        |> TextField.renderElement cfg
 
 
 usernameTextFieldCode : String
@@ -82,13 +94,18 @@ passwordTextFieldStory : RenderConfig -> ExplorerStory
 passwordTextFieldStory cfg =
     story
         ( "Password"
-        , TextField.currentPassword (always RootMsg.NoOp)
-            "Enter your password"
-            "Value"
-            |> TextField.setLabelVisible True
-            |> TextField.renderElement cfg
+        , passwordTextFieldView cfg
         , pluginOptions passwordTextFieldCode
         )
+
+
+passwordTextFieldView : RenderConfig -> Element RootMsg.Msg
+passwordTextFieldView cfg =
+    TextField.currentPassword (always RootMsg.NoOp)
+        "Enter your password"
+        "Value"
+        |> TextField.setLabelVisible True
+        |> TextField.renderElement cfg
 
 
 passwordTextFieldCode : String
@@ -107,14 +124,19 @@ fullWidthStory : RenderConfig -> ExplorerStory
 fullWidthStory cfg =
     story
         ( "Full Width"
-        , TextField.singlelineText (always RootMsg.NoOp)
-            "My TextField"
-            "Some big text"
-            |> TextField.setLabelVisible True
-            |> TextField.withWidth TextField.widthFull
-            |> TextField.renderElement cfg
+        , fullWidthView cfg
         , pluginOptions fullWidthCode
         )
+
+
+fullWidthView : RenderConfig -> Element RootMsg.Msg
+fullWidthView cfg =
+    TextField.singlelineText (always RootMsg.NoOp)
+        "My TextField"
+        "Some big text"
+        |> TextField.setLabelVisible True
+        |> TextField.withWidth TextField.widthFull
+        |> TextField.renderElement cfg
 
 
 fullWidthCode : String
@@ -146,3 +168,22 @@ type Msg
     | ...
 
 """
+
+
+unitedStory : RenderConfig -> ExplorerStory
+unitedStory cfg =
+    story
+        ( "Full Width"
+        , unitedView cfg
+        , pluginOptions fullWidthCode
+        )
+
+
+unitedView : RenderConfig -> Element RootMsg.Msg
+unitedView cfg =
+    Element.column [ Element.spacing 8 ]
+        [ defaultTextFieldView cfg
+        , usernameTextFieldView cfg
+        , passwordTextFieldView cfg
+        , fullWidthView cfg
+        ]
