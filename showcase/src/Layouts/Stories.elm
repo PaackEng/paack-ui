@@ -10,15 +10,16 @@ import Return exposing (Return)
 import Tables.Book exposing (Book, books)
 import UI.Button as Button
 import UI.Layout.SplitSelectable as SplitSelectable
-import UI.Palette as Palette exposing (tonePrimary, brightnessLighter)
 import UI.ListView as ListView exposing (ListView)
 import UI.NavigationContainer as Nav
+import UI.Palette as Palette exposing (brightnessLighter, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.SummaryListItem as Summary
+import UI.Text as Text
 import UI.TextField as TextField
 import UIExplorer exposing (storiesOf)
 import Utils exposing (ExplorerStory, ExplorerUI, goToDocsCallToAction, prettifyElmCode, storyWithModel)
-import UI.Text as Text
+
 
 update : LayoutsMsg.Msg -> LayoutsModel.Model -> Return LayoutsMsg.Msg LayoutsModel.Model
 update msg model =
@@ -64,7 +65,7 @@ view renderConfig { layoutsStories } =
 
 
 selectedView : RenderConfig -> LayoutsModel.Model -> Element msg
-selectedView renderConfig model = 
+selectedView renderConfig model =
     case model.selected of
         Just book ->
             Element.column
@@ -73,27 +74,31 @@ selectedView renderConfig model =
                 , Element.width (fill |> maximum 600)
                 ]
                 [ Element.column [ Element.spacing 16 ]
-                    [  book.title
+                    [ book.title
                         |> Text.heading4
                         |> Text.renderElement renderConfig
-                    ,  "By " ++ book.author
+                    , "By "
+                        ++ book.author
                         |> Text.subtitle1
                         |> Text.withColor (Palette.color tonePrimary brightnessLighter)
                         |> Text.renderElement renderConfig
                     ]
-                , Element.column 
+                , Element.column
                     [ Element.spacing 8 ]
-                    [ "Year: " ++ book.year
+                    [ "Year: "
+                        ++ book.year
                         |> Text.body1
                         |> Text.renderElement renderConfig
-                    
-                    , "ISBN: " ++ book.isbn
+                    , "ISBN: "
+                        ++ book.isbn
                         |> Text.body1
                         |> Text.renderElement renderConfig
                     ]
                 ]
+
         _ ->
             Element.none
+
 
 listView : RenderConfig -> LayoutsModel.Model -> ListView Book Msg
 listView renderConfig model =
