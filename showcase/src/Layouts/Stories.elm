@@ -116,7 +116,7 @@ SplitSelectable.desktop renderConfig
     { getKey = .isbn
     , items = books
     , listView = listView renderConfig layoutsStories
-    , selected = Nothing
-    , selectedView = Element.none
+    , selected = model.selected
+    , selectedView = selectedView model
     }
 """
