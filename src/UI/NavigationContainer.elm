@@ -6,6 +6,7 @@ module UI.NavigationContainer exposing
     , withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages, MenuPage, menuPage
     , Dialog, dialog
     , toBrowserDocument
+    , toShowcaseElement
     )
 
 {-| The `UI.NavigationContainer` (abbreviated as `Nav`) is a page presenter.
@@ -513,6 +514,16 @@ toBrowserDocument cfg page (Navigator model) =
         , Element.layout defaultAttrs bodyWithDialog
         ]
     }
+
+
+toShowcaseElement : Content msg -> Element msg
+toShowcaseElement content =
+    case content of
+        ContentSingle body ->
+            body
+
+        ContentStackChild _ body ->
+            body
 
 
 

@@ -7,9 +7,13 @@ import Model exposing (Model)
 import Msg exposing (Msg)
 import PluginOptions exposing (defaultWithoutMenu)
 import Return exposing (Return)
+import Tables.Book exposing (Book, books)
 import UI.Button as Button
-import UI.Layout.Auth as Auth
+import UI.Layout.SplitSelectable as SplitSelectable
+import UI.ListView as ListView exposing (ListView)
+import UI.NavigationContainer as Nav
 import UI.RenderConfig exposing (RenderConfig)
+import UI.SummaryListItem as Summary
 import UI.TextField as TextField
 import UIExplorer exposing (storiesOf)
 import Utils exposing (ExplorerStory, ExplorerUI, goToDocsCallToAction, prettifyElmCode, storyWithModel)
@@ -18,12 +22,6 @@ import Utils exposing (ExplorerStory, ExplorerUI, goToDocsCallToAction, prettify
 update : LayoutsMsg.Msg -> LayoutsModel.Model -> Return LayoutsMsg.Msg LayoutsModel.Model
 update msg model =
     case msg of
-        LayoutsMsg.SetEmail e ->
-            ( { model | email = e }, Cmd.none )
-
-        LayoutsMsg.SetPassword p ->
-            ( { model | password = p }, Cmd.none )
-
         LayoutsMsg.NoOp ->
             ( model, Cmd.none )
 
@@ -39,12 +37,9 @@ stories cfg =
 demo : RenderConfig -> ExplorerStory
 demo renderConfig =
     storyWithModel
-        ( "Auth"
+        ( "SplitSelectable"
         , view renderConfig
-        , { defaultWithoutMenu
-            | code = code
-            , note = goToDocsCallToAction "Radio"
-          }
+        , { defaultWithoutMenu | code = code }
         )
 
 
@@ -54,25 +49,39 @@ view renderConfig { layoutsStories } =
         msg =
             Msg.LayoutsStoriesMsg
     in
-    Auth.view renderConfig
-        { title = "Auth Layout Example Story"
-        , logo = Element.image [] { src = "logo.png", description = "logo" }
-        , emailField = TextField.username (msg << LayoutsMsg.SetEmail) "username" layoutsStories.email
-        , passwordField = TextField.username (msg << LayoutsMsg.SetPassword) "password" layoutsStories.password
-        , submitMsg = msg LayoutsMsg.NoOp
-        , submitButton = Button.fromLabel "Login" |> Button.cmd (msg LayoutsMsg.NoOp) Button.primary
+    SplitSelectable.desktop renderConfig
+        { getKey = .isbn
+        , items = books
+        , listView = listView renderConfig layoutsStories
+        , selected = Nothing
+        , selectedView = Element.none
         }
+        |> Nav.toShowcaseElement
+
+
+listView : RenderConfig -> LayoutsModel.Model -> ListView Book Msg
+listView renderConfig model =
+    listItemView renderConfig
+        |> ListView.selectList (always (Msg.LayoutsStoriesMsg LayoutsMsg.NoOp))
+
+
+listItemView : RenderConfig -> Bool -> Book -> Element Msg
+listItemView renderConfig isSelected book =
+    Summary.view renderConfig
+        isSelected
+        book.title
+        book.author
+        0
 
 
 code : String
 code =
     prettifyElmCode """
-Auth.view cfg
-    { title = "Auth Layout Example Story"
-    , logo = Element.image [] { src = "logo.png", description = "logo" }
-    , emailField = TextField.username (always msg) "username" ""
-    , passwordField = TextField.username (always msg) "username" ""
-    , submitMsg = msg
-    , submitButton = Button.fromLabel "Login" |> Button.cmd msg Button.primary
+SplitSelectable.desktop renderConfig  
+    { getKey = .isbn
+    , items = books
+    , listView = listView renderConfig layoutsStories
+    , selected = Nothing
+    , selectedView = Element.none
     }
 """
