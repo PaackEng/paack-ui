@@ -11,7 +11,6 @@ import Tables.Book exposing (Book, books)
 import UI.Internal.NavigationContainer
 import UI.Layout.SplitSelectable as SplitSelectable
 import UI.ListView as ListView exposing (ListView)
-import UI.NavigationContainer as Nav
 import UI.Palette as Palette exposing (brightnessLighter, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.SummaryListItem as Summary
