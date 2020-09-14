@@ -16,7 +16,7 @@ import UI.RenderConfig exposing (RenderConfig)
 import UI.SummaryListItem as Summary
 import UI.Text as Text
 import UIExplorer exposing (storiesOf)
-import Utils exposing (ExplorerStory, ExplorerUI, prettifyElmCode, storyWithModel)
+import Utils exposing (ExplorerStory, ExplorerUI, prettifyElmCode, storyBorder, storyWithModel)
 
 
 update : LayoutsMsg.Msg -> LayoutsModel.Model -> Return LayoutsMsg.Msg LayoutsModel.Model
@@ -41,7 +41,7 @@ demo : RenderConfig -> ExplorerStory
 demo renderConfig =
     storyWithModel
         ( "SplitSelectable"
-        , view renderConfig
+        , storyBorder << view renderConfig
         , { defaultWithoutMenu | code = code }
         )
 
