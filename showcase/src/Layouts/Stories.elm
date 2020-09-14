@@ -8,6 +8,7 @@ import Msg exposing (Msg)
 import PluginOptions exposing (defaultWithoutMenu)
 import Return exposing (Return)
 import Tables.Book exposing (Book, books)
+import UI.Badge as Badge
 import UI.Internal.NavigationContainer
 import UI.Layout.SplitSelectable as SplitSelectable
 import UI.ListView as ListView exposing (ListView)
@@ -106,7 +107,7 @@ listItemView renderConfig isSelected book =
         isSelected
         book.title
         book.author
-        1
+        (Badge.grayLight <| String.fromInt 1)
 
 
 code : String

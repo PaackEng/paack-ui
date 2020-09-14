@@ -3,20 +3,27 @@ module UI.SummaryListItem exposing (view)
 import Element exposing (Element, fill)
 import Element.Keyed as Keyed
 import UI.Badge as Badge exposing (Badge)
-import UI.Palette as Palette exposing (brightnessLight, brightnessLighter, brightnessMiddle, toneGray, tonePrimary)
+import UI.Palette as Palette
+    exposing
+        ( brightnessLight
+        , brightnessLighter
+        , brightnessMiddle
+        , toneGray
+        , tonePrimary
+        )
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text exposing (ellipsize)
 
 
 type alias ColorsHelper =
-    { badge : String -> Badge
+    { badge : Badge -> Badge
     , title : Palette.Color
     , caption : Palette.Color
     }
 
 
-view : RenderConfig -> Bool -> String -> String -> Int -> Element msg
-view renderConfig isSelected title caption number =
+view : RenderConfig -> Bool -> String -> String -> Badge -> Element msg
+view renderConfig isSelected title caption badge =
     let
         colors =
             listItemColors isSelected
@@ -26,7 +33,7 @@ view renderConfig isSelected title caption number =
         , Element.paddingEach { top = 11, bottom = 11, left = 20, right = 12 }
         ]
         [ ( "label", listItemLabel renderConfig colors title caption )
-        , ( "badge", listItemBadge renderConfig colors.badge number )
+        , ( "badge", listItemBadge renderConfig <| colors.badge badge )
         ]
 
 
@@ -39,11 +46,9 @@ listItemLabel renderConfig colors title caption =
         ]
 
 
-listItemBadge : RenderConfig -> (String -> Badge) -> Int -> Element msg
-listItemBadge renderConfig badgeFn number =
-    number
-        |> String.fromInt
-        |> badgeFn
+listItemBadge : RenderConfig -> Badge -> Element msg
+listItemBadge renderConfig badge =
+    badge
         |> Badge.renderElement renderConfig
         |> Element.el [ Element.alignTop ]
 
@@ -69,7 +74,7 @@ listItemCaption renderConfig color caption =
 listItemColors : Bool -> ColorsHelper
 listItemColors isSelected =
     if isSelected then
-        { badge = Badge.primaryDark
+        { badge = Badge.withTone Badge.primaryDark
         , title =
             Palette.color tonePrimary brightnessMiddle
                 |> Palette.setContrasting True
@@ -77,7 +82,7 @@ listItemColors isSelected =
         }
 
     else
-        { badge = Badge.grayLight
+        { badge = Badge.withTone Badge.grayLight
         , title =
             Palette.color tonePrimary brightnessLighter
                 |> Palette.setContrasting True
