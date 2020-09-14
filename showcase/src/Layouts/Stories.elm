@@ -8,10 +8,10 @@ import Msg exposing (Msg)
 import PluginOptions exposing (defaultWithoutMenu)
 import Return exposing (Return)
 import Tables.Book exposing (Book, books)
+import UI.Internal.NavigationContainer
 import UI.Layout.SplitSelectable as SplitSelectable
 import UI.ListView as ListView exposing (ListView)
 import UI.NavigationContainer as Nav
-import UI.Internal.NavigationContainer
 import UI.Palette as Palette exposing (brightnessLighter, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.SummaryListItem as Summary
@@ -96,7 +96,7 @@ selectedView renderConfig model =
 
 
 listView : RenderConfig -> ListView Book Msg
-listView renderConfig  =
+listView renderConfig =
     listItemView renderConfig
         |> ListView.selectList (Msg.LayoutsStoriesMsg << LayoutsMsg.Select)
 
