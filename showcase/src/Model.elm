@@ -5,6 +5,7 @@ module Model exposing
 
 import Buttons.Model as Buttons
 import Checkboxes.Model as Checkboxes
+import Layouts.Model as Layouts
 import Paginators.Model as Paginators
 import Radio.Model as Radio
 import Tables.Model as Tables
@@ -20,6 +21,7 @@ type alias Model =
     , radioStories : Radio.Model
     , tabsStories : Tabs.Model
     , tabs : TabsPlugin.Model
+    , layoutsStories : Layouts.Model
     }
 
 
@@ -32,4 +34,5 @@ init =
     , radioStories = Radio.initModel
     , tabsStories = Tabs.initModel
     , tabs = TabsPlugin.initialModel
+    , layoutsStories = Layouts.initModel
     }

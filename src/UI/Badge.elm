@@ -3,6 +3,7 @@ module UI.Badge exposing
     , grayLight, primaryLight, successLight, warningLight, dangerLight
     , grayDark, primaryDark, successDark, warningDark, dangerDark
     , renderElement
+    , withTone
     )
 
 {-| Badges are small elements displayed, usually on the right of texts or top-right corner of the view, serving as counters, tags, or labels.
@@ -175,6 +176,11 @@ dangerDark content =
 successDark : String -> Badge
 successDark content =
     Badge { content = content, tone = ToneSuccess, brightness = Dark }
+
+
+withTone : (String -> Badge) -> Badge -> Badge
+withTone builder (Badge { content }) =
+    builder content
 
 
 

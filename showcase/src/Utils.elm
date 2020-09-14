@@ -7,15 +7,18 @@ module Utils exposing
     , prettifyElmCode
     , reducedToDocs
     , story
+    , storyBorder
     , storyList
     , storyWithModel
     )
 
 import Element exposing (Element, layout, spacing, wrappedRow)
+import Element.Border as Border
 import Html exposing (Html)
 import Model exposing (Model)
 import Msg exposing (Msg)
 import PluginOptions exposing (PluginOptions, defaultWithMenu)
+import UI.Palette as Palette exposing (brightnessMiddle, toneGray)
 import UIExplorer
 
 
@@ -62,6 +65,18 @@ storyWithModel ( title, content, note ) =
     , \{ customModel } -> layout [] <| content customModel
     , note
     )
+
+
+storyBorder : Element Msg -> Element Msg
+storyBorder view =
+    Element.el
+        [ Border.dashed
+        , Border.width 2
+        , Palette.color toneGray brightnessMiddle
+            |> Palette.toElementColor
+            |> Border.color
+        ]
+        view
 
 
 iconsSvgSprite : Element msg

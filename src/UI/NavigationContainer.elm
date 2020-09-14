@@ -87,6 +87,7 @@ import UI.Button as Button exposing (Button)
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Dialog as Dialog
 import UI.Internal.Menu as Menu
+import UI.Internal.NavigationContainer as Internal
 import UI.Internal.SideBar as SideBar
 import UI.Link exposing (Link)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
@@ -136,9 +137,8 @@ The typical single page renders the way they come.
 The stacked child has a different header on mobile, where a back button replaces the sandwich button.
 
 -}
-type Content msg
-    = ContentSingle (Element msg)
-    | ContentStackChild (StackChild msg) (Element msg)
+type alias Content msg =
+    Internal.Content msg
 
 
 {-| The `Nav.Dialog msg` is a record holding the description of a dialog.
@@ -204,10 +204,7 @@ That includes the back button's message, a title which overwrites the main page'
 
 -}
 type alias StackChild msg =
-    { title : String
-    , buttons : List (Button msg)
-    , goBackMsg : msg
-    }
+    Internal.StackChild msg
 
 
 
@@ -298,15 +295,15 @@ containerMap applier data =
 contentMap : (a -> b) -> Content a -> Content b
 contentMap applier data =
     case data of
-        ContentSingle element ->
+        Internal.ContentSingle element ->
             element
                 |> Element.map applier
-                |> ContentSingle
+                |> Internal.ContentSingle
 
-        ContentStackChild stack element ->
+        Internal.ContentStackChild stack element ->
             element
                 |> Element.map applier
-                |> ContentStackChild
+                |> Internal.ContentStackChild
                     { title = stack.title
                     , goBackMsg = applier stack.goBackMsg
                     , buttons = List.map (Button.map applier) stack.buttons
@@ -344,7 +341,7 @@ It expects the final page's view in the only parameter.
 -}
 contentSingle : Element msg -> Content msg
 contentSingle body =
-    ContentSingle body
+    Internal.ContentSingle body
 
 
 {-| `Nav.contentStackChild` indicates that the current page is a stack child's page.
@@ -365,7 +362,7 @@ It expects the child's configuration and the final page's view as its parameters
 -}
 contentStackChild : StackChild msg -> Element msg -> Content msg
 contentStackChild prop body =
-    ContentStackChild prop body
+    Internal.ContentStackChild prop body
 
 
 {-| `Nav.menuPage` describes a page to [`Nav.withMenuPages`](#withMenuPages).
@@ -527,10 +524,10 @@ menu applier { menuExpanded } =
 contentProps : String -> Content msg -> ( Element msg, Maybe ( msg, List (Button msg) ), String )
 contentProps mainTitle content =
     case content of
-        ContentSingle body ->
+        Internal.ContentSingle body ->
             ( body, Nothing, mainTitle )
 
-        ContentStackChild { title, goBackMsg, buttons } body ->
+        Internal.ContentStackChild { title, goBackMsg, buttons } body ->
             ( body, Just ( goBackMsg, buttons ), title )
 
 

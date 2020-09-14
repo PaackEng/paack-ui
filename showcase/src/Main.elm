@@ -7,6 +7,7 @@ import Checkboxes.Stories as Checkboxes
 import Html exposing (Html, div, img)
 import Html.Attributes exposing (src, style)
 import Icons
+import Layouts.Stories as Layouts
 import LoadingView as LoadingView
 import Model as Model exposing (Model)
 import Msg exposing (Msg(..))
@@ -114,6 +115,7 @@ main =
             , Checkboxes.stories renderConfig
             , Radio.stories renderConfig
             , Tabs.stories renderConfig
+            , Layouts.stories renderConfig
             ]
         |> category
             "Complex components"
@@ -169,6 +171,11 @@ updateStories msg ({ customModel } as model) =
         TabMsg submsg ->
             TabsPlugin.update submsg customModel.tabs
                 |> (\t -> ( { customModel | tabs = t }, Cmd.none ))
+                |> finishCustomUpdate model
+
+        LayoutsStoriesMsg submsg ->
+            Layouts.update submsg customModel.layoutsStories
+                |> R.map (\t -> { customModel | layoutsStories = t })
                 |> finishCustomUpdate model
 
         NoOp ->
