@@ -179,10 +179,8 @@ successDark content =
 
 
 withTone : (String -> Badge) -> Badge -> Badge
-withTone builder badge =
-    case badge of
-        Badge { content } ->
-            builder content
+withTone builder (Badge { content }) =
+    builder content
 
 
 
