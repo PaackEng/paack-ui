@@ -1,6 +1,6 @@
 module UI.Internal.Dialog exposing (Dialog, dialogMap, view)
 
-import Element exposing (Element, fill, shrink)
+import Element exposing (Element, fill, px, shrink)
 import Element.Events as Events
 import UI.Icon as Icon
 import UI.Internal.Palette as Palette
@@ -50,21 +50,17 @@ desktopView cfg dialog =
 
 desktopDialogView : RenderConfig -> Dialog msg -> Element msg
 desktopDialogView cfg { title, body, close } =
-    Element.column
+    Element.el
         [ Element.width shrink
         , Element.centerY
         , Element.centerX
-        , Element.spacing 8
         , Palette.mainBackground
+        , Element.above
+            (desktopHeaderRow cfg close title)
+        , Element.paddingEach
+            { top = 8, left = 32, right = 32, bottom = 32 }
         ]
-        [ desktopHeaderRow cfg close title
-        , body
-            |> Element.el
-                [ Element.width shrink
-                , Element.paddingEach
-                    { top = 0, left = 32, right = 32, bottom = 32 }
-                ]
-        ]
+        body
 
 
 desktopHeaderRow : RenderConfig -> msg -> String -> Element msg
@@ -72,6 +68,7 @@ desktopHeaderRow cfg close title =
     Element.row
         [ Element.width fill
         , Element.paddingEach { top = 12, right = 12, left = 0, bottom = 0 }
+        , Palette.mainBackground
         ]
         [ titleText cfg
             { top = 20, left = 32, right = 0, bottom = 0 }
@@ -117,7 +114,7 @@ titleText cfg padding title =
     Text.heading5 title
         |> Text.renderElement cfg
         |> Element.el
-            [ Element.width fill
+            [ Element.width (px 400)
             , Element.paddingEach padding
             , Element.alignTop
             ]
