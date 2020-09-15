@@ -1,6 +1,10 @@
 module UI.Icon exposing
     ( svgSpriteImport
-    , Icon, add, check, close, edit, eventLog, previousContent, logout, notifications, paackSpaces, packages, print, nextContent, sandwichMenu, search, seeMore, toggle, toggleDown, toggleUp, warning, filter, groups, download, expand, collapse, searchSpace
+    , Icon
+    , add, check, close, collapse, download, edit, eventLog, expand, filter
+    , groups, logout, nextContent, notifications, paackSpaces, packages
+    , previousContent, print, remove, sandwichMenu, search, searchSpace
+    , seeMore, toggle, toggleDown, toggleUp, warning
     , getHint
     , withColor
     , withSize, withCustomSize
@@ -30,7 +34,11 @@ An icon can be created and rendered as in the following pipeline:
 
 # Building
 
-@docs Icon, add, check, close, edit, eventLog, previousContent, logout, notifications, paackSpaces, packages, print, nextContent, sandwichMenu, search, seeMore, toggle, toggleDown, toggleUp, warning, filter, groups, download, expand, collapse, searchSpace
+@docs Icon
+@docs add, check, close, collapse, download, edit, eventLog, expand, filter
+@docs groups, logout, nextContent, notifications, paackSpaces, packages
+@docs previousContent, print, remove, sandwichMenu, search, searchSpace
+@docs seeMore, toggle, toggleDown, toggleUp, warning
 
 
 # Disassemble
@@ -90,31 +98,32 @@ type Icon
 
 type IconGlyph
     = Add
+    | BackwardContent
     | Check
     | Close
+    | Collapse
+    | DownArrow
+    | Download
     | Edit
     | EventLog
+    | Expand
+    | Filter
+    | Groups
+    | LeftArrow
     | Logout
     | Notifications
     | PaackSpaces
     | Packages
     | Print
+    | Remove
+    | RightArrow
     | SandwichMenu
     | Search
+    | SearchSpace
+    | SeeMore
     | Toggle
     | UpArrow
-    | DownArrow
-    | BackwardContent
-    | LeftArrow
-    | RightArrow
-    | SeeMore
     | Warning
-    | Filter
-    | Groups
-    | Download
-    | Expand
-    | Collapse
-    | SearchSpace
 
 
 
@@ -394,7 +403,7 @@ download hint =
     Icon (Properties hint Download) defaultOptions
 
 
-{-| 2 Arrows from the center to the border
+{-| Two arrows from the center to the border
 
     Icon.expand "Expand view"
 
@@ -422,6 +431,16 @@ collapse hint =
 searchSpace : String -> Icon
 searchSpace hint =
     Icon (Properties hint SearchSpace) defaultOptions
+
+
+{-| A circe with a line on center similar to a "No Way" road sign.
+
+    Icon.remove "Remove item"
+
+-}
+remove : String -> Icon
+remove hint =
+    Icon (Properties hint Remove) defaultOptions
 
 
 
@@ -459,14 +478,8 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
             Add ->
                 svgIcon "Add"
 
-            Toggle ->
-                svgIcon "Map"
-
-            UpArrow ->
-                svgIcon "Chevron.Up"
-
-            DownArrow ->
-                svgIcon "Chevron.Down"
+            BackwardContent ->
+                svgIcon "Chevron.Left"
 
             Check ->
                 svgIcon "Checkmark"
@@ -474,8 +487,35 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
             Close ->
                 svgIcon "Close"
 
-            SandwichMenu ->
-                svgIcon "Hamburger"
+            Collapse ->
+                svgIcon "Collapse"
+
+            DownArrow ->
+                svgIcon "Chevron.Down"
+
+            Download ->
+                svgIcon "Download"
+
+            Edit ->
+                svgIcon "Edit"
+
+            EventLog ->
+                svgIcon "Message"
+
+            Expand ->
+                svgIcon "Expand"
+
+            Filter ->
+                svgIcon "Filter"
+
+            Groups ->
+                svgIcon "Groups"
+
+            LeftArrow ->
+                svgIcon "Chevron.Left"
+
+            Logout ->
+                svgIcon "Logout"
 
             Notifications ->
                 svgIcon "Bell"
@@ -486,53 +526,35 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
             Packages ->
                 svgIcon "Box.Outlined"
 
-            EventLog ->
-                svgIcon "Message"
-
-            Logout ->
-                svgIcon "Logout"
-
-            Search ->
-                svgIcon "Search"
-
             Print ->
                 svgIcon "Printer"
 
-            Edit ->
-                svgIcon "Edit"
-
-            BackwardContent ->
-                svgIcon "Chevron.Left"
-
-            LeftArrow ->
-                svgIcon "Chevron.Left"
+            Remove ->
+                svgIcon "Remove"
 
             RightArrow ->
                 svgIcon "Chevron.Right"
 
-            SeeMore ->
-                svgIcon "Ellipsis"
+            SandwichMenu ->
+                svgIcon "Hamburger"
 
-            Warning ->
-                svgIcon "Warning"
-
-            Filter ->
-                svgIcon "Filter"
-
-            Groups ->
-                svgIcon "Groups"
-
-            Download ->
-                svgIcon "Download"
-
-            Expand ->
-                svgIcon "Expand"
-
-            Collapse ->
-                svgIcon "Collapse"
+            Search ->
+                svgIcon "Search"
 
             SearchSpace ->
                 svgIcon "Space.Search"
+
+            SeeMore ->
+                svgIcon "Ellipsis"
+
+            Toggle ->
+                svgIcon "Map"
+
+            UpArrow ->
+                svgIcon "Chevron.Up"
+
+            Warning ->
+                svgIcon "Warning"
 
 
 
