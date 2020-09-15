@@ -97,7 +97,7 @@ renderElement renderConfig (Checkbox { message, label, state } { labelVisible })
             , Border.color Palette.primary.middle
             , Border.width 2
             , Border.rounded 8
-            , Events.onClick (message (not state))
+            , Element.onIndividualClick (message (not state))
             , Element.pointer
             ]
                 ++ aria
