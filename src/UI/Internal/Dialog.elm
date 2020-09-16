@@ -114,7 +114,7 @@ titleText cfg padding title =
     Text.heading5 title
         |> Text.renderElement cfg
         |> Element.el
-            [ Element.width (px 400)
+            [ Element.width fill
             , Element.paddingEach padding
             , Element.alignTop
             ]
