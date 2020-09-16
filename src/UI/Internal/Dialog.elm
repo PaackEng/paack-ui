@@ -1,6 +1,6 @@
 module UI.Internal.Dialog exposing (Dialog, dialogMap, view)
 
-import Element exposing (Element, fill, px, shrink)
+import Element exposing (Element, fill, shrink)
 import Element.Events as Events
 import UI.Icon as Icon
 import UI.Internal.Palette as Palette
