@@ -198,6 +198,7 @@ renderElement cfg (Badge { content, tone, brightness }) =
     in
     Text.overline content
         |> Text.withColor textColor
+        |> Text.withOverflow Text.ellipsize
         |> Text.renderElement cfg
         |> Element.el
             [ Element.width shrink

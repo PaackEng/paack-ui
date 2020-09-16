@@ -82,7 +82,7 @@ listItemColors isSelected =
         }
 
     else
-        { badge = Badge.withTone Badge.grayLight
+        { badge = identity
         , title =
             Palette.color tonePrimary brightnessLighter
                 |> Palette.setContrasting True
