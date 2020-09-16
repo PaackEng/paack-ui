@@ -33,7 +33,6 @@ module UI.Checkbox exposing
 import Element exposing (Attribute, Element, px)
 import Element.Background as Background
 import Element.Border as Border
-import Element.Events as Events
 import UI.Icon as Icon
 import UI.Internal.Palette as Palette
 import UI.Internal.RenderConfig exposing (localeTerms)
@@ -97,7 +96,7 @@ renderElement renderConfig (Checkbox { message, label, state } { labelVisible })
             , Border.color Palette.primary.middle
             , Border.width 2
             , Border.rounded 8
-            , Events.onClick (message (not state))
+            , Element.onIndividualClick (message (not state))
             , Element.pointer
             ]
                 ++ aria
