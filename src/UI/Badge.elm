@@ -185,7 +185,7 @@ successDark content =
 
 {-| Replaces the tone of a badge with a new one.
 
-    prepareBadge model
+    Badge.successLight "status"
         |> (if model.requestStatus == Model.Failed then
                 Badge.withTone Badge.dangerLight
 
