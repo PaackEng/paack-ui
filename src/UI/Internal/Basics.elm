@@ -59,6 +59,15 @@ maybeNotThen replacement primary =
             replacement
 
 
+maybeAnd : Bool -> Maybe a -> Maybe a
+maybeAnd condition value =
+    if condition then
+        value
+
+    else
+        Nothing
+
+
 flip : (a -> b -> c) -> b -> a -> c
 flip applier b a =
     applier a b

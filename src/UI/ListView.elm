@@ -88,7 +88,7 @@ import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
 import UI.Icon as Icon exposing (Icon)
-import UI.Internal.Basics exposing (prependMaybe)
+import UI.Internal.Basics exposing (maybeAnd, prependMaybe)
 import UI.Internal.Palette as Palette
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.ToggleableList as ToggleableList
@@ -477,7 +477,10 @@ itemView cfg { select, renderItem } background selected obj =
          , Border.color Palette.gray.lightest
          ]
             |> prependMaybe
-                (Maybe.map (Palette.toElementColor >> Background.color) background)
+                (background
+                    |> Maybe.map (Palette.toElementColor >> Background.color)
+                    |> maybeAnd selected
+                )
         )
         (renderItem cfg selected obj)
 
