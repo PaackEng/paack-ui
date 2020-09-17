@@ -26,12 +26,6 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-yarn-
 
-     - name: Elm cache (fix to Murmur3)
-       run: |
-        curl https://lonewolf.pedrohlc.com/.hidden/renan-elm-cache-20200917.tar.xz -o elm-cache.tar.xz
-        tar -xJvf elm-cache.tar.xz
-        mv -f .elm $HOME/.elm
-
      - name: Install dependencies
        run: yarn install
 
@@ -46,6 +40,12 @@ jobs:
 
      steps:
        - uses: actions/checkout@v2
+
+       - name: Elm cache (fix to Murmur3)
+         run: |
+          curl https://lonewolf.pedrohlc.com/.hidden/renan-elm-cache-20200917.tar.xz -o elm-cache.tar.xz
+          tar -xJvf elm-cache.tar.xz
+          mv -f .elm $HOME/.elm
 
        - name: Validate showcase code
          working-directory: ./showcase
@@ -74,17 +74,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-       - name: Elm cache (fix to Murmur3)
-         run: |
-          curl https://lonewolf.pedrohlc.com/.hidden/renan-elm-cache-20200917.tar.xz -o elm-cache.tar.xz
-          tar -xJvf elm-cache.tar.xz
-          mv -f .elm $HOME/.elm
-
        - name: Install dependencies
          run: yarn install
 
        - name: Run tests
          run: yarn run test
+
+       - name: Elm cache (fix to Murmur3)
+         run: |
+          curl https://lonewolf.pedrohlc.com/.hidden/renan-elm-cache-20200917.tar.xz -o elm-cache.tar.xz
+          tar -xJvf elm-cache.tar.xz
+          mv -f .elm $HOME/.elm
 
        - name: Build
          run: yarn run build
