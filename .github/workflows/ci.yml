@@ -27,10 +27,10 @@ jobs:
           ${{ runner.os }}-yarn-
 
      - name: Elm cache (fix to Murmur3)
-        run: |
-          curl https://lonewolf.pedrohlc.com/.hidden/renan-elm-cache-20200917.tar.xz -o elm-cache.tar.xz
-          tar -xJvf elm-cache.tar.xz
-          mv -f .elm $HOME/.elm
+       run: |
+        curl https://lonewolf.pedrohlc.com/.hidden/renan-elm-cache-20200917.tar.xz -o elm-cache.tar.xz
+        tar -xJvf elm-cache.tar.xz
+        mv -f .elm $HOME/.elm
 
      - name: Install dependencies
        run: yarn install
@@ -73,6 +73,7 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
+
        - name: Elm cache (fix to Murmur3)
          run: |
           curl https://lonewolf.pedrohlc.com/.hidden/renan-elm-cache-20200917.tar.xz -o elm-cache.tar.xz
