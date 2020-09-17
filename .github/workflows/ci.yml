@@ -5,7 +5,7 @@ on: [pull_request]
 jobs:
   lint:
    runs-on: ubuntu-latest
-   
+
    steps:
      - uses: actions/checkout@v2
 
@@ -41,6 +41,12 @@ jobs:
      steps:
        - uses: actions/checkout@v2
 
+       - name: Elm cache (fix to Murmur3)
+         run: |
+          curl https://lonewolf.pedrohlc.com/.hidden/renan-elm-cache-20200917.tar.xz -o elm-cache.tar.xz
+          tar -xJvf elm-cache.tar.xz
+          mv -f .elm $HOME/.elm
+
        - name: Validate showcase code
          working-directory: ./showcase
          run: npx elm make src/Main.elm --output /dev/null
@@ -55,7 +61,7 @@ jobs:
          uses: actions/setup-node@v1
          with:
           node-version: '12'
-       
+
        - name: Get yarn cache directory path
          id: yarn-cache-dir-path
          run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -71,17 +77,23 @@ jobs:
        - name: Install dependencies
          run: yarn install
 
+       - name: Elm cache (fix to Murmur3)
+         run: |
+          curl https://lonewolf.pedrohlc.com/.hidden/renan-elm-cache-20200917.tar.xz -o elm-cache.tar.xz
+          tar -xJvf elm-cache.tar.xz
+          mv -f .elm $HOME/.elm
+
        - name: Run tests
          run: yarn run test
 
        - name: Build
          run: yarn run build
-       
+
        - name: Percy test
          uses: cypress-io/github-action@v2
          with:
           start: npm run showcase
           wait-on: 'http://localhost:1234'
-          command-prefix: 'percy exec --'  
+          command-prefix: 'percy exec --'
          env:
           PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
