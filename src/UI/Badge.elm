@@ -2,8 +2,8 @@ module UI.Badge exposing
     ( Badge
     , grayLight, primaryLight, successLight, warningLight, dangerLight
     , grayDark, primaryDark, successDark, warningDark, dangerDark
-    , renderElement
     , withTone
+    , renderElement
     )
 
 {-| Badges are small elements displayed, usually on the right of texts or top-right corner of the view, serving as counters, tags, or labels.
@@ -34,6 +34,11 @@ A badge can be created and rendered as in the following pipeline:
 ## Dark
 
 @docs grayDark, primaryDark, successDark, warningDark, dangerDark
+
+
+# Options
+
+@docs withTone
 
 
 # Rendering
@@ -178,6 +183,18 @@ successDark content =
     Badge { content = content, tone = ToneSuccess, brightness = Dark }
 
 
+{-| Replaces the tone of a badge with a new one.
+
+    prepareBadge model
+        |> (if model.requestStatus == Model.Failed then
+                Badge.withTone Badge.dangerLight
+
+            else
+                identity
+           )
+        |> Badge.renderElement renderConfig
+
+-}
 withTone : (String -> Badge) -> Badge -> Badge
 withTone builder (Badge { content }) =
     builder content
