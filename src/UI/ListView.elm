@@ -4,6 +4,7 @@ module UI.ListView exposing
     , withItems, withSelected
     , SearchConfig, withSearchField, ActionConfig, withActionBar
     , withWidth
+    , SelectStyle, withSelectStyle
     , renderElement
     )
 
@@ -60,14 +61,19 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 @docs withItems, withSelected
 
 
-# Extra elements
+## Extra elements
 
 @docs SearchConfig, withSearchField, ActionConfig, withActionBar
 
 
-# Width
+## Width
 
 @docs withWidth
+
+
+## Select Style
+
+@docs SelectStyle, withSelectStyle
 
 
 # Rendering
@@ -82,7 +88,7 @@ import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
 import UI.Icon as Icon exposing (Icon)
-import UI.Internal.Basics exposing (prependIf)
+import UI.Internal.Basics exposing (prependMaybe)
 import UI.Internal.Palette as Palette
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.ToggleableList as ToggleableList
@@ -101,6 +107,7 @@ type alias Options object msg =
     , actionBar : Maybe (ActionConfig msg)
     , isSelected : Maybe (object -> Bool)
     , width : Element.Length
+    , selectStyle : SelectStyle
     }
 
 
@@ -147,6 +154,17 @@ type alias ActionConfig msg =
     { label : String
     , icon : String -> Icon
     , onClick : msg
+    }
+
+
+{-| The selected item can be styled using [`ListView.withSelectStyle`](#withSelectStyle).
+
+  - `backgroundColor`: The color in which the background assumes for selected items.
+    When `Nothing` no color is applied.
+
+-}
+type alias SelectStyle =
+    { backgroundColor : Maybe Palette.Color
     }
 
 
@@ -331,6 +349,18 @@ withWidth width (SelectList prop opt) =
     SelectList prop { opt | width = width }
 
 
+{-| Overwrite the appearance of the selected item.
+
+    ListView.withWidth
+        { backgroundColor = Palette.color toneDanger brightnessMiddle }
+        someListView
+
+-}
+withSelectStyle : SelectStyle -> ListView object msg -> ListView object msg
+withSelectStyle style (SelectList prop opt) =
+    SelectList prop { opt | selectStyle = style }
+
+
 
 -- Render
 
@@ -357,7 +387,14 @@ renderElement cfg (SelectList prop opt) =
         [ searchFieldView cfg opt.searchField
         , opt.items
             |> filterOptions opt.searchField
-            |> List.map (\obj -> itemView cfg prop (isSelected obj) obj)
+            |> List.map
+                (\obj ->
+                    itemView cfg
+                        prop
+                        opt.selectStyle.backgroundColor
+                        (isSelected obj)
+                        obj
+                )
             |> Element.column
                 [ Border.widthEach { bottom = 0, left = 0, right = 0, top = 1 }
                 , Border.color Palette.gray.lightest
@@ -430,12 +467,8 @@ searchFieldView cfg searchField =
             Element.none
 
 
-itemView : RenderConfig -> Properties object msg -> Bool -> object -> Element msg
-itemView cfg { select, renderItem } selected obj =
-    let
-        selectedBg =
-            Background.color Palette.primary.middle
-    in
+itemView : RenderConfig -> Properties object msg -> Maybe Palette.Color -> Bool -> object -> Element msg
+itemView cfg { select, renderItem } background selected obj =
     Element.el
         ([ Events.onClick (select obj)
          , Element.pointer
@@ -443,7 +476,8 @@ itemView cfg { select, renderItem } selected obj =
          , Border.widthEach { zeroPadding | bottom = 1 }
          , Border.color Palette.gray.lightest
          ]
-            |> prependIf selected selectedBg
+            |> prependMaybe
+                (Maybe.map (Palette.toElementColor >> Background.color) background)
         )
         (renderItem cfg selected obj)
 
@@ -455,7 +489,13 @@ defaultOptions =
     , actionBar = Nothing
     , isSelected = Nothing
     , width = Element.fill
+    , selectStyle = defaultSelectStyle
     }
+
+
+defaultSelectStyle : SelectStyle
+defaultSelectStyle =
+    { backgroundColor = Just (Palette.color tonePrimary brightnessMiddle) }
 
 
 
