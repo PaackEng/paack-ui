@@ -13,6 +13,10 @@
     "i18n": "i18n-json-to-elm",
     "percy": "percy exec -- cypress run"
   },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "all"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/PaackEng/paack-ui.git"
