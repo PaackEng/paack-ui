@@ -268,13 +268,13 @@ colors tone brightness =
             )
 
         ( Dark, ToneWarning ) ->
-            ( Palette.color Palette.toneDanger Palette.brightnessDarkest
-            , Palette.color Palette.toneDanger Palette.brightnessLightest
+            ( Palette.color Palette.toneWarning Palette.brightnessDarkest
+            , Palette.color Palette.toneWarning Palette.brightnessLightest
             )
 
         ( Dark, ToneDanger ) ->
-            ( Palette.color Palette.toneWarning Palette.brightnessDarkest
-            , Palette.color Palette.toneWarning Palette.brightnessLightest
+            ( Palette.color Palette.toneDanger Palette.brightnessDarkest
+            , Palette.color Palette.toneDanger Palette.brightnessLightest
             )
 
         ( Dark, ToneSuccess ) ->
