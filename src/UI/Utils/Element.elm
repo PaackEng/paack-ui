@@ -3,6 +3,7 @@ module UI.Utils.Element exposing
     , desktopMaximum
     , svg, title, maxHeightVH, maxHeightPct, minHeightVH
     , disabled, onEnterPressed, onIndividualClick
+    , usernameTag
     , RectangleSides, zeroPadding
     )
 
@@ -27,6 +28,7 @@ module UI.Utils.Element exposing
 # Input
 
 @docs disabled, onEnterPressed, onIndividualClick
+@docs usernameTag
 
 
 # Padding, borders and size
@@ -218,4 +220,15 @@ onIndividualClick message =
     Decode.succeed message
         |> Decode.map (\msg -> { message = msg, stopPropagation = True, preventDefault = True })
         |> HtmlEvents.custom "click"
+        |> Element.htmlAttribute
+
+
+{-| LastPass (the password manager) expects both username and password inputs to be inside an HTML form. As we can't create forms with elm-ui, to trigger the username's autofill, we need either id or name equals to "username".
+
+This function sets the attribute `name="username"`.
+
+-}
+usernameTag : Attribute msg
+usernameTag =
+    HtmlAttrs.attribute "name" "username"
         |> Element.htmlAttribute

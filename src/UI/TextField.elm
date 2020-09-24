@@ -672,6 +672,14 @@ attrs cfg prop opt =
 
                 Nothing ->
                     acu
+
+        usernameAttr acu =
+            case prop.content of
+                ContentUsername ->
+                    Element.usernameTag :: acu
+
+                _ ->
+                    acu
     in
     genericAttr prop.label
         isPlaceholder
@@ -680,6 +688,7 @@ attrs cfg prop opt =
         opt.size
         |> eventAttr
         |> focustAttr
+        |> usernameAttr
         |> (++) (textAttrs cfg opt.size)
 
 
