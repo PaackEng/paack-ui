@@ -3,7 +3,7 @@ module UI.Utils.Element exposing
     , desktopMaximum
     , svg, title, maxHeightVH, maxHeightPct, minHeightVH
     , disabled, onEnterPressed, onIndividualClick
-    , usernameTag
+    , nameUsername, namePassword
     , RectangleSides, zeroPadding
     )
 
@@ -28,7 +28,7 @@ module UI.Utils.Element exposing
 # Input
 
 @docs disabled, onEnterPressed, onIndividualClick
-@docs usernameTag
+@docs nameUsername, namePassword
 
 
 # Padding, borders and size
@@ -223,12 +223,25 @@ onIndividualClick message =
         |> Element.htmlAttribute
 
 
-{-| LastPass (the password manager) expects both username and password inputs to be inside an HTML form. As we can't create forms with elm-ui, to trigger the username's autofill, we need either id or name equals to "username".
+{-| LastPass (the password manager) expects both username and password inputs to be inside an HTML form.
+As we can't create forms with elm-ui, to trigger the username's autofill, we need either id or name equals to "username".
 
 This function sets the attribute `name="username"`.
 
 -}
-usernameTag : Attribute msg
-usernameTag =
+nameUsername : Attribute msg
+nameUsername =
     HtmlAttrs.attribute "name" "username"
+        |> Element.htmlAttribute
+
+
+{-| LastPass (the password manager) expects both username and password inputs to be inside an HTML form.
+As we can't create forms with elm-ui, to trigger the password's autofill and username all at once, we need either id or name equals to "password".
+
+This function sets the attribute `name="password"`.
+
+-}
+namePassword : Attribute msg
+namePassword =
+    HtmlAttrs.attribute "name" "password"
         |> Element.htmlAttribute

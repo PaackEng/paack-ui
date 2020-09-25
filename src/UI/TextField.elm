@@ -676,7 +676,10 @@ attrs cfg prop opt =
         usernameAttr acu =
             case prop.content of
                 ContentUsername ->
-                    Element.usernameTag :: acu
+                    Element.nameUsername :: acu
+
+                ContentPassword _ ->
+                    Element.namePassword :: acu
 
                 _ ->
                     acu
