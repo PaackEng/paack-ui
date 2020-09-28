@@ -3,11 +3,12 @@ module UI.Layout.SplitSelectable exposing (Config, MobileConfig, desktop, mobile
 import Element exposing (Element, fill, fillPortion, minimum)
 import Element.Border as Border
 import Element.Keyed as Keyed
-import UI.Button exposing (Button)
+import UI.Button exposing (Button, ButtonStyle)
 import UI.ListView as ListView exposing (ListView)
 import UI.NavigationContainer as Nav
 import UI.Palette as Palette
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
+import UI.Text exposing (Text)
 import UI.Utils.Element as Element exposing (zeroPadding)
 
 
@@ -21,8 +22,8 @@ type alias Config object msg =
 
 
 type alias MobileConfig msg =
-    { buttons : List (Button msg)
-    , title : String
+    { buttons : List (ButtonStyle -> Button msg)
+    , title : Text
     , unselectMsg : msg
     }
 

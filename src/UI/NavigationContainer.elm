@@ -83,7 +83,7 @@ Example of usage:
 
 import Element exposing (Element)
 import Html exposing (Html)
-import UI.Button as Button exposing (Button)
+import UI.Button as Button exposing (Button, ButtonStyle)
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Dialog as Dialog
 import UI.Internal.Menu as Menu
@@ -91,6 +91,7 @@ import UI.Internal.NavigationContainer as Internal
 import UI.Internal.SideBar as SideBar
 import UI.Link exposing (Link)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
+import UI.Text as Text exposing (Text)
 import UI.Utils.Element as Element
 
 
@@ -306,7 +307,10 @@ contentMap applier data =
                 |> Internal.ContentStackChild
                     { title = stack.title
                     , goBackMsg = applier stack.goBackMsg
-                    , buttons = List.map (Button.map applier) stack.buttons
+                    , buttons =
+                        List.map
+                            (\button style -> Button.map applier (button style))
+                            stack.buttons
                     }
 
 
@@ -521,11 +525,12 @@ menu applier { menuExpanded } =
     Menu.default (ToggleMenu >> applier) menuExpanded
 
 
-contentProps : String -> Content msg -> ( Element msg, Maybe ( msg, List (Button msg) ), String )
+contentProps : String -> Content msg -> ( Element msg, Maybe ( msg, List (ButtonStyle -> Button msg) ), Text )
 contentProps mainTitle content =
     case content of
         Internal.ContentSingle body ->
-            ( body, Nothing, mainTitle )
+            -- TODO: Replace subtitle2 with whatever Sufyian decides
+            ( body, Nothing, Text.subtitle2 mainTitle )
 
         Internal.ContentStackChild { title, goBackMsg, buttons } body ->
             ( body, Just ( goBackMsg, buttons ), title )

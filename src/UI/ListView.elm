@@ -418,10 +418,10 @@ actionBarView cfg actionBar =
                 (ARIA.toElementAttributes ARIA.roleButton
                     ++ [ Element.width fill
                        , Element.paddingEach
-                            { bottom = 17
+                            { bottom = 12
                             , left = 20
                             , right = 12
-                            , top = 17
+                            , top = 12
                             }
                        , Background.color Palette.primary.lightest
                        , Font.color Palette.primary.middle

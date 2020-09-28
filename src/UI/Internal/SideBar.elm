@@ -2,9 +2,10 @@ module UI.Internal.SideBar exposing (desktopColumn, mobileDrawer)
 
 import Element exposing (Attribute, Element, fill, fillPortion, height, padding, paddingEach, paddingXY, px, scrollbarY, shrink, spacing, width)
 import Element.Background as Background
+import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
-import UI.Button as Button exposing (Button)
+import UI.Button as Button exposing (Button, ButtonStyle)
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Menu as Menu exposing (Menu)
 import UI.Internal.Palette as Palette
@@ -14,9 +15,9 @@ import UI.Link as Link exposing (Link)
 import UI.Palette as Palette exposing (brightnessLight, brightnessMiddle, toneGray, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
-import UI.Text as Text
+import UI.Text as Text exposing (Text, ellipsize)
 import UI.Utils.ARIA as ARIA
-import UI.Utils.Element as Element
+import UI.Utils.Element as Element exposing (zeroPadding)
 
 
 
@@ -41,8 +42,8 @@ mobileDrawer :
     RenderConfig
     -> Element msg
     -> Menu msg
-    -> String
-    -> Maybe ( msg, List (Button msg) )
+    -> Text
+    -> Maybe ( msg, List (ButtonStyle -> Button msg) )
     -> Element msg
 mobileDrawer cfg page menu title maybeStack =
     let
@@ -92,7 +93,7 @@ mobileDrawer cfg page menu title maybeStack =
 -- Internals
 
 
-viewHead : RenderConfig -> Menu msg -> String -> Maybe ( msg, List (Button msg) ) -> Element msg
+viewHead : RenderConfig -> Menu msg -> Text -> Maybe ( msg, List (ButtonStyle -> Button msg) ) -> Element msg
 viewHead cfg (Menu.Menu prop _) title maybeStack =
     let
         sidebarTerms =
@@ -101,7 +102,8 @@ viewHead cfg (Menu.Menu prop _) title maybeStack =
         mobileHeadSandwich =
             sidebarTerms.expand
                 |> Icon.sandwichMenu
-                |> Icon.withSize Size.medium
+                |> Icon.withSize Size.large
+                |> Icon.withColor (Palette.color toneGray brightnessMiddle)
                 |> Icon.renderElement cfg
                 |> Element.el (headerButtonAttr (prop.toggleMsg True) 48 20)
 
@@ -110,26 +112,45 @@ viewHead cfg (Menu.Menu prop _) title maybeStack =
                 |> Icon.previousContent
                 |> Icon.renderElement cfg
                 |> Element.el (headerButtonAttr msg 48 20)
+
+        baseAttrs =
+            [ Element.width fill
+            , Border.widthEach { zeroPadding | bottom = 1 }
+            , Border.color Palette.gray.lightest
+            ]
+
+        titleView =
+            title
+                |> Text.withOverflow ellipsize
+                |> Text.renderElement cfg
     in
     case maybeStack of
         Nothing ->
-            Element.row
-                [ width fill
-                , Element.inFront mobileHeadSandwich
-                ]
-                [ Element.el
-                    [ Element.width fill, Font.center, padding 20 ]
-                    (Text.heading5 title |> Text.renderElement cfg)
-                ]
+            Element.el
+                (baseAttrs
+                    |> (::) (Element.inFront mobileHeadSandwich)
+                )
+            <|
+                Element.el
+                    [ Element.width fill, Font.center, Element.centerY, padding 20 ]
+                    titleView
 
         Just ( goBackMsg, stackButtons ) ->
-            Element.row [ width fill, spacing 8, paddingEach { left = 4, right = 12, top = 0, bottom = 0 } ] <|
+            Element.row
+                (baseAttrs
+                    |> (::) (Element.spacing 8)
+                    |> (::)
+                        (Element.paddingEach
+                            { left = 4, right = 12, top = 0, bottom = 0 }
+                        )
+                )
+            <|
                 [ mobileHeadGoBack goBackMsg
                 , Element.el
-                    [ Element.width fill, Element.centerY ]
-                    (Text.heading5 title |> Text.renderElement cfg)
+                    [ Element.width fill, Font.center, Element.centerY ]
+                    titleView
                 ]
-                    ++ List.map (Button.renderElement cfg) stackButtons
+                    ++ List.map (renderHeaderButton cfg) stackButtons
 
 
 viewSide : RenderConfig -> Bool -> Menu msg -> Element msg
@@ -417,3 +438,9 @@ slimIconColor isSelected =
     else
         Palette.color tonePrimary brightnessMiddle
             |> Palette.withAlpha 0.4
+
+
+renderHeaderButton : RenderConfig -> (ButtonStyle -> Button msg) -> Element msg
+renderHeaderButton renderConfig button =
+    button Button.clear
+        |> Button.renderElement renderConfig

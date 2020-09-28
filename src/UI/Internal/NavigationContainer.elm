@@ -1,7 +1,8 @@
 module UI.Internal.NavigationContainer exposing (Content(..), StackChild, toShowcaseElement)
 
 import Element exposing (Element)
-import UI.Button exposing (Button)
+import UI.Button exposing (Button, ButtonStyle)
+import UI.Text exposing (Text)
 
 
 type Content msg
@@ -10,8 +11,8 @@ type Content msg
 
 
 type alias StackChild msg =
-    { title : String
-    , buttons : List (Button msg)
+    { title : Text
+    , buttons : List (ButtonStyle -> Button msg)
     , goBackMsg : msg
     }
 
