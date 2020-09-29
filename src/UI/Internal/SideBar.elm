@@ -5,8 +5,9 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
-import UI.Button as Button exposing (Button, ButtonStyle)
+import UI.Button as Button exposing (Button)
 import UI.Icon as Icon exposing (Icon)
+import UI.Internal.Button as Button
 import UI.Internal.Menu as Menu exposing (Menu)
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
@@ -15,7 +16,7 @@ import UI.Link as Link exposing (Link)
 import UI.Palette as Palette exposing (brightnessLight, brightnessMiddle, toneGray, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
-import UI.Text as Text exposing (Text, ellipsize)
+import UI.Text as Text exposing (ellipsize)
 import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element exposing (zeroPadding)
 
@@ -42,8 +43,8 @@ mobileDrawer :
     RenderConfig
     -> Element msg
     -> Menu msg
-    -> Text
-    -> Maybe ( msg, List (ButtonStyle -> Button msg) )
+    -> ( String, Maybe String )
+    -> Maybe ( msg, List (Button msg) )
     -> Element msg
 mobileDrawer cfg page menu title maybeStack =
     let
@@ -93,8 +94,8 @@ mobileDrawer cfg page menu title maybeStack =
 -- Internals
 
 
-viewHead : RenderConfig -> Menu msg -> Text -> Maybe ( msg, List (ButtonStyle -> Button msg) ) -> Element msg
-viewHead cfg (Menu.Menu prop _) title maybeStack =
+viewHead : RenderConfig -> Menu msg -> ( String, Maybe String ) -> Maybe ( msg, List (Button msg) ) -> Element msg
+viewHead cfg (Menu.Menu prop _) ( title, maybeSubtitle ) maybeStack =
     let
         sidebarTerms =
             cfg |> localeTerms >> .sidebar
@@ -120,7 +121,16 @@ viewHead cfg (Menu.Menu prop _) title maybeStack =
             ]
 
         titleView =
-            title
+            (case maybeSubtitle of
+                Just subTitle ->
+                    Text.combination
+                        [ Text.subtitle2 title
+                        , Text.caption subTitle
+                        ]
+
+                Nothing ->
+                    Text.subtitle2 title
+            )
                 |> Text.withOverflow ellipsize
                 |> Text.renderElement cfg
     in
@@ -440,7 +450,8 @@ slimIconColor isSelected =
             |> Palette.withAlpha 0.4
 
 
-renderHeaderButton : RenderConfig -> (ButtonStyle -> Button msg) -> Element msg
+renderHeaderButton : RenderConfig -> Button msg -> Element msg
 renderHeaderButton renderConfig button =
-    button Button.clear
-        |> Button.renderElement renderConfig
+    button
+        |> Button.withSize Size.large
+        |> Button.renderUnstyled renderConfig []
