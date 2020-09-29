@@ -21,7 +21,7 @@ type alias Config object msg =
 
 
 type alias MobileConfig msg =
-    { buttons : List (Button msg)
+    { rightButton : Maybe (Button msg)
     , title : ( String, Maybe String )
     , unselectMsg : msg
     }
@@ -34,7 +34,7 @@ mobile renderConfig mobileConfig layoutConfig =
             Nav.contentStackChild
                 { title = mobileConfig.title
                 , goBackMsg = mobileConfig.unselectMsg
-                , buttons = mobileConfig.buttons
+                , rightButton = mobileConfig.rightButton
                 }
                 layoutConfig.selectedView
 

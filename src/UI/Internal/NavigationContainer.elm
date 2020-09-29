@@ -11,7 +11,7 @@ type Content msg
 
 type alias StackChild msg =
     { title : ( String, Maybe String )
-    , buttons : List (Button msg)
+    , rightButton : Maybe (Button msg)
     , goBackMsg : msg
     }
 

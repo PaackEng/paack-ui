@@ -2,13 +2,12 @@ module UI.Internal.SideBar exposing (desktopColumn, mobileDrawer)
 
 import Element exposing (Attribute, Element, fill, fillPortion, height, padding, paddingEach, paddingXY, px, scrollbarY, shrink, spacing, width)
 import Element.Background as Background
-import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
 import UI.Button as Button exposing (Button)
 import UI.Icon as Icon exposing (Icon)
-import UI.Internal.Button as Button
 import UI.Internal.Menu as Menu exposing (Menu)
+import UI.Internal.Nav.StackHeader as StackHeader
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Internal.RenderConfig exposing (localeTerms)
@@ -16,9 +15,9 @@ import UI.Link as Link exposing (Link)
 import UI.Palette as Palette exposing (brightnessLight, brightnessMiddle, toneGray, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
-import UI.Text as Text exposing (ellipsize)
+import UI.Text as Text
 import UI.Utils.ARIA as ARIA
-import UI.Utils.Element as Element exposing (zeroPadding)
+import UI.Utils.Element as Element
 
 
 
@@ -44,7 +43,7 @@ mobileDrawer :
     -> Element msg
     -> Menu msg
     -> ( String, Maybe String )
-    -> Maybe ( msg, List (Button msg) )
+    -> Maybe ( msg, Maybe (Button msg) )
     -> Element msg
 mobileDrawer cfg page menu title maybeStack =
     let
@@ -94,73 +93,20 @@ mobileDrawer cfg page menu title maybeStack =
 -- Internals
 
 
-viewHead : RenderConfig -> Menu msg -> ( String, Maybe String ) -> Maybe ( msg, List (Button msg) ) -> Element msg
-viewHead cfg (Menu.Menu prop _) ( title, maybeSubtitle ) maybeStack =
-    let
-        sidebarTerms =
-            cfg |> localeTerms >> .sidebar
-
-        mobileHeadSandwich =
-            sidebarTerms.expand
-                |> Icon.sandwichMenu
-                |> Icon.withSize Size.large
-                |> Icon.withColor (Palette.color toneGray brightnessMiddle)
-                |> Icon.renderElement cfg
-                |> Element.el (headerButtonAttr (prop.toggleMsg True) 48 20)
-
-        mobileHeadGoBack msg =
-            sidebarTerms.previous
-                |> Icon.previousContent
-                |> Icon.renderElement cfg
-                |> Element.el (headerButtonAttr msg 48 20)
-
-        baseAttrs =
-            [ Element.width fill
-            , Border.widthEach { zeroPadding | bottom = 1 }
-            , Border.color Palette.gray.lightest
-            ]
-
-        titleView =
-            (case maybeSubtitle of
-                Just subTitle ->
-                    Text.combination
-                        [ Text.subtitle2 title
-                        , Text.caption subTitle
-                        ]
-
-                Nothing ->
-                    Text.subtitle2 title
-            )
-                |> Text.withOverflow ellipsize
-                |> Text.renderElement cfg
-    in
+viewHead : RenderConfig -> Menu msg -> ( String, Maybe String ) -> Maybe ( msg, Maybe (Button msg) ) -> Element msg
+viewHead cfg (Menu.Menu prop _) label maybeStack =
     case maybeStack of
         Nothing ->
-            Element.el
-                (baseAttrs
-                    |> (::) (Element.inFront mobileHeadSandwich)
-                )
-            <|
-                Element.el
-                    [ Element.width fill, Font.center, Element.centerY, padding 20 ]
-                    titleView
+            StackHeader.view cfg
+                (StackHeader.MenuButton (prop.toggleMsg True))
+                Nothing
+                label
 
-        Just ( goBackMsg, stackButtons ) ->
-            Element.row
-                (baseAttrs
-                    |> (::) (Element.spacing 8)
-                    |> (::)
-                        (Element.paddingEach
-                            { left = 4, right = 12, top = 0, bottom = 0 }
-                        )
-                )
-            <|
-                [ mobileHeadGoBack goBackMsg
-                , Element.el
-                    [ Element.width fill, Font.center, Element.centerY ]
-                    titleView
-                ]
-                    ++ List.map (renderHeaderButton cfg) stackButtons
+        Just ( goBackMsg, rightButton ) ->
+            StackHeader.view cfg
+                (StackHeader.BackButton goBackMsg)
+                rightButton
+                label
 
 
 viewSide : RenderConfig -> Bool -> Menu msg -> Element msg
@@ -233,7 +179,7 @@ headerView cfg toggleMsg logo =
                 |> Icon.withSize Size.small
                 |> Icon.withColor (Palette.color toneGray brightnessLight)
                 |> Icon.renderElement cfg
-                |> Element.el (headerButtonAttr toggleMsg 40 10)
+                |> Element.el (headerButtonAttr toggleMsg)
     in
     Element.row attr
         [ logoEl
@@ -248,17 +194,15 @@ slimHeaderView cfg toggleMsg _ =
             |> Icon.sandwichMenu
             |> Icon.withSize Size.small
             |> Icon.renderElement cfg
-            |> Element.el (headerButtonAttr toggleMsg 48 14)
+            |> Element.el (headerButtonAttr toggleMsg)
         ]
 
 
-headerButtonAttr : msg -> Int -> Int -> List (Attribute msg)
-headerButtonAttr toggleMsg boxWidth padY =
-    [ width (px boxWidth)
-    , paddingXY 0 padY
-    , Font.center
-    , Events.onClick toggleMsg
+headerButtonAttr : msg -> List (Attribute msg)
+headerButtonAttr toggleMsg =
+    [ Events.onClick toggleMsg
     , Element.pointer
+    , Element.centerY
     ]
         ++ ARIA.toElementAttributes ARIA.roleButton
 
@@ -448,10 +392,3 @@ slimIconColor isSelected =
     else
         Palette.color tonePrimary brightnessMiddle
             |> Palette.withAlpha 0.4
-
-
-renderHeaderButton : RenderConfig -> Button msg -> Element msg
-renderHeaderButton renderConfig button =
-    button
-        |> Button.withSize Size.large
-        |> Button.renderUnstyled renderConfig []
