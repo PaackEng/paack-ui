@@ -70,6 +70,17 @@ import Element.Border as Border
 import Element.Font as Font
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Basics exposing (lazyMap, pairUncurry, prependMaybe)
+import UI.Internal.Button as Internal
+    exposing
+        ( Button(..)
+        , ButtonAction(..)
+        , ButtonBody(..)
+        , ButtonMode(..)
+        , ButtonStyle(..)
+        , ButtonWidth(..)
+        , EmbossedTone(..)
+        , bodyToElement
+        )
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Size as Size exposing (Size)
@@ -83,48 +94,28 @@ import UI.Utils.Element as Element
 
 
 type alias Options =
-    { width : ButtonWidth
-    , size : Size
-    }
-
-
-type alias Properties msg =
-    { body : ButtonBody
-    , mode : ButtonMode msg
-    }
+    Internal.Options
 
 
 {-| The `Button msg` type is used for describing the component for later rendering.
 -}
-type Button msg
-    = Button (Properties msg) Options
-    | Toggle (ToggleProperties msg) Options
+type alias Button msg =
+    Internal.Button msg
 
 
 {-| The `ButtonBody` is required when assembling the most-basic `Button msg` type.
 It indicates the contents inside of the desired button, like its label or icon.
 -}
-type ButtonBody
-    = BodyText String
-    | BodyIcon Icon
+type alias ButtonBody =
+    Internal.ButtonBody
 
 
-type ButtonAction msg
-    = ActionMsg msg
-    | ActionRedirect Link
+type alias ButtonAction msg =
+    Internal.ButtonAction msg
 
 
-type ButtonMode msg
-    = ButtonActive (ButtonAction msg) ButtonStyle
-    | ButtonDisabled
-    | ButtonSuccess
-
-
-type EmbossedTone
-    = TonePrimary
-    | ToneDanger
-    | ToneLight
-    | ToneClear
+type alias EmbossedTone =
+    Internal.EmbossedTone
 
 
 {-| Non-toggle buttons must-be styled. The currently available styles are Hyperlink and Embossed.
@@ -136,23 +127,14 @@ It's available through its sub-themes: Primary, Danger, Light, and Clear.
 These only change background and text color.
 
 -}
-type ButtonStyle
-    = StyleEmbossed EmbossedTone
-    | StyleHyperlink
+type alias ButtonStyle =
+    Internal.ButtonStyle
 
 
 {-| Describes a compatible width.
 -}
-type ButtonWidth
-    = WidthFull
-    | WidthShrink
-
-
-type alias ToggleProperties msg =
-    { current : Bool
-    , toggleMsg : Bool -> msg
-    , hint : String
-    }
+type alias ButtonWidth =
+    Internal.ButtonWidth
 
 
 
@@ -611,23 +593,6 @@ staticView cfg size width body theme =
         |> Element.el attrs
 
 
-bodyToElement : RenderConfig -> Size -> ButtonBody -> Element msg
-bodyToElement cfg size body =
-    case body of
-        BodyText str ->
-            Element.el
-                [ Font.size <| textSize size
-                , Element.centerX
-                , Element.spacing 8
-                ]
-                (Element.text str)
-
-        BodyIcon icon ->
-            icon
-                |> Icon.withSize size
-                |> Icon.renderElement cfg
-
-
 
 -- Attributes
 
@@ -716,22 +681,6 @@ borderWidth size =
 
         Size.ExtraSmall ->
             1
-
-
-textSize : Size -> Int
-textSize size =
-    case size of
-        Size.Large ->
-            20
-
-        Size.Medium ->
-            16
-
-        Size.Small ->
-            12
-
-        Size.ExtraSmall ->
-            10
 
 
 

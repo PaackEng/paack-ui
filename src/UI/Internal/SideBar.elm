@@ -4,9 +4,10 @@ import Element exposing (Attribute, Element, fill, fillPortion, height, padding,
 import Element.Background as Background
 import Element.Events as Events
 import Element.Font as Font
-import UI.Button as Button exposing (Button)
+import UI.Button exposing (Button)
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Menu as Menu exposing (Menu)
+import UI.Internal.Nav.StackHeader as StackHeader
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Internal.RenderConfig exposing (localeTerms)
@@ -41,8 +42,8 @@ mobileDrawer :
     RenderConfig
     -> Element msg
     -> Menu msg
-    -> String
-    -> Maybe ( msg, List (Button msg) )
+    -> ( String, Maybe String )
+    -> Maybe ( msg, Maybe (Button msg) )
     -> Element msg
 mobileDrawer cfg page menu title maybeStack =
     let
@@ -92,44 +93,20 @@ mobileDrawer cfg page menu title maybeStack =
 -- Internals
 
 
-viewHead : RenderConfig -> Menu msg -> String -> Maybe ( msg, List (Button msg) ) -> Element msg
-viewHead cfg (Menu.Menu prop _) title maybeStack =
-    let
-        sidebarTerms =
-            cfg |> localeTerms >> .sidebar
-
-        mobileHeadSandwich =
-            sidebarTerms.expand
-                |> Icon.sandwichMenu
-                |> Icon.withSize Size.medium
-                |> Icon.renderElement cfg
-                |> Element.el (headerButtonAttr (prop.toggleMsg True) 48 20)
-
-        mobileHeadGoBack msg =
-            sidebarTerms.previous
-                |> Icon.previousContent
-                |> Icon.renderElement cfg
-                |> Element.el (headerButtonAttr msg 48 20)
-    in
+viewHead : RenderConfig -> Menu msg -> ( String, Maybe String ) -> Maybe ( msg, Maybe (Button msg) ) -> Element msg
+viewHead cfg (Menu.Menu prop _) label maybeStack =
     case maybeStack of
         Nothing ->
-            Element.row
-                [ width fill
-                , Element.inFront mobileHeadSandwich
-                ]
-                [ Element.el
-                    [ Element.width fill, Font.center, padding 20 ]
-                    (Text.heading5 title |> Text.renderElement cfg)
-                ]
+            StackHeader.view cfg
+                (StackHeader.MenuButton (prop.toggleMsg True))
+                Nothing
+                label
 
-        Just ( goBackMsg, stackButtons ) ->
-            Element.row [ width fill, spacing 8, paddingEach { left = 4, right = 12, top = 0, bottom = 0 } ] <|
-                [ mobileHeadGoBack goBackMsg
-                , Element.el
-                    [ Element.width fill, Element.centerY ]
-                    (Text.heading5 title |> Text.renderElement cfg)
-                ]
-                    ++ List.map (Button.renderElement cfg) stackButtons
+        Just ( goBackMsg, rightButton ) ->
+            StackHeader.view cfg
+                (StackHeader.BackButton goBackMsg)
+                rightButton
+                label
 
 
 viewSide : RenderConfig -> Bool -> Menu msg -> Element msg
@@ -202,7 +179,7 @@ headerView cfg toggleMsg logo =
                 |> Icon.withSize Size.small
                 |> Icon.withColor (Palette.color toneGray brightnessLight)
                 |> Icon.renderElement cfg
-                |> Element.el (headerButtonAttr toggleMsg 40 10)
+                |> Element.el (headerButtonAttr toggleMsg)
     in
     Element.row attr
         [ logoEl
@@ -217,17 +194,15 @@ slimHeaderView cfg toggleMsg _ =
             |> Icon.sandwichMenu
             |> Icon.withSize Size.small
             |> Icon.renderElement cfg
-            |> Element.el (headerButtonAttr toggleMsg 48 14)
+            |> Element.el (headerButtonAttr toggleMsg)
         ]
 
 
-headerButtonAttr : msg -> Int -> Int -> List (Attribute msg)
-headerButtonAttr toggleMsg boxWidth padY =
-    [ width (px boxWidth)
-    , paddingXY 0 padY
-    , Font.center
-    , Events.onClick toggleMsg
+headerButtonAttr : msg -> List (Attribute msg)
+headerButtonAttr toggleMsg =
+    [ Events.onClick toggleMsg
     , Element.pointer
+    , Element.centerY
     ]
         ++ ARIA.toElementAttributes ARIA.roleButton
 

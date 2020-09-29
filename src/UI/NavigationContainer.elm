@@ -306,7 +306,7 @@ contentMap applier data =
                 |> Internal.ContentStackChild
                     { title = stack.title
                     , goBackMsg = applier stack.goBackMsg
-                    , buttons = List.map (Button.map applier) stack.buttons
+                    , rightButton = Maybe.map (Button.map applier) stack.rightButton
                     }
 
 
@@ -521,14 +521,17 @@ menu applier { menuExpanded } =
     Menu.default (ToggleMenu >> applier) menuExpanded
 
 
-contentProps : String -> Content msg -> ( Element msg, Maybe ( msg, List (Button msg) ), String )
+contentProps :
+    String
+    -> Content msg
+    -> ( Element msg, Maybe ( msg, Maybe (Button msg) ), ( String, Maybe String ) )
 contentProps mainTitle content =
     case content of
         Internal.ContentSingle body ->
-            ( body, Nothing, mainTitle )
+            ( body, Nothing, ( mainTitle, Nothing ) )
 
-        Internal.ContentStackChild { title, goBackMsg, buttons } body ->
-            ( body, Just ( goBackMsg, buttons ), title )
+        Internal.ContentStackChild { title, goBackMsg, rightButton } body ->
+            ( body, Just ( goBackMsg, rightButton ), title )
 
 
 dialogMap : (a -> b) -> Dialog a -> Dialog b

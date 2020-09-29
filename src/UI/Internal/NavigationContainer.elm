@@ -10,8 +10,8 @@ type Content msg
 
 
 type alias StackChild msg =
-    { title : String
-    , buttons : List (Button msg)
+    { title : ( String, Maybe String )
+    , rightButton : Maybe (Button msg)
     , goBackMsg : msg
     }
 
