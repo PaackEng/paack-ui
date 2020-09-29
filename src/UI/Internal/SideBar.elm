@@ -4,7 +4,7 @@ import Element exposing (Attribute, Element, fill, fillPortion, height, padding,
 import Element.Background as Background
 import Element.Events as Events
 import Element.Font as Font
-import UI.Button as Button exposing (Button)
+import UI.Button exposing (Button)
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Menu as Menu exposing (Menu)
 import UI.Internal.Nav.StackHeader as StackHeader
