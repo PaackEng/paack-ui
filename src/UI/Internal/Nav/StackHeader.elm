@@ -76,7 +76,10 @@ rightButtonView renderConfig maybeRightButton =
         Just rightButton ->
             rightButton
                 |> Button.withSize Size.medium
-                |> Button.renderUnstyled renderConfig [ Element.padding 8 ]
+                |> Button.renderUnstyled renderConfig
+                    [ Element.padding 8
+                    , Font.color Palette.gray.middle
+                    ]
 
         Nothing ->
             Element.el
