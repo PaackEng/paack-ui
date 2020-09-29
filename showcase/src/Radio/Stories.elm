@@ -3,7 +3,7 @@ module Radio.Stories exposing (stories, update)
 import Element exposing (Element)
 import Model exposing (Model)
 import Msg exposing (Msg)
-import PluginOptions exposing (defaultWithoutMenu)
+import PluginOptions exposing (defaultWithMenu)
 import Radio.Model as RadioModel
 import Radio.Msg as RadioMsg
 import Return exposing (Return)
@@ -33,16 +33,30 @@ stories : RenderConfig -> ExplorerUI
 stories renderConfig =
     storiesOf
         "Radio"
-        [ demo renderConfig ]
+        [ radioGroupVertical renderConfig
+        , radioGroupHorizontal renderConfig
+        ]
 
 
-demo : RenderConfig -> ExplorerStory
-demo renderConfig =
+radioGroupVertical : RenderConfig -> ExplorerStory
+radioGroupVertical renderConfig =
     storyWithModel
-        ( "Radio"
-        , view renderConfig
-        , { defaultWithoutMenu
-            | code = code
+        ( "Vertical"
+        , view Radio.vertical renderConfig
+        , { defaultWithMenu
+            | code = codeForVerticalRadioGroup
+            , note = goToDocsCallToAction "Radio"
+          }
+        )
+
+
+radioGroupHorizontal : RenderConfig -> ExplorerStory
+radioGroupHorizontal renderConfig =
+    storyWithModel
+        ( "Horizontal"
+        , view Radio.horizontal renderConfig
+        , { defaultWithMenu
+            | code = codeForHorizontalRadioGroup
             , note = goToDocsCallToAction "Radio"
           }
         )
@@ -53,8 +67,8 @@ label =
     "Pick one classic rock band"
 
 
-view : RenderConfig -> Model -> Element Msg
-view renderConfig { radioStories } =
+view : Radio.Direction -> RenderConfig -> Model -> Element Msg
+view direction renderConfig { radioStories } =
     Element.column
         [ Element.spacing 8 ]
         [ iconsSvgSprite
@@ -64,6 +78,7 @@ view renderConfig { radioStories } =
             label
             (RadioMsg.Set >> Msg.RadioStoriesMsg)
             |> Radio.withSelected radioStories.selected
+            |> Radio.withDirection direction
             |> Radio.withButtons
                 [ Radio.button RadioModel.Queen "Queen"
                 , Radio.button RadioModel.Beatles "Beatles"
@@ -75,13 +90,32 @@ view renderConfig { radioStories } =
         ]
 
 
-code : String
-code =
+codeForVerticalRadioGroup : String
+codeForVerticalRadioGroup =
     prettifyElmCode """
 Radio.group
     "Pick one classic rock band"
     Msg.RadioSet
     |> Radio.withSelected model.selected
+    |> Radio.withButtons
+        [ Radio.button Model.Queen "Queen"
+        , Radio.button Model.Beatles "Beatles"
+        , Radio.button Model.ACDC "AC/DC"
+        , Radio.button Model.LedZeppelin "Led Zeppelin"
+        , Radio.button Model.PinkFloyd "Pink Floyd"
+        ]
+    |> Radio.renderElement renderConfig
+"""
+
+
+codeForHorizontalRadioGroup : String
+codeForHorizontalRadioGroup =
+    prettifyElmCode """
+Radio.group
+    "Pick one classic rock band"
+    Msg.RadioSet
+    |> Radio.withSelected model.selected
+    |> Radio.withDirection model.direction
     |> Radio.withButtons
         [ Radio.button Model.Queen "Queen"
         , Radio.button Model.Beatles "Beatles"

@@ -4,6 +4,7 @@ module UI.Radio exposing
     , withButtons, withSelected
     , RadioWidth, withWidth, widthFull, widthRelative
     , renderElement
+    , Direction, horizontal, vertical, withDirection
     )
 
 {-| Accessible and uniform-styled implementation of a radio buttons.
@@ -79,6 +80,11 @@ type RadioWidth
     | WidthRelative
 
 
+type Direction
+    = Vertical
+    | Horizontal
+
+
 type alias Properties id msg =
     { label : String
     , message : id -> msg
@@ -89,6 +95,7 @@ type alias Options id =
     { selected : Maybe id
     , buttons : List (RadioButton id)
     , width : RadioWidth
+    , direction : Direction
     }
 
 
@@ -103,7 +110,7 @@ The second is the message triggered when there is a selection.
 group : String -> (id -> msg) -> RadioGroup id msg
 group label message =
     RadioGroup { label = label, message = message }
-        { selected = Nothing, buttons = [], width = WidthRelative }
+        { selected = Nothing, buttons = [], width = WidthRelative, direction = Vertical }
 
 
 {-| A radio button and an element of a radio group.
@@ -151,6 +158,30 @@ withWidth width (RadioGroup prop opt) =
     RadioGroup prop { opt | width = width }
 
 
+{-| `Radio.withDisposition` determines whether the radio group's items are arranged horizontally or vertically.
+
+    Radio.withDisposition Radio.horizontalDisposition someRadioGroup
+
+-}
+withDirection : Direction -> RadioGroup id msg -> RadioGroup id msg
+withDirection direction (RadioGroup prop opt) =
+    RadioGroup prop { opt | direction = direction }
+
+
+{-| When displaying, arrange the buttons in horizontal lines.
+-}
+horizontal : Direction
+horizontal =
+    Horizontal
+
+
+{-| When displaying, arrange the buttons in a column.
+-}
+vertical : Direction
+vertical =
+    Vertical
+
+
 {-| All the radio buttons' width will fill the container.
 -}
 widthFull : RadioWidth
@@ -172,7 +203,16 @@ widthRelative =
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
 renderElement : RenderConfig -> RadioGroup id msg -> Element msg
-renderElement renderConfig (RadioGroup { label, message } { selected, buttons, width }) =
+renderElement renderConfig (RadioGroup { label, message } { selected, buttons, width, direction }) =
+    let
+        layoutFunc =
+            case direction of
+                Vertical ->
+                    Element.column
+
+                Horizontal ->
+                    Element.wrappedRow
+    in
     buttons
         |> List.map
             (\(RadioButton id buttonLabel) ->
@@ -181,7 +221,7 @@ renderElement renderConfig (RadioGroup { label, message } { selected, buttons, w
                     buttonLabel
                     (selected == Just id)
             )
-        |> Element.column
+        |> layoutFunc
             (widthToEl width
                 :: (ARIA.toElementAttributes <| ARIA.roleRadioGroup label)
             )
