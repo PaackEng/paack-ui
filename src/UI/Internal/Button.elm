@@ -106,25 +106,38 @@ renderUnstyled : RenderConfig -> List (Attribute msg) -> Button msg -> Element m
 renderUnstyled renderConfig attributes button =
     case button of
         Button { body, mode } { size } ->
-            bodyToElement renderConfig size body
-                |> (case mode of
-                        ButtonActive action _ ->
-                            case action of
-                                ActionMsg onClickMsg ->
-                                    [ Element.pointer
-                                    , Element.onIndividualClick onClickMsg
-                                    ]
-                                        |> (++) (ARIA.toElementAttributes ARIA.roleButton)
-                                        |> (++) attributes
-                                        |> Element.el
-
-                                ActionRedirect link ->
-                                    Link.wrapElement renderConfig attributes link
-
-                        _ ->
-                            identity
-                   )
+            body
+                |> bodyToElement
+                    renderConfig
+                    size
+                |> applyFunctionality
+                    renderConfig
+                    attributes
+                    mode
 
         Toggle _ _ ->
             -- TODO: Do it if you need it someday...
             Element.none
+
+
+applyFunctionality : RenderConfig -> List (Attribute msg) -> ButtonMode msg -> (Element msg -> Element msg)
+applyFunctionality renderConfig attributes mode =
+    case mode of
+        ButtonActive (ActionMsg onClickMsg) _ ->
+            applyCmdFunctionality attributes onClickMsg
+
+        ButtonActive (ActionRedirect link) _ ->
+            Link.wrapElement renderConfig attributes link
+
+        _ ->
+            identity
+
+
+applyCmdFunctionality : List (Attribute msg) -> msg -> (Element msg -> Element msg)
+applyCmdFunctionality attributes onClickMsg =
+    [ Element.pointer
+    , Element.onIndividualClick onClickMsg
+    ]
+        |> (++) (ARIA.toElementAttributes ARIA.roleButton)
+        |> (++) attributes
+        |> Element.el
