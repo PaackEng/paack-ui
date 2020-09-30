@@ -44,12 +44,12 @@ leftButtonView renderConfig leftButton =
     case leftButton of
         BackButton msg ->
             (localeTerms renderConfig).sidebar.expand
-                |> Icon.sandwichMenu
+                |> Icon.previousContent
                 |> iconToButton renderConfig msg
 
         MenuButton msg ->
             (localeTerms renderConfig).sidebar.previous
-                |> Icon.previousContent
+                |> Icon.sandwichMenu
                 |> iconToButton renderConfig msg
 
 
