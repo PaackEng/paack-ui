@@ -1,12 +1,11 @@
 module UI.Internal.Button exposing (..)
 
-import Element exposing (Attribute, Element)
+import Element exposing (Element)
 import Element.Font as Font
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Size as Size exposing (Size)
-import UI.Link as Link exposing (Link)
+import UI.Link exposing (Link)
 import UI.RenderConfig exposing (RenderConfig)
-import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element
 
 

@@ -89,7 +89,7 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
-import UI.Icon as Icon exposing (Icon)
+import UI.Icon as Icon
 import UI.Internal.Basics exposing (maybeAnd, prependMaybe)
 import UI.Internal.Clickable as Clickable
 import UI.Internal.Palette as Palette
@@ -100,8 +100,7 @@ import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
 import UI.TextField as TextField
-import UI.Utils.ARIA as ARIA
-import UI.Utils.Action as Action exposing (Config)
+import UI.Utils.Action as Action
 import UI.Utils.Element as Element exposing (zeroPadding)
 
 

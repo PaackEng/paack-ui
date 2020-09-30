@@ -83,7 +83,6 @@ Example of usage:
 
 import Element exposing (Element)
 import Html exposing (Html)
-import UI.Button as Button exposing (Button)
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Dialog as Dialog
 import UI.Internal.Menu as Menu

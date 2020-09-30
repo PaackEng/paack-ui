@@ -3,7 +3,6 @@ module UI.Layout.SplitSelectable exposing (Config, MobileConfig, desktop, mobile
 import Element exposing (Element, fill, fillPortion, minimum)
 import Element.Border as Border
 import Element.Keyed as Keyed
-import UI.Button exposing (Button)
 import UI.ListView as ListView exposing (ListView)
 import UI.NavigationContainer as Nav
 import UI.Palette as Palette

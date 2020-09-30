@@ -1,7 +1,7 @@
 module UI.Internal.Clickable exposing (actionIcon, actionWrapElement, msgWrapElement)
 
 import Element exposing (Attribute, Element)
-import UI.Icon as Icon exposing (Icon)
+import UI.Icon as Icon
 import UI.Link as Link
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Utils.ARIA as ARIA

@@ -3,9 +3,7 @@ module UI.Internal.Nav.StackHeader exposing (LeftButton(..), view)
 import Element exposing (Element, fill, minimum, shrink)
 import Element.Border as Border
 import Element.Font as Font
-import UI.Button as Button exposing (Button)
 import UI.Icon as Icon exposing (Icon)
-import UI.Internal.Button as Button
 import UI.Internal.Clickable as Clickable
 import UI.Internal.Palette as Palette
 import UI.Internal.RenderConfig exposing (localeTerms)
@@ -13,7 +11,7 @@ import UI.Palette as Palette exposing (brightnessMiddle, toneGray)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text exposing (ellipsize)
-import UI.Utils.Action as Action exposing (Config)
+import UI.Utils.Action as Action
 import UI.Utils.Element as Element exposing (zeroPadding)
 
 

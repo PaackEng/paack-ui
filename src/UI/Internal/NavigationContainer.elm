@@ -1,7 +1,6 @@
 module UI.Internal.NavigationContainer exposing (Content(..), StackChild, toShowcaseElement)
 
 import Element exposing (Element)
-import UI.Button exposing (Button)
 import UI.Utils.Action as Action
 
 
