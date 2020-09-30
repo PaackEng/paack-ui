@@ -3,7 +3,7 @@ module UI.Internal.Nav.StackHeader exposing (LeftButton(..), view)
 import Element exposing (Element, fill, minimum, shrink)
 import Element.Border as Border
 import Element.Font as Font
-import UI.Icon as Icon exposing (Icon)
+import UI.Icon as Icon
 import UI.Internal.Clickable as Clickable
 import UI.Internal.Palette as Palette
 import UI.Internal.RenderConfig exposing (localeTerms)
@@ -43,14 +43,18 @@ leftButtonView : RenderConfig -> LeftButton msg -> Element msg
 leftButtonView renderConfig leftButton =
     case leftButton of
         BackButton msg ->
-            (localeTerms renderConfig).sidebar.expand
-                |> Icon.previousContent
-                |> iconToButton renderConfig msg
+            { action = Action.DispatchMsg msg
+            , label = (localeTerms renderConfig).sidebar.expand
+            , icon = Icon.previousContent
+            }
+                |> renderAction renderConfig
 
         MenuButton msg ->
-            (localeTerms renderConfig).sidebar.previous
-                |> Icon.sandwichMenu
-                |> iconToButton renderConfig msg
+            { action = Action.DispatchMsg msg
+            , label = (localeTerms renderConfig).sidebar.previous
+            , icon = Icon.sandwichMenu
+            }
+                |> renderAction renderConfig
 
 
 labelView : RenderConfig -> ( String, Maybe String ) -> Element msg
@@ -74,17 +78,7 @@ rightActionView : RenderConfig -> Maybe (Action.Config msg) -> Element msg
 rightActionView renderConfig maybeRightAction =
     case maybeRightAction of
         Just rightAction ->
-            rightAction
-                |> Action.mapIcon
-                    (Icon.withSize
-                        Size.medium
-                        >> Icon.withColor
-                            (Palette.color toneGray brightnessMiddle)
-                    )
-                |> Clickable.actionIcon renderConfig
-                    [ Element.padding 8
-                    , Font.color Palette.gray.middle
-                    ]
+            renderAction renderConfig rightAction
 
         Nothing ->
             Element.el
@@ -95,10 +89,16 @@ rightActionView renderConfig maybeRightAction =
                 Element.none
 
 
-iconToButton : RenderConfig -> msg -> Icon -> Element msg
-iconToButton renderConfig msg icon =
-    icon
-        |> Icon.withColor (Palette.color toneGray brightnessMiddle)
-        |> Icon.withSize Size.medium
-        |> Icon.renderElement renderConfig
-        |> Clickable.msgWrapElement [ Element.padding 8 ] msg
+renderAction : RenderConfig -> Action.Config msg -> Element msg
+renderAction renderConfig action =
+    action
+        |> Action.mapIcon
+            (Icon.withSize
+                Size.medium
+                >> Icon.withColor
+                    (Palette.color toneGray brightnessMiddle)
+            )
+        |> Clickable.actionIcon renderConfig
+            [ Element.padding 8
+            , Font.color Palette.gray.middle
+            ]
