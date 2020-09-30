@@ -6,12 +6,14 @@ import Element.Font as Font
 import UI.Button as Button exposing (Button)
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Button as Button
+import UI.Internal.Clickable as Clickable
 import UI.Internal.Palette as Palette
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Palette as Palette exposing (brightnessMiddle, toneGray)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text exposing (ellipsize)
+import UI.Utils.Action as Action exposing (Config)
 import UI.Utils.Element as Element exposing (zeroPadding)
 
 
@@ -23,10 +25,10 @@ type LeftButton msg
 view :
     RenderConfig
     -> LeftButton msg
-    -> Maybe (Button msg)
+    -> Maybe (Action.Config msg)
     -> ( String, Maybe String )
     -> Element msg
-view renderConfig leftButton rightButton label =
+view renderConfig leftButton rightAction label =
     Element.row
         [ Element.width fill
         , Element.paddingEach { top = 14, bottom = 4, left = 4, right = 4 }
@@ -35,7 +37,7 @@ view renderConfig leftButton rightButton label =
         ]
         [ leftButtonView renderConfig leftButton
         , labelView renderConfig label
-        , rightButtonView renderConfig rightButton
+        , rightActionView renderConfig rightAction
         ]
 
 
@@ -70,13 +72,18 @@ labelView renderConfig ( title, maybeSubtitle ) =
         |> Element.el [ Element.centerY, Font.center, Element.width fill ]
 
 
-rightButtonView : RenderConfig -> Maybe (Button msg) -> Element msg
-rightButtonView renderConfig maybeRightButton =
-    case maybeRightButton of
-        Just rightButton ->
-            rightButton
-                |> Button.withSize Size.medium
-                |> Button.renderUnstyled renderConfig
+rightActionView : RenderConfig -> Maybe (Action.Config msg) -> Element msg
+rightActionView renderConfig maybeRightAction =
+    case maybeRightAction of
+        Just rightAction ->
+            rightAction
+                |> Action.mapIcon
+                    (Icon.withSize
+                        Size.medium
+                        >> Icon.withColor
+                            (Palette.color toneGray brightnessMiddle)
+                    )
+                |> Clickable.actionIcon renderConfig
                     [ Element.padding 8
                     , Font.color Palette.gray.middle
                     ]
@@ -94,7 +101,6 @@ iconToButton : RenderConfig -> msg -> Icon -> Element msg
 iconToButton renderConfig msg icon =
     icon
         |> Icon.withColor (Palette.color toneGray brightnessMiddle)
-        |> Button.fromIcon
-        |> Button.cmd msg Button.clear
-        |> Button.withSize Size.medium
-        |> Button.renderUnstyled renderConfig [ Element.padding 8 ]
+        |> Icon.withSize Size.medium
+        |> Icon.renderElement renderConfig
+        |> Clickable.msgWrapElement [ Element.padding 8 ] msg

@@ -17,6 +17,7 @@ import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
 import UI.Utils.ARIA as ARIA
+import UI.Utils.Action as Action
 import UI.Utils.Element as Element
 
 
@@ -43,7 +44,7 @@ mobileDrawer :
     -> Element msg
     -> Menu msg
     -> ( String, Maybe String )
-    -> Maybe ( msg, Maybe (Button msg) )
+    -> Maybe ( msg, Maybe (Action.Config msg) )
     -> Element msg
 mobileDrawer cfg page menu title maybeStack =
     let
@@ -93,7 +94,7 @@ mobileDrawer cfg page menu title maybeStack =
 -- Internals
 
 
-viewHead : RenderConfig -> Menu msg -> ( String, Maybe String ) -> Maybe ( msg, Maybe (Button msg) ) -> Element msg
+viewHead : RenderConfig -> Menu msg -> ( String, Maybe String ) -> Maybe ( msg, Maybe (Action.Config msg) ) -> Element msg
 viewHead cfg (Menu.Menu prop _) label maybeStack =
     case maybeStack of
         Nothing ->
