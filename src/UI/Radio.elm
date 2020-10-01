@@ -158,9 +158,9 @@ withWidth width (RadioGroup prop opt) =
     RadioGroup prop { opt | width = width }
 
 
-{-| `Radio.withDisposition` determines whether the radio group's items are arranged horizontally or vertically.
+{-| `Radio.withDirection` determines whether the radio group's items are arranged horizontally or vertically.
 
-    Radio.withDisposition Radio.horizontalDisposition someRadioGroup
+    Radio.withDirection Radio.horizontal someRadioGroup
 
 -}
 withDirection : Direction -> RadioGroup id msg -> RadioGroup id msg
