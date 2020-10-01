@@ -211,7 +211,7 @@ renderElement renderConfig (RadioGroup { label, message } { selected, buttons, w
                     Element.column
 
                 Horizontal ->
-                    Element.wrappedRow
+                    Element.row
     in
     buttons
         |> List.map
