@@ -107,7 +107,7 @@ import UI.Utils.Element as Element exposing (zeroPadding)
 type alias Options object msg =
     { items : List object
     , searchField : Maybe (SearchConfig object msg)
-    , actionBar : Maybe (Action.Config msg)
+    , actionBar : Maybe (Action.WithIcon msg)
     , isSelected : Maybe (object -> Bool)
     , width : Element.Length
     , selectStyle : SelectStyle
@@ -265,7 +265,7 @@ An action-bar is an additional pre-styled stick row that, when clicked, triggers
 
 -}
 withActionBar :
-    Action.Config msg
+    Action.WithIcon msg
     -> ListView object msg
     -> ListView object msg
 withActionBar config (SelectList prop opt) =
@@ -397,7 +397,7 @@ renderElement cfg (SelectList prop opt) =
 -- Internal
 
 
-actionBarView : RenderConfig -> Maybe (Action.Config msg) -> Element msg
+actionBarView : RenderConfig -> Maybe (Action.WithIcon msg) -> Element msg
 actionBarView cfg actionBar =
     case actionBar of
         Just { label, icon, action } ->

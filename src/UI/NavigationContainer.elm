@@ -306,7 +306,7 @@ contentMap applier data =
                 |> Internal.ContentStackChild
                     { title = stack.title
                     , goBackMsg = applier stack.goBackMsg
-                    , action = Maybe.map (Action.map applier) stack.action
+                    , action = Maybe.map (Action.iconMap applier) stack.action
                     }
 
 
@@ -524,7 +524,7 @@ menu applier { menuExpanded } =
 contentProps :
     String
     -> Content msg
-    -> ( Element msg, Maybe ( msg, Maybe (Action.Config msg) ), ( String, Maybe String ) )
+    -> ( Element msg, Maybe ( msg, Maybe (Action.WithIcon msg) ), ( String, Maybe String ) )
 contentProps mainTitle content =
     case content of
         Internal.ContentSingle body ->

@@ -11,7 +11,7 @@ type Content msg
 
 type alias StackChild msg =
     { title : ( String, Maybe String )
-    , action : Maybe (Action.Config msg)
+    , action : Maybe (Action.WithIcon msg)
     , goBackMsg : msg
     }
 

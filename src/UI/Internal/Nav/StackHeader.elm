@@ -23,7 +23,7 @@ type LeftButton msg
 view :
     RenderConfig
     -> LeftButton msg
-    -> Maybe (Action.Config msg)
+    -> Maybe (Action.WithIcon msg)
     -> ( String, Maybe String )
     -> Element msg
 view renderConfig leftButton rightAction label =
@@ -74,7 +74,7 @@ labelView renderConfig ( title, maybeSubtitle ) =
         |> Element.el [ Element.centerY, Font.center, Element.width fill ]
 
 
-rightActionView : RenderConfig -> Maybe (Action.Config msg) -> Element msg
+rightActionView : RenderConfig -> Maybe (Action.WithIcon msg) -> Element msg
 rightActionView renderConfig maybeRightAction =
     case maybeRightAction of
         Just rightAction ->
@@ -89,10 +89,10 @@ rightActionView renderConfig maybeRightAction =
                 Element.none
 
 
-renderAction : RenderConfig -> Action.Config msg -> Element msg
+renderAction : RenderConfig -> Action.WithIcon msg -> Element msg
 renderAction renderConfig action =
     action
-        |> Action.mapIcon
+        |> Action.iconWith
             (Icon.withSize
                 Size.medium
                 >> Icon.withColor

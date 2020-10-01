@@ -43,7 +43,7 @@ mobileDrawer :
     -> Element msg
     -> Menu msg
     -> ( String, Maybe String )
-    -> Maybe ( msg, Maybe (Action.Config msg) )
+    -> Maybe ( msg, Maybe (Action.WithIcon msg) )
     -> Element msg
 mobileDrawer cfg page menu title maybeStack =
     let
@@ -93,7 +93,7 @@ mobileDrawer cfg page menu title maybeStack =
 -- Internals
 
 
-viewHead : RenderConfig -> Menu msg -> ( String, Maybe String ) -> Maybe ( msg, Maybe (Action.Config msg) ) -> Element msg
+viewHead : RenderConfig -> Menu msg -> ( String, Maybe String ) -> Maybe ( msg, Maybe (Action.WithIcon msg) ) -> Element msg
 viewHead cfg (Menu.Menu prop _) label maybeStack =
     case maybeStack of
         Nothing ->

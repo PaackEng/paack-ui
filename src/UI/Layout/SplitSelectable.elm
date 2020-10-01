@@ -21,7 +21,7 @@ type alias Config object msg =
 
 
 type alias MobileConfig msg =
-    { action : Maybe (Action.Config msg)
+    { action : Maybe (Action.WithIcon msg)
     , title : ( String, Maybe String )
     , unselectMsg : msg
     }

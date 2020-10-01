@@ -22,7 +22,7 @@ msgWrapElement attributes onClickMsg =
 actionIcon :
     RenderConfig
     -> List (Attribute msg)
-    -> Action.Config msg
+    -> Action.WithIcon msg
     -> Element msg
 actionIcon renderConfig attributes { icon, label, action } =
     icon label
