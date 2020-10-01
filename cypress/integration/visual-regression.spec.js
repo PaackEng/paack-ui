@@ -64,9 +64,9 @@ describe('Percy Snapshots', () => {
   })
 
   describe('Radio', () => {
-    it('Creates a snapshot for vertically arranged radio buttons variation', () => {
-      cy.visit('/#Basics/Radio/Vertical')
-      cy.percySnapshot('Radio Groups')
+    it('Creates a snapshot for horizontal and vertical arrangement of radio groups', () => {
+      cy.visit('/#Basics/Radio/United')
+      cy.percySnapshot('Radio groups')
     })
   })
 

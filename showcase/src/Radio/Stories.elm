@@ -4,7 +4,7 @@ import Element exposing (Element)
 import Model exposing (Model)
 import Msg exposing (Msg)
 import PluginOptions exposing (defaultWithMenu)
-import Radio.Model as RadioModel
+import Radio.Model as RadioModel exposing (Options(..))
 import Radio.Msg as RadioMsg
 import Return exposing (Return)
 import UI.Radio as Radio
@@ -18,6 +18,7 @@ import Utils
         , goToDocsCallToAction
         , iconsSvgSprite
         , prettifyElmCode
+        , story
         , storyWithModel
         )
 
@@ -28,6 +29,9 @@ update msg model =
         RadioMsg.Set newValue ->
             ( { model | selected = Just newValue }, Cmd.none )
 
+        RadioMsg.NoOp _ ->
+            ( model, Cmd.none )
+
 
 stories : RenderConfig -> ExplorerUI
 stories renderConfig =
@@ -35,6 +39,7 @@ stories renderConfig =
         "Radio"
         [ radioGroupVertical renderConfig
         , radioGroupHorizontal renderConfig
+        , united renderConfig
         ]
 
 
@@ -62,6 +67,15 @@ radioGroupHorizontal renderConfig =
         )
 
 
+united : RenderConfig -> ExplorerStory
+united renderConfig =
+    story
+        ( "United"
+        , unitedView renderConfig
+        , defaultWithMenu
+        )
+
+
 label : String
 label =
     "Pick one classic rock band"
@@ -69,6 +83,11 @@ label =
 
 view : Radio.Direction -> RenderConfig -> Model -> Element Msg
 view direction renderConfig { radioStories } =
+    radioGroupView direction renderConfig (RadioMsg.Set >> Msg.RadioStoriesMsg) radioStories
+
+
+radioGroupView : Radio.Direction -> RenderConfig -> (Options -> msg) -> RadioModel.Model -> Element msg
+radioGroupView direction renderConfig msg { selected } =
     Element.column
         [ Element.spacing 8 ]
         [ iconsSvgSprite
@@ -76,8 +95,8 @@ view direction renderConfig { radioStories } =
             |> Text.renderElement renderConfig
         , Radio.group
             label
-            (RadioMsg.Set >> Msg.RadioStoriesMsg)
-            |> Radio.withSelected radioStories.selected
+            msg
+            |> Radio.withSelected selected
             |> Radio.withDirection direction
             |> Radio.withButtons
                 [ Radio.button RadioModel.Queen "Queen"
@@ -87,6 +106,15 @@ view direction renderConfig { radioStories } =
                 , Radio.button RadioModel.PinkFloyd "Pink Floyd"
                 ]
             |> Radio.renderElement renderConfig
+        ]
+
+
+unitedView : RenderConfig -> Element Msg
+unitedView renderConfig =
+    Element.column
+        [ Element.spacing 8 ]
+        [ radioGroupView Radio.vertical renderConfig (RadioMsg.NoOp >> Msg.RadioStoriesMsg) { selected = Nothing }
+        , radioGroupView Radio.horizontal renderConfig (RadioMsg.NoOp >> Msg.RadioStoriesMsg) { selected = Nothing }
         ]
 
 
