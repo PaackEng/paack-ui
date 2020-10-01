@@ -3,8 +3,8 @@ module Radio.Stories exposing (stories, update)
 import Element exposing (Element)
 import Model exposing (Model)
 import Msg exposing (Msg)
-import PluginOptions exposing (defaultWithoutMenu)
-import Radio.Model as RadioModel
+import PluginOptions exposing (defaultWithMenu)
+import Radio.Model as RadioModel exposing (Options(..))
 import Radio.Msg as RadioMsg
 import Return exposing (Return)
 import UI.Radio as Radio
@@ -18,6 +18,7 @@ import Utils
         , goToDocsCallToAction
         , iconsSvgSprite
         , prettifyElmCode
+        , story
         , storyWithModel
         )
 
@@ -28,23 +29,50 @@ update msg model =
         RadioMsg.Set newValue ->
             ( { model | selected = Just newValue }, Cmd.none )
 
+        RadioMsg.NoOp _ ->
+            ( model, Cmd.none )
+
 
 stories : RenderConfig -> ExplorerUI
 stories renderConfig =
     storiesOf
         "Radio"
-        [ demo renderConfig ]
+        [ radioGroupVertical renderConfig
+        , radioGroupHorizontal renderConfig
+        , united renderConfig
+        ]
 
 
-demo : RenderConfig -> ExplorerStory
-demo renderConfig =
+radioGroupVertical : RenderConfig -> ExplorerStory
+radioGroupVertical renderConfig =
     storyWithModel
-        ( "Radio"
-        , view renderConfig
-        , { defaultWithoutMenu
-            | code = code
+        ( "Vertical"
+        , view Radio.vertical renderConfig
+        , { defaultWithMenu
+            | code = codeForVerticalRadioGroup
             , note = goToDocsCallToAction "Radio"
           }
+        )
+
+
+radioGroupHorizontal : RenderConfig -> ExplorerStory
+radioGroupHorizontal renderConfig =
+    storyWithModel
+        ( "Horizontal"
+        , view Radio.horizontal renderConfig
+        , { defaultWithMenu
+            | code = codeForHorizontalRadioGroup
+            , note = goToDocsCallToAction "Radio"
+          }
+        )
+
+
+united : RenderConfig -> ExplorerStory
+united renderConfig =
+    story
+        ( "United"
+        , unitedView renderConfig
+        , defaultWithMenu
         )
 
 
@@ -53,8 +81,13 @@ label =
     "Pick one classic rock band"
 
 
-view : RenderConfig -> Model -> Element Msg
-view renderConfig { radioStories } =
+view : Radio.Direction -> RenderConfig -> Model -> Element Msg
+view direction renderConfig { radioStories } =
+    radioGroupView direction renderConfig (RadioMsg.Set >> Msg.RadioStoriesMsg) radioStories
+
+
+radioGroupView : Radio.Direction -> RenderConfig -> (Options -> msg) -> RadioModel.Model -> Element msg
+radioGroupView direction renderConfig msg { selected } =
     Element.column
         [ Element.spacing 8 ]
         [ iconsSvgSprite
@@ -62,8 +95,9 @@ view renderConfig { radioStories } =
             |> Text.renderElement renderConfig
         , Radio.group
             label
-            (RadioMsg.Set >> Msg.RadioStoriesMsg)
-            |> Radio.withSelected radioStories.selected
+            msg
+            |> Radio.withSelected selected
+            |> Radio.withDirection direction
             |> Radio.withButtons
                 [ Radio.button RadioModel.Queen "Queen"
                 , Radio.button RadioModel.Beatles "Beatles"
@@ -75,13 +109,41 @@ view renderConfig { radioStories } =
         ]
 
 
-code : String
-code =
+unitedView : RenderConfig -> Element Msg
+unitedView renderConfig =
+    Element.column
+        [ Element.spacing 8 ]
+        [ radioGroupView Radio.vertical renderConfig (RadioMsg.NoOp >> Msg.RadioStoriesMsg) { selected = Nothing }
+        , radioGroupView Radio.horizontal renderConfig (RadioMsg.NoOp >> Msg.RadioStoriesMsg) { selected = Nothing }
+        ]
+
+
+codeForVerticalRadioGroup : String
+codeForVerticalRadioGroup =
     prettifyElmCode """
 Radio.group
     "Pick one classic rock band"
     Msg.RadioSet
     |> Radio.withSelected model.selected
+    |> Radio.withButtons
+        [ Radio.button Model.Queen "Queen"
+        , Radio.button Model.Beatles "Beatles"
+        , Radio.button Model.ACDC "AC/DC"
+        , Radio.button Model.LedZeppelin "Led Zeppelin"
+        , Radio.button Model.PinkFloyd "Pink Floyd"
+        ]
+    |> Radio.renderElement renderConfig
+"""
+
+
+codeForHorizontalRadioGroup : String
+codeForHorizontalRadioGroup =
+    prettifyElmCode """
+Radio.group
+    "Pick one classic rock band"
+    Msg.RadioSet
+    |> Radio.withSelected model.selected
+    |> Radio.withDirection model.direction
     |> Radio.withButtons
         [ Radio.button Model.Queen "Queen"
         , Radio.button Model.Beatles "Beatles"

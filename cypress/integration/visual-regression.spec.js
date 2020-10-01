@@ -64,9 +64,9 @@ describe('Percy Snapshots', () => {
   })
 
   describe('Radio', () => {
-    it('Creates the Radio page snapshot', () => {
-      cy.visit('/#Basics/Radio/Radio')
-      cy.percySnapshot('Radio')
+    it('Creates a snapshot for horizontal and vertical arrangement of radio groups', () => {
+      cy.visit('/#Basics/Radio/United')
+      cy.percySnapshot('Radio groups')
     })
   })
 

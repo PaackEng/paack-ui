@@ -5,3 +5,4 @@ import Radio.Model as Model
 
 type Msg
     = Set Model.Options
+    | NoOp Model.Options
