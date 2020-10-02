@@ -3,15 +3,15 @@ module UI.Internal.Nav.StackHeader exposing (LeftButton(..), view)
 import Element exposing (Element, fill, minimum, shrink)
 import Element.Border as Border
 import Element.Font as Font
-import UI.Button as Button exposing (Button)
-import UI.Icon as Icon exposing (Icon)
-import UI.Internal.Button as Button
+import UI.Icon as Icon
+import UI.Internal.Clickable as Clickable
 import UI.Internal.Palette as Palette
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Palette as Palette exposing (brightnessMiddle, toneGray)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text exposing (ellipsize)
+import UI.Utils.Action as Action
 import UI.Utils.Element as Element exposing (zeroPadding)
 
 
@@ -23,10 +23,10 @@ type LeftButton msg
 view :
     RenderConfig
     -> LeftButton msg
-    -> Maybe (Button msg)
+    -> Maybe (Action.WithIcon msg)
     -> ( String, Maybe String )
     -> Element msg
-view renderConfig leftButton rightButton label =
+view renderConfig leftButton rightAction label =
     Element.row
         [ Element.width fill
         , Element.paddingEach { top = 14, bottom = 4, left = 4, right = 4 }
@@ -35,7 +35,7 @@ view renderConfig leftButton rightButton label =
         ]
         [ leftButtonView renderConfig leftButton
         , labelView renderConfig label
-        , rightButtonView renderConfig rightButton
+        , rightActionView renderConfig rightAction
         ]
 
 
@@ -43,14 +43,18 @@ leftButtonView : RenderConfig -> LeftButton msg -> Element msg
 leftButtonView renderConfig leftButton =
     case leftButton of
         BackButton msg ->
-            (localeTerms renderConfig).sidebar.expand
-                |> Icon.sandwichMenu
-                |> iconToButton renderConfig msg
+            { action = Action.DispatchMsg msg
+            , label = (localeTerms renderConfig).sidebar.expand
+            , icon = Icon.previousContent
+            }
+                |> renderAction renderConfig
 
         MenuButton msg ->
-            (localeTerms renderConfig).sidebar.previous
-                |> Icon.previousContent
-                |> iconToButton renderConfig msg
+            { action = Action.DispatchMsg msg
+            , label = (localeTerms renderConfig).sidebar.previous
+            , icon = Icon.sandwichMenu
+            }
+                |> renderAction renderConfig
 
 
 labelView : RenderConfig -> ( String, Maybe String ) -> Element msg
@@ -70,16 +74,11 @@ labelView renderConfig ( title, maybeSubtitle ) =
         |> Element.el [ Element.centerY, Font.center, Element.width fill ]
 
 
-rightButtonView : RenderConfig -> Maybe (Button msg) -> Element msg
-rightButtonView renderConfig maybeRightButton =
-    case maybeRightButton of
-        Just rightButton ->
-            rightButton
-                |> Button.withSize Size.medium
-                |> Button.renderUnstyled renderConfig
-                    [ Element.padding 8
-                    , Font.color Palette.gray.middle
-                    ]
+rightActionView : RenderConfig -> Maybe (Action.WithIcon msg) -> Element msg
+rightActionView renderConfig maybeRightAction =
+    case maybeRightAction of
+        Just rightAction ->
+            renderAction renderConfig rightAction
 
         Nothing ->
             Element.el
@@ -90,11 +89,16 @@ rightButtonView renderConfig maybeRightButton =
                 Element.none
 
 
-iconToButton : RenderConfig -> msg -> Icon -> Element msg
-iconToButton renderConfig msg icon =
-    icon
-        |> Icon.withColor (Palette.color toneGray brightnessMiddle)
-        |> Button.fromIcon
-        |> Button.cmd msg Button.clear
-        |> Button.withSize Size.medium
-        |> Button.renderUnstyled renderConfig [ Element.padding 8 ]
+renderAction : RenderConfig -> Action.WithIcon msg -> Element msg
+renderAction renderConfig action =
+    action
+        |> Action.iconWith
+            (Icon.withSize
+                Size.medium
+                >> Icon.withColor
+                    (Palette.color toneGray brightnessMiddle)
+            )
+        |> Clickable.actionIcon renderConfig
+            [ Element.padding 8
+            , Font.color Palette.gray.middle
+            ]

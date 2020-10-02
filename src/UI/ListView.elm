@@ -2,7 +2,7 @@ module UI.ListView exposing
     ( ListView, selectList
     , ToggleableConfig, ToggleableCover, toggleableList
     , withItems, withSelected
-    , SearchConfig, withSearchField, ActionConfig, withActionBar
+    , SearchConfig, withSearchField, withActionBar
     , withWidth
     , SelectStyle, withSelectStyle
     , renderElement
@@ -30,8 +30,10 @@ Also, it can optionally filter when having a search bar, and add an action bar.
             |> ListView.withActionBar
                 { label = "Create new element"
                 , icon = Icon.add
-                , onClick =
-                    Msg.UuidGen (Msg.ForDialog << DialogMsg.OpenElementCreation)
+                , action =
+                    DialogMsg.OpenElementCreation
+                        |> Msg.ForDialog
+                        |> Action.DispatchMsg
                 }
             |> ListView.withSelected
                 (\{ id } ->
@@ -63,7 +65,7 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
 ## Extra elements
 
-@docs SearchConfig, withSearchField, ActionConfig, withActionBar
+@docs SearchConfig, withSearchField, withActionBar
 
 
 ## Width
@@ -87,8 +89,9 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
-import UI.Icon as Icon exposing (Icon)
+import UI.Icon as Icon
 import UI.Internal.Basics exposing (maybeAnd, prependMaybe)
+import UI.Internal.Clickable as Clickable
 import UI.Internal.Palette as Palette
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.ToggleableList as ToggleableList
@@ -97,14 +100,14 @@ import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
 import UI.TextField as TextField
-import UI.Utils.ARIA as ARIA
+import UI.Utils.Action as Action
 import UI.Utils.Element as Element exposing (zeroPadding)
 
 
 type alias Options object msg =
     { items : List object
     , searchField : Maybe (SearchConfig object msg)
-    , actionBar : Maybe (ActionConfig msg)
+    , actionBar : Maybe (Action.WithIcon msg)
     , isSelected : Maybe (object -> Bool)
     , width : Element.Length
     , selectStyle : SelectStyle
@@ -138,22 +141,6 @@ type alias SearchConfig object msg =
     { label : String
     , searchMsg : String -> msg
     , currentFilter : Maybe ( String, String -> object -> Bool )
-    }
-
-
-{-| `ActionConfig` assembles the required configuration for having an action bar at the bottom of the list.
-
-    { label = "Create new element"
-    , icon = Icon.add
-    , onClick =
-        Msg.UuidGen (Msg.ForDialog << DialogMsg.OpenElementCreation)
-    }
-
--}
-type alias ActionConfig msg =
-    { label : String
-    , icon : String -> Icon
-    , onClick : msg
     }
 
 
@@ -278,7 +265,7 @@ An action-bar is an additional pre-styled stick row that, when clicked, triggers
 
 -}
 withActionBar :
-    ActionConfig msg
+    Action.WithIcon msg
     -> ListView object msg
     -> ListView object msg
 withActionBar config (SelectList prop opt) =
@@ -410,25 +397,21 @@ renderElement cfg (SelectList prop opt) =
 -- Internal
 
 
-actionBarView : RenderConfig -> Maybe (ActionConfig msg) -> Element msg
+actionBarView : RenderConfig -> Maybe (Action.WithIcon msg) -> Element msg
 actionBarView cfg actionBar =
     case actionBar of
-        Just { label, icon, onClick } ->
+        Just { label, icon, action } ->
             Element.row
-                (ARIA.toElementAttributes ARIA.roleButton
-                    ++ [ Element.width fill
-                       , Element.paddingEach
-                            { bottom = 12
-                            , left = 20
-                            , right = 12
-                            , top = 12
-                            }
-                       , Background.color Palette.primary.lightest
-                       , Font.color Palette.primary.middle
-                       , Element.pointer
-                       , Events.onClick onClick
-                       ]
-                )
+                [ Element.width fill
+                , Element.paddingEach
+                    { bottom = 12
+                    , left = 20
+                    , right = 12
+                    , top = 12
+                    }
+                , Background.color Palette.primary.lightest
+                , Font.color Palette.primary.middle
+                ]
                 [ Text.body2 label
                     |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
                     |> Text.renderElement cfg
@@ -439,6 +422,9 @@ actionBarView cfg actionBar =
                         [ Element.alignRight
                         ]
                 ]
+                |> Clickable.actionWrapElement cfg
+                    [ Element.width fill ]
+                    action
 
         Nothing ->
             Element.none

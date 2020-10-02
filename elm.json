@@ -25,6 +25,7 @@
         "UI.Tabs",
         "UI.Text",
         "UI.TextField",
+        "UI.Utils.Action",
         "UI.Utils.ARIA",
         "UI.Utils.Element",
         "UI.Utils.Focus",

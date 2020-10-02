@@ -83,7 +83,6 @@ Example of usage:
 
 import Element exposing (Element)
 import Html exposing (Html)
-import UI.Button as Button exposing (Button)
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Dialog as Dialog
 import UI.Internal.Menu as Menu
@@ -91,6 +90,7 @@ import UI.Internal.NavigationContainer as Internal
 import UI.Internal.SideBar as SideBar
 import UI.Link exposing (Link)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
+import UI.Utils.Action as Action
 import UI.Utils.Element as Element
 
 
@@ -306,7 +306,7 @@ contentMap applier data =
                 |> Internal.ContentStackChild
                     { title = stack.title
                     , goBackMsg = applier stack.goBackMsg
-                    , rightButton = Maybe.map (Button.map applier) stack.rightButton
+                    , action = Maybe.map (Action.iconMap applier) stack.action
                     }
 
 
@@ -524,14 +524,14 @@ menu applier { menuExpanded } =
 contentProps :
     String
     -> Content msg
-    -> ( Element msg, Maybe ( msg, Maybe (Button msg) ), ( String, Maybe String ) )
+    -> ( Element msg, Maybe ( msg, Maybe (Action.WithIcon msg) ), ( String, Maybe String ) )
 contentProps mainTitle content =
     case content of
         Internal.ContentSingle body ->
             ( body, Nothing, ( mainTitle, Nothing ) )
 
-        Internal.ContentStackChild { title, goBackMsg, rightButton } body ->
-            ( body, Just ( goBackMsg, rightButton ), title )
+        Internal.ContentStackChild { title, goBackMsg, action } body ->
+            ( body, Just ( goBackMsg, action ), title )
 
 
 dialogMap : (a -> b) -> Dialog a -> Dialog b

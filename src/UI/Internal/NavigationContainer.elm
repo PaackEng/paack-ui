@@ -1,7 +1,7 @@
 module UI.Internal.NavigationContainer exposing (Content(..), StackChild, toShowcaseElement)
 
 import Element exposing (Element)
-import UI.Button exposing (Button)
+import UI.Utils.Action as Action
 
 
 type Content msg
@@ -11,7 +11,7 @@ type Content msg
 
 type alias StackChild msg =
     { title : ( String, Maybe String )
-    , rightButton : Maybe (Button msg)
+    , action : Maybe (Action.WithIcon msg)
     , goBackMsg : msg
     }
 

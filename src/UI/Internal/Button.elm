@@ -1,12 +1,11 @@
 module UI.Internal.Button exposing (..)
 
-import Element exposing (Attribute, Element)
+import Element exposing (Element)
 import Element.Font as Font
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Size as Size exposing (Size)
-import UI.Link as Link exposing (Link)
+import UI.Link exposing (Link)
 import UI.RenderConfig exposing (RenderConfig)
-import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element
 
 
@@ -98,46 +97,3 @@ textSize size =
 
         Size.ExtraSmall ->
             10
-
-
-{-| For when designers do designer stuff
--}
-renderUnstyled : RenderConfig -> List (Attribute msg) -> Button msg -> Element msg
-renderUnstyled renderConfig attributes button =
-    case button of
-        Button { body, mode } { size } ->
-            body
-                |> bodyToElement
-                    renderConfig
-                    size
-                |> applyFunctionality
-                    renderConfig
-                    attributes
-                    mode
-
-        Toggle _ _ ->
-            -- TODO: Do it if you need it someday...
-            Element.none
-
-
-applyFunctionality : RenderConfig -> List (Attribute msg) -> ButtonMode msg -> (Element msg -> Element msg)
-applyFunctionality renderConfig attributes mode =
-    case mode of
-        ButtonActive (ActionMsg onClickMsg) _ ->
-            applyCmdFunctionality attributes onClickMsg
-
-        ButtonActive (ActionRedirect link) _ ->
-            Link.wrapElement renderConfig attributes link
-
-        _ ->
-            identity
-
-
-applyCmdFunctionality : List (Attribute msg) -> msg -> (Element msg -> Element msg)
-applyCmdFunctionality attributes onClickMsg =
-    [ Element.pointer
-    , Element.onIndividualClick onClickMsg
-    ]
-        |> (++) (ARIA.toElementAttributes ARIA.roleButton)
-        |> (++) attributes
-        |> Element.el

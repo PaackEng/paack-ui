@@ -10,6 +10,7 @@ import Tests.Utils.Element exposing (cursorPointer, elementToHtml)
 import Tests.Utils.RenderConfig exposing (desktopWindowConfig)
 import UI.Icon as Icon
 import UI.ListView as ListView
+import UI.Utils.Action as Action
 
 
 type Msg
@@ -38,7 +39,7 @@ withActionBar =
                 |> ListView.withActionBar
                     { label = actionBarTitle
                     , icon = Icon.toggle
-                    , onClick = SomeButtonClicked
+                    , action = Action.DispatchMsg SomeButtonClicked
                     }
     in
     describe "#withActionBar"
