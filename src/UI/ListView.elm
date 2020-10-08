@@ -89,6 +89,7 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
+import Element.Keyed as Keyed
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (maybeAnd, prependMaybe)
 import UI.Internal.Clickable as Clickable
@@ -116,6 +117,7 @@ type alias Options object msg =
 
 type alias Properties object msg =
     { select : object -> msg
+    , toKey : object -> String
     , renderItem : RenderConfig -> Bool -> object -> Element msg
     }
 
@@ -205,10 +207,11 @@ Click an element, and it will be selected.
 -}
 selectList :
     (object -> msg)
+    -> (object -> String)
     -> (Bool -> object -> Element msg)
     -> ListView object msg
-selectList selectMsg renderItem =
-    SelectList (Properties selectMsg (always renderItem))
+selectList selectMsg toKey renderItem =
+    SelectList (Properties selectMsg toKey (always renderItem))
         defaultOptions
 
 
@@ -244,7 +247,7 @@ toggleableList config =
             else
                 ToggleableList.defaultRow parentCfg config selected item
     in
-    SelectList (Properties config.selectMsg toggleableItemView)
+    SelectList (Properties config.selectMsg config.toKey toggleableItemView)
         defaultOptions
 
 
@@ -382,7 +385,7 @@ renderElement cfg (SelectList prop opt) =
                         (isSelected obj)
                         obj
                 )
-            |> Element.column
+            |> Keyed.column
                 [ Border.widthEach { bottom = 0, left = 0, right = 0, top = 1 }
                 , Border.color Palette.gray.lightest
                 , Element.width fill
@@ -453,9 +456,10 @@ searchFieldView cfg searchField =
             Element.none
 
 
-itemView : RenderConfig -> Properties object msg -> Maybe Palette.Color -> Bool -> object -> Element msg
-itemView cfg { select, renderItem } background selected obj =
-    Element.el
+itemView : RenderConfig -> Properties object msg -> Maybe Palette.Color -> Bool -> object -> ( String, Element msg )
+itemView cfg { select, renderItem, toKey } background selected obj =
+    ( toKey obj
+    , Element.el
         ([ Events.onClick (select obj)
          , Element.pointer
          , Element.width fill
@@ -469,6 +473,7 @@ itemView cfg { select, renderItem } background selected obj =
                 )
         )
         (renderItem cfg selected obj)
+    )
 
 
 defaultOptions : Options object msg

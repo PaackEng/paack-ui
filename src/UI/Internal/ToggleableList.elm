@@ -19,6 +19,7 @@ type alias Config object msg =
     , toCover : object -> Cover
     , toDetails : object -> List ( String, Element msg )
     , selectMsg : object -> msg
+    , toKey : object -> String
     }
 
 
