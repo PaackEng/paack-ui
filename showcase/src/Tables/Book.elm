@@ -136,7 +136,7 @@ toTableRow : Tables.ToRow msg Book T.Five
 toTableRow =
     { toKey = .isbn
     , view =
-        \{ author, title, year, acquired, read, isbn } ->
+        \{ author, title, year, acquired, read } ->
             rowEmpty
                 |> rowCellText (Text.body2 title)
                 |> rowCellText (Text.body2 author)
