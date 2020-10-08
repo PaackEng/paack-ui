@@ -35,7 +35,9 @@ withActionBar =
             "Some Title"
 
         component =
-            ListView.selectList Select mockView
+            ListView.selectList Select
+                (.id >> String.fromInt)
+                mockView
                 |> ListView.withActionBar
                     { label = actionBarTitle
                     , icon = Icon.toggle
@@ -70,7 +72,9 @@ withItems =
             [ Whatever 111 "Bear", lonewolf, Whatever 333 "Fox" ]
 
         component =
-            ListView.selectList Select mockView
+            ListView.selectList Select
+                (.id >> String.fromInt)
+                mockView
                 |> ListView.withItems options
     in
     describe "#withItems"
@@ -105,7 +109,9 @@ withSearchField =
             "Searching for..."
 
         component filterState =
-            ListView.selectList Select mockView
+            ListView.selectList Select
+                (.id >> String.fromInt)
+                mockView
                 |> ListView.withSearchField
                     { label = searchLabel
                     , searchMsg = FilterSet
