@@ -59,11 +59,11 @@ widthToEl width =
 
 rowRender : RenderConfig -> ToRow msg item columns -> List Column -> item -> ( String, List ( String, Element msg ) )
 rowRender renderConfig toRow columns item =
-    toRow item
-        |> Tuple.mapSecond
-            (NArray.toList
-                >> List.map2 (cellRender renderConfig) columns
-            )
+    ( toRow.toKey item
+    , toRow.view item
+        |> NArray.toList
+        |> List.map2 (cellRender renderConfig) columns
+    )
 
 
 rowBox : ( String, List ( String, Element msg ) ) -> ( String, Element msg )

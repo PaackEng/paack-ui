@@ -4,6 +4,7 @@ import Element exposing (Attribute, Element, fill, px)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
+import Element.Keyed as Keyed
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.Palette as Palette exposing (brightnessDarkest, brightnessLight, brightnessLighter, brightnessLightest, brightnessMiddle, toneGray, tonePrimary)
@@ -19,6 +20,7 @@ type alias Config object msg =
     , toCover : object -> Cover
     , toDetails : object -> List ( String, Element msg )
     , selectMsg : object -> msg
+    , toKey : object -> String
     }
 
 
@@ -62,13 +64,14 @@ selectedRow renderConfig config object =
         , object
             |> config.toDetails
             |> List.map (detailItem renderConfig)
-            |> Element.column toggleableCard
+            |> Keyed.column toggleableCard
         ]
 
 
-detailItem : RenderConfig -> ( String, Element msg ) -> Element msg
+detailItem : RenderConfig -> ( String, Element msg ) -> ( String, Element msg )
 detailItem renderConfig ( label, content ) =
-    Element.column indentedDetailItemAttributes
+    ( label
+    , Element.column indentedDetailItemAttributes
         [ label
             |> Text.overline
             |> Text.withColor (Palette.color toneGray brightnessLight)
@@ -76,6 +79,7 @@ detailItem renderConfig ( label, content ) =
             |> Text.renderElement renderConfig
         , content
         ]
+    )
 
 
 indentedDetailItemAttributes : List (Attribute msg)

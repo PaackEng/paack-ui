@@ -132,16 +132,18 @@ tablePortionColumns =
         |> column "Read" (columnWidthPortion 12)
 
 
-toTableRow : Book -> ( String, Tables.Row msg T.Five )
-toTableRow { author, title, year, acquired, read, isbn } =
-    ( isbn
-    , rowEmpty
-        |> rowCellText (Text.body2 title)
-        |> rowCellText (Text.body2 author)
-        |> rowCellText (Text.caption year)
-        |> rowCellText (Text.caption <| DateInput.toDD_MM_YYYY "/" <| DateInput.fromPosix Time.utc acquired)
-        |> rowCellText (Text.caption <| DateInput.toDD_MM_YYYY "/" <| DateInput.fromPosix Time.utc read)
-    )
+toTableRow : Tables.ToRow msg Book T.Five
+toTableRow =
+    { toKey = .isbn
+    , view =
+        \{ author, title, year, acquired, read } ->
+            rowEmpty
+                |> rowCellText (Text.body2 title)
+                |> rowCellText (Text.body2 author)
+                |> rowCellText (Text.caption year)
+                |> rowCellText (Text.caption <| DateInput.toDD_MM_YYYY "/" <| DateInput.fromPosix Time.utc acquired)
+                |> rowCellText (Text.caption <| DateInput.toDD_MM_YYYY "/" <| DateInput.fromPosix Time.utc read)
+    }
 
 
 toTableDetails : Book -> Stateful.Details msg T.Five

@@ -961,6 +961,7 @@ mobileView renderConfig prop opt responsive =
     ListView.toggleableList
         { detailsShowLabel = detailsTerms.show
         , detailsCollapseLabel = detailsTerms.collapse
+        , toKey = Tuple.second >> prop.toRow.toKey
         , toCover = Tuple.second >> responsive.toCover
         , toDetails =
             Tuple.second

@@ -97,8 +97,10 @@ selectedView renderConfig model =
 
 listView : RenderConfig -> ListView Book Msg
 listView renderConfig =
-    listItemView renderConfig
-        |> ListView.selectList (Msg.LayoutsStoriesMsg << LayoutsMsg.Select)
+    ListView.selectList
+        (Msg.LayoutsStoriesMsg << LayoutsMsg.Select)
+        .isbn
+        (listItemView renderConfig)
 
 
 listItemView : RenderConfig -> Bool -> Book -> Element Msg
@@ -113,7 +115,7 @@ listItemView renderConfig isSelected book =
 code : String
 code =
     prettifyElmCode """
-SplitSelectable.desktop renderConfig  
+SplitSelectable.desktop renderConfig
     { getKey = .isbn
     , items = books
     , listView = listView renderConfig layoutsStories
