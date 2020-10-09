@@ -189,13 +189,15 @@ headerView cfg toggleMsg logo =
 
 slimHeaderView : RenderConfig -> msg -> Maybe (Menu.Logo msg) -> Element msg
 slimHeaderView cfg toggleMsg _ =
-    Element.column [ height (px (72 + 48)) ]
-        [ (cfg |> localeTerms >> .sidebar >> .expand)
-            |> Icon.sandwichMenu
-            |> Icon.withSize Size.small
-            |> Icon.renderElement cfg
-            |> Element.el (headerButtonAttr toggleMsg)
-        ]
+    (cfg |> localeTerms >> .sidebar >> .expand)
+        |> Icon.sandwichMenu
+        |> Icon.renderElement cfg
+        |> Element.el
+            (headerButtonAttr toggleMsg
+                ++ [ Element.centerX
+                   , Element.paddingEach { top = 8, left = 8, right = 8, bottom = 88 }
+                   ]
+            )
 
 
 headerButtonAttr : msg -> List (Attribute msg)
