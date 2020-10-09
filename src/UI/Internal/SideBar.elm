@@ -195,7 +195,10 @@ slimHeaderView cfg toggleMsg _ =
         |> Element.el
             (headerButtonAttr toggleMsg
                 ++ [ Element.centerX
-                   , Element.paddingEach { top = 8, left = 8, right = 8, bottom = 88 }
+
+                   -- It has 2 levels of padding, because of the extra padding.
+                   -- As we are trying to do the 8dot grid, the top field was set to 16px
+                   , Element.paddingEach { top = 16, left = 8, right = 8, bottom = 88 }
                    ]
             )
 
