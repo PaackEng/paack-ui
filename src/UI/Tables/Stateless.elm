@@ -57,6 +57,7 @@ Where `Book` is:
 -}
 
 import Element exposing (Element, shrink)
+import Element.Keyed as Keyed
 import UI.Internal.NArray as NArray
 import UI.Internal.Tables.Common exposing (..)
 import UI.Internal.Tables.View exposing (..)
@@ -177,7 +178,7 @@ desktopView renderConfig prop opt =
         rows =
             List.map (rowRender renderConfig prop.toRow columns >> rowBox) opt.items
     in
-    Element.column
+    Keyed.column
         [ Element.spacing 2
         , Element.width opt.width
         ]
@@ -187,11 +188,13 @@ desktopView renderConfig prop opt =
 headersRender :
     RenderConfig
     -> List Column
-    -> Element msg
+    -> ( String, Element msg )
 headersRender renderConfig columns =
-    Element.row
+    ( "@headers"
+    , Element.row
         headersAttr
         (List.map (headerRender renderConfig) columns)
+    )
 
 
 

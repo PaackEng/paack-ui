@@ -168,7 +168,7 @@ type alias Row msg columns =
 {-| Helper for composing a map function for a single row.
 -}
 type alias ToRow msg item columns =
-    item -> Row msg columns
+    item -> ( String, Row msg columns )
 
 
 {-| An empty set of cells for a row.
