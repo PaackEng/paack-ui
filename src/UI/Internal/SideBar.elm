@@ -189,13 +189,18 @@ headerView cfg toggleMsg logo =
 
 slimHeaderView : RenderConfig -> msg -> Maybe (Menu.Logo msg) -> Element msg
 slimHeaderView cfg toggleMsg _ =
-    Element.column [ height (px (72 + 48)) ]
-        [ (cfg |> localeTerms >> .sidebar >> .expand)
-            |> Icon.sandwichMenu
-            |> Icon.withSize Size.small
-            |> Icon.renderElement cfg
-            |> Element.el (headerButtonAttr toggleMsg)
-        ]
+    (cfg |> localeTerms >> .sidebar >> .expand)
+        |> Icon.sandwichMenu
+        |> Icon.renderElement cfg
+        |> Element.el
+            (headerButtonAttr toggleMsg
+                ++ [ Element.centerX
+
+                   -- It has 2 levels of padding, because of the extra padding.
+                   -- As we are trying to do the 8dot grid, the top field was set to 16px
+                   , Element.paddingEach { top = 16, left = 8, right = 8, bottom = 88 }
+                   ]
+            )
 
 
 headerButtonAttr : msg -> List (Attribute msg)
