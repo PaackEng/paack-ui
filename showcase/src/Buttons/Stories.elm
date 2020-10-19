@@ -42,6 +42,7 @@ stories renderConfig =
         , dangerStory renderConfig
         , lightStory renderConfig
         , clearStory renderConfig
+        , squaredStory renderConfig
         , linkStory renderConfig
         , fullWidthStory renderConfig
         , toggleStory renderConfig
@@ -197,6 +198,14 @@ clearStory cfg =
         "Button.clear"
 
 
+squaredStory : RenderConfig -> ExplorerStory
+squaredStory cfg =
+    enabledStory cfg
+        "Squared"
+        Button.squared
+        "Button.squared"
+
+
 linkStory : RenderConfig -> ExplorerStory
 linkStory renderConfig =
     story
@@ -314,6 +323,7 @@ unitedView renderConfig =
         , unitedItem <| enabledView renderConfig Button.danger
         , unitedItem <| enabledView renderConfig Button.light
         , unitedItem <| enabledView renderConfig Button.clear
+        , unitedItem <| enabledView renderConfig Button.squared
         , unitedItem <| successView renderConfig
         , unitedItem <| [ linkView renderConfig ]
         , unitedItem <| [ fullWidthView renderConfig ]

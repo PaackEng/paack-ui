@@ -50,8 +50,13 @@ type EmbossedTone
 
 
 type ButtonStyle
-    = StyleEmbossed EmbossedTone
+    = StyleEmbossed EmbossedTone BorderStyle
     | StyleHyperlink
+
+
+type BorderStyle
+    = BorderRounded
+    | BorderSquared
 
 
 type ButtonWidth

@@ -1,7 +1,7 @@
 module UI.Button exposing
     ( Button, toggle, success, disabled, cmd, redirect
     , ButtonBody, fromLabel, fromIcon
-    , ButtonStyle, hyperlink, primary, danger, light, clear
+    , ButtonStyle, hyperlink, primary, danger, light, clear, squared
     , ButtonWidth, withWidth, widthFull, widthRelative
     , withSize
     , withDisabledIf, withSuccessIf
@@ -35,7 +35,7 @@ A button can be created and rendered as in the following pipeline:
 
 # Style
 
-@docs ButtonStyle, hyperlink, primary, danger, light, clear
+@docs ButtonStyle, hyperlink, primary, danger, light, clear, squared
 
 
 # Width
@@ -72,7 +72,8 @@ import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Basics exposing (lazyMap, pairUncurry, prependMaybe)
 import UI.Internal.Button as Internal
     exposing
-        ( Button(..)
+        ( BorderStyle(..)
+        , Button(..)
         , ButtonAction(..)
         , ButtonBody(..)
         , ButtonMode(..)
@@ -348,21 +349,21 @@ withSize size button =
 -}
 danger : ButtonStyle
 danger =
-    StyleEmbossed ToneDanger
+    StyleEmbossed ToneDanger BorderRounded
 
 
 {-| This is the light-theme, mostly used for less-important actions.
 -}
 light : ButtonStyle
 light =
-    StyleEmbossed ToneLight
+    StyleEmbossed ToneLight BorderRounded
 
 
 {-| This is the clear-theme, mostly used on icons where the background color isn't needed.
 -}
 clear : ButtonStyle
 clear =
-    StyleEmbossed ToneClear
+    StyleEmbossed ToneClear BorderRounded
 
 
 {-| The primary action's theme.
@@ -370,7 +371,14 @@ This button usually commits the main task.
 -}
 primary : ButtonStyle
 primary =
-    StyleEmbossed TonePrimary
+    StyleEmbossed TonePrimary BorderRounded
+
+
+{-| The primary button without rounded borders.
+-}
+squared : ButtonStyle
+squared =
+    StyleEmbossed TonePrimary BorderSquared
 
 
 {-| A hyperlink-styled button looks like classical web links: Blue with an underline.
@@ -457,8 +465,8 @@ renderElement cfg button =
                 ButtonActive action StyleHyperlink ->
                     hyperlinkView cfg size width body action
 
-                ButtonActive action (StyleEmbossed tone) ->
-                    workingView cfg size width tone body action
+                ButtonActive action (StyleEmbossed tone border) ->
+                    workingView cfg size width tone border body action
 
                 ButtonDisabled ->
                     staticView cfg size width body disabledTheme
@@ -535,17 +543,17 @@ workingView :
     -> Size
     -> ButtonWidth
     -> EmbossedTone
+    -> BorderStyle
     -> ButtonBody
     -> ButtonAction msg
     -> Element msg
-workingView cfg size width tone body action =
+workingView cfg size width tone border body action =
     let
         ( paddings, borders ) =
             bodyLayout body size
 
         attrs =
-            [ Primitives.roundedBorders size
-            , buttonWidth width
+            [ buttonWidth width
             , paddings
             , borders
             , Font.semiBold
@@ -553,6 +561,7 @@ workingView cfg size width tone body action =
             ]
                 ++ (ARIA.toElementAttributes <| ARIA.roleButton)
                 ++ workingTheme tone
+                ++ borderAttribute size border
     in
     case action of
         ActionRedirect link ->
@@ -564,6 +573,16 @@ workingView cfg size width tone body action =
             body
                 |> bodyToElement cfg size
                 |> Element.el (Element.onIndividualClick msg :: attrs)
+
+
+borderAttribute : Size -> BorderStyle -> List (Attribute msg)
+borderAttribute size borderStyle =
+    case borderStyle of
+        BorderSquared ->
+            []
+
+        BorderRounded ->
+            [ Primitives.roundedBorders size ]
 
 
 staticView :
