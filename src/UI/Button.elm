@@ -561,7 +561,7 @@ workingView cfg size width tone border body action =
             ]
                 ++ (ARIA.toElementAttributes <| ARIA.roleButton)
                 ++ workingTheme tone
-                ++ borderAttribute size border
+                ++ borderAttributes size border
     in
     case action of
         ActionRedirect link ->
@@ -575,8 +575,8 @@ workingView cfg size width tone border body action =
                 |> Element.el (Element.onIndividualClick msg :: attrs)
 
 
-borderAttribute : Size -> BorderStyle -> List (Attribute msg)
-borderAttribute size borderStyle =
+borderAttributes : Size -> BorderStyle -> List (Attribute msg)
+borderAttributes size borderStyle =
     case borderStyle of
         BorderSquared ->
             []
