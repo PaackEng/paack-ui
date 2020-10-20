@@ -105,7 +105,7 @@ eventsTests =
             defaultTextField input
                 |> TextField.renderElement desktopWindowConfig
                 |> findTextField
-                |> Event.simulate ExtraEvents.enterKey
+                |> Event.simulate ExtraEvents.inputEnterKey
                 |> Event.expect OnEnterPressed
 
         testTextFieldForOnTextFieldChanged input =
