@@ -90,7 +90,7 @@ eventsTests =
                 tabsElement
                     |> findTabs
                     |> Query.index 1
-                    |> Event.simulate ExtraEvents.enterKey
+                    |> Event.simulate ExtraEvents.buttonEnterKey
                     |> Event.toResult
                     -- I've used toResult cause it show proper error messages
                     |> Expect.equal (Ok (SelectTab TabTwo))
