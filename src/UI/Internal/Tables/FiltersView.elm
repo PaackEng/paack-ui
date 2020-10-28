@@ -10,7 +10,7 @@ import Element.Events as Events
 import Element.Font as Font
 import UI.Button as Button
 import UI.Icon as Icon
-import UI.Internal.Basics exposing (maybeNotThen)
+import UI.Internal.Basics exposing (maybeNotThen, prependIf)
 import UI.Internal.DateInput as DateInput exposing (DateInput(..), PeriodComparison(..), PeriodDate, RangeDate)
 import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
@@ -76,6 +76,9 @@ header renderConfig filter config =
                 selectFilterRender renderConfig config list editable
                     |> dialog renderConfig config filter clearMsg applyMsg
 
+            Filters.Unfiltrable ->
+                headerUnfiltrable renderConfig config.label
+
     else if Filters.isApplied filter then
         headerApplied renderConfig
             config.openMsg
@@ -84,9 +87,14 @@ header renderConfig filter config =
             config.label
 
     else
-        headerNormal renderConfig
-            config.openMsg
-            config.label
+        case filter of
+            Filters.Unfiltrable ->
+                headerUnfiltrable renderConfig config.label
+
+            _ ->
+                headerNormal renderConfig
+                    config.openMsg
+                    config.label
 
 
 
@@ -100,7 +108,7 @@ headerSelectToggle renderConfig toggleMsg =
         |> Icon.renderElement renderConfig
         |> Element.el
             (Element.onIndividualClick toggleMsg
-                :: headerAttrs False
+                :: headerAttrs True False
             )
         |> Element.el
             [ Element.width (px 32) ]
@@ -113,7 +121,7 @@ headerSelectToggle renderConfig toggleMsg =
 headerNormal : RenderConfig -> msg -> String -> Element msg
 headerNormal renderConfig openMsg label =
     -- Button.light
-    Element.row (Element.onIndividualClick openMsg :: headerAttrs False)
+    Element.row (Element.onIndividualClick openMsg :: headerAttrs True False)
         [ headerText renderConfig label
         , Icon.filter label
             |> Icon.withSize contextSize
@@ -122,10 +130,16 @@ headerNormal renderConfig openMsg label =
         ]
 
 
+headerUnfiltrable : RenderConfig -> String -> Element msg
+headerUnfiltrable renderConfig label =
+    headerText renderConfig label
+        |> Element.el (headerAttrs False False)
+
+
 headerApplied : RenderConfig -> msg -> msg -> String -> String -> Element msg
 headerApplied renderConfig openMsg clearMsg clearHint label =
     -- Button.primary
-    Element.row (Element.onIndividualClick openMsg :: headerAttrs True)
+    Element.row (Element.onIndividualClick openMsg :: headerAttrs True True)
         [ headerText renderConfig label
         , Button.fromIcon (Icon.close clearHint)
             |> Button.cmd clearMsg Button.primary
@@ -150,8 +164,8 @@ headerPadX =
     (36 - 16) // 2
 
 
-headerAttrs : Bool -> List (Attribute msg)
-headerAttrs isApplied =
+headerAttrs : Bool -> Bool -> List (Attribute msg)
+headerAttrs hoverEffect isApplied =
     let
         baseHeight =
             if isApplied then
@@ -179,10 +193,23 @@ headerAttrs isApplied =
             else
                 [ Background.color Palette.gray.lightest
                 , Font.color Palette.primary.darkest
-                , Element.mouseOver
-                    [ Background.color Palette.primary.lightest ]
                 ]
                     ++ Element.colorTransition 100
+                    |> mouseOver
+
+        pointer accu =
+            if hoverEffect then
+                Element.pointer
+                    :: accu
+                    ++ (ARIA.toElementAttributes <| ARIA.roleButton)
+
+            else
+                accu
+
+        mouseOver =
+            Element.mouseOver
+                [ Background.color Palette.primary.lightest ]
+                |> prependIf hoverEffect
     in
     [ Primitives.roundedBorders contextSize
     , Element.width Element.fill
@@ -190,10 +217,9 @@ headerAttrs isApplied =
     , Element.spacing 8
     , Font.size textSize
     , Font.semiBold
-    , Element.pointer
     ]
-        ++ (ARIA.toElementAttributes <| ARIA.roleButton)
         ++ workingTheme
+        |> pointer
 
 
 

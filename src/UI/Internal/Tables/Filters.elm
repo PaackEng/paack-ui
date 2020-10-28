@@ -37,6 +37,7 @@ type Filter msg item
     | RangeDateFilter (RangeDateFilterConfig msg item)
     | PeriodDateFilter (PeriodDateFilterConfig msg item)
     | SelectFilter (List String) (SelectFilterConfig msg item)
+    | Unfiltrable
 
 
 type alias Editable value =
@@ -122,6 +123,17 @@ strategyLocal isKept =
 strategyRemote : RemoteMessages msg value -> Strategy msg value item
 strategyRemote messages =
     Remote messages
+
+
+
+-- Unfiltrable
+
+
+unfiltrable :
+    Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+unfiltrable accu =
+    push Unfiltrable accu
 
 
 
@@ -722,6 +734,9 @@ applyFilter column model =
         Just (SelectFilter list config) ->
             applyShortcut model column config (SelectFilter list)
 
+        Just Unfiltrable ->
+            ( model, Cmd.none )
+
         Nothing ->
             ( model, Cmd.none )
 
@@ -771,6 +786,9 @@ filterClear column model =
                 |> flip (set column) model
                 |> dispatchClear config.strategy
 
+        Just Unfiltrable ->
+            ( model, Cmd.none )
+
         Nothing ->
             ( model, Cmd.none )
 
@@ -810,6 +828,9 @@ isEdited filter =
         SelectFilter _ { editable } ->
             editable.current /= Nothing
 
+        Unfiltrable ->
+            False
+
 
 isApplied : Filter msg item -> Bool
 isApplied filter =
@@ -831,6 +852,9 @@ isApplied filter =
 
         SelectFilter _ { editable } ->
             editable.applied /= Nothing
+
+        Unfiltrable ->
+            False
 
 
 localAppliedMap : FilterConfig msg value item -> Maybe (item -> Bool)
@@ -863,6 +887,9 @@ filterGet filter =
 
         SelectFilter _ config ->
             localAppliedMap config
+
+        Unfiltrable ->
+            Nothing
 
 
 

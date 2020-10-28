@@ -3,6 +3,7 @@ module UI.Tables.Stateful exposing
     , Responsive, Cover, Details, Detail, withResponsive, detailsEmpty, detailShown, detailHidden
     , State, Msg, init, update
     , Filters, filtersEmpty, stateWithFilters
+    , unfiltrable
     , localSingleTextFilter, remoteSingleTextFilter
     , localMultiTextFilter, remoteMultiTextFilter
     , localSingleDateFilter, remoteSingleDateFilter
@@ -99,6 +100,11 @@ And on model:
 # Filters
 
 @docs Filters, filtersEmpty, stateWithFilters
+
+
+## Unfilterable
+
+@docs unfiltrable
 
 
 ## Single Text
@@ -619,6 +625,15 @@ stateIsSelected item (State state) =
 filtersEmpty : Filters msg item T.Zero
 filtersEmpty =
     Filters.empty
+
+
+{-| Mark a collumn as incompatible with any filter.
+-}
+unfiltrable :
+    Filters msg item columns
+    -> Filters msg item (T.Increase columns)
+unfiltrable =
+    Filters.unfiltrable
 
 
 {-| A filter with one single text field.
