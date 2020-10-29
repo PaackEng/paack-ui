@@ -11,7 +11,9 @@
     "showcase": "parcel showcase/public/index.html",
     "test": "elm-test",
     "i18n": "i18n-json-to-elm",
-    "percy": "percy exec -- cypress run"
+    "percy": "percy exec -- cypress run",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "prettier": {
     "singleQuote": true,
@@ -35,12 +37,14 @@
     "node-elm-compiler": "^5.0.4",
     "paack-ui-assets": "^0.0.12",
     "parcel-bundler": "^1.12.4",
-    "parcel-plugin-asset-copier": "^1.1.0"
+    "parcel-plugin-asset-copier": "^1.1.0",
+    "snyk": "^1.421.1"
   },
   "devDependencies": {
     "@percy/cypress": "^2.3.1",
     "cypress": "^4.12.1",
     "elm-format": "^0.8.3",
     "i18n-json-to-elm": "PedroHLC/i18n-json-to-elm"
-  }
+  },
+  "snyk": true
 }
