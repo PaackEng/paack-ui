@@ -3,6 +3,7 @@ module UI.Internal.Tables.View exposing (..)
 import Element exposing (Attribute, Element, fill, fillPortion, minimum, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
+import Element.Font as Font
 import Element.Keyed as Keyed
 import UI.Button as Button
 import UI.Internal.NArray as NArray
@@ -10,7 +11,8 @@ import UI.Internal.Palette as Palette
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Tables.Common exposing (..)
 import UI.Internal.Utils.Element as InternalElement
-import UI.Palette as Palette exposing (brightnessMiddle, toneGray)
+import UI.Link as Link exposing (Link)
+import UI.Palette as Palette exposing (brightnessMiddle, toneGray, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Tables.Common as Common exposing (..)
 import UI.Text as Text exposing (Text, ellipsizeWithTooltip)
@@ -24,6 +26,9 @@ cellContentRender renderConfig cell_ =
 
         CellButton button ->
             Button.renderElement renderConfig button
+
+        CellLink link text ->
+            linkedText renderConfig link text
 
         CellCustom element ->
             element
@@ -45,6 +50,26 @@ simpleText renderConfig text =
             [ Element.width fill
             , InternalElement.overflowVisible
             ]
+
+
+linkedText : RenderConfig -> Link -> Text -> Element msg
+linkedText renderConfig link text =
+    text
+        |> Text.withOverflow ellipsizeWithTooltip
+        |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
+        |> Text.renderElement renderConfig
+        |> Element.el [ Element.width fill, Element.clipX, InternalElement.overflowVisible ]
+        |> Link.wrapElement renderConfig
+            [ Element.width fill
+            , InternalElement.overflowVisible
+            , Palette.color tonePrimary brightnessMiddle
+                |> Palette.toElementColor
+                |> Font.color
+
+            -- Color twice, otherwise underline is black
+            , Font.underline
+            ]
+            link
 
 
 widthToEl : Common.ColumnWidth -> Element.Length
