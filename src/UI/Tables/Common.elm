@@ -1,8 +1,8 @@
 module UI.Tables.Common exposing
     ( Columns, columnsEmpty, column
     , ColumnWidth, columnWidthPortion, columnWidthPixels
-    , Row, ToRow, rowEmpty, rowCellText, rowCellButton, rowCellCustom
-    , Cell, cellFromText, cellFromButton, cellFromCustom
+    , Row, ToRow, rowEmpty, rowCellText, rowCellButton, rowCellLink, rowCellCustom
+    , Cell, cellFromText, cellFromButton, cellFromLink, cellFromCustom
     )
 
 {-|
@@ -20,12 +20,12 @@ module UI.Tables.Common exposing
 
 ## Desktop rows
 
-@docs Row, ToRow, rowEmpty, rowCellText, rowCellButton, rowCellCustom
+@docs Row, ToRow, rowEmpty, rowCellText, rowCellButton, rowCellLink, rowCellCustom
 
 
 # Individual cell
 
-@docs Cell, cellFromText, cellFromButton, cellFromCustom
+@docs Cell, cellFromText, cellFromButton, cellFromLink, cellFromCustom
 
 -}
 
@@ -33,6 +33,7 @@ import Element exposing (Element)
 import UI.Button exposing (Button)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Internal.Tables.Common as Internal exposing (..)
+import UI.Link exposing (Link)
 import UI.Text exposing (Text)
 import UI.Utils.TypeNumbers as T
 
@@ -121,6 +122,8 @@ type alias Cell msg =
 
 {-| Creates a cell with some text content.
 
+Text may be ellipsized to fit cell's width.
+
     cellFromText <| Text.body2 "Watermelon"
 
 -}
@@ -149,6 +152,20 @@ cellFromButton text =
 cellFromCustom : Element msg -> Cell msg
 cellFromCustom element =
     CellCustom element
+
+
+{-| Creates a cell with a good-old hyperlink from a text.
+
+Text may be ellipsized to fit cell's width.
+
+    cellFromLink
+        (Link.link "https://www.google.com")
+        (Text.body2 "Go to Google")
+
+-}
+cellFromLink : Link -> Text -> Cell msg
+cellFromLink link text =
+    CellLink link text
 
 
 
@@ -230,3 +247,17 @@ Similar to [`cellFromCustom`](#cellFromCustom) but infused for rows.
 rowCellCustom : Element msg -> Row msg columns -> Row msg (T.Increase columns)
 rowCellCustom element accu =
     NArray.push (CellCustom element) accu
+
+
+{-| Transforms a `UI.Text` into a hyperlinked-cell appending it to a row.
+
+Similar to [`cellFromText`](#cellFromText) but infused for rows.
+
+    rowEmpty
+        |> rowCellLink (Link.link "https://starbucks.com") (Text.body1 "Starbucks")
+        |> rowCellText (Text.body2 "Coffe and Capuccino")
+
+-}
+rowCellLink : Link -> Text -> Row msg columns -> Row msg (T.Increase columns)
+rowCellLink link text accu =
+    NArray.push (CellLink link text) accu
