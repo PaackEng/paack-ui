@@ -4,7 +4,7 @@ module UI.TextField exposing
     , newPassword, currentPassword, setPasswordVisible
     , username, email
     , search
-    , static
+    , static, toStaticIf
     , withSize
     , TextFieldWidth, withWidth, widthFull, widthRelative
     , setLabelVisible, withPlaceholder, withIcon
@@ -59,7 +59,7 @@ Different from [`Element.Input`](/packages/mdgriffith/elm-ui/latest/Element-Inpu
 
 ## Static
 
-@docs static
+@docs static, toStaticIf
 
 
 # Size
@@ -159,6 +159,29 @@ type TextFieldWidth
 -- Options
 
 
+{-| Irreversibly converts the input to static field. Given True to a condition.
+
+    TextField.newPassword Msg.OnPasswordChanged
+        "New password"
+        model.value
+        |> TextField.toStaticIf
+            model.hasSentForm
+
+-}
+toStaticIf : Bool -> TextField msg -> TextField msg
+toStaticIf condition =
+    if condition then
+        \(TextField prop opt) ->
+            TextField
+                { prop
+                    | changeable = Nothing
+                }
+                opt
+
+    else
+        identity
+
+
 {-| Listen to focus events, add tab-indexing and enforce focus state.
 
     TextField.withFocus
@@ -197,6 +220,8 @@ withIcon icon (TextField prop opt) =
 {-| Place-holds the text field with text.
 
     TextField.withPlaceholder "Enter your personal email" someTextField
+
+**NOTE**: When creating password fields, the placeholder is "●●●●●●●●" by default.
 
 -}
 withPlaceholder : String -> TextField msg -> TextField msg
@@ -363,6 +388,8 @@ username onChange label currentValue =
         "New password"
         model.value
 
+**NOTE**: Uses [`withPlaceholder "●●●●●●●●"`](#withPlaceholder) as default.
+
 -}
 newPassword : (String -> msg) -> String -> String -> TextField msg
 newPassword onChange label currentValue =
@@ -370,6 +397,7 @@ newPassword onChange label currentValue =
         label
         currentValue
         forNewPassword
+        |> withPlaceholder "●●●●●●●●"
 
 
 {-| Wrapper around [`Element.Input.currentPassword` ](/packages/mdgriffith/elm-ui/latest/Element-Input#currentPassword).
@@ -378,6 +406,8 @@ newPassword onChange label currentValue =
         "Current password"
         model.value
 
+**NOTE**: Uses [`withPlaceholder "●●●●●●●●"`](#withPlaceholder) as default.
+
 -}
 currentPassword : (String -> msg) -> String -> String -> TextField msg
 currentPassword onChange label currentValue =
@@ -385,6 +415,7 @@ currentPassword onChange label currentValue =
         label
         currentValue
         forCurrentPassword
+        |> withPlaceholder "●●●●●●●●"
 
 
 {-| Wrapper around [`Element.Input.email` ](/packages/mdgriffith/elm-ui/latest/Element-Input#email).
@@ -460,45 +491,21 @@ The result of this function is a ready-to-insert Elm UI's Element.
 -}
 renderElement : RenderConfig -> TextField msg -> Element msg
 renderElement cfg (TextField prop opt) =
+    case prop.changeable of
+        Just msg ->
+            nonStaticView cfg prop opt msg
+
+        Nothing ->
+            staticView cfg prop opt
+
+
+nonStaticView : RenderConfig -> Properties msg -> Options msg -> (String -> msg) -> Element msg
+nonStaticView cfg prop opt msg =
     let
         elAttrs =
             attrs cfg prop opt
 
-        nonStatic content msg =
-            case content of
-                ContentSinglelineText ->
-                    inputAnyOptions cfg msg prop opt
-                        |> Input.text elAttrs
-
-                ContentMultilineText ->
-                    inputMultilineOptions cfg msg prop opt
-                        |> Input.multiline elAttrs
-
-                ContentUsername ->
-                    inputAnyOptions cfg msg prop opt
-                        |> Input.username elAttrs
-
-                ContentPassword pswOpt ->
-                    whenPassword msg pswOpt
-
-                ContentEmail ->
-                    inputAnyOptions cfg msg prop opt
-                        |> Input.email elAttrs
-
-                ContentSearch ->
-                    inputAnyOptions cfg msg prop opt
-                        |> Input.search elAttrs
-
-                ContentSpellChecked ->
-                    inputAnyOptions cfg msg prop opt
-                        |> Input.spellChecked elAttrs
-
-        whenStatic value =
-            Text.subtitle2 value
-                |> Text.renderElement cfg
-                |> Element.el elAttrs
-
-        whenPassword msg { isVisible, isCurrent } =
+        whenPassword { isVisible, isCurrent } =
             if isCurrent then
                 inputPasswordOptions cfg msg prop opt isVisible
                     |> Input.currentPassword elAttrs
@@ -507,12 +514,75 @@ renderElement cfg (TextField prop opt) =
                 inputPasswordOptions cfg msg prop opt isVisible
                     |> Input.newPassword elAttrs
     in
-    case prop.changeable of
-        Just msg ->
-            nonStatic prop.content msg
+    case prop.content of
+        ContentSinglelineText ->
+            inputAnyOptions cfg msg prop opt
+                |> Input.text elAttrs
 
-        Nothing ->
-            whenStatic prop.currentValue
+        ContentMultilineText ->
+            inputMultilineOptions cfg msg prop opt
+                |> Input.multiline elAttrs
+
+        ContentUsername ->
+            inputAnyOptions cfg msg prop opt
+                |> Input.username elAttrs
+
+        ContentPassword pswOpt ->
+            whenPassword pswOpt
+
+        ContentEmail ->
+            inputAnyOptions cfg msg prop opt
+                |> Input.email elAttrs
+
+        ContentSearch ->
+            inputAnyOptions cfg msg prop opt
+                |> Input.search elAttrs
+
+        ContentSpellChecked ->
+            inputAnyOptions cfg msg prop opt
+                |> Input.spellChecked elAttrs
+
+
+staticView : RenderConfig -> Properties msg -> Options msg -> Element msg
+staticView renderConfig prop opt =
+    let
+        elAttrs =
+            attrs renderConfig prop opt
+
+        genericInputElement value =
+            value
+                |> Text.subtitle2
+                |> Text.renderElement renderConfig
+                |> Element.el elAttrs
+
+        inputElement =
+            case prop.content of
+                ContentPassword _ ->
+                    "●"
+                        |> String.repeat (String.length prop.currentValue)
+                        |> genericInputElement
+
+                _ ->
+                    genericInputElement prop.currentValue
+    in
+    if opt.labelVisible then
+        Element.column
+            [ Element.width <|
+                case opt.width of
+                    WidthFull ->
+                        Element.fill
+
+                    WidthRelative ->
+                        Element.shrink
+            ]
+            [ prop.label
+                |> Text.caption
+                |> Text.renderElement renderConfig
+            , inputElement
+            ]
+
+    else
+        inputElement
 
 
 
