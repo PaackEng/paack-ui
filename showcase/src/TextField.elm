@@ -23,6 +23,8 @@ stories cfg =
         [ defaultTextFieldStory cfg
         , usernameTextFieldStory cfg
         , passwordTextFieldStory cfg
+        , staticTextFieldStory cfg
+        , staticIfTextFieldStory cfg
         , fullWidthStory cfg
         , unitedStory cfg
         ]
@@ -120,6 +122,68 @@ TextField.currentPassword OnTextFieldChanged
 """
 
 
+staticTextFieldStory : RenderConfig -> ExplorerStory
+staticTextFieldStory cfg =
+    story
+        ( "Static"
+        , staticTextFieldView cfg
+        , pluginOptions staticTextFieldCode
+        )
+
+
+staticTextFieldView : RenderConfig -> Element RootMsg.Msg
+staticTextFieldView cfg =
+    TextField.static
+        "A good label"
+        "Static fields don't require a message / update"
+        |> TextField.setLabelVisible True
+        |> TextField.renderElement cfg
+
+
+staticTextFieldCode : String
+staticTextFieldCode =
+    """
+-- Username
+TextField.static
+        "You can't edit this text"
+        model.staticValue
+    |> TextField.setLabelVisible true
+    |> TextField.renderElement renderCfg
+"""
+
+
+staticIfTextFieldStory : RenderConfig -> ExplorerStory
+staticIfTextFieldStory cfg =
+    story
+        ( "Static If"
+        , staticIfTextFieldView cfg
+        , pluginOptions staticIfTextFieldCode
+        )
+
+
+staticIfTextFieldView : RenderConfig -> Element RootMsg.Msg
+staticIfTextFieldView cfg =
+    TextField.currentPassword (always RootMsg.NoOp)
+        "Enter your password (blocked)"
+        "Value"
+        |> TextField.setLabelVisible True
+        |> TextField.toStaticIf True
+        |> TextField.renderElement cfg
+
+
+staticIfTextFieldCode : String
+staticIfTextFieldCode =
+    """
+-- Password
+TextField.currentPassword OnTextFieldChanged
+        "Enter your password"
+        mode.passwordValue
+    |> TextField.setLabelVisible True
+    |> TextField.toDisabledIf model.isFormDisabled
+    |> TextField.renderElement renderCfg
+"""
+
+
 fullWidthStory : RenderConfig -> ExplorerStory
 fullWidthStory cfg =
     story
@@ -173,7 +237,7 @@ type Msg
 unitedStory : RenderConfig -> ExplorerStory
 unitedStory cfg =
     story
-        ( "Full Width"
+        ( "United"
         , unitedView cfg
         , pluginOptions fullWidthCode
         )
@@ -185,5 +249,6 @@ unitedView cfg =
         [ defaultTextFieldView cfg
         , usernameTextFieldView cfg
         , passwordTextFieldView cfg
+        , staticIfTextFieldView cfg
         , fullWidthView cfg
         ]

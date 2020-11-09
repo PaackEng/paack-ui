@@ -6,7 +6,7 @@ module UI.TextField exposing
     , search
     , static, toStaticIf
     , withSize
-    , TextFieldWidth, withWidth, widthFull, widthRelative
+    , TextFieldWidth, withWidth, widthFull, widthPx
     , setLabelVisible, withPlaceholder, withIcon
     , withFocus, withOnEnterPressed, withError
     , renderElement
@@ -69,7 +69,7 @@ Different from [`Element.Input`](/packages/mdgriffith/elm-ui/latest/Element-Inpu
 
 # Width
 
-@docs TextFieldWidth, withWidth, widthFull, widthRelative
+@docs TextFieldWidth, withWidth, widthFull, widthPx
 
 
 # Accessibility
@@ -152,7 +152,7 @@ type alias PasswordOptions =
 -}
 type TextFieldWidth
     = WidthFull
-    | WidthRelative
+    | WidthPx Int
 
 
 
@@ -328,9 +328,9 @@ widthFull =
 **NOTE**: Default behaviour.
 
 -}
-widthRelative : TextFieldWidth
-widthRelative =
-    WidthRelative
+widthPx : Int -> TextFieldWidth
+widthPx pixels =
+    WidthPx pixels
 
 
 
@@ -499,93 +499,6 @@ renderElement cfg (TextField prop opt) =
             staticView cfg prop opt
 
 
-nonStaticView : RenderConfig -> Properties msg -> Options msg -> (String -> msg) -> Element msg
-nonStaticView cfg prop opt msg =
-    let
-        elAttrs =
-            attrs cfg prop opt
-
-        whenPassword { isVisible, isCurrent } =
-            if isCurrent then
-                inputPasswordOptions cfg msg prop opt isVisible
-                    |> Input.currentPassword elAttrs
-
-            else
-                inputPasswordOptions cfg msg prop opt isVisible
-                    |> Input.newPassword elAttrs
-    in
-    case prop.content of
-        ContentSinglelineText ->
-            inputAnyOptions cfg msg prop opt
-                |> Input.text elAttrs
-
-        ContentMultilineText ->
-            inputMultilineOptions cfg msg prop opt
-                |> Input.multiline elAttrs
-
-        ContentUsername ->
-            inputAnyOptions cfg msg prop opt
-                |> Input.username elAttrs
-
-        ContentPassword pswOpt ->
-            whenPassword pswOpt
-
-        ContentEmail ->
-            inputAnyOptions cfg msg prop opt
-                |> Input.email elAttrs
-
-        ContentSearch ->
-            inputAnyOptions cfg msg prop opt
-                |> Input.search elAttrs
-
-        ContentSpellChecked ->
-            inputAnyOptions cfg msg prop opt
-                |> Input.spellChecked elAttrs
-
-
-staticView : RenderConfig -> Properties msg -> Options msg -> Element msg
-staticView renderConfig prop opt =
-    let
-        elAttrs =
-            attrs renderConfig prop opt
-
-        genericInputElement value =
-            value
-                |> Text.subtitle2
-                |> Text.renderElement renderConfig
-                |> Element.el elAttrs
-
-        inputElement =
-            case prop.content of
-                ContentPassword _ ->
-                    "●"
-                        |> String.repeat (String.length prop.currentValue)
-                        |> genericInputElement
-
-                _ ->
-                    genericInputElement prop.currentValue
-    in
-    if opt.labelVisible then
-        Element.column
-            [ Element.width <|
-                case opt.width of
-                    WidthFull ->
-                        Element.fill
-
-                    WidthRelative ->
-                        Element.shrink
-            , Element.spacing 5
-            ]
-            [ prop.label
-                |> Text.caption
-                |> Text.renderElement renderConfig
-            , inputElement
-            ]
-
-    else
-        inputElement
-
-
 
 -- Internals for contructors
 
@@ -627,7 +540,7 @@ defaultOptions =
     , labelVisible = False
     , focus = Nothing
     , icon = Nothing
-    , width = WidthRelative
+    , width = WidthPx 260
     , errorCaption = Nothing
     , onEnterPressed = Nothing
     , size = Size.default
@@ -811,8 +724,8 @@ genericAttr label isPlaceholder hasError width size =
             WidthFull ->
                 Element.fill
 
-            WidthRelative ->
-                Element.shrink
+            WidthPx value ->
+                Element.px value
     , Font.color <|
         -- TODO: Use CSS pre-processor
         if isPlaceholder then
@@ -827,10 +740,7 @@ genericAttr label isPlaceholder hasError width size =
 inputLabel : RenderConfig -> String -> Bool -> Input.Label msg
 inputLabel cfg label labelVisible =
     if labelVisible then
-        Text.caption label
-            |> Text.withColor
-                (Palette.color toneGray brightnessMiddle)
-            |> Text.renderElement cfg
+        inputLabelView cfg label
             |> Input.labelAbove
                 [ Element.paddingEach
                     { top = 0, left = 0, right = 0, bottom = 3 }
@@ -838,6 +748,14 @@ inputLabel cfg label labelVisible =
 
     else
         Input.labelHidden label
+
+
+inputLabelView : RenderConfig -> String -> Element msg
+inputLabelView cfg label =
+    Text.caption label
+        |> Text.withColor
+            (Palette.color toneGray brightnessMiddle)
+        |> Text.renderElement cfg
 
 
 textFieldPadding : Size -> Attribute msg
@@ -856,3 +774,88 @@ textFieldPadding size =
 
         Size.ExtraSmall ->
             Element.paddingXY 8 7
+
+
+nonStaticView : RenderConfig -> Properties msg -> Options msg -> (String -> msg) -> Element msg
+nonStaticView cfg prop opt msg =
+    let
+        elAttrs =
+            attrs cfg prop opt
+
+        whenPassword { isVisible, isCurrent } =
+            if isCurrent then
+                inputPasswordOptions cfg msg prop opt isVisible
+                    |> Input.currentPassword elAttrs
+
+            else
+                inputPasswordOptions cfg msg prop opt isVisible
+                    |> Input.newPassword elAttrs
+    in
+    case prop.content of
+        ContentSinglelineText ->
+            inputAnyOptions cfg msg prop opt
+                |> Input.text elAttrs
+
+        ContentMultilineText ->
+            inputMultilineOptions cfg msg prop opt
+                |> Input.multiline elAttrs
+
+        ContentUsername ->
+            inputAnyOptions cfg msg prop opt
+                |> Input.username elAttrs
+
+        ContentPassword pswOpt ->
+            whenPassword pswOpt
+
+        ContentEmail ->
+            inputAnyOptions cfg msg prop opt
+                |> Input.email elAttrs
+
+        ContentSearch ->
+            inputAnyOptions cfg msg prop opt
+                |> Input.search elAttrs
+
+        ContentSpellChecked ->
+            inputAnyOptions cfg msg prop opt
+                |> Input.spellChecked elAttrs
+
+
+staticView : RenderConfig -> Properties msg -> Options msg -> Element msg
+staticView renderConfig prop opt =
+    let
+        elAttrs =
+            attrs renderConfig prop opt
+
+        genericInputElement value =
+            value
+                |> Text.subtitle2
+                |> Text.renderElement renderConfig
+                |> Element.el elAttrs
+
+        inputElement =
+            case prop.content of
+                ContentPassword _ ->
+                    "●"
+                        |> String.repeat (String.length prop.currentValue)
+                        |> genericInputElement
+
+                _ ->
+                    genericInputElement prop.currentValue
+    in
+    if opt.labelVisible then
+        Element.column
+            [ Element.width <|
+                case opt.width of
+                    WidthFull ->
+                        Element.fill
+
+                    WidthPx value ->
+                        Element.px value
+            , Element.spacing 5
+            ]
+            [ inputLabelView renderConfig prop.label
+            , inputElement
+            ]
+
+    else
+        inputElement
