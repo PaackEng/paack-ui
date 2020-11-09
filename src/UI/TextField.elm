@@ -323,9 +323,9 @@ widthFull =
     WidthFull
 
 
-{-| The field will have the exact width to fit its contents.
+{-| The field will have the width you specify in pixels.
 
-**NOTE**: Default behaviour.
+**NOTE**: Default behaviour with 260px.
 
 -}
 widthPx : Int -> TextFieldWidth
