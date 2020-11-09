@@ -574,6 +574,7 @@ staticView renderConfig prop opt =
 
                     WidthRelative ->
                         Element.shrink
+            , Element.spacing 5
             ]
             [ prop.label
                 |> Text.caption
