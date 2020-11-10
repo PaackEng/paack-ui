@@ -4,7 +4,7 @@ module UI.Icon exposing
     , add, check, close, collapse, download, edit, eventLog, expand, filter
     , groups, logout, move, nextContent, notifications, paackSpaces, packages
     , previousContent, print, remove, sandwichMenu, search, searchSpace
-    , seeMore, toggle, toggleDown, toggleUp, trash, warning
+    , seeMore, toggle, toggleDown, toggleUp, delete, warning
     , getHint
     , withColor
     , withSize, withCustomSize
@@ -38,7 +38,7 @@ An icon can be created and rendered as in the following pipeline:
 @docs add, check, close, collapse, download, edit, eventLog, expand, filter
 @docs groups, logout, move, nextContent, notifications, paackSpaces, packages
 @docs previousContent, print, remove, sandwichMenu, search, searchSpace
-@docs seeMore, toggle, toggleDown, toggleUp, trash, warning
+@docs seeMore, toggle, toggleDown, toggleUp, delete, warning
 
 
 # Disassemble
@@ -123,7 +123,7 @@ type IconGlyph
     | SearchSpace
     | SeeMore
     | Toggle
-    | Trash
+    | Delete
     | UpArrow
     | Warning
 
@@ -447,12 +447,12 @@ remove hint =
 
 {-| A trash can with an "x" on it.
 
-    Icon.trash "Delete item"
+    Icon.delete "Delete item"
 
 -}
-trash : String -> Icon
-trash hint =
-    Icon (Properties hint Trash) defaultOptions
+delete : String -> Icon
+delete hint =
+    Icon (Properties hint Delete) defaultOptions
 
 
 {-| Two vertical parallel arrows pointing to opposite directions.
@@ -578,8 +578,8 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
             Warning ->
                 svgIcon "Warning"
 
-            Trash ->
-                svgIcon "Trash"
+            Delete ->
+                svgIcon "Delete"
 
             Move ->
                 svgIcon "Move"
