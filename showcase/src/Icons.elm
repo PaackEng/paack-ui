@@ -70,6 +70,8 @@ icons =
     , ( Icon.toggleDown, "toggleDown" )
     , ( Icon.toggleUp, "toggleUp" )
     , ( Icon.warning, "warning" )
+    , ( Icon.trash, "trash" )
+    , ( Icon.move, "move" )
     ]
 
 
