@@ -579,7 +579,7 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
                 svgIcon "Warning"
 
             Delete ->
-                svgIcon "Delete"
+                svgIcon "Trash"
 
             Move ->
                 svgIcon "Move"
