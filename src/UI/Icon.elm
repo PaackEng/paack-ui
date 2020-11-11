@@ -2,9 +2,9 @@ module UI.Icon exposing
     ( svgSpriteImport
     , Icon
     , add, check, close, collapse, download, edit, eventLog, expand, filter
-    , groups, logout, nextContent, notifications, paackSpaces, packages
+    , groups, logout, move, nextContent, notifications, paackSpaces, packages
     , previousContent, print, remove, sandwichMenu, search, searchSpace
-    , seeMore, toggle, toggleDown, toggleUp, warning
+    , seeMore, toggle, toggleDown, toggleUp, delete, warning
     , getHint
     , withColor
     , withSize, withCustomSize
@@ -36,9 +36,9 @@ An icon can be created and rendered as in the following pipeline:
 
 @docs Icon
 @docs add, check, close, collapse, download, edit, eventLog, expand, filter
-@docs groups, logout, nextContent, notifications, paackSpaces, packages
+@docs groups, logout, move, nextContent, notifications, paackSpaces, packages
 @docs previousContent, print, remove, sandwichMenu, search, searchSpace
-@docs seeMore, toggle, toggleDown, toggleUp, warning
+@docs seeMore, toggle, toggleDown, toggleUp, delete, warning
 
 
 # Disassemble
@@ -111,6 +111,7 @@ type IconGlyph
     | Groups
     | LeftArrow
     | Logout
+    | Move
     | Notifications
     | PaackSpaces
     | Packages
@@ -122,6 +123,7 @@ type IconGlyph
     | SearchSpace
     | SeeMore
     | Toggle
+    | Delete
     | UpArrow
     | Warning
 
@@ -443,6 +445,26 @@ remove hint =
     Icon (Properties hint Remove) defaultOptions
 
 
+{-| A trash can with an "x" on it.
+
+    Icon.delete "Delete item"
+
+-}
+delete : String -> Icon
+delete hint =
+    Icon (Properties hint Delete) defaultOptions
+
+
+{-| Two vertical parallel arrows pointing to opposite directions.
+
+    Icon.move "Move item"
+
+-}
+move : String -> Icon
+move hint =
+    Icon (Properties hint Move) defaultOptions
+
+
 
 -- Rendering
 
@@ -555,6 +577,12 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
 
             Warning ->
                 svgIcon "Warning"
+
+            Delete ->
+                svgIcon "Trash"
+
+            Move ->
+                svgIcon "Move"
 
 
 
