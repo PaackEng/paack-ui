@@ -1,6 +1,7 @@
 module UI.Utils.TypeNumbers exposing
     ( Zero, Increase
     , One, Two, Three, Four, Five, Six, Seven, Eight, Nine
+    , Decimal
     )
 
 {-| This module contains phantom-types for helping guarantee lengths in collectibles.
@@ -21,6 +22,7 @@ The UI.Table uses this for constraining all rows dimensions.
 # Descendents
 
 @docs One, Two, Three, Four, Five, Six, Seven, Eight, Nine
+@docs Decimal
 
 -}
 
@@ -94,3 +96,12 @@ type alias Eight =
 -}
 type alias Nine =
     Increase Eight
+
+
+{-| Used to compose numbers greater than nine.
+
+`(Decimal (Decimal Zero))` is equivalent to 20.
+
+-}
+type alias Decimal base =
+    Increase (Increase (Increase (Increase (Increase (Increase (Increase (Increase (Increase (Increase base)))))))))
