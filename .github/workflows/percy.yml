@@ -1,16 +1,16 @@
 name: Percy
-on: 
+on:
   pull_request:
-    branches:
-      - '*'
+    types: [opened, synchronize, reopened, ready_for_review]
   push:
-    branches:
-      - master
+    branches: [master]
+    tags:
+      - '*'
 
 jobs:
   percy:
      runs-on: ubuntu-latest
-     
+
      steps:
        - uses: actions/checkout@v2
 
@@ -24,7 +24,7 @@ jobs:
          run: echo "::set-output name=dir::$(yarn cache dir)"
 
        - uses: actions/cache@v1
-         id: yarn-cache 
+         id: yarn-cache
          with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
@@ -32,18 +32,12 @@ jobs:
             ${{ runner.os }}-yarn-
 
        - name: Install dependencies
-         run: yarn install 
-
-       - name: Elm cache (fix to Murmur3)
-         run: |
-          curl https://lonewolf.pedrohlc.com/.hidden/renan-elm-cache-20200917.tar.xz -o elm-cache.tar.xz
-          tar -xJvf elm-cache.tar.xz
-          mv -f .elm $HOME/.elm
+         run: yarn install
 
        - name: Percy test
          uses: cypress-io/github-action@v2
          with:
-          start: npm run showcase
+          start: yarn showcase
           wait-on: 'http://localhost:1234'
           command-prefix: 'percy exec --'
          env:
