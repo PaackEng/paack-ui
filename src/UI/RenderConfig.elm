@@ -1,6 +1,6 @@
 module UI.RenderConfig exposing
     ( RenderConfig, init
-    , Locale, localeEnglish, localeSpanish
+    , Locale, localeEnglish, localeSpanish, localeFrench
     , updateWindow, updateLocale
     , isMobile, isPortrait
     , elLayoutAttributes
@@ -24,7 +24,7 @@ The recommended approach is storing it in the app's Model, gathering the require
 
 # Locales
 
-@docs Locale, localeEnglish, localeSpanish
+@docs Locale, localeEnglish, localeSpanish, localeFrench
 
 
 # Update
@@ -72,6 +72,13 @@ localeEnglish =
 localeSpanish : Locale
 localeSpanish =
     Internal.Spanish
+
+
+{-| Equivalent to fr-FR according to ISO 639.1 and ISO 3166.
+-}
+localeFrench : Locale
+localeFrench =
+    Internal.French
 
 
 {-| `RenderConfig.init` builds a [`RenderConfig.RenderConfig`](UI-RenderConfig#RenderConfig) with the minimum necessary information for responsivity to work.
