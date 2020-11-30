@@ -1,11 +1,11 @@
 name: Percy
 on:
   pull_request:
-    branches:
-      - '*'
+    types: [opened, synchronize, reopened, ready_for_review]
   push:
-    branches:
-      - master
+    branches: [master]
+    tags:
+      - '*'
 
 jobs:
   percy:
