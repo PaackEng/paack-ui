@@ -39,13 +39,7 @@ simpleText renderConfig text =
     text
         |> Text.withOverflow ellipsizeWithTooltip
         |> Text.renderElement renderConfig
-        |> Element.el
-            [ Element.width fill
-            , Element.clipX
-            , Element.paddingXY 8 0
-            , Element.centerY
-            , InternalElement.overflowVisible
-            ]
+        |> Element.el cellTextAttributes
         |> Element.el
             [ Element.width fill
             , InternalElement.overflowVisible
@@ -58,7 +52,7 @@ linkedText renderConfig link text =
         |> Text.withOverflow ellipsizeWithTooltip
         |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
         |> Text.renderElement renderConfig
-        |> Element.el [ Element.width fill, Element.clipX, InternalElement.overflowVisible ]
+        |> Element.el cellTextAttributes
         |> Link.wrapElement renderConfig
             [ Element.width fill
             , InternalElement.overflowVisible
@@ -70,6 +64,16 @@ linkedText renderConfig link text =
             , Font.underline
             ]
             link
+
+
+cellTextAttributes : List (Attribute msg)
+cellTextAttributes =
+    [ Element.width fill
+    , Element.clipX
+    , Element.paddingXY 8 0
+    , Element.centerY
+    , InternalElement.overflowVisible
+    ]
 
 
 widthToEl : Common.ColumnWidth -> Element.Length
