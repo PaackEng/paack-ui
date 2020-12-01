@@ -46,7 +46,7 @@ module UI.Palette exposing
 
 import Element
 import UI.Internal.Basics exposing (ifThenElse)
-import UI.Internal.Palette exposing (..)
+import UI.Internal.Palette as Internal exposing (..)
 import UI.Utils.Element exposing (colorSetOpacity)
 
 
@@ -92,6 +92,131 @@ type Brightness
     | BrightnessLight
     | BrightnessLighter
     | BrightnessLightest
+
+
+primaryDark1 : Color
+primaryDark1 =
+    color TonePrimary BrightnessDarkest
+
+
+primary : Color
+primary =
+    color TonePrimary BrightnessMiddle
+
+
+primaryLight1 : Color
+primaryLight1 =
+    color TonePrimary BrightnessLight
+
+
+primaryLight2 : Color
+primaryLight2 =
+    color TonePrimary BrightnessLighter
+
+
+primaryLight3 : Color
+primaryLight3 =
+    color TonePrimary BrightnessLightest
+
+
+successDark1 : Color
+successDark1 =
+    color ToneSuccess BrightnessDarkest
+
+
+success : Color
+success =
+    color ToneSuccess BrightnessMiddle
+
+
+successLight1 : Color
+successLight1 =
+    color ToneSuccess BrightnessLight
+
+
+successLight2 : Color
+successLight2 =
+    color ToneSuccess BrightnessLighter
+
+
+successLight3 : Color
+successLight3 =
+    color ToneSuccess BrightnessLightest
+
+
+dangerDark1 : Color
+dangerDark1 =
+    color ToneDanger BrightnessDarkest
+
+
+danger : Color
+danger =
+    color ToneDanger BrightnessMiddle
+
+
+dangerLight1 : Color
+dangerLight1 =
+    color ToneDanger BrightnessLight
+
+
+dangerLight2 : Color
+dangerLight2 =
+    color ToneDanger BrightnessLighter
+
+
+dangerLight3 : Color
+dangerLight3 =
+    color ToneDanger BrightnessLightest
+
+
+warningDark1 : Color
+warningDark1 =
+    color ToneWarning BrightnessDarkest
+
+
+warning : Color
+warning =
+    color ToneWarning BrightnessMiddle
+
+
+warningLight1 : Color
+warningLight1 =
+    color ToneWarning BrightnessLight
+
+
+warningLight2 : Color
+warningLight2 =
+    color ToneWarning BrightnessLighter
+
+
+warningLight3 : Color
+warningLight3 =
+    color ToneWarning BrightnessLightest
+
+
+black : Color
+black =
+    color ToneGray BrightnessDarkest
+
+
+gray : Color
+gray =
+    color ToneGray BrightnessMiddle
+
+
+grayLight1 : Color
+grayLight1 =
+    color ToneGray BrightnessLight
+
+
+grayLight2 : Color
+grayLight2 =
+    color ToneGray BrightnessLighter
+
+
+grayLight3 : Color
+grayLight3 =
+    color ToneGray BrightnessLightest
 
 
 {-| Given a tone and brightness, initiates the building of a color.
@@ -278,19 +403,19 @@ toColors : Tone -> ToneColors
 toColors tone =
     case tone of
         ToneGray ->
-            gray
+            Internal.gray
 
         TonePrimary ->
-            primary
+            Internal.primary
 
         ToneSuccess ->
-            success
+            Internal.success
 
         ToneDanger ->
-            danger
+            Internal.danger
 
         ToneWarning ->
-            warning
+            Internal.warning
 
 
 contrastColors : Tone -> ToneColors
