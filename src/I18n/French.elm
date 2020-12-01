@@ -5,32 +5,32 @@ import I18n.Types exposing (..)
 
 filtersPeriod : FiltersPeriod
 filtersPeriod =
-    { after = "After"
-    , before = "Before"
-    , on = "On"
-    , description = "Select period reference"
+    { after = "Après"
+    , before = "Avant"
+    , on = "Sur"
+    , description = "Sélectionner la période de référence"
     }
 
 
 filtersRange : FiltersRange
 filtersRange =
-    { from = \{ date } -> "From: " ++ date ++ ""
-    , to = \{ date } -> "To: " ++ date ++ ""
+    { from = \{ date } -> "De:" ++ date ++ ""
+    , to = \{ date } -> "A:" ++ date ++ ""
     }
 
 
 filtersSelect : FiltersSelect
 filtersSelect =
-    { description = "Select option for filtering"
+    { description = "Sélectionner l'option de filtrage"
     }
 
 
 filters : Filters
 filters =
     { dateFormat = "DD/MM/YYYY"
-    , close = "Close"
-    , clear = "Clear"
-    , apply = "Apply"
+    , close = "Fermer"
+    , clear = "Effacer"
+    , apply = "Appliquer"
     , period = filtersPeriod
     , range = filtersRange
     , select = filtersSelect
@@ -39,34 +39,34 @@ filters =
 
 paginator : Paginator
 paginator =
-    { format = \{ first, last, total } -> "" ++ first ++ " - " ++ last ++ " of " ++ total ++ ""
-    , previous = "Previous"
-    , next = "Next"
+    { format = \{ first, last, total } -> "" ++ first ++ " - " ++ last ++ " sur " ++ total ++ "\n"
+    , previous = "Précédent"
+    , next = "Suivant"
     }
 
 
 checkbox : Checkbox
 checkbox =
-    { toggle = "Toggle"
+    { toggle = "Basculer"
     }
 
 
 listView : ListView
 listView =
-    { search = "Search"
+    { search = "Rechercher"
     }
 
 
 radio : Radio
 radio =
-    { select = "Select item"
+    { select = "Sélectionner l'élément"
     }
 
 
 tablesDetails : TablesDetails
 tablesDetails =
-    { show = "Expand"
-    , collapse = "Collapse"
+    { show = "Elargir"
+    , collapse = "Crash"
     }
 
 
@@ -78,21 +78,21 @@ tables =
 
 dateInput : DateInput
 dateInput =
-    { invalid = "Invalid date format."
+    { invalid = "Format de date invalide"
     }
 
 
 dialog : Dialog
 dialog =
-    { close = "Close dialog"
+    { close = "Fermer le dialogue"
     }
 
 
 sidebar : Sidebar
 sidebar =
-    { expand = "Expand sidebar"
-    , collapse = "Minimize sidebar"
-    , previous = "Go back"
+    { expand = "Elargir la barre latérale"
+    , collapse = "Réduire la barre latérale"
+    , previous = "Retourner"
     }
 
 

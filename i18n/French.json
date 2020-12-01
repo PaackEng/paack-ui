@@ -1,52 +1,52 @@
 {
     "filters": {
         "dateFormat": "DD/MM/YYYY",
-        "close": "Close",
-        "clear": "Clear",
-        "apply": "Apply",
+        "close": "Fermer",
+        "clear": "Effacer",
+        "apply": "Appliquer",
         "period": {
-            "after": "After",
-            "before": "Before",
-            "on": "On",
-            "description": "Select period reference"
+            "after": "Après",
+            "before": "Avant",
+            "on": "Sur",
+            "description": "Sélectionner la période de référence"
         },
         "range": {
-            "from": "From: {{date}}",
-            "to": "To: {{date}}"
+            "from": "De:{{date}}",
+            "to": "A:{{date}}"
         },
         "select": {
-            "description": "Select option for filtering"
+            "description": "Sélectionner l'option de filtrage"
         }
     },
     "paginator": {
-        "format": "{{first}} - {{last}} of {{total}}",
-        "previous": "Previous",
-        "next": "Next"
+        "format": "{{first}} - {{last}} sur {{total}}\n",
+        "previous": "Précédent",
+        "next": "Suivant"
     },
     "checkbox": {
-        "toggle": "Toggle"
+        "toggle": "Basculer"
     },
     "listView": {
-        "search": "Search"
+        "search": "Rechercher"
     },
     "radio": {
-        "select": "Select item"
+        "select": "Sélectionner l'élément"
     },
     "tables": {
         "details": {
-            "show" : "Expand",
-            "collapse": "Collapse"
+            "show": "Elargir",
+            "collapse": "Crash"
         }
     },
     "dateInput": {
-        "invalid": "Invalid date format."
+        "invalid": "Format de date invalide"
     },
     "dialog": {
-        "close": "Close dialog"
+        "close": "Fermer le dialogue"
     },
     "sidebar": {
-        "expand": "Expand sidebar",
-        "collapse": "Minimize sidebar",
-        "previous": "Go back"
+        "expand": "Elargir la barre latérale",
+        "collapse": "Réduire la barre latérale",
+        "previous": "Retourner"
     }
 }
