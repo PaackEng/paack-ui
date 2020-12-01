@@ -15,6 +15,15 @@ module UI.Palette exposing
 
 # What color
 
+@docs primaryDark1, primary, primaryLight1, primaryLight2, primaryLight3
+@docs successDark1, success, successLight1, successLight2, successLight3
+@docs dangerDark1, danger, dangerLight1, dangerLight2, dangerLight3
+@docs warningDark1, warning, warningLight1, warningLight2, warningLight3
+@docs grayDark1, gray, grayLight1, grayLight2, grayLight3
+
+
+# What tone
+
 @docs Tone, toneGray, tonePrimary, toneSuccess, toneWarning, toneDanger
 
 
@@ -94,126 +103,176 @@ type Brightness
     | BrightnessLightest
 
 
+{-| Shorthand for the primary tone with dark brightness
+-}
 primaryDark1 : Color
 primaryDark1 =
     color TonePrimary BrightnessDarkest
 
 
+{-| Shorthand for the default primary tone
+-}
 primary : Color
 primary =
     color TonePrimary BrightnessMiddle
 
 
+{-| Shorthand for the primary tone with light brightness
+-}
 primaryLight1 : Color
 primaryLight1 =
     color TonePrimary BrightnessLight
 
 
+{-| Shorthand for the primary tone with light brightness
+-}
 primaryLight2 : Color
 primaryLight2 =
     color TonePrimary BrightnessLighter
 
 
+{-| Shorthand for the primary tone with light brightness
+-}
 primaryLight3 : Color
 primaryLight3 =
     color TonePrimary BrightnessLightest
 
 
+{-| Shorthand for the success tone with dark brightness
+-}
 successDark1 : Color
 successDark1 =
     color ToneSuccess BrightnessDarkest
 
 
+{-| Shorthand for the default success tone
+-}
 success : Color
 success =
     color ToneSuccess BrightnessMiddle
 
 
+{-| Shorthand for the success tone with light brightness
+-}
 successLight1 : Color
 successLight1 =
     color ToneSuccess BrightnessLight
 
 
+{-| Shorthand for the success tone with light brightness
+-}
 successLight2 : Color
 successLight2 =
     color ToneSuccess BrightnessLighter
 
 
+{-| Shorthand for the success tone with light brightness
+-}
 successLight3 : Color
 successLight3 =
     color ToneSuccess BrightnessLightest
 
 
+{-| Shorthand for the success danger tone with dark brightness
+-}
 dangerDark1 : Color
 dangerDark1 =
     color ToneDanger BrightnessDarkest
 
 
+{-| Shorthand for the default danger tone
+-}
 danger : Color
 danger =
     color ToneDanger BrightnessMiddle
 
 
+{-| Shorthand for the danger tone with light brightness
+-}
 dangerLight1 : Color
 dangerLight1 =
     color ToneDanger BrightnessLight
 
 
+{-| Shorthand for the danger tone with light brightness
+-}
 dangerLight2 : Color
 dangerLight2 =
     color ToneDanger BrightnessLighter
 
 
+{-| Shorthand for the danger tone with light brightness
+-}
 dangerLight3 : Color
 dangerLight3 =
     color ToneDanger BrightnessLightest
 
 
+{-| Shorthand for the danger warning with dark brightness
+-}
 warningDark1 : Color
 warningDark1 =
     color ToneWarning BrightnessDarkest
 
 
+{-| Shorthand for the default warning
+-}
 warning : Color
 warning =
     color ToneWarning BrightnessMiddle
 
 
+{-| Shorthand for the warning with light brightness
+-}
 warningLight1 : Color
 warningLight1 =
     color ToneWarning BrightnessLight
 
 
+{-| Shorthand for the warning with light brightness
+-}
 warningLight2 : Color
 warningLight2 =
     color ToneWarning BrightnessLighter
 
 
+{-| Shorthand for the warning with light brightness
+-}
 warningLight3 : Color
 warningLight3 =
     color ToneWarning BrightnessLightest
 
 
+{-| Shorthand for the gray tone with dark brightness
+-}
 black : Color
 black =
     color ToneGray BrightnessDarkest
 
 
+{-| Shorthand for the default gray tone
+-}
 gray : Color
 gray =
     color ToneGray BrightnessMiddle
 
 
+{-| Shorthand for the gray tone with light brightness
+-}
 grayLight1 : Color
 grayLight1 =
     color ToneGray BrightnessLight
 
 
+{-| Shorthand for the gray tone with light brightness
+-}
 grayLight2 : Color
 grayLight2 =
     color ToneGray BrightnessLighter
 
 
+{-| Shorthand for the gray tone with light brightness
+-}
 grayLight3 : Color
 grayLight3 =
     color ToneGray BrightnessLightest
