@@ -7,7 +7,7 @@ import Element.Font as Font
 import Element.Keyed as Keyed
 import UI.Button as Button
 import UI.Internal.NArray as NArray
-import UI.Internal.Palette as Palette
+import UI.Internal.Palette as Colors
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Tables.Common exposing (..)
 import UI.Internal.Utils.Element as InternalElement
@@ -102,7 +102,7 @@ rowBox ( key, cells ) =
         [ Element.spacing 8
         , Primitives.defaultRoundedBorders
         , Element.width fill
-        , Element.mouseOver [ Background.color Palette.gray.lightest ]
+        , Element.mouseOver [ Background.color Colors.gray.lightest ]
         ]
         cells
     )
@@ -151,5 +151,5 @@ headersAttr =
     , Element.width fill
     , Element.paddingEach { bottom = 7, top = 0, left = 0, right = 0 }
     , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
-    , Border.color Palette.gray.lightest
+    , Border.color Colors.gray.lightest
     ]

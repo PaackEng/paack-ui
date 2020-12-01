@@ -94,7 +94,7 @@ import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
 import UI.Icon exposing (Icon)
-import UI.Internal.Palette as Palette
+import UI.Internal.Palette as Colors
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Size as Size
 import UI.Internal.Text as Text
@@ -717,14 +717,14 @@ textAttrs cfg size =
 
 genericAttr : String -> Bool -> Bool -> TextFieldWidth -> Size -> List (Attribute msg)
 genericAttr label isPlaceholder hasError width size =
-    [ Background.color Palette.gray.lightest
+    [ Background.color Colors.gray.lightest
     , Primitives.roundedBorders size
     , Border.color <|
         if hasError then
-            Palette.danger.light
+            Colors.danger.light
 
         else
-            Palette.gray.lighter
+            Colors.gray.lighter
     , Border.width <|
         if hasError then
             2
@@ -733,7 +733,7 @@ genericAttr label isPlaceholder hasError width size =
             1
     , textFieldPadding size
     , Element.focused
-        [ Border.color Palette.primary.lighter
+        [ Border.color Colors.primary.lighter
         ]
     , Element.width <|
         case width of
@@ -745,10 +745,10 @@ genericAttr label isPlaceholder hasError width size =
     , Font.color <|
         -- TODO: Use CSS pre-processor
         if isPlaceholder then
-            Palette.gray.darkest
+            Colors.gray.darkest
 
         else
-            Palette.gray.light
+            Colors.gray.light
     , Element.title label
     ]
 

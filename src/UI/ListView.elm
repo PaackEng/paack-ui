@@ -93,7 +93,7 @@ import Element.Keyed as Keyed
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (maybeAnd, prependMaybe)
 import UI.Internal.Clickable as Clickable
-import UI.Internal.Palette as Palette
+import UI.Internal.Palette as Colors
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.ToggleableList as ToggleableList
 import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
@@ -387,7 +387,7 @@ renderElement cfg (SelectList prop opt) =
                 )
             |> Keyed.column
                 [ Border.widthEach { bottom = 0, left = 0, right = 0, top = 1 }
-                , Border.color Palette.gray.lightest
+                , Border.color Colors.gray.lightest
                 , Element.width fill
                 , Element.height fill
                 , Element.scrollbarY
@@ -412,8 +412,8 @@ actionBarView cfg actionBar =
                     , right = 12
                     , top = 12
                     }
-                , Background.color Palette.primary.lightest
-                , Font.color Palette.primary.middle
+                , Background.color Colors.primary.lightest
+                , Font.color Colors.primary.middle
                 ]
                 [ Text.body2 label
                     |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
@@ -464,7 +464,7 @@ itemView cfg { select, renderItem, toKey } background selected obj =
          , Element.pointer
          , Element.width fill
          , Border.widthEach { zeroPadding | bottom = 1 }
-         , Border.color Palette.gray.lightest
+         , Border.color Colors.gray.lightest
          ]
             |> prependMaybe
                 (background

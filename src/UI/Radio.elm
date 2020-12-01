@@ -57,7 +57,7 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
 import UI.Icon as Icon
-import UI.Internal.Palette as Palette
+import UI.Internal.Palette as Colors
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
@@ -240,7 +240,7 @@ renderButton renderConfig message label state =
         radioAttrs =
             Element.width (px 20)
                 :: Element.height (px 20)
-                :: Border.color Palette.primary.middle
+                :: Border.color Colors.primary.middle
                 :: Border.width 2
                 :: Border.rounded 8
                 :: (ARIA.toElementAttributes <| ARIA.rolePresentation)
@@ -262,7 +262,7 @@ renderButton renderConfig message label state =
                 :: Element.paddingXY 12 4
                 :: Events.onClick message
                 :: Element.pointer
-                :: Element.mouseOver [ Background.color <| Palette.gray.lightest ]
+                :: Element.mouseOver [ Background.color <| Colors.gray.lightest ]
                 :: (ARIA.toElementAttributes <| ARIA.roleRadio state)
     in
     Element.row rowAttrs
@@ -274,7 +274,7 @@ renderButton renderConfig message label state =
 
 radioSelected : Attribute msg
 radioSelected =
-    Background.color Palette.primary.middle
+    Background.color Colors.primary.middle
 
 
 radioCheck : RenderConfig -> Element msg

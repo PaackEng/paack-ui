@@ -12,7 +12,7 @@ import UI.Button as Button
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (maybeNotThen)
 import UI.Internal.DateInput as DateInput exposing (DateInput(..), PeriodComparison(..), PeriodDate, RangeDate)
-import UI.Internal.Palette as Palette
+import UI.Internal.Palette as Colors
 import UI.Internal.Primitives as Primitives
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.Size as Size exposing (Size)
@@ -167,7 +167,7 @@ headerAttrs isApplied =
 
         workingTheme =
             if isApplied then
-                [ Background.color Palette.primary.middle
+                [ Background.color Colors.primary.middle
                 , Palette.color
                     Palette.tonePrimary
                     Palette.brightnessMiddle
@@ -177,10 +177,10 @@ headerAttrs isApplied =
                 ]
 
             else
-                [ Background.color Palette.gray.lightest
-                , Font.color Palette.primary.darkest
+                [ Background.color Colors.gray.lightest
+                , Font.color Colors.primary.darkest
                 , Element.mouseOver
-                    [ Background.color Palette.primary.lightest ]
+                    [ Background.color Colors.primary.lightest ]
                 ]
                     ++ Element.colorTransition 100
     in
@@ -251,7 +251,7 @@ dialogHeader renderConfig discardMsg label =
     Element.row
         [ Element.paddingEach { top = 10, left = headerPadX, right = 10, bottom = 9 }
         , Element.width fill
-        , Border.color Palette.gray.lighter
+        , Border.color Colors.gray.lighter
         , Border.widthEach { zeroPadding | bottom = 1 }
         ]
         [ filteredHeaderLabel label
@@ -304,7 +304,7 @@ dialog renderConfig config filter clearMsg applyMsg content =
         Element.column
             [ zIndex 9
             , Element.alignTop
-            , Palette.mainBackground
+            , Colors.mainBackground
             , Primitives.defaultRoundedBorders
             , tuplesToStyles ( "min-width", "100%" )
             , tuplesToStyles ( "width", "min-content" )

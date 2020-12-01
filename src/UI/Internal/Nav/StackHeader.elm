@@ -5,7 +5,7 @@ import Element.Border as Border
 import Element.Font as Font
 import UI.Icon as Icon
 import UI.Internal.Clickable as Clickable
-import UI.Internal.Palette as Palette
+import UI.Internal.Palette as Colors
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Palette as Palette exposing (brightnessMiddle, toneGray)
 import UI.RenderConfig exposing (RenderConfig)
@@ -31,7 +31,7 @@ view renderConfig leftButton rightAction label =
         [ Element.width fill
         , Element.paddingEach { top = 14, bottom = 4, left = 4, right = 4 }
         , Border.widthEach { zeroPadding | bottom = 1 }
-        , Border.color Palette.gray.lightest
+        , Border.color Colors.gray.lightest
         ]
         [ leftButtonView renderConfig leftButton
         , labelView renderConfig label
@@ -100,5 +100,5 @@ renderAction renderConfig action =
             )
         |> Clickable.actionIcon renderConfig
             [ Element.padding 8
-            , Font.color Palette.gray.middle
+            , Font.color Colors.gray.middle
             ]

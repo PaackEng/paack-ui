@@ -7,7 +7,7 @@ import Element.Font as Font
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Menu as Menu exposing (Menu)
 import UI.Internal.Nav.StackHeader as StackHeader
-import UI.Internal.Palette as Palette
+import UI.Internal.Palette as Colors
 import UI.Internal.Primitives as Primitives
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Link as Link exposing (Link)
@@ -64,7 +64,7 @@ mobileDrawer cfg page menu title maybeStack =
             Element.row [ width fill, height fill ]
                 [ viewSide cfg True menu
                 , Element.el
-                    [ Palette.gray.darkest
+                    [ Colors.gray.darkest
                         |> Element.colorSetOpacity 0.85
                         |> Background.color
                     , width (fillPortion 25)
@@ -133,7 +133,7 @@ viewSide cfg proportional (Menu.Menu prop opt) =
     Element.column
         [ height fill
         , adaptWidth
-        , Background.color Palette.gray.lightest
+        , Background.color Colors.gray.lightest
         ]
         [ adaptHeader cfg (prop.toggleMsg (not prop.isExpanded)) opt.logo
         , pagesView cfg
@@ -297,7 +297,7 @@ pageItem cfg icon link isSelected =
             ]
 
         selectedColor =
-            Palette.primary.darkest
+            Colors.primary.darkest
                 |> Element.colorSetOpacity 0.12
 
         attrs =
