@@ -1,10 +1,16 @@
 module UI.Palette exposing
-    ( Tone, toneGray, tonePrimary, toneSuccess, toneWarning, toneDanger
+    ( primaryDark1, primary, primaryLight1, primaryLight2, primaryLight3
+    , successDark1, success, successLight1, successLight2, successLight3
+    , dangerDark1, danger, dangerLight1, dangerLight2, dangerLight3
+    , black, warning, warningLight1, warningLight2, warningLight3
+    , gray, grayLight1, grayLight2, grayLight3
+    , Tone, toneGray, tonePrimary, toneSuccess, toneWarning, toneDanger
     , Brightness, brightnessDarkest, brightnessMiddle, brightnessLight, brightnessLighter, brightnessLightest
     , Color, color
     , setContrasting
     , withAlpha
     , toElementColor, toCssColor
+    , warningDark1
     )
 
 {-| `UI.Palette` is an interface offering all colors variations proposed in the design system.
@@ -18,7 +24,7 @@ module UI.Palette exposing
 @docs primaryDark1, primary, primaryLight1, primaryLight2, primaryLight3
 @docs successDark1, success, successLight1, successLight2, successLight3
 @docs dangerDark1, danger, dangerLight1, dangerLight2, dangerLight3
-@docs warningDark1, warning, warningLight1, warningLight2, warningLight3
+@docs black, warning, warningLight1, warningLight2, warningLight3
 @docs grayDark1, gray, grayLight1, grayLight2, grayLight3
 
 
