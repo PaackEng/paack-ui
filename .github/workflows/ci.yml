@@ -40,10 +40,10 @@ jobs:
        run: npx elm-format --validate src/ showcase/
 
      - name: Run docs
-       run: npx elm-format --validate src/ showcase/
+       run: npx elm make --docs=/tmp/docs.json
 
      - name: Run analyse
-       run: npx elm make --docs=/tmp/docs.json
+       run: npx elm-analyse
 
   validate:
      runs-on: ubuntu-latest
