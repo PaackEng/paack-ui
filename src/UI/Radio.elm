@@ -3,8 +3,8 @@ module UI.Radio exposing
     , group, button
     , withButtons, withSelected
     , RadioWidth, withWidth, widthFull, widthRelative
-    , renderElement
     , Direction, horizontal, vertical, withDirection
+    , renderElement
     )
 
 {-| Accessible and uniform-styled implementation of a radio buttons.
@@ -39,6 +39,11 @@ module UI.Radio exposing
 # Width
 
 @docs RadioWidth, withWidth, widthFull, widthRelative
+
+
+# Direction
+
+@docs Direction, horizontal, vertical, withDirection
 
 
 # Rendering
@@ -80,6 +85,8 @@ type RadioWidth
     | WidthRelative
 
 
+{-| Describes the direction in which the radio group will be rendered.
+-}
 type Direction
     = Vertical
     | Horizontal
