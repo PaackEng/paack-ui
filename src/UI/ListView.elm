@@ -96,6 +96,7 @@ import UI.Internal.Clickable as Clickable
 import UI.Internal.Colors as Colors
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.ToggleableList as ToggleableList
+import UI.Internal.Utils.Element as Element
 import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
@@ -458,13 +459,18 @@ searchFieldView cfg searchField =
 
 itemView : RenderConfig -> Properties object msg -> Maybe Palette.Color -> Bool -> object -> ( String, Element msg )
 itemView cfg { select, renderItem, toKey } background selected obj =
-    ( toKey obj
+    let
+        key =
+            toKey obj
+    in
+    ( key
     , Element.el
         ([ Events.onClick (select obj)
          , Element.pointer
          , Element.width fill
          , Border.widthEach { zeroPadding | bottom = 1 }
          , Border.color Colors.gray.lightest
+         , Element.id ("selector-" ++ key)
          ]
             |> prependMaybe
                 (background

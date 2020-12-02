@@ -33,6 +33,13 @@ title value =
         |> Element.htmlAttribute
 
 
+id : String -> Attribute msg
+id value =
+    value
+        |> HtmlAttrs.id
+        |> Element.htmlAttribute
+
+
 overlayBackground : msg -> Element msg
 overlayBackground onClickMsg =
     Element.el
