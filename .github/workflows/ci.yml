@@ -39,9 +39,6 @@ jobs:
      - name: Run linter
        run: npx elm-format --validate src/ showcase/
 
-     - name: Run docs
-       run: npx elm make --docs=/tmp/docs.json
-
      - name: Run analyse
        run: npx elm-analyse
 
@@ -55,6 +52,9 @@ jobs:
        - name: Validate showcase code
          working-directory: ./showcase
          run: npx elm make src/Main.elm --output /dev/null
+
+       - name: Run docs
+         run: npx elm make --docs=/tmp/docs.json
 
   tests:
      runs-on: ubuntu-latest
