@@ -6,6 +6,7 @@ module UI.ListView exposing
     , withWidth
     , SelectStyle, withSelectStyle
     , renderElement
+    , withDomIds
     )
 
 {-| `UI.ListView` is a styled searchable row list.
@@ -113,6 +114,7 @@ type alias Options object msg =
     , isSelected : Maybe (object -> Bool)
     , width : Element.Length
     , selectStyle : SelectStyle
+    , containerId : Maybe String
     }
 
 
@@ -352,6 +354,11 @@ withSelectStyle style (SelectList prop opt) =
     SelectList prop { opt | selectStyle = style }
 
 
+withDomIds : String -> ListView object msg -> ListView object msg
+withDomIds containerId (SelectList prop opt) =
+    SelectList prop { opt | containerId = Just containerId }
+
+
 
 -- Render
 
@@ -382,17 +389,20 @@ renderElement cfg (SelectList prop opt) =
                 (\obj ->
                     itemView cfg
                         prop
+                        opt
                         opt.selectStyle.backgroundColor
                         (isSelected obj)
                         obj
                 )
             |> Keyed.column
-                [ Border.widthEach { bottom = 0, left = 0, right = 0, top = 1 }
-                , Border.color Colors.gray.lightest
-                , Element.width fill
-                , Element.height fill
-                , Element.scrollbarY
-                ]
+                ([ Border.widthEach { bottom = 0, left = 0, right = 0, top = 1 }
+                 , Border.color Colors.gray.lightest
+                 , Element.width fill
+                 , Element.height fill
+                 , Element.scrollbarY
+                 ]
+                    |> prependMaybe (Maybe.map Element.id opt.containerId)
+                )
         , actionBarView cfg opt.actionBar
         ]
 
@@ -457,8 +467,15 @@ searchFieldView cfg searchField =
             Element.none
 
 
-itemView : RenderConfig -> Properties object msg -> Maybe Palette.Color -> Bool -> object -> ( String, Element msg )
-itemView cfg { select, renderItem, toKey } background selected obj =
+itemView :
+    RenderConfig
+    -> Properties object msg
+    -> Options object msg
+    -> Maybe Palette.Color
+    -> Bool
+    -> object
+    -> ( String, Element msg )
+itemView cfg { select, renderItem, toKey } { containerId } background selected obj =
     let
         key =
             toKey obj
@@ -470,13 +487,13 @@ itemView cfg { select, renderItem, toKey } background selected obj =
          , Element.width fill
          , Border.widthEach { zeroPadding | bottom = 1 }
          , Border.color Colors.gray.lightest
-         , Element.id ("selector-" ++ key)
          ]
             |> prependMaybe
                 (background
                     |> Maybe.map (Palette.toElementColor >> Background.color)
                     |> maybeAnd selected
                 )
+            |> prependMaybe (Maybe.map (\s -> Element.id (s ++ "-" ++ key)) containerId)
         )
         (renderItem cfg selected obj)
     )
@@ -490,6 +507,7 @@ defaultOptions =
     , isSelected = Nothing
     , width = Element.fill
     , selectStyle = defaultSelectStyle
+    , containerId = Nothing
     }
 
 
