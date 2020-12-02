@@ -32,7 +32,7 @@ import UI.Palette as Palette
 
 myRedSquare =
     Element.el
-        [ Palette.color Palette.toneDanger Palette.brightnessMiddle
+        [ Palette.toElementColor Palette.danger
             |> Background.color
         , Element.width (px 100)
         , Element.height (px 100)
@@ -53,6 +53,10 @@ Example:
 
 ```elm
 Palette.color Palette.toneDanger Palette.brightnessMiddle
+
+-- or using a shorthand
+
+Palette.danger
 ```
 
 Once you hve a `Color` value, you have 2 ways to use it:
@@ -64,6 +68,7 @@ This is the most common use case, as we use elm-ui.
 
 ````elm
 Palette.color Palette.toneDanger Palette.brightnessMiddle
+    |> Palette.toElementColor
     |> Background.color
 ````
 
