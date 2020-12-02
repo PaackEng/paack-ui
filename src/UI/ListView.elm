@@ -93,7 +93,7 @@ import Element.Keyed as Keyed
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (maybeAnd, prependMaybe)
 import UI.Internal.Clickable as Clickable
-import UI.Internal.Palette as Colors
+import UI.Internal.Colors as Colors
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.ToggleableList as ToggleableList
 import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)

@@ -5,9 +5,9 @@ import Element.Background as Background
 import Element.Events as Events
 import Element.Font as Font
 import UI.Icon as Icon exposing (Icon)
+import UI.Internal.Colors as Colors
 import UI.Internal.Menu as Menu exposing (Menu)
 import UI.Internal.Nav.StackHeader as StackHeader
-import UI.Internal.Palette as Colors
 import UI.Internal.Primitives as Primitives
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Link as Link exposing (Link)

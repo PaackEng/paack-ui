@@ -6,8 +6,8 @@ import Element.Border as Border
 import Element.Font as Font
 import Element.Keyed as Keyed
 import UI.Button as Button
+import UI.Internal.Colors as Colors
 import UI.Internal.NArray as NArray
-import UI.Internal.Palette as Colors
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Tables.Common exposing (..)
 import UI.Internal.Utils.Element as InternalElement

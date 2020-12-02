@@ -4,7 +4,7 @@ import Element exposing (Element, fill, shrink)
 import Element.Border as Border
 import Element.Events as Events
 import UI.Icon as Icon
-import UI.Internal.Palette as Palette
+import UI.Internal.Colors as Colors
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Palette as Palette exposing (brightnessLight, toneGray)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
@@ -55,7 +55,7 @@ desktopDialogView cfg { title, body, close } =
         [ Element.width shrink
         , Element.centerY
         , Element.centerX
-        , Palette.mainBackground
+        , Colors.mainBackground
         , Element.above
             (desktopHeaderRow cfg close title)
         , Element.paddingEach
@@ -75,7 +75,7 @@ desktopHeaderRow cfg close title =
     Element.row
         [ Element.width fill
         , Element.paddingEach { top = 12, right = 12, left = 0, bottom = 0 }
-        , Palette.mainBackground
+        , Colors.mainBackground
         , Border.roundEach
             { topLeft = 6
             , topRight = 6
@@ -97,7 +97,7 @@ mobileView cfg { title, body, close } =
         , Element.height fill
         , Element.alignTop
         , Element.spacing 8
-        , Palette.mainBackground
+        , Colors.mainBackground
         ]
         [ mobileHeaderRow cfg close title
         , body
@@ -156,7 +156,7 @@ blackBlock close =
     Element.el
         [ Element.width fill
         , Element.height fill
-        , Palette.overlayBackground
+        , Colors.overlayBackground
         , Events.onClick close
         ]
         Element.none

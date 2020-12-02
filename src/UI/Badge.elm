@@ -51,7 +51,7 @@ import Element exposing (Element, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
-import UI.Internal.Palette as Palette
+import UI.Internal.Colors as Colors
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text

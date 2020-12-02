@@ -1,4 +1,4 @@
-module UI.Internal.Palette exposing (..)
+module UI.Internal.Colors exposing (..)
 
 import Element exposing (Attribute, rgb255)
 import Element.Background as Background

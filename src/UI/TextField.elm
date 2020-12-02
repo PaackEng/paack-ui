@@ -94,7 +94,7 @@ import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
 import UI.Icon exposing (Icon)
-import UI.Internal.Palette as Colors
+import UI.Internal.Colors as Colors
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Size as Size
 import UI.Internal.Text as Text

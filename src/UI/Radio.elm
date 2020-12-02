@@ -57,7 +57,7 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
 import UI.Icon as Icon
-import UI.Internal.Palette as Colors
+import UI.Internal.Colors as Colors
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)

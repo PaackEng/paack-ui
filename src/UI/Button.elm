@@ -81,7 +81,7 @@ import UI.Internal.Button as Internal
         , EmbossedTone(..)
         , bodyToElement
         )
-import UI.Internal.Palette as Palette
+import UI.Internal.Colors as Colors
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Size as Size exposing (Size)
 import UI.Internal.Text as Text exposing (TextColor)

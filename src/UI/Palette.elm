@@ -61,7 +61,7 @@ module UI.Palette exposing
 
 import Element
 import UI.Internal.Basics exposing (ifThenElse)
-import UI.Internal.Palette as Internal exposing (..)
+import UI.Internal.Colors as Internal exposing (..)
 import UI.Utils.Element exposing (colorSetOpacity)
 
 

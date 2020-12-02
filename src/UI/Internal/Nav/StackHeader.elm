@@ -5,7 +5,7 @@ import Element.Border as Border
 import Element.Font as Font
 import UI.Icon as Icon
 import UI.Internal.Clickable as Clickable
-import UI.Internal.Palette as Colors
+import UI.Internal.Colors as Colors
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Palette as Palette exposing (brightnessMiddle, toneGray)
 import UI.RenderConfig exposing (RenderConfig)

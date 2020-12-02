@@ -7,7 +7,7 @@ import Msg as Msg exposing (Msg)
 import PluginOptions exposing (PluginOptions, defaultWithMenu)
 import UI.Button as Button exposing (ButtonBody)
 import UI.Icon as Icon exposing (Icon)
-import UI.Internal.Palette as Palette
+import UI.Internal.Colors as Colors
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size exposing (Size)
 import UI.TextField as TextField
@@ -72,8 +72,8 @@ icons =
 iconView : RenderConfig -> Size -> ( String -> Icon, String ) -> Element msg
 iconView cfg size ( iconFn, label ) =
     Element.column
-        [ Background.color Palette.gray.darkest
-        , Font.color Palette.darkConstrast.darkest
+        [ Background.color Colors.gray.darkest
+        , Font.color Colors.darkConstrast.darkest
         , Element.spacing 10
         , Element.padding 10
         ]
@@ -83,7 +83,7 @@ iconView cfg size ( iconFn, label ) =
             |> Element.el
                 [ Font.size 25
                 , Element.centerX
-                , Background.color <| Palette.primary.middle
+                , Background.color <| Colors.primary.middle
                 ]
         , Element.el [ Font.size 14 ] <| Element.text label
         ]
@@ -130,7 +130,7 @@ codeSample suffix =
         """
 -- Buttons
 
-submitButton = 
+submitButton =
     Button.fromLabel "Submit"
         |> Button.cmd FormSend Button.primary
         |> Button.withSize Size."""
@@ -140,7 +140,7 @@ submitButton =
 
 -- Icons
 
-logoutIcon = 
+logoutIcon =
     Icon.logout "Logout from this account"
         |> Icon.withSize Size."""
             ++ suffix
