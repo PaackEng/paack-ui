@@ -6,7 +6,7 @@ import Html exposing (Html)
 import Html.Attributes exposing (attribute)
 import List
 import UI.Internal.Basics exposing (ifThenElse)
-import UI.Internal.Palette as Palette
+import UI.Internal.Colors as Colors
 import UI.Internal.Utils.Element exposing (overflowAttrs, overflowVisible)
 import UI.Palette as Palette exposing (brightnessDarkest, toneGray)
 import UI.RenderConfig exposing (RenderConfig, isMobile)
@@ -91,7 +91,7 @@ fontColor color =
             Just <| Palette.toElementColor paletteColor
 
         ColorForLightButtonDisabled ->
-            Just <| Palette.textLightButtonDisabled
+            Just <| Colors.textLightButtonDisabled
 
         ColorInherit ->
             Nothing

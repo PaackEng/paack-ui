@@ -3,7 +3,7 @@ module UI.Internal.Utils.Element exposing (..)
 import Element exposing (Attribute, Element, fill, minimum, shrink)
 import Element.Events as Events
 import Html.Attributes as HtmlAttrs
-import UI.Internal.Palette as Palette
+import UI.Internal.Colors as Colors
 
 
 style : String -> String -> Attribute msg
@@ -38,7 +38,7 @@ overlayBackground onClickMsg =
     Element.el
         [ positionFixed -- Needs for starting at the top-left corner
         , zIndex 8
-        , Palette.overlayBackground
+        , Colors.overlayBackground
         , Element.htmlAttribute <| HtmlAttrs.style "top" "0"
         , Element.htmlAttribute <| HtmlAttrs.style "left" "0"
         , Element.htmlAttribute <| HtmlAttrs.style "width" "100vw"

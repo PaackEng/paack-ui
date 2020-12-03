@@ -34,7 +34,7 @@ import Element exposing (Attribute, Element, px)
 import Element.Background as Background
 import Element.Border as Border
 import UI.Icon as Icon
-import UI.Internal.Palette as Palette
+import UI.Internal.Colors as Colors
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
@@ -93,7 +93,7 @@ renderElement renderConfig (Checkbox { message, label, state } { labelVisible })
         boxAttrs =
             [ Element.width (px 20)
             , Element.height (px 20)
-            , Border.color Palette.primary.middle
+            , Border.color Colors.primary.middle
             , Border.width 2
             , Border.rounded 8
             , Element.onIndividualClick (message (not state))
@@ -130,7 +130,7 @@ renderElement renderConfig (Checkbox { message, label, state } { labelVisible })
 
 boxSelected : Attribute msg
 boxSelected =
-    Background.color Palette.primary.middle
+    Background.color Colors.primary.middle
 
 
 boxCheck : RenderConfig -> Element msg

@@ -33,7 +33,7 @@ import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
 import UI.Internal.Basics exposing (ifThenElse)
-import UI.Internal.Palette as Palette
+import UI.Internal.Colors as Colors
 import UI.Internal.Utils.Element as Element
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Utils.ARIA as ARIA
@@ -163,14 +163,14 @@ normalBorder =
 
 textNormalColor : Element.Color
 textNormalColor =
-    Palette.gray.light
+    Colors.gray.light
 
 
 borderNormalColor : Element.Color
 borderNormalColor =
-    Palette.gray.lighter
+    Colors.gray.lighter
 
 
 currentColor : Element.Color
 currentColor =
-    Palette.primary.middle
+    Colors.primary.middle
