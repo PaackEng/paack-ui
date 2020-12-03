@@ -6,6 +6,7 @@ module UI.NavigationContainer exposing
     , withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages, MenuPage, menuPage
     , Dialog, dialog
     , toBrowserDocument
+    , dialogV2
     )
 
 {-| The `UI.NavigationContainer` (abbreviated as `Nav`) is a page presenter.
@@ -84,7 +85,7 @@ Example of usage:
 import Element exposing (Element)
 import Html exposing (Html)
 import UI.Icon as Icon exposing (Icon)
-import UI.Internal.Dialog as Dialog
+import UI.Internal.Dialog as Dialog1
 import UI.Internal.Menu as Menu
 import UI.Internal.NavigationContainer as Internal
 import UI.Internal.SideBar as SideBar
@@ -92,6 +93,7 @@ import UI.Link exposing (Link)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Utils.Action as Action
 import UI.Utils.Element as Element
+import UI.V2.Dialog as Dialog2
 
 
 
@@ -145,7 +147,8 @@ type alias Content msg =
 See [`Nav.dialog`](#dialog) to see how to create a dialog.
 -}
 type Dialog msg
-    = Dialog (Dialog.Dialog msg)
+    = Dialog1 (Dialog1.Dialog msg)
+    | Dialog2 (Dialog2.Dialog msg)
 
 
 {-| The `Nav.Container msg` describes the current page in its current state.
@@ -434,11 +437,35 @@ Clicking on the black layer also activates the closing message.
 -}
 dialog : String -> msg -> Element msg -> Dialog msg
 dialog title onClose body =
-    Dialog
+    Dialog1
         { title = title
         , close = onClose
         , body = body
         }
+
+
+{-|
+
+    `Nav.dialogV2` constructs a [`Nav.Dialog`](#Dialog) from a title and icon.
+    This variant of the dialog does not require you to specify body at the time
+    of creation and you can specify it alongside dialog buttons as an option
+    like this:
+
+    Nav.dialog2 "An example dialog" Icon.warning
+        |> withBody (Element.text "Dialog body")
+        |> withButtons [submitButton, cancleButton]
+
+-}
+dialogV2 : String -> Icon -> Dialog msg
+dialogV2 title titleIcon =
+    Dialog2 <|
+        Dialog2.Dialog
+            { title = title
+            , icon = titleIcon
+            }
+            { buttons = []
+            , body = Element.none
+            }
 
 
 
@@ -486,8 +513,11 @@ toBrowserDocument cfg page (Navigator model) =
 
         dialogView =
             case container.dialog of
-                Just (Dialog dialogState) ->
-                    Dialog.view cfg dialogState
+                Just (Dialog1 dialogState) ->
+                    Dialog1.view cfg dialogState
+
+                Just (Dialog2 dialogState) ->
+                    Dialog2.renderElement cfg dialogState
 
                 Nothing ->
                     Element.none
@@ -535,5 +565,10 @@ contentProps mainTitle content =
 
 
 dialogMap : (a -> b) -> Dialog a -> Dialog b
-dialogMap applier (Dialog dialogState) =
-    Dialog <| Dialog.dialogMap applier dialogState
+dialogMap applier dlg =
+    case dlg of
+        Dialog1 dialogState ->
+            Dialog1 <| Dialog1.dialogMap applier dialogState
+
+        Dialog2 dialogState ->
+            Dialog2 <| Dialog2.dialogMap applier dialogState
