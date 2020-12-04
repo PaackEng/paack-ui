@@ -2,9 +2,9 @@ module Main exposing (CompileNav, CompilerListView, main)
 
 import Alerts
 import Badges
-import Dialog
 import Buttons.Stories as Buttons
 import Checkboxes.Stories as Checkboxes
+import Dialog
 import Html exposing (Html, div, img)
 import Html.Attributes exposing (src, style)
 import Icons
