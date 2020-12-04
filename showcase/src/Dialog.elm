@@ -5,7 +5,7 @@ import Msg
 import PluginOptions exposing (defaultWithoutMenu)
 import UI.Button as Button exposing (Button)
 import UI.Icon as Icon
-import UI.Internal.Palette exposing (overlayBackground)
+import UI.Internal.Colors exposing (overlayBackground)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UI.V2.Dialog as Dialog

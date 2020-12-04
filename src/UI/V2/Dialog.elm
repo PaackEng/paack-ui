@@ -10,7 +10,7 @@ import Element exposing (Element, fill, shrink)
 import Element.Border as Border
 import UI.Button as Button exposing (Button)
 import UI.Icon as Icon exposing (Icon)
-import UI.Internal.Palette as PaletteInternal
+import UI.Internal.Colors exposing (mainBackground)
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
@@ -65,7 +65,7 @@ desktopDialogView cfg (Dialog { title, icon } { body, buttons }) =
         [ Element.width shrink
         , Element.centerY
         , Element.centerX
-        , PaletteInternal.mainBackground
+        , mainBackground
         , Element.padding 32
         , Border.rounded 6
         ]
