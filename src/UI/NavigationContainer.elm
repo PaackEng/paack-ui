@@ -435,7 +435,7 @@ Clicking on the black layer also activates the closing message.
         Msg.NewCardDiscard
         (cardNewView model)
 
-Note: This is deprecated, use 'Nav.dialogV2' instead
+**Note**: This is deprecated, use 'Nav.dialogV2' instead
 
 -}
 dialog : String -> msg -> Element msg -> Dialog msg
