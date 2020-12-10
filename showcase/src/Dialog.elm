@@ -28,17 +28,16 @@ dialog cfg =
         , Element.column
             [ Element.centerX
             , Element.centerY
-            , Element.padding 32
+            , Element.padding 100
             , overlayBackground
             ]
             [ iconsSvgSprite
-            , Dialog.Dialog
-                { title = "Dialog Header"
-                , icon = Icon.warning "Warning dialog"
-                }
-                { buttons = buttons
-                , body = "I am body of the dialog" |> Text.body2 |> Text.renderElement cfg
-                }
+            , Dialog.dialog "Dialog title"
+                (Icon.warning "Warning dialog")
+                Msg.NoOp
+                |> Dialog.withBody
+                    ("Dialog body text" |> Text.body2 |> Text.renderElement cfg)
+                |> Dialog.withButtons buttons
                 |> Dialog.renderElement cfg
             ]
         , { defaultWithoutMenu | code = code }
@@ -48,16 +47,16 @@ dialog cfg =
 buttons : List (Button Msg.Msg)
 buttons =
     [ Button.fromLabel "Ok" |> Button.cmd Msg.NoOp Button.primary
-    , Button.fromLabel "Ok" |> Button.cmd Msg.NoOp Button.primary
-    , Button.fromLabel "Ok" |> Button.cmd Msg.NoOp Button.primary
+    , Button.fromLabel "Cancel" |> Button.cmd Msg.NoOp Button.danger
     ]
 
 
 code : String
 code =
     prettifyElmCode """
-dialogV2 "Dialog title" Icon.warning
+dialog "Dialog title" Icon.warning closeMsg
     |> Dialog.withBody ("Dialog body text" |> Text.body2 |> Text.renderElement cfg)
     |> Dialog.withButtons
-        (Button.fromLabel "Ok" |> Button.cmd NoOp Button.primary)
+        [(Button.fromLabel "Ok" |> Button.cmd NoOp Button.primary)]
+    |> Dialog.renderElement renderConfig
 """

@@ -1,5 +1,6 @@
 module UI.V2.Dialog exposing
     ( Dialog(..)
+    , dialog
     , dialogMap
     , renderElement
     , withBody
@@ -18,12 +19,13 @@ import UI.Utils.Element as Element
 
 
 type Dialog msg
-    = Dialog Properties (Options msg)
+    = Dialog (Properties msg) (Options msg)
 
 
-type alias Properties =
+type alias Properties msg =
     { title : String
     , icon : Icon
+    , close : msg
     }
 
 
@@ -33,11 +35,17 @@ type alias Options msg =
     }
 
 
+dialog : String -> Icon -> msg -> Dialog msg
+dialog title icon closeMsg =
+    Dialog (Properties title icon closeMsg) (Options Element.none [])
+
+
 dialogMap : (a -> b) -> Dialog a -> Dialog b
-dialogMap applier (Dialog { title, icon } { body, buttons }) =
+dialogMap applier (Dialog { title, icon, close } { body, buttons }) =
     Dialog
         { title = title
         , icon = icon
+        , close = applier close
         }
         { body = Element.map applier body
         , buttons = List.map (Button.map applier) buttons
@@ -55,8 +63,8 @@ withButtons buttons (Dialog props options) =
 
 
 renderElement : RenderConfig -> Dialog msg -> Element msg
-renderElement cfg dialog =
-    desktopDialogView cfg dialog
+renderElement cfg dlg =
+    desktopDialogView cfg dlg
 
 
 desktopDialogView : RenderConfig -> Dialog msg -> Element msg
@@ -66,23 +74,25 @@ desktopDialogView cfg (Dialog { title, icon } { body, buttons }) =
         , Element.centerY
         , Element.centerX
         , mainBackground
-        , Element.padding 32
-        , Border.rounded 6
+        , Element.paddingEach
+            { top = 0
+            , right = 32
+            , bottom = 32
+            , left = 32
+            }
+        , Border.roundEach
+            { topLeft = 0
+            , topRight = 0
+            , bottomLeft = 6
+            , bottomRight = 6
+            }
+        , Element.above
+            (desktopHeaderRow cfg title icon)
         ]
-        [ desktopHeaderRow cfg title icon
-        , Element.el
-            [ Element.paddingEach
-                { top = 8
-                , bottom = 0
-                , left = 0
-                , right =
-                    0
-                }
-            ]
-            body
+        [ body
         , Element.row
             [ Element.spacing 16
-            , Element.paddingEach { top = 22, left = 0, right = 0, bottom = 0 }
+            , Element.paddingEach { top = 24, left = 0, right = 0, bottom = 0 }
             ]
           <|
             List.map
@@ -96,6 +106,14 @@ desktopHeaderRow cfg title icon =
     Element.row
         [ Element.spacing 12
         , Element.width fill
+        , Element.paddingEach { top = 32, bottom = 8, right = 32, left = 32 }
+        , mainBackground
+        , Border.roundEach
+            { topLeft = 6
+            , topRight = 6
+            , bottomLeft = 0
+            , bottomRight = 0
+            }
         ]
         [ icon
             |> Icon.withColor headerColor

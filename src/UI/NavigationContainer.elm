@@ -82,9 +82,11 @@ Example of usage:
 
 -}
 
-import Element exposing (Element)
+import Element exposing (Element, fill)
+import Element.Events as Events
 import Html exposing (Html)
 import UI.Icon as Icon exposing (Icon)
+import UI.Internal.Colors as Colors
 import UI.Internal.Dialog as Dialog1
 import UI.Internal.Menu as Menu
 import UI.Internal.NavigationContainer as Internal
@@ -434,6 +436,8 @@ Clicking on the black layer also activates the closing message.
         Msg.NewCardDiscard
         (cardNewView model)
 
+Note: This is deprecated, use 'Nav.dialogV2' instead
+
 -}
 dialog : String -> msg -> Element msg -> Dialog msg
 dialog title onClose body =
@@ -446,26 +450,20 @@ dialog title onClose body =
 
 {-|
 
-    `Nav.dialogV2` constructs a [`Nav.Dialog`](#Dialog) from a title and icon.
+    `Nav.dialogV2` constructs a [`Nav.Dialog`](#Dialog) from dialog v2.
     This variant of the dialog does not require you to specify body at the time
-    of creation and you can specify it alongside dialog buttons as an option
+    of construction and you can specify it alongside buttons as an option
     like this:
 
-    Nav.dialog2 "An example dialog" Icon.warning
-        |> withBody (Element.text "Dialog body")
-        |> withButtons [submitButton, cancleButton]
+    Dialogv2.dialog "An example dialog" Icon.warning closeMsg
+        |> Dialogv2.withBody (Element.text "Dialog body")
+        |> Dialogv2.withButtons [submitButton, cancleButton]
+        |> dialogV2
 
 -}
-dialogV2 : String -> Icon -> Dialog msg
-dialogV2 title titleIcon =
-    Dialog2 <|
-        Dialog2.Dialog
-            { title = title
-            , icon = titleIcon
-            }
-            { buttons = []
-            , body = Element.none
-            }
+dialogV2 : Dialog2.Dialog msg -> Dialog msg
+dialogV2 dlg =
+    Dialog2 dlg
 
 
 
@@ -516,8 +514,14 @@ toBrowserDocument cfg page (Navigator model) =
                 Just (Dialog1 dialogState) ->
                     Dialog1.view cfg dialogState
 
-                Just (Dialog2 dialogState) ->
-                    Dialog2.renderElement cfg dialogState
+                Just (Dialog2 ((Dialog2.Dialog { close } _) as dialogState)) ->
+                    dialogState
+                        |> Dialog2.renderElement cfg
+                        |> Element.el
+                            [ Element.width fill
+                            , Element.height fill
+                            , Element.behindContent (blackBlock close)
+                            ]
 
                 Nothing ->
                     Element.none
@@ -526,8 +530,8 @@ toBrowserDocument cfg page (Navigator model) =
             -- Always creating this element is required so we don't loose scrollbar state
             Element.el
                 [ Element.inFront dialogView
-                , Element.width Element.fill
-                , Element.height Element.fill
+                , Element.width fill
+                , Element.height fill
                 ]
                 body
 
@@ -572,3 +576,14 @@ dialogMap applier dlg =
 
         Dialog2 dialogState ->
             Dialog2 <| Dialog2.dialogMap applier dialogState
+
+
+blackBlock : msg -> Element msg
+blackBlock close =
+    Element.el
+        [ Element.width fill
+        , Element.height fill
+        , Colors.overlayBackground
+        , Events.onClick close
+        ]
+        Element.none
