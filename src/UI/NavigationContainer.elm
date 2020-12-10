@@ -4,9 +4,8 @@ module UI.NavigationContainer exposing
     , Container, containerMap
     , Content, contentSingle, StackChild, contentStackChild
     , withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages, MenuPage, menuPage
-    , Dialog, dialog
+    , Dialog, dialog, dialogV2
     , toBrowserDocument
-    , dialogV2
     )
 
 {-| The `UI.NavigationContainer` (abbreviated as `Nav`) is a page presenter.
@@ -73,7 +72,7 @@ Example of usage:
 
 # Dialog
 
-@docs Dialog, dialog
+@docs Dialog, dialog, dialogV2
 
 
 # Rendering
