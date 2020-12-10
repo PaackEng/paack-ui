@@ -1,12 +1,11 @@
 module UI.ListView exposing
     ( ListView, selectList
     , ToggleableConfig, ToggleableCover, toggleableList
-    , withItems, withSelected
+    , withItems, withSelected, withDomIds
     , SearchConfig, withSearchField, withActionBar
     , withWidth
     , SelectStyle, withSelectStyle
     , renderElement
-    , withDomIds
     )
 
 {-| `UI.ListView` is a styled searchable row list.
@@ -61,7 +60,7 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
 # Options
 
-@docs withItems, withSelected
+@docs withItems, withSelected, withDomIds
 
 
 ## Extra elements
@@ -354,6 +353,20 @@ withSelectStyle style (SelectList prop opt) =
     SelectList prop { opt | selectStyle = style }
 
 
+{-| Add id attribute to the HTML tags of the elements and the list itself.
+
+    ListView.withDomIds "wineBrands"
+        someListView
+
+Generates:
+
+    < ... id="wineBrands">
+        <... id="wineBrands-key1"></...>
+        <... id="wineBrands-key2"></...>
+        <... id="wineBrands-key3"></...>
+    </...>
+
+-}
 withDomIds : String -> ListView object msg -> ListView object msg
 withDomIds containerId (SelectList prop opt) =
     SelectList prop { opt | containerId = Just containerId }
