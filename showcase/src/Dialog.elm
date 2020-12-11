@@ -6,10 +6,10 @@ import PluginOptions exposing (defaultWithoutMenu)
 import UI.Button as Button exposing (Button)
 import UI.Icon as Icon
 import UI.Internal.Colors exposing (overlayBackground)
+import UI.Internal.DialogV2 exposing (dialogViewV2)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UI.V2.Dialog as Dialog
-import UI.Internal.DialogV2 exposing(dialogViewV2)
 import UIExplorer exposing (storiesOf)
 import Utils exposing (ExplorerStory, ExplorerUI, iconsSvgSprite, prettifyElmCode, story)
 
