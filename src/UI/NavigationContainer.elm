@@ -574,7 +574,7 @@ dialogMap applier dlg =
             Dialog1 <| Dialog1.dialogMap applier dialogState
 
         Dialog2 dialogState ->
-            Dialog2 <| Dialog2.dialogMap applier dialogState
+            Dialog2 <| Dialog2.map applier dialogState
 
 
 blackBlock : msg -> Element msg

@@ -2,7 +2,7 @@ module UI.V2.Dialog exposing
     ( Dialog(..), dialog
     , withBody, withButtons
     , renderElement
-    , dialogMap
+    , map
     )
 
 {-| The `UI.V2.Dialog` is a component for displaying dialogs and modals.
@@ -33,7 +33,7 @@ following pipeline:
 
 # Component handling
 
-@docs dialogMap
+@docs map
 
 -}
 
@@ -86,8 +86,8 @@ dialog title icon closeMsg =
 
 {-| Transforms the message produced by the component.
 -}
-dialogMap : (a -> b) -> Dialog a -> Dialog b
-dialogMap applier (Dialog { title, icon, close } { body, buttons }) =
+map : (a -> b) -> Dialog a -> Dialog b
+map applier (Dialog { title, icon, close } { body, buttons }) =
     Dialog
         { title = title
         , icon = icon
