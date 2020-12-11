@@ -514,14 +514,9 @@ toBrowserDocument cfg page (Navigator model) =
                 Just (Dialog1 dialogState) ->
                     Dialog1.view cfg dialogState
 
-                Just (Dialog2 ((Dialog2.Dialog { close } _) as dialogState)) ->
+                Just (Dialog2 ((Dialog2.Dialog { close } { closeOnOverlayClick }) as dialogState)) ->
                     dialogState
                         |> dialogViewV2 cfg
-                        |> Element.el
-                            [ Element.width fill
-                            , Element.height fill
-                            , Element.behindContent (blackBlock close)
-                            ]
 
                 Nothing ->
                     Element.none
@@ -576,14 +571,3 @@ dialogMap applier dlg =
 
         Dialog2 dialogState ->
             Dialog2 <| Dialog2.map applier dialogState
-
-
-blackBlock : msg -> Element msg
-blackBlock close =
-    Element.el
-        [ Element.width fill
-        , Element.height fill
-        , Colors.overlayBackground
-        , Events.onClick close
-        ]
-        Element.none

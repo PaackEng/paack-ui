@@ -67,6 +67,7 @@ type alias Properties msg =
 type alias Options msg =
     { body : Element msg
     , buttons : List (Button msg)
+    , closeOnOverlayClick : Bool
     }
 
 
@@ -75,7 +76,7 @@ message.
 -}
 dialog : String -> Icon -> msg -> Dialog msg
 dialog title icon closeMsg =
-    Dialog (Properties title icon closeMsg) (Options Element.none [])
+    Dialog (Properties title icon closeMsg) (Options Element.none [] False)
 
 
 
@@ -85,7 +86,7 @@ dialog title icon closeMsg =
 {-| Transforms the message produced by the component.
 -}
 map : (a -> b) -> Dialog a -> Dialog b
-map applier (Dialog { title, icon, close } { body, buttons }) =
+map applier (Dialog { title, icon, close } { body, buttons, closeOnOverlayClick }) =
     Dialog
         { title = title
         , icon = icon
@@ -93,6 +94,7 @@ map applier (Dialog { title, icon, close } { body, buttons }) =
         }
         { body = Element.map applier body
         , buttons = List.map (Button.map applier) buttons
+        , closeOnOverlayClick = closeOnOverlayClick
         }
 
 
@@ -115,3 +117,16 @@ dialog.
 withButtons : List (Button msg) -> Dialog msg -> Dialog msg
 withButtons buttons (Dialog props options) =
     Dialog props { options | buttons = buttons }
+
+
+{-| Allows you to specify whether clicking on overlay closes the dialog or not.
+By default, clicking on overlay does nothing, that is because an unintentional
+click can cause loss of information if a dialog is open which is expecting an
+input from the user and user has already provided it partially. It is
+recommended to provide an explicit cancel/close button for such cases. However
+this helper can be used to recieve clicks on overlay to close the dialog where
+loss of information is not likely to happen.
+-}
+withCloseOnOverlayClick : Bool -> Dialog msg -> Dialog msg
+withCloseOnOverlayClick shouldClose (Dialog props options) =
+    Dialog props { options | closeOnOverlayClick = shouldClose }

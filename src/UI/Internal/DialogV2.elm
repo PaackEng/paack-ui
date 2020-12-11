@@ -5,7 +5,7 @@ import Element.Border as Border
 import Element.Events as Events
 import UI.Button as Button exposing (Button)
 import UI.Icon as Icon exposing (Icon)
-import UI.Internal.Colors exposing (mainBackground)
+import UI.Internal.Colors exposing (mainBackground, overlayBackground)
 import UI.Internal.RenderConfig exposing (RenderConfig, localeTerms)
 import UI.Palette as Palette
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
@@ -17,12 +17,17 @@ import UI.V2.Dialog as Dialog exposing (Dialog)
 
 
 dialogViewV2 : RenderConfig -> Dialog msg -> Element msg
-dialogViewV2 cfg dlg =
+dialogViewV2 cfg ((Dialog.Dialog { close } { closeOnOverlayClick }) as dlg) =
     if RenderConfig.isMobile cfg then
         mobileView cfg dlg
 
     else
         desktopDialogView cfg dlg
+            |> Element.el
+                [ Element.width fill
+                , Element.height fill
+                , Element.behindContent (blackBlock close closeOnOverlayClick)
+                ]
 
 
 desktopDialogView : RenderConfig -> Dialog msg -> Element msg
@@ -159,3 +164,21 @@ titleText cfg title =
 headerColor : Palette.Color
 headerColor =
     Palette.color Palette.toneGray Palette.brightnessMiddle
+
+
+{-| Making overlay part of the dialog since it is almost always used with it and
+almost all of the major UI frameworks follow this practice.
+-}
+blackBlock : msg -> Bool -> Element msg
+blackBlock close shouldCloseOnClick =
+    Element.el
+        [ Element.width fill
+        , Element.height fill
+        , overlayBackground
+        , if shouldCloseOnClick then
+            Events.onClick close
+
+          else
+            Element.width fill
+        ]
+        Element.none
