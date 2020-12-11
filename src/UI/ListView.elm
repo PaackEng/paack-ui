@@ -1,7 +1,7 @@
 module UI.ListView exposing
     ( ListView, selectList
     , ToggleableConfig, ToggleableCover, toggleableList
-    , withItems, withSelected, withDomIds
+    , withItems, withSelected, withDomId
     , SearchConfig, withSearchField, withActionBar
     , withWidth
     , SelectStyle, withSelectStyle
@@ -17,7 +17,9 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
     view : RenderConfig -> Model -> Element Msg
     view renderConfig model =
-        ListView.selectList Msg.SelectElement elementView
+        ListView.selectList Msg.SelectElement
+            elementToKey
+            elementView
             |> ListView.withItems model.myListElements
             |> ListView.withSearchField
                 { label = "Search for elements matching name.."
@@ -60,7 +62,7 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
 # Options
 
-@docs withItems, withSelected, withDomIds
+@docs withItems, withSelected, withDomId
 
 
 ## Extra elements
@@ -355,20 +357,25 @@ withSelectStyle style (SelectList prop opt) =
 
 {-| Add id attribute to the HTML tags of the elements and the list itself.
 
-    ListView.withDomIds "wineBrands"
-        someListView
+    ListView.selectList
+        Msg.SelectDrink
+        softDrinkToString
+        softDrinkView
+        |> ListView.withDomId "softDrinks"
 
 Generates:
 
-    < ... id="wineBrands">
-        <... id="wineBrands-key1"></...>
-        <... id="wineBrands-key2"></...>
-        <... id="wineBrands-key3"></...>
+    < ... id="softDriks">
+        <... id="fanta">...</...>
+        <... id="coke">...</...>
+        <... id="drPepper">...</...>
     </...>
 
+**NOTE**: Only when `withDomId` is used children have `id`s.
+
 -}
-withDomIds : String -> ListView object msg -> ListView object msg
-withDomIds containerId (SelectList prop opt) =
+withDomId : String -> ListView object msg -> ListView object msg
+withDomId containerId (SelectList prop opt) =
     SelectList prop { opt | containerId = Just containerId }
 
 
@@ -492,22 +499,25 @@ itemView cfg { select, renderItem, toKey } { containerId } background selected o
     let
         key =
             toKey obj
+
+        attributes =
+            [ Events.onClick (select obj)
+            , Element.pointer
+            , Element.width fill
+            , Border.widthEach { zeroPadding | bottom = 1 }
+            , Border.color Colors.gray.lightest
+            ]
+                |> prependMaybe
+                    (background
+                        |> Maybe.map (Palette.toElementColor >> Background.color)
+                        |> maybeAnd selected
+                    )
+                |> prependMaybe
+                    (Maybe.map (always <| Element.id key) containerId)
     in
     ( key
     , Element.el
-        ([ Events.onClick (select obj)
-         , Element.pointer
-         , Element.width fill
-         , Border.widthEach { zeroPadding | bottom = 1 }
-         , Border.color Colors.gray.lightest
-         ]
-            |> prependMaybe
-                (background
-                    |> Maybe.map (Palette.toElementColor >> Background.color)
-                    |> maybeAnd selected
-                )
-            |> prependMaybe (Maybe.map (\s -> Element.id (s ++ "-" ++ key)) containerId)
-        )
+        attributes
         (renderItem cfg selected obj)
     )
 
