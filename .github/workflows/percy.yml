@@ -42,3 +42,4 @@ jobs:
           command-prefix: 'percy exec --'
          env:
           PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
+          ELM_DEBUGGER: 'false'
