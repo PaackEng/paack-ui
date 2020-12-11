@@ -39,6 +39,7 @@ jobs:
          with:
           start: yarn showcase
           wait-on: 'http://localhost:1234'
-          command-prefix: 'percy exec -- env NODE_ENV=production'
+          command-prefix: 'percy exec --'
          env:
           PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
+          NODE_ENV: 'production'
