@@ -39,12 +39,16 @@ following pipeline:
 
 import Element exposing (Element, fill, shrink)
 import Element.Border as Border
+import Element.Events as Events
 import UI.Button as Button exposing (Button)
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Colors exposing (mainBackground)
+import UI.Internal.RenderConfig exposing (RenderConfig, localeTerms)
 import UI.Palette as Palette
-import UI.RenderConfig exposing (RenderConfig)
+import UI.RenderConfig as RenderConfig exposing (RenderConfig)
+import UI.Size as Size
 import UI.Text as Text
+import UI.Utils.ARIA as ARIA exposing (roleButton)
 import UI.Utils.Element as Element
 
 
@@ -128,7 +132,11 @@ The result of this function is a ready-to-insert Elm UI's Element.
 -}
 renderElement : RenderConfig -> Dialog msg -> Element msg
 renderElement cfg dlg =
-    desktopDialogView cfg dlg
+    if RenderConfig.isMobile cfg then
+        mobileView cfg dlg
+
+    else
+        desktopDialogView cfg dlg
 
 
 
@@ -158,15 +166,20 @@ desktopDialogView cfg (Dialog { title, icon } { body, buttons }) =
             (desktopHeaderRow cfg title icon)
         ]
         [ body
-        , Element.row
-            [ Element.spacing 16
-            , Element.paddingEach { top = 24, left = 0, right = 0, bottom = 0 }
-            ]
-          <|
-            List.map
-                (Button.renderElement cfg)
-                buttons
+        , buttonsRow cfg buttons
         ]
+
+
+buttonsRow : RenderConfig -> List (Button msg) -> Element msg
+buttonsRow cfg buttons =
+    Element.row
+        [ Element.spacing 16
+        , Element.paddingEach { top = 24, left = 0, right = 0, bottom = 0 }
+        ]
+    <|
+        List.map
+            (Button.renderElement cfg)
+            buttons
 
 
 desktopHeaderRow : RenderConfig -> String -> Icon -> Element msg
@@ -186,8 +199,72 @@ desktopHeaderRow cfg title icon =
         [ icon
             |> Icon.withColor headerColor
             |> Icon.renderElement cfg
-        , titleText cfg title
+        , titleText cfg title |> Element.el [ Element.width fill ]
         ]
+
+
+mobileView : RenderConfig -> Dialog msg -> Element msg
+mobileView cfg (Dialog { title, close } { body, buttons }) =
+    Element.column
+        [ Element.width fill
+        , Element.height fill
+        , Element.alignTop
+        , Element.spacing 8
+        , mainBackground
+        ]
+        [ mobileHeaderRow cfg close title
+        , body
+            |> Element.el
+                [ Element.width fill
+                , Element.paddingEach
+                    { top = 0, left = 20, right = 20, bottom = 0 }
+                ]
+        , buttonsRow cfg buttons
+            |> Element.el
+                [ Element.paddingEach
+                    { left = 20
+                    , right = 20
+                    , top = 0
+                    , bottom = 20
+                    }
+                ]
+        ]
+
+
+mobileHeaderRow : RenderConfig -> msg -> String -> Element msg
+mobileHeaderRow cfg close title =
+    Element.row
+        [ Element.width fill
+        , Element.padding 0
+        ]
+        [ titleText cfg
+            title
+            |> Element.el
+                [ Element.paddingEach
+                    { top = 40, left = 20, right = 0, bottom = 0 }
+                , Element.width fill
+                ]
+        , closeButton cfg close
+        ]
+
+
+closeButton : RenderConfig -> msg -> Element msg
+closeButton cfg close =
+    (cfg |> localeTerms >> .dialog >> .close)
+        |> Icon.close
+        |> Icon.withSize Size.small
+        |> Icon.withColor
+            (Palette.color Palette.toneGray Palette.brightnessLight)
+        |> Icon.renderElement cfg
+        |> Element.el
+            (ARIA.toElementAttributes ARIA.roleButton
+                ++ [ Events.onClick close
+                   , Element.pointer
+                   , Element.padding 12
+                   , Element.height shrink
+                   , Element.alignTop
+                   ]
+            )
 
 
 titleText : RenderConfig -> String -> Element msg
@@ -195,9 +272,6 @@ titleText cfg title =
     Text.heading5 title
         |> Text.withColor headerColor
         |> Text.renderElement cfg
-        |> Element.el
-            [ Element.width fill
-            ]
 
 
 headerColor : Palette.Color
