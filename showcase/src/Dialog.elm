@@ -9,6 +9,7 @@ import UI.Internal.Colors exposing (overlayBackground)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UI.V2.Dialog as Dialog
+import UI.Internal.DialogV2 exposing(dialogViewV2)
 import UIExplorer exposing (storiesOf)
 import Utils exposing (ExplorerStory, ExplorerUI, iconsSvgSprite, prettifyElmCode, story)
 
@@ -28,7 +29,8 @@ dialog cfg =
         , Element.column
             [ Element.centerX
             , Element.centerY
-            , Element.padding 100
+            , Element.padding 20
+            , Element.height <| Element.px 500
             , overlayBackground
             ]
             [ iconsSvgSprite
@@ -38,7 +40,7 @@ dialog cfg =
                 |> Dialog.withBody
                     ("Dialog body text" |> Text.body2 |> Text.renderElement cfg)
                 |> Dialog.withButtons buttons
-                |> Dialog.renderElement cfg
+                |> dialogViewV2 cfg
             ]
         , { defaultWithoutMenu | code = code }
         )

@@ -87,6 +87,7 @@ import Html exposing (Html)
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Colors as Colors
 import UI.Internal.Dialog as Dialog1
+import UI.Internal.DialogV2 exposing (dialogViewV2)
 import UI.Internal.Menu as Menu
 import UI.Internal.NavigationContainer as Internal
 import UI.Internal.SideBar as SideBar
@@ -515,7 +516,7 @@ toBrowserDocument cfg page (Navigator model) =
 
                 Just (Dialog2 ((Dialog2.Dialog { close } _) as dialogState)) ->
                     dialogState
-                        |> Dialog2.renderElement cfg
+                        |> dialogViewV2 cfg
                         |> Element.el
                             [ Element.width fill
                             , Element.height fill
