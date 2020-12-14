@@ -4,11 +4,14 @@ updates:
   directory: "/"
   schedule:
     interval: daily
+  rebase-strategy: "disabled"
 - package-ecosystem: npm
   directory: "/"
   schedule:
     interval: daily
+  rebase-strategy: "disabled"
 - package-ecosystem: elm
   directory: "/"
   schedule:
     interval: daily
+  rebase-strategy: "disabled"
