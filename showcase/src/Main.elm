@@ -4,6 +4,7 @@ import Alerts
 import Badges
 import Buttons.Stories as Buttons
 import Checkboxes.Stories as Checkboxes
+import Dialog
 import Html exposing (Html, div, img)
 import Html.Attributes exposing (src, style)
 import Icons
@@ -110,6 +111,7 @@ main =
             , Buttons.stories renderConfig
             , Alerts.stories renderConfig
             , Badges.stories renderConfig
+            , Dialog.stories renderConfig
             , TextField.stories renderConfig
             , LoadingView.stories
             , Checkboxes.stories renderConfig

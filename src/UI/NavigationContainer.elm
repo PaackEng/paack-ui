@@ -4,7 +4,7 @@ module UI.NavigationContainer exposing
     , Container, containerMap
     , Content, contentSingle, StackChild, contentStackChild
     , withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages, MenuPage, menuPage
-    , Dialog, dialog
+    , Dialog, dialog, dialogV2
     , toBrowserDocument
     )
 
@@ -72,7 +72,7 @@ Example of usage:
 
 # Dialog
 
-@docs Dialog, dialog
+@docs Dialog, dialog, dialogV2
 
 
 # Rendering
@@ -81,10 +81,13 @@ Example of usage:
 
 -}
 
-import Element exposing (Element)
+import Element exposing (Element, fill)
+import Element.Events as Events
 import Html exposing (Html)
 import UI.Icon as Icon exposing (Icon)
-import UI.Internal.Dialog as Dialog
+import UI.Internal.Colors as Colors
+import UI.Internal.Dialog as Dialog1
+import UI.Internal.DialogV2 exposing (dialogViewV2)
 import UI.Internal.Menu as Menu
 import UI.Internal.NavigationContainer as Internal
 import UI.Internal.SideBar as SideBar
@@ -92,6 +95,7 @@ import UI.Link exposing (Link)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Utils.Action as Action
 import UI.Utils.Element as Element
+import UI.V2.Dialog as Dialog2
 
 
 
@@ -145,7 +149,8 @@ type alias Content msg =
 See [`Nav.dialog`](#dialog) to see how to create a dialog.
 -}
 type Dialog msg
-    = Dialog (Dialog.Dialog msg)
+    = Dialog1 (Dialog1.Dialog msg)
+    | Dialog2 (Dialog2.Dialog msg)
 
 
 {-| The `Nav.Container msg` describes the current page in its current state.
@@ -431,14 +436,34 @@ Clicking on the black layer also activates the closing message.
         Msg.NewCardDiscard
         (cardNewView model)
 
+**Note**: This is deprecated, use 'Nav.dialogV2' instead
+
 -}
 dialog : String -> msg -> Element msg -> Dialog msg
 dialog title onClose body =
-    Dialog
+    Dialog1
         { title = title
         , close = onClose
         , body = body
         }
+
+
+{-|
+
+    `Nav.dialogV2` constructs a [`Nav.Dialog`](#Dialog) from dialog v2.
+    This variant of the dialog does not require you to specify body at the time
+    of construction and you can specify it alongside buttons as an option
+    like this:
+
+    Dialogv2.dialog "An example dialog" Icon.warning closeMsg
+        |> Dialogv2.withBody (Element.text "Dialog body")
+        |> Dialogv2.withButtons [submitButton, cancleButton]
+        |> dialogV2
+
+-}
+dialogV2 : Dialog2.Dialog msg -> Dialog msg
+dialogV2 dlg =
+    Dialog2 dlg
 
 
 
@@ -486,8 +511,12 @@ toBrowserDocument cfg page (Navigator model) =
 
         dialogView =
             case container.dialog of
-                Just (Dialog dialogState) ->
-                    Dialog.view cfg dialogState
+                Just (Dialog1 dialogState) ->
+                    Dialog1.view cfg dialogState
+
+                Just (Dialog2 ((Dialog2.Dialog { close } { closeOnOverlayClick }) as dialogState)) ->
+                    dialogState
+                        |> dialogViewV2 cfg
 
                 Nothing ->
                     Element.none
@@ -496,8 +525,8 @@ toBrowserDocument cfg page (Navigator model) =
             -- Always creating this element is required so we don't loose scrollbar state
             Element.el
                 [ Element.inFront dialogView
-                , Element.width Element.fill
-                , Element.height Element.fill
+                , Element.width fill
+                , Element.height fill
                 ]
                 body
 
@@ -535,5 +564,10 @@ contentProps mainTitle content =
 
 
 dialogMap : (a -> b) -> Dialog a -> Dialog b
-dialogMap applier (Dialog dialogState) =
-    Dialog <| Dialog.dialogMap applier dialogState
+dialogMap applier dlg =
+    case dlg of
+        Dialog1 dialogState ->
+            Dialog1 <| Dialog1.dialogMap applier dialogState
+
+        Dialog2 dialogState ->
+            Dialog2 <| Dialog2.map applier dialogState

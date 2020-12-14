@@ -48,6 +48,13 @@ describe('Percy Snapshots', () => {
     })
   })
 
+  describe('Dialog', () => {
+    it('Creates a snapshot of dialog component', () => {
+      cy.visit('/#Basics/Dialog/Dialog')
+      cy.percySnapshot('Dialog')
+    })
+  })
+
   describe('Text fields', () => {
     it('Creates a snapshot for default text field', () => {
       cy.visit('/#Basics/TextField/United')
