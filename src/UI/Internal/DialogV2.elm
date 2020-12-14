@@ -13,10 +13,10 @@ import UI.Size as Size
 import UI.Text as Text
 import UI.Utils.ARIA as ARIA exposing (roleButton)
 import UI.Utils.Element as Element
-import UI.V2.Dialog as Dialog exposing (Dialog)
+import UI.V2.Dialog as Dialog
 
 
-dialogViewV2 : RenderConfig -> Dialog msg -> Element msg
+dialogViewV2 : RenderConfig -> Dialog.Dialog msg -> Element msg
 dialogViewV2 cfg ((Dialog.Dialog { close } { closeOnOverlayClick }) as dlg) =
     if RenderConfig.isMobile cfg then
         mobileView cfg dlg
@@ -30,7 +30,7 @@ dialogViewV2 cfg ((Dialog.Dialog { close } { closeOnOverlayClick }) as dlg) =
                 ]
 
 
-desktopDialogView : RenderConfig -> Dialog msg -> Element msg
+desktopDialogView : RenderConfig -> Dialog.Dialog msg -> Element msg
 desktopDialogView cfg (Dialog.Dialog { title, icon } { body, buttons }) =
     Element.column
         [ Element.width shrink
@@ -90,7 +90,7 @@ desktopHeaderRow cfg title icon =
         ]
 
 
-mobileView : RenderConfig -> Dialog msg -> Element msg
+mobileView : RenderConfig -> Dialog.Dialog msg -> Element msg
 mobileView cfg (Dialog.Dialog { title, close } { body, buttons }) =
     Element.column
         [ Element.width fill

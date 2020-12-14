@@ -31,18 +31,9 @@ following pipeline:
 
 -}
 
-import Element exposing (Element, fill, shrink)
-import Element.Border as Border
-import Element.Events as Events
+import Element exposing (Element)
 import UI.Button as Button exposing (Button)
-import UI.Icon as Icon exposing (Icon)
-import UI.Internal.Colors exposing (mainBackground)
-import UI.Internal.RenderConfig exposing (RenderConfig, localeTerms)
-import UI.Palette as Palette
-import UI.RenderConfig as RenderConfig exposing (RenderConfig)
-import UI.Size as Size
-import UI.Text as Text
-import UI.Utils.ARIA as ARIA exposing (roleButton)
+import UI.Icon exposing (Icon)
 import UI.Utils.Element as Element
 
 

@@ -82,10 +82,8 @@ Example of usage:
 -}
 
 import Element exposing (Element, fill)
-import Element.Events as Events
 import Html exposing (Html)
 import UI.Icon as Icon exposing (Icon)
-import UI.Internal.Colors as Colors
 import UI.Internal.Dialog as Dialog1
 import UI.Internal.DialogV2 exposing (dialogViewV2)
 import UI.Internal.Menu as Menu
@@ -514,7 +512,7 @@ toBrowserDocument cfg page (Navigator model) =
                 Just (Dialog1 dialogState) ->
                     Dialog1.view cfg dialogState
 
-                Just (Dialog2 ((Dialog2.Dialog { close } { closeOnOverlayClick }) as dialogState)) ->
+                Just (Dialog2 dialogState) ->
                     dialogState
                         |> dialogViewV2 cfg
 
