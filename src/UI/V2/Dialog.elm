@@ -117,16 +117,3 @@ dialog.
 withButtons : List (Button msg) -> Dialog msg -> Dialog msg
 withButtons buttons (Dialog props options) =
     Dialog props { options | buttons = buttons }
-
-
-{-| Allows you to specify whether clicking on overlay closes the dialog or not.
-By default, clicking on overlay does nothing, that is because an unintentional
-click can cause loss of information if a dialog is open which is expecting an
-input from the user and user has already provided it partially. It is
-recommended to provide an explicit cancel/close button for such cases. However
-this helper can be used to recieve clicks on overlay to close the dialog where
-loss of information is not likely to happen.
--}
-withCloseOnOverlayClick : Bool -> Dialog msg -> Dialog msg
-withCloseOnOverlayClick shouldClose (Dialog props options) =
-    Dialog props { options | closeOnOverlayClick = shouldClose }
