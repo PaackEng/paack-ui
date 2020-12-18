@@ -23,9 +23,6 @@ import Utils exposing (ExplorerStory, ExplorerUI, prettifyElmCode, storyBorder, 
 update : LayoutsMsg.Msg -> LayoutsModel.Model -> Return LayoutsMsg.Msg LayoutsModel.Model
 update msg model =
     case msg of
-        LayoutsMsg.NoOp ->
-            ( model, Cmd.none )
-
         LayoutsMsg.Select book ->
             ( { model | selected = Just book }, Cmd.none )
 

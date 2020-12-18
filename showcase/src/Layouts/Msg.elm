@@ -4,5 +4,4 @@ import Tables.Book exposing (Book)
 
 
 type Msg
-    = NoOp
-    | Select Book
+    = Select Book
