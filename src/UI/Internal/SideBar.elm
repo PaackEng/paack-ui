@@ -1,6 +1,6 @@
 module UI.Internal.SideBar exposing (desktopColumn, mobileDrawer)
 
-import Element exposing (Attribute, Element, fill, fillPortion, height, padding, paddingEach, paddingXY, px, scrollbarY, shrink, spacing, width)
+import Element exposing (Attribute, Element, fill, fillPortion, height, padding, paddingEach, paddingXY, px, shrink, spacing, width)
 import Element.Background as Background
 import Element.Events as Events
 import Element.Font as Font

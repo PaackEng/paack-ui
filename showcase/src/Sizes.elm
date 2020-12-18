@@ -3,7 +3,7 @@ module Sizes exposing (stories)
 import Element exposing (Element)
 import Element.Background as Background
 import Element.Font as Font
-import Msg as Msg exposing (Msg)
+import Msg exposing (Msg)
 import PluginOptions exposing (PluginOptions, defaultWithMenu)
 import UI.Button as Button exposing (ButtonBody)
 import UI.Icon as Icon exposing (Icon)

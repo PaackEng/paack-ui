@@ -11,7 +11,7 @@ import UI.Palette as Palette
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
-import UI.Utils.ARIA as ARIA exposing (roleButton)
+import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element
 import UI.V2.Dialog as Dialog
 
