@@ -12,7 +12,7 @@ import NoUnused.Parameters
 import NoUnused.Patterns
 import NoUnused.Variables
 import NoUnused.Exports
-import Review.Rule exposing (Rule)
+import Review.Rule exposing (Rule, ignoreErrorsForFiles)
 
 
 
@@ -38,5 +38,5 @@ config =
     , NoUnused.Variables.rule
     , NoUnused.CustomTypeConstructors.rule []
     , NoRedundantConcat.rule
-    , NoUnused.Exports.rule
+    , ignoreErrorsForFiles ["showcase/src/Main.elm"] NoUnused.Exports.rule
     ]
