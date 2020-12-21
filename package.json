@@ -5,7 +5,6 @@
   "main": "index.js",
   "assetsPath": "showcase/public/assets/",
   "scripts": {
-    "analyse": "elm-analyse",
     "docs": "elm make --docs=dist/docs.json",
     "build": "parcel build showcase/public/index.html --public-url ./",
     "showcase": "parcel showcase/public/index.html",
