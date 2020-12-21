@@ -1,4 +1,4 @@
-module I18n.Spanish exposing (..)
+module I18n.Spanish exposing (root)
 
 import I18n.Types exposing (..)
 

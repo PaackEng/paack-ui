@@ -1,4 +1,4 @@
-module UI.Internal.Utils.Element exposing (..)
+module UI.Internal.Utils.Element exposing (id, overflowAttrs, overflowVisible, overlay, style, title, tuplesToStyles, zIndex)
 
 import Element exposing (Attribute, Element, fill, minimum, shrink)
 import Element.Events as Events
@@ -65,14 +65,6 @@ overlay closeMsg content =
         (overlayBackground closeMsg)
 
 
-tabIndex : Int -> Attribute msg
-tabIndex code =
-    -- -1 is disabled, 0 is following document flow, greater than 0 are priorities numbers
-    String.fromInt code
-        |> HtmlAttrs.attribute "tabindex"
-        |> Element.htmlAttribute
-
-
 
 -- Some good-old CSS
 
@@ -80,26 +72,6 @@ tabIndex code =
 positionFixed : Attribute msg
 positionFixed =
     Element.htmlAttribute <| HtmlAttrs.style "position" "fixed"
-
-
-positionRelative : Attribute msg
-positionRelative =
-    Element.htmlAttribute <| HtmlAttrs.style "position" "relative"
-
-
-positionAbsolute : Attribute ms
-positionAbsolute =
-    Element.htmlAttribute <| HtmlAttrs.style "position" "absolute"
-
-
-positionAbsoluteTop : Attribute ms
-positionAbsoluteTop =
-    Element.htmlAttribute <| HtmlAttrs.style "top" "1"
-
-
-positionAbsoluteLeft : Attribute ms
-positionAbsoluteLeft =
-    Element.htmlAttribute <| HtmlAttrs.style "left" "1"
 
 
 overflowVisible : Attribute msg
@@ -110,8 +82,3 @@ overflowVisible =
 zIndex : Int -> Attribute msg
 zIndex val =
     Element.htmlAttribute <| HtmlAttrs.style "z-index" (String.fromInt val)
-
-
-borderTriangleUp : String -> Attribute msg
-borderTriangleUp cssColor =
-    style "border-color" ("transparent transparent " ++ cssColor ++ " transparent")

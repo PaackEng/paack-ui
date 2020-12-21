@@ -1,4 +1,4 @@
-module UI.Internal.Size exposing (..)
+module UI.Internal.Size exposing (Size(..), default)
 
 
 type Size

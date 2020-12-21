@@ -1,4 +1,4 @@
-module UI.Internal.Text exposing (..)
+module UI.Internal.Text exposing (Options, Span(..), SpanProperties, Text(..), TextColor(..), TextOptions, TextOverflow(..), TextSize(..), attributes, combinedAttrs, defaultText, ellipsizedText, fontColor, getSpans, mapOptions, spanRenderEl, textDefaultOptions, withOverflow)
 
 import Element exposing (Attribute, Element, fill)
 import Element.Font as Font
@@ -426,39 +426,3 @@ ellipsizableNode content =
     Html.node "ellipsizable-text"
         [ attribute "text" content ]
         []
-
-
-spanLength : Span -> Int
-spanLength (Span { content } _) =
-    String.length content
-
-
-length : Text -> Int
-length (Text spans _) =
-    spans
-        |> List.map spanLength
-        |> List.sum
-
-
-spanSize : Span -> TextSize
-spanSize (Span { size } _) =
-    size
-
-
-textSize : Text -> Maybe TextSize
-textSize (Text spans _) =
-    case spans of
-        [ theOneAndOnly ] ->
-            Just (spanSize theOneAndOnly)
-
-        _ ->
-            Nothing
-
-
-textSizePx : RenderConfig -> Text -> Int
-textSizePx renderConfig text =
-    text
-        |> textSize
-        |> Maybe.withDefault SizeBody1
-        |> lineHeight
-            (isMobile renderConfig)

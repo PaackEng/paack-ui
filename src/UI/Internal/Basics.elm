@@ -1,13 +1,4 @@
-module UI.Internal.Basics exposing (..)
-
-
-prependIf : Bool -> a -> List a -> List a
-prependIf shouldAdd item items =
-    if shouldAdd then
-        item :: items
-
-    else
-        items
+module UI.Internal.Basics exposing (flip, ifThenElse, lazyMap, maybeAnd, maybeNotThen, pairUncurry, prependMaybe)
 
 
 prependMaybe : Maybe a -> List a -> List a
@@ -37,16 +28,6 @@ ifThenElse condition ifThen ifElse =
 pairUncurry : (a -> b -> c) -> ( a, b ) -> c
 pairUncurry applier ( first, second ) =
     applier first second
-
-
-maybeToList : Maybe a -> List a
-maybeToList maybeSomething =
-    case maybeSomething of
-        Just something ->
-            [ something ]
-
-        Nothing ->
-            []
 
 
 maybeNotThen : Maybe a -> Maybe a -> Maybe a

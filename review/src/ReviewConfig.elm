@@ -12,11 +12,11 @@ import NoUnused.Parameters
 import NoUnused.Patterns
 import NoUnused.Variables
 import NoUnused.Exports
+import NoExposingEverything
 import Review.Rule exposing (Rule, ignoreErrorsForFiles)
 
 
 
--- Add ExposeAll
 -- Missing rules present in elm-analyse
 -- MapNothingToNothing
 -- FileLoadFailed (?)
@@ -39,4 +39,5 @@ config =
     , NoUnused.CustomTypeConstructors.rule []
     , NoRedundantConcat.rule
     , ignoreErrorsForFiles ["showcase/src/Main.elm"] NoUnused.Exports.rule
+    , NoExposingEverything.rule
     ]

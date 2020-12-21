@@ -1,4 +1,4 @@
-module UI.Internal.Colors exposing (..)
+module UI.Internal.Colors exposing (ToneColors, contrastDanger, contrastPrimary, contrastSuccess, contrastWarning, danger, darkConstrast, gray, mainBackground, overlayBackground, primary, success, warning)
 
 import Element exposing (Attribute, rgb255)
 import Element.Background as Background
@@ -113,15 +113,6 @@ contrastWarning =
 
 
 -- Text
-
-
-textLightButtonDisabled : Element.Color
-textLightButtonDisabled =
-    -- #666666
-    rgb255 102 102 102
-
-
-
 -- Background
 
 
