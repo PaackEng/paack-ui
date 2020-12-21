@@ -7,7 +7,6 @@ import NoExposingEverything
 import NoMissingTypeAnnotation
 import NoRedundantConcat
 import NoRedundantCons
-import NoUnused.CustomTypeConstructorArgs
 import NoUnused.CustomTypeConstructors
 import NoUnused.Dependencies
 import NoUnused.Exports
@@ -29,7 +28,6 @@ config =
     , NoUnused.Patterns.rule
     , NoUnused.Variables.rule
     , NoUnused.CustomTypeConstructors.rule []
-    , NoUnused.CustomTypeConstructorArgs.rule
     , NoRedundantConcat.rule
     , ignoreErrorsForFiles [ "showcase/src/Main.elm" ] NoUnused.Exports.rule
     , NoExposingEverything.rule
