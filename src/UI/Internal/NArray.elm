@@ -1,7 +1,6 @@
 module UI.Internal.NArray exposing (NArray(..), empty, get, push, set, toList)
 
 import Array exposing (Array)
-import UI.Internal.NList exposing (NList(..))
 import UI.Utils.TypeNumbers as T
 
 
