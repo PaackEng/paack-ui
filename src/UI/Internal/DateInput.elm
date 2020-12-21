@@ -4,7 +4,6 @@ module UI.Internal.DateInput exposing
     , PeriodDate
     , RangeDate
     , fromPosix
-    , ifValid
     , isPosixAfter
     , isPosixBefore
     , isPosixBetween

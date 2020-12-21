@@ -1,4 +1,4 @@
-module Main exposing (CompileNav, CompilerListView, main)
+module Main exposing (main)
 
 import Alerts
 import Badges
@@ -22,8 +22,6 @@ import Tables.Stories as Tables
 import Tabs.Stories as Tabs
 import TextField
 import Texts
-import UI.ListView exposing (ListView)
-import UI.NavigationContainer exposing (Navigator)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UIExplorer
     exposing
@@ -40,16 +38,6 @@ import UIExplorer.Plugins.Note as NotePlugin
 import UIExplorer.Plugins.Tabs as TabsPlugin
 import UIExplorer.Plugins.Tabs.Icons as TabsIconsPlugin
 import Utils exposing (ExplorerModel)
-
-
-{-| importing UI.NavigationContainer and UI.ListView mostly so they compile too
--}
-type alias CompileNav =
-    Navigator Never Never
-
-
-type alias CompilerListView =
-    ListView Never Never
 
 
 config : Config Model Msg PluginOptions

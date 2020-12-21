@@ -11,11 +11,11 @@ import NoRedundantConcat
 import NoUnused.Parameters
 import NoUnused.Patterns
 import NoUnused.Variables
+import NoUnused.Exports
 import Review.Rule exposing (Rule)
 
 
 
--- NoUnused.Exports
 -- Add ExposeAll
 -- Missing rules present in elm-analyse
 -- MapNothingToNothing
@@ -38,4 +38,5 @@ config =
     , NoUnused.Variables.rule
     , NoUnused.CustomTypeConstructors.rule []
     , NoRedundantConcat.rule
+    , NoUnused.Exports.rule
     ]
