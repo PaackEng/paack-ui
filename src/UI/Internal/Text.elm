@@ -1,4 +1,23 @@
-module UI.Internal.Text exposing (Options, Span(..), SpanProperties, Text(..), TextColor(..), TextOptions, TextOverflow(..), TextSize(..), attributes, combinedAttrs, defaultText, ellipsizedText, fontColor, getSpans, mapOptions, spanRenderEl, textDefaultOptions, withOverflow)
+module UI.Internal.Text exposing
+    ( Options
+    , Span(..)
+    , SpanProperties
+    , Text(..)
+    , TextColor(..)
+    , TextOptions
+    , TextOverflow(..)
+    , TextSize(..)
+    , attributes
+    , combinedAttrs
+    , defaultText
+    , ellipsizedText
+    , fontColor
+    , getSpans
+    , mapOptions
+    , spanRenderEl
+    , textDefaultOptions
+    , withOverflow
+    )
 
 import Element exposing (Attribute, Element, fill)
 import Element.Font as Font

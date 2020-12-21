@@ -1,4 +1,11 @@
-module UI.Internal.NArray exposing (NArray(..), empty, get, push, set, toList)
+module UI.Internal.NArray exposing
+    ( NArray(..)
+    , empty
+    , get
+    , push
+    , set
+    , toList
+    )
 
 import Array exposing (Array)
 import UI.Utils.TypeNumbers as T

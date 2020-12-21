@@ -1,4 +1,13 @@
-module Tables.Book exposing (Book, books, someFilters, tablePixelColumns, tablePortionColumns, toTableCover, toTableDetails, toTableRow)
+module Tables.Book exposing
+    ( Book
+    , books
+    , someFilters
+    , tablePixelColumns
+    , tablePortionColumns
+    , toTableCover
+    , toTableDetails
+    , toTableRow
+    )
 
 import Time exposing (millisToPosix)
 import UI.Internal.DateInput as DateInput

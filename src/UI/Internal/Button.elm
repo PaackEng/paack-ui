@@ -1,4 +1,16 @@
-module UI.Internal.Button exposing (Button(..), ButtonAction(..), ButtonBody(..), ButtonMode(..), ButtonStyle(..), ButtonWidth(..), EmbossedTone(..), Options, Properties, ToggleProperties, bodyToElement)
+module UI.Internal.Button exposing
+    ( Button(..)
+    , ButtonAction(..)
+    , ButtonBody(..)
+    , ButtonMode(..)
+    , ButtonStyle(..)
+    , ButtonWidth(..)
+    , EmbossedTone(..)
+    , Options
+    , Properties
+    , ToggleProperties
+    , bodyToElement
+    )
 
 import Element exposing (Element)
 import Element.Font as Font

@@ -1,4 +1,13 @@
-module UI.Internal.Utils.Element exposing (id, overflowAttrs, overflowVisible, overlay, style, title, tuplesToStyles, zIndex)
+module UI.Internal.Utils.Element exposing
+    ( id
+    , overflowAttrs
+    , overflowVisible
+    , overlay
+    , style
+    , title
+    , tuplesToStyles
+    , zIndex
+    )
 
 import Element exposing (Attribute, Element, fill, minimum, shrink)
 import Element.Events as Events

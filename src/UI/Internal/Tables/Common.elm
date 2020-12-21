@@ -1,4 +1,9 @@
-module UI.Internal.Tables.Common exposing (Cell(..), Column(..), ColumnOptions, ColumnWidth(..))
+module UI.Internal.Tables.Common exposing
+    ( Cell(..)
+    , Column(..)
+    , ColumnOptions
+    , ColumnWidth(..)
+    )
 
 import Element exposing (Element)
 import UI.Button exposing (Button)

@@ -1,4 +1,19 @@
-module I18n.Types exposing (Checkbox, DateInput, Dialog, Filters, FiltersPeriod, FiltersRange, FiltersSelect, ListView, Paginator, Radio, Root, Sidebar, Tables, TablesDetails)
+module I18n.Types exposing
+    ( Checkbox
+    , DateInput
+    , Dialog
+    , Filters
+    , FiltersPeriod
+    , FiltersRange
+    , FiltersSelect
+    , ListView
+    , Paginator
+    , Radio
+    , Root
+    , Sidebar
+    , Tables
+    , TablesDetails
+    )
 
 
 type alias FiltersPeriod =

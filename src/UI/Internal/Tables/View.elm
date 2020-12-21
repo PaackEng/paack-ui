@@ -1,4 +1,12 @@
-module UI.Internal.Tables.View exposing (cellContentRender, cellSpace, headersAttr, rowBox, rowRender, simpleHeaderRender, topCellSpace)
+module UI.Internal.Tables.View exposing
+    ( cellContentRender
+    , cellSpace
+    , headersAttr
+    , rowBox
+    , rowRender
+    , simpleHeaderRender
+    , topCellSpace
+    )
 
 import Element exposing (Attribute, Element, fill, fillPortion, minimum, px, shrink)
 import Element.Background as Background
