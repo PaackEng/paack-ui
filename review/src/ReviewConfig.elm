@@ -3,16 +3,16 @@ module ReviewConfig exposing (config)
 import NoBooleanCase
 import NoDebug.Log
 import NoDebug.TodoOrToString
+import NoExposingEverything
 import NoMissingTypeAnnotation
+import NoRedundantConcat
 import NoRedundantCons
 import NoUnused.CustomTypeConstructors
 import NoUnused.Dependencies
-import NoRedundantConcat
+import NoUnused.Exports
 import NoUnused.Parameters
 import NoUnused.Patterns
 import NoUnused.Variables
-import NoUnused.Exports
-import NoExposingEverything
 import Review.Rule exposing (Rule, ignoreErrorsForFiles)
 
 
@@ -38,6 +38,6 @@ config =
     , NoUnused.Variables.rule
     , NoUnused.CustomTypeConstructors.rule []
     , NoRedundantConcat.rule
-    , ignoreErrorsForFiles ["showcase/src/Main.elm"] NoUnused.Exports.rule
+    , ignoreErrorsForFiles [ "showcase/src/Main.elm" ] NoUnused.Exports.rule
     , NoExposingEverything.rule
     ]
