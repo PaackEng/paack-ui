@@ -7,6 +7,7 @@ import NoMissingTypeAnnotation
 import NoRedundantCons
 import NoUnused.CustomTypeConstructors
 import NoUnused.Dependencies
+import NoRedundantConcat
 import NoUnused.Parameters
 import NoUnused.Patterns
 import NoUnused.Variables
@@ -14,7 +15,6 @@ import Review.Rule exposing (Rule)
 
 
 
--- Add rule regarding redundant concat
 -- NoUnused.Exports
 -- Add ExposeAll
 -- Missing rules present in elm-analyse
@@ -37,4 +37,5 @@ config =
     , NoUnused.Patterns.rule
     , NoUnused.Variables.rule
     , NoUnused.CustomTypeConstructors.rule []
+    , NoRedundantConcat.rule
     ]

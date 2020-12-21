@@ -205,11 +205,10 @@ slimHeaderView cfg toggleMsg _ =
 
 headerButtonAttr : msg -> List (Attribute msg)
 headerButtonAttr toggleMsg =
-    [ Events.onClick toggleMsg
-    , Element.pointer
-    , Element.centerY
-    ]
-        ++ ARIA.toElementAttributes ARIA.roleButton
+    Events.onClick toggleMsg
+        :: Element.pointer
+        :: Element.centerY
+        :: ARIA.toElementAttributes ARIA.roleButton
 
 
 pagesView : RenderConfig -> List Menu.Page -> Bool -> Element msg
@@ -339,12 +338,11 @@ actionItem : RenderConfig -> Icon -> msg -> Element msg
 actionItem cfg icon msg =
     let
         attrs =
-            [ width fill
-            , spacing 4
-            , Element.pointer
-            , Events.onClick msg
-            ]
-                ++ ARIA.toElementAttributes ARIA.roleButton
+            width fill
+                :: spacing 4
+                :: Element.pointer
+                :: Events.onClick msg
+                :: ARIA.toElementAttributes ARIA.roleButton
     in
     Element.row attrs
         [ icon
@@ -366,10 +364,9 @@ slimActionItem cfg icon msg =
         |> Icon.withColor (slimIconColor True)
         |> Icon.renderElement cfg
         |> Element.el
-            (slimIconAttr
-                ++ [ Element.pointer
-                   , Events.onClick msg
-                   ]
+            (Element.pointer
+                :: Events.onClick msg
+                :: slimIconAttr
                 ++ ARIA.toElementAttributes ARIA.roleButton
             )
 
