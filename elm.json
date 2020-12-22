@@ -30,7 +30,8 @@
         "UI.Utils.Element",
         "UI.Utils.Focus",
         "UI.Utils.TypeNumbers",
-        "UI.V2.Dialog"
+        "UI.V2.Dialog",
+        "UI.Layout.SplitSelectable"
     ],
     "elm-version": "0.19.0 <= v < 0.20.0",
     "dependencies": {

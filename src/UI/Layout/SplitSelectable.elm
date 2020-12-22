@@ -1,4 +1,4 @@
-module UI.Layout.SplitSelectable exposing (Config, desktop)
+module UI.Layout.SplitSelectable exposing (Config, MobileConfig, desktop, mobile)
 
 import Element exposing (Element, fill, fillPortion, minimum)
 import Element.Border as Border
@@ -7,6 +7,7 @@ import UI.ListView as ListView exposing (ListView)
 import UI.NavigationContainer as Nav
 import UI.Palette as Palette
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
+import UI.Utils.Action as Action
 import UI.Utils.Element as Element exposing (zeroPadding)
 
 
@@ -17,6 +18,30 @@ type alias Config object msg =
     , selected : Maybe String
     , selectedView : Element msg
     }
+
+
+type alias MobileConfig msg =
+    { action : Maybe (Action.WithIcon msg)
+    , title : ( String, Maybe String )
+    , unselectMsg : msg
+    }
+
+
+mobile : RenderConfig -> MobileConfig msg -> Config object msg -> Nav.Content msg
+mobile renderConfig mobileConfig layoutConfig =
+    case layoutConfig.selected of
+        Just _ ->
+            Nav.contentStackChild
+                { title = mobileConfig.title
+                , goBackMsg = mobileConfig.unselectMsg
+                , action = mobileConfig.action
+                }
+                layoutConfig.selectedView
+
+        Nothing ->
+            layoutConfig
+                |> listContent renderConfig
+                |> Nav.contentSingle
 
 
 desktop : RenderConfig -> Config object msg -> Nav.Content msg
