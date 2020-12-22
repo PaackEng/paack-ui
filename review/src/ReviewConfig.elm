@@ -13,7 +13,12 @@ import NoUnused.Exports
 import NoUnused.Parameters
 import NoUnused.Patterns
 import NoUnused.Variables
-import Review.Rule exposing (Rule, ignoreErrorsForFiles)
+import Review.Rule
+    exposing
+        ( Rule
+        , ignoreErrorsForDirectories
+        , ignoreErrorsForFiles
+        )
 
 
 config : List Rule
@@ -32,3 +37,4 @@ config =
     , ignoreErrorsForFiles [ "showcase/src/Main.elm" ] NoUnused.Exports.rule
     , NoExposingEverything.rule
     ]
+        |> List.map (ignoreErrorsForDirectories [ "src/I18n" ])

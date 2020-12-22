@@ -1,4 +1,4 @@
-module I18n.French exposing (root)
+module I18n.French exposing (..)
 
 import I18n.Types exposing (..)
 
