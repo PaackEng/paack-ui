@@ -9,8 +9,8 @@ import Html exposing (Html, div, img)
 import Html.Attributes exposing (src, style)
 import Icons
 import Layouts.Stories as Layouts
-import LoadingView as LoadingView
-import Model as Model exposing (Model)
+import LoadingView
+import Model exposing (Model)
 import Msg exposing (Msg(..))
 import Paginators.Stories as Paginators
 import Palette

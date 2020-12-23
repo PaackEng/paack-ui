@@ -177,23 +177,23 @@ headerAttrs isApplied =
                 ]
 
             else
-                [ Background.color Colors.gray.lightest
-                , Font.color Colors.primary.darkest
-                , Element.mouseOver
-                    [ Background.color Colors.primary.lightest ]
-                ]
-                    ++ Element.colorTransition 100
+                Background.color
+                    Colors.gray.lightest
+                    :: Font.color Colors.primary.darkest
+                    :: Element.mouseOver [ Background.color Colors.primary.lightest ]
+                    :: Element.colorTransition 100
     in
-    [ Primitives.roundedBorders contextSize
-    , Element.width Element.fill
-    , paddingXY
-    , Element.spacing 8
-    , Font.size textSize
-    , Font.semiBold
-    , Element.pointer
-    ]
-        ++ (ARIA.toElementAttributes <| ARIA.roleButton)
-        ++ workingTheme
+    Primitives.roundedBorders
+        contextSize
+        :: Element.width Element.fill
+        :: paddingXY
+        :: Element.spacing 8
+        :: Font.size textSize
+        :: Font.semiBold
+        :: Element.pointer
+        :: (ARIA.toElementAttributes ARIA.roleButton
+                ++ workingTheme
+           )
 
 
 

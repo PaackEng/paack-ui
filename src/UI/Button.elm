@@ -483,12 +483,11 @@ toggleView cfg size hint toggleMsg current =
             iconLayout size
 
         attrs =
-            [ Primitives.roundedBorders size
-            , paddings
-            , borders
-            , Element.onIndividualClick <| toggleMsg (not current)
-            ]
-                ++ ARIA.toElementAttributes ARIA.roleButton
+            Primitives.roundedBorders size
+                :: paddings
+                :: borders
+                :: (Element.onIndividualClick <| toggleMsg (not current))
+                :: ARIA.toElementAttributes ARIA.roleButton
                 ++ toggleTheme current
     in
     Icon.toggle hint
@@ -507,15 +506,15 @@ hyperlinkView :
 hyperlinkView cfg size width body action =
     let
         attrs =
-            [ buttonWidth width
-            , Palette.color tonePrimary brightnessMiddle
-                |> Palette.toElementColor
-                |> Font.color
-            , Font.regular
-            , Font.underline
-            , Element.pointer
-            ]
-                ++ (ARIA.toElementAttributes <| ARIA.roleButton)
+            buttonWidth width
+                :: (Palette.color tonePrimary brightnessMiddle
+                        |> Palette.toElementColor
+                        |> Font.color
+                   )
+                :: Font.regular
+                :: Font.underline
+                :: Element.pointer
+                :: (ARIA.toElementAttributes <| ARIA.roleButton)
     in
     case action of
         ActionRedirect link ->
@@ -543,14 +542,13 @@ workingView cfg size width tone body action =
             bodyLayout body size
 
         attrs =
-            [ Primitives.roundedBorders size
-            , buttonWidth width
-            , paddings
-            , borders
-            , Font.semiBold
-            , Element.pointer
-            ]
-                ++ (ARIA.toElementAttributes <| ARIA.roleButton)
+            Primitives.roundedBorders size
+                :: buttonWidth width
+                :: paddings
+                :: borders
+                :: Font.semiBold
+                :: Element.pointer
+                :: (ARIA.toElementAttributes <| ARIA.roleButton)
                 ++ workingTheme tone
     in
     case action of
@@ -578,13 +576,13 @@ staticView cfg size width body theme =
             bodyLayout body size
 
         attrs =
-            [ Primitives.roundedBorders size
-            , buttonWidth width
-            , paddings
-            , borders
-            , Font.semiBold
-            ]
-                ++ Element.disabled
+            Primitives.roundedBorders
+                size
+                :: buttonWidth width
+                :: paddings
+                :: borders
+                :: Font.semiBold
+                :: Element.disabled
                 ++ theme body
     in
     body

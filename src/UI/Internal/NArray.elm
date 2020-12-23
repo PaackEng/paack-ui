@@ -1,7 +1,13 @@
-module UI.Internal.NArray exposing (..)
+module UI.Internal.NArray exposing
+    ( NArray(..)
+    , empty
+    , get
+    , push
+    , set
+    , toList
+    )
 
 import Array exposing (Array)
-import UI.Internal.NList exposing (NList(..))
 import UI.Utils.TypeNumbers as T
 
 
@@ -16,11 +22,6 @@ type NArray data n
 empty : NArray msg T.Zero
 empty =
     NArray Array.empty
-
-
-length : NArray msg columns -> Int
-length (NArray array) =
-    Array.length array
 
 
 get : Int -> NArray data n -> Maybe data
@@ -38,41 +39,6 @@ push new (NArray old) =
     NArray (Array.push new old)
 
 
-foldl : (data -> accu -> accu) -> accu -> NArray data n -> accu
-foldl applier accu (NArray array) =
-    Array.foldl applier accu array
-
-
-indexedMap : (Int -> a -> b) -> NArray a n -> NArray b n
-indexedMap applier (NArray array) =
-    NArray <| Array.indexedMap applier array
-
-
-map : (a -> b) -> NArray a n -> NArray b n
-map applier (NArray array) =
-    NArray <| Array.map applier array
-
-
-toNList : NArray data n -> NList data n
-toNList (NArray array) =
-    NList <| Array.toList array
-
-
-toIndexedNList : NArray data n -> NList ( Int, data ) n
-toIndexedNList (NArray array) =
-    NList <| Array.toIndexedList array
-
-
 toList : NArray data n -> List data
 toList (NArray array) =
     Array.toList array
-
-
-toIndexedList : NArray data n -> List ( Int, data )
-toIndexedList (NArray array) =
-    Array.toIndexedList array
-
-
-toArray : NArray data n -> Array data
-toArray (NArray array) =
-    array

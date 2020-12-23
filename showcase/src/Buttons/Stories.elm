@@ -4,7 +4,7 @@ import Buttons.Model as Buttons
 import Buttons.Msg as Buttons
 import Element exposing (Element, fill)
 import Model exposing (Model)
-import Msg as Msg exposing (Msg)
+import Msg exposing (Msg)
 import PluginOptions exposing (PluginOptions, defaultWithMenu)
 import Return exposing (Return)
 import UI.Button as Button exposing (ButtonStyle)

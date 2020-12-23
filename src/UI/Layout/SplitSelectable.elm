@@ -1,4 +1,36 @@
-module UI.Layout.SplitSelectable exposing (Config, MobileConfig, desktop, mobile)
+module UI.Layout.SplitSelectable exposing
+    ( Config, MobileConfig
+    , mobile, desktop
+    )
+
+{-| The `UI.Layout.SplitSelectable` provide helpers to render a view for
+displaying a list of items where selecting any particular item opens a detailed
+view of it. You will have to generate a
+[`Nav.Content`](UI-NavigationContainer#Content) through [`mobile`](#mobile) or
+[`desktop`](#desktop) helper depending upon the target device, which later a
+page can provide through `[Nav.Container](UI-NavigationContainer#Container)` to
+show on screens.
+
+Example of usage:
+
+    splitSelectableContent : RenderConfig -> Config -> Nav.Content
+    splitSelectableContent renderConfig layoutConfig =
+        desktop renderConfig layoutConfig
+
+later on, `splitSelectableContent` can be used to populate the `content` field
+inside the [`Container`](UI-NavigationContainer#Container) record to render it.
+
+
+# Types
+
+@docs Config, MobileConfig
+
+
+# Building
+
+@docs mobile, desktop
+
+-}
 
 import Element exposing (Element, fill, fillPortion, minimum)
 import Element.Border as Border
@@ -11,6 +43,15 @@ import UI.Utils.Action as Action
 import UI.Utils.Element as Element exposing (zeroPadding)
 
 
+
+-- Types
+
+
+{-| The `Config object msg` is used to construct a record which later can
+be fed to [`mobile`](#mobile) or [`desktop`](#desktop) helper to construct a
+SplitSelectable view. Have a look at ['ListView'](UI-ListView) docs to populate
+`listView` field.
+-}
 type alias Config object msg =
     { getKey : object -> String
     , items : List object
@@ -20,6 +61,9 @@ type alias Config object msg =
     }
 
 
+{-| The `MobileConfig msg` is used to construct a record having mobile specific
+parts of the data items needed to build a SplitSelectable view.
+-}
 type alias MobileConfig msg =
     { action : Maybe (Action.WithIcon msg)
     , title : ( String, Maybe String )
@@ -27,6 +71,12 @@ type alias MobileConfig msg =
     }
 
 
+
+-- Building
+
+
+{-| `mobile` helper constructs SplitSelectable layout for rendering on mobile
+-}
 mobile : RenderConfig -> MobileConfig msg -> Config object msg -> Nav.Content msg
 mobile renderConfig mobileConfig layoutConfig =
     case layoutConfig.selected of
@@ -44,6 +94,8 @@ mobile renderConfig mobileConfig layoutConfig =
                 |> Nav.contentSingle
 
 
+{-| `desktop` helper constructs SplitSelectable layout for rendering on desktop
+-}
 desktop : RenderConfig -> Config object msg -> Nav.Content msg
 desktop renderConfig layoutConfig =
     Keyed.row
@@ -56,6 +108,10 @@ desktop renderConfig layoutConfig =
         , ( "selected", selectedColumn layoutConfig )
         ]
         |> Nav.contentSingle
+
+
+
+-- Internals
 
 
 listColumn : RenderConfig -> Config object msg -> Element msg

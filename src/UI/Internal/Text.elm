@@ -1,4 +1,23 @@
-module UI.Internal.Text exposing (..)
+module UI.Internal.Text exposing
+    ( Options
+    , Span(..)
+    , SpanProperties
+    , Text(..)
+    , TextColor(..)
+    , TextOptions
+    , TextOverflow(..)
+    , TextSize(..)
+    , attributes
+    , combinedAttrs
+    , defaultText
+    , ellipsizedText
+    , fontColor
+    , getSpans
+    , mapOptions
+    , spanRenderEl
+    , textDefaultOptions
+    , withOverflow
+    )
 
 import Element exposing (Attribute, Element, fill)
 import Element.Font as Font
@@ -6,7 +25,6 @@ import Html exposing (Html)
 import Html.Attributes exposing (attribute)
 import List
 import UI.Internal.Basics exposing (ifThenElse)
-import UI.Internal.Colors as Colors
 import UI.Internal.Utils.Element exposing (overflowAttrs, overflowVisible)
 import UI.Palette as Palette exposing (brightnessDarkest, toneGray)
 import UI.RenderConfig exposing (RenderConfig, isMobile)
@@ -53,7 +71,6 @@ type TextSize
 
 type TextColor
     = ColorPalette Palette.Color
-    | ColorForLightButtonDisabled
     | ColorInherit
 
 
@@ -89,9 +106,6 @@ fontColor color =
     case color of
         ColorPalette paletteColor ->
             Just <| Palette.toElementColor paletteColor
-
-        ColorForLightButtonDisabled ->
-            Just <| Colors.textLightButtonDisabled
 
         ColorInherit ->
             Nothing
@@ -431,39 +445,3 @@ ellipsizableNode content =
     Html.node "ellipsizable-text"
         [ attribute "text" content ]
         []
-
-
-spanLength : Span -> Int
-spanLength (Span { content } _) =
-    String.length content
-
-
-length : Text -> Int
-length (Text spans _) =
-    spans
-        |> List.map spanLength
-        |> List.sum
-
-
-spanSize : Span -> TextSize
-spanSize (Span { size } _) =
-    size
-
-
-textSize : Text -> Maybe TextSize
-textSize (Text spans _) =
-    case spans of
-        [ theOneAndOnly ] ->
-            Just (spanSize theOneAndOnly)
-
-        _ ->
-            Nothing
-
-
-textSizePx : RenderConfig -> Text -> Int
-textSizePx renderConfig text =
-    text
-        |> textSize
-        |> Maybe.withDefault SizeBody1
-        |> lineHeight
-            (isMobile renderConfig)

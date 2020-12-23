@@ -1,4 +1,12 @@
-module UI.Internal.Menu exposing (..)
+module UI.Internal.Menu exposing
+    ( Action
+    , Logo
+    , Menu(..)
+    , Options
+    , Page
+    , Properties
+    , default
+    )
 
 import Element exposing (Element)
 import UI.Icon exposing (Icon)

@@ -91,15 +91,14 @@ renderElement : RenderConfig -> Checkbox msg -> Element msg
 renderElement renderConfig (Checkbox { message, label, state } { labelVisible }) =
     let
         boxAttrs =
-            [ Element.width (px 20)
-            , Element.height (px 20)
-            , Border.color Colors.primary.middle
-            , Border.width 2
-            , Border.rounded 8
-            , Element.onIndividualClick (message (not state))
-            , Element.pointer
-            ]
-                ++ aria
+            Element.width (px 20)
+                :: Element.height (px 20)
+                :: Border.color Colors.primary.middle
+                :: Border.width 2
+                :: Border.rounded 8
+                :: Element.onIndividualClick (message (not state))
+                :: Element.pointer
+                :: aria
 
         aria =
             ARIA.roleCheckbox state

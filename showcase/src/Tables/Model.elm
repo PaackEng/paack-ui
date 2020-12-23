@@ -1,4 +1,4 @@
-module Tables.Model exposing (..)
+module Tables.Model exposing (Model, initModel)
 
 import Msg exposing (Msg)
 import Tables.Book exposing (..)

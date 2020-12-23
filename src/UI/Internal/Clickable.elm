@@ -1,4 +1,4 @@
-module UI.Internal.Clickable exposing (actionIcon, actionWrapElement, msgWrapElement)
+module UI.Internal.Clickable exposing (actionIcon, actionWrapElement)
 
 import Element exposing (Attribute, Element)
 import UI.Icon as Icon

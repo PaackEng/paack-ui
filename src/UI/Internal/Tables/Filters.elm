@@ -1,4 +1,38 @@
-module UI.Internal.Tables.Filters exposing (..)
+module UI.Internal.Tables.Filters exposing
+    ( Editable
+    , Filter(..)
+    , FilterConfig
+    , Filters
+    , Msg(..)
+    , MultiTextFilterConfig
+    , PeriodDateFilterConfig
+    , RangeDateFilterConfig
+    , RemoteMessages
+    , SelectFilterConfig
+    , SingleDateFilterConfig
+    , SingleTextFilterConfig
+    , Strategy(..)
+    , dateSeparator
+    , editableWithDefault
+    , empty
+    , filterGet
+    , filtersReduce
+    , isApplied
+    , isEdited
+    , multiTextLocal
+    , multiTextRemote
+    , periodDateLocal
+    , periodDateRemote
+    , rangeDateLocal
+    , rangeDateRemote
+    , selectLocal
+    , selectRemote
+    , singleDateLocal
+    , singleDateRemote
+    , singleTextLocal
+    , singleTextRemote
+    , update
+    )
 
 import Array exposing (Array)
 import Task
