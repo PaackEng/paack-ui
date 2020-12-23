@@ -11,6 +11,15 @@ view of it. You will have to generate a
 page can provide through `[Nav.Container](UI-NavigationContainer#Container)` to
 show on screens.
 
+Example of usage:
+
+    splitSelectableContent : RenderConfig -> Config -> Nav.Content
+    splitSelectableContent renderConfig layoutConfig =
+        desktop renderConfig layoutConfig
+
+later on, `splitSelectableContent` can be used to populate the `content` field
+inside the [`Container`](UI-NavigationContainer#Container) record to render it.
+
 
 # Types
 
@@ -40,7 +49,8 @@ import UI.Utils.Element as Element exposing (zeroPadding)
 
 {-| The `Config object msg` is used to construct a record which later can
 be fed to [`mobile`](#mobile) or [`desktop`](#desktop) helper to construct a
-SplitSelectable view.
+SplitSelectable view. Have a look at ['ListView'](UI-ListView) docs to populate
+`listView` field.
 -}
 type alias Config object msg =
     { getKey : object -> String
