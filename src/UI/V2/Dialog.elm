@@ -94,7 +94,9 @@ map applier (Dialog { title, icon, close } { body, buttons, closeOnOverlayClick 
 
 
 {-| With `Dialog.withBody` you can specify the body of the dialog.
+
 **Note**: By default, the body is `Element.none`
+
 -}
 withBody : Element msg -> Dialog msg -> Dialog msg
 withBody body (Dialog props options) =
@@ -103,7 +105,9 @@ withBody body (Dialog props options) =
 
 {-| With `Dialog.withButtons` you can specify the buttons for the footer of the
 dialog.
+
 **Note**: By default, the buttons are an empty list
+
 -}
 withButtons : List (Button msg) -> Dialog msg -> Dialog msg
 withButtons buttons (Dialog props options) =

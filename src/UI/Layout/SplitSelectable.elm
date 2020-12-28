@@ -8,7 +8,7 @@ displaying a list of items where selecting any particular item opens a detailed
 view of it. You will have to generate a
 [`Nav.Content`](UI-NavigationContainer#Content) through [`mobile`](#mobile) or
 [`desktop`](#desktop) helper depending upon the target device, which later a
-page can provide through `[Nav.Container](UI-NavigationContainer#Container)` to
+page can provide through [`Nav.Container`](UI-NavigationContainer#Container) to
 show on screens.
 
 Example of usage:
@@ -49,8 +49,7 @@ import UI.Utils.Element as Element exposing (zeroPadding)
 
 {-| The `Config object msg` is used to construct a record which later can
 be fed to [`mobile`](#mobile) or [`desktop`](#desktop) helper to construct a
-SplitSelectable view. Have a look at ['ListView'](UI-ListView) docs to populate
-`listView` field.
+SplitSelectable view.
 -}
 type alias Config object msg =
     { getKey : object -> String
