@@ -6,6 +6,7 @@
   "assetsPath": "showcase/public/assets/",
   "scripts": {
     "docs": "elm make --docs=dist/docs.json",
+    "docs-preview": "npx edp",
     "build": "parcel build showcase/public/index.html --public-url ./",
     "showcase": "parcel showcase/public/index.html",
     "test": "elm-test",
@@ -43,6 +44,7 @@
     "parcel-plugin-asset-copier": "^1.1.0"
   },
   "devDependencies": {
+    "elm-doc-preview": "^5.0.5",
     "elm-review": "^2.3.3"
   }
 }
