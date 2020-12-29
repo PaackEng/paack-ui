@@ -9,23 +9,36 @@ import UI.Internal.Colors exposing (mainBackground, overlayBackground)
 import UI.Internal.RenderConfig exposing (RenderConfig)
 import UI.Palette as Palette
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
+import UI.Size as Size
 import UI.Text as Text
-import UI.Utils.Element as Element
+import UI.Utils.Element as Element exposing (RectangleSides)
 import UI.V2.Dialog as Dialog
 
 
 dialogViewV2 : RenderConfig -> Dialog.Dialog msg -> Element msg
 dialogViewV2 cfg ((Dialog.Dialog _ { overlayClickCloseMsg }) as dlg) =
     if RenderConfig.isMobile cfg then
-        mobileView cfg dlg
+        viewWithOverlay
+            { top = 0, bottom = 0, left = 20, right = 20 }
+            overlayClickCloseMsg
+            (mobileView cfg dlg)
 
     else
-        desktopDialogView cfg dlg
-            |> Element.el
-                [ Element.width fill
-                , Element.height fill
-                , Element.behindContent (blackBlock overlayClickCloseMsg)
-                ]
+        viewWithOverlay
+            { top = 0, bottom = 0, left = 0, right = 0 }
+            overlayClickCloseMsg
+            (desktopDialogView cfg dlg)
+
+
+viewWithOverlay : RectangleSides -> Maybe msg -> Element msg -> Element msg
+viewWithOverlay padding overlayClickCloseMsg dialogView =
+    Element.el
+        [ Element.width fill
+        , Element.height fill
+        , Element.behindContent (blackBlock overlayClickCloseMsg)
+        , Element.paddingEach padding
+        ]
+        dialogView
 
 
 desktopDialogView : RenderConfig -> Dialog.Dialog msg -> Element msg
@@ -55,6 +68,22 @@ desktopDialogView cfg (Dialog.Dialog { title, icon } { body, buttons }) =
         ]
 
 
+buttonsColumn : RenderConfig -> List (Button msg) -> Element msg
+buttonsColumn cfg buttons =
+    Element.column
+        [ Element.spacing 12
+        , Element.width fill
+        , Element.paddingEach { top = 20, left = 0, right = 0, bottom = 0 }
+        ]
+    <|
+        List.map
+            (Button.withSize Size.medium
+                >> Button.withWidth Button.widthFull
+                >> Button.renderElement cfg
+            )
+            buttons
+
+
 buttonsRow : RenderConfig -> List (Button msg) -> Element msg
 buttonsRow cfg buttons =
     Element.row
@@ -63,7 +92,7 @@ buttonsRow cfg buttons =
         ]
     <|
         List.map
-            (Button.renderElement cfg)
+            (Button.withSize Size.medium >> Button.renderElement cfg)
             buttons
 
 
@@ -89,46 +118,29 @@ desktopHeaderRow cfg title icon =
 
 
 mobileView : RenderConfig -> Dialog.Dialog msg -> Element msg
-mobileView cfg (Dialog.Dialog { title } { body, buttons }) =
+mobileView cfg (Dialog.Dialog { title, icon } { body, buttons }) =
     Element.column
-        [ Element.width fill
-        , Element.height fill
-        , Element.alignTop
+        [ mainBackground
+        , Element.centerX
+        , Element.centerY
+        , Element.padding 32
         , Element.spacing 8
-        , mainBackground
         ]
-        [ mobileHeaderRow cfg title
+        [ mobileHeader cfg title icon
         , body
-            |> Element.el
-                [ Element.width fill
-                , Element.paddingEach
-                    { top = 0, left = 20, right = 20, bottom = 0 }
-                ]
-        , buttonsRow cfg buttons
-            |> Element.el
-                [ Element.paddingEach
-                    { left = 20
-                    , right = 20
-                    , top = 0
-                    , bottom = 20
-                    }
-                ]
+        , buttonsColumn cfg buttons
         ]
 
 
-mobileHeaderRow : RenderConfig -> String -> Element msg
-mobileHeaderRow cfg title =
-    Element.row
-        [ Element.width fill
-        , Element.padding 0
-        ]
-        [ titleText cfg
-            title
-            |> Element.el
-                [ Element.paddingEach
-                    { top = 40, left = 20, right = 0, bottom = 0 }
-                , Element.width fill
-                ]
+mobileHeader : RenderConfig -> String -> Icon -> Element msg
+mobileHeader cfg title icon =
+    Element.column
+        [ Element.spacing 12 ]
+        [ icon
+            |> Icon.withColor headerColor
+            |> Icon.renderElement cfg
+            |> Element.el [ Element.alignLeft ]
+        , titleText cfg title
         ]
 
 
