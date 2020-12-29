@@ -36,7 +36,6 @@ dialog cfg =
             [ iconsSvgSprite
             , Dialog.dialog "Dialog title"
                 (Icon.warning "Warning dialog")
-                Msg.NoOp
                 |> Dialog.withBody
                     ("Dialog body text" |> Text.body2 |> Text.renderElement cfg)
                 |> Dialog.withButtons buttons

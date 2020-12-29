@@ -6,9 +6,8 @@ module UI.V2.Dialog exposing
 
 {-| The `UI.V2.Dialog` is a component for displaying dialogs and modals.
 
-User must specify a title, an icon to be displayed in title and a close message
-to construct it. Body and buttons can be specified optionally as in the
-following pipeline:
+User must specify a title and an icon to be displayed in the title to construct
+it. Body and buttons can be specified optionally as in the following pipeline:
 
     dialog "Title" Icon.warning closeMsg
         |> withBody ("Body text" |> Text.body2 |> Text.renderElement cfg)
@@ -45,29 +44,27 @@ import UI.Utils.Element as Element
 rendering.
 -}
 type Dialog msg
-    = Dialog (Properties msg) (Options msg)
+    = Dialog Properties (Options msg)
 
 
-type alias Properties msg =
+type alias Properties =
     { title : String
     , icon : Icon
-    , close : msg
     }
 
 
 type alias Options msg =
     { body : Element msg
     , buttons : List (Button msg)
-    , closeOnOverlayClick : Bool
+    , overlayClickCloseMsg : Maybe msg
     }
 
 
-{-| Constructs a dialog by receiving its title, icon in the title and a close
-message.
+{-| Constructs a dialog by receiving its title and an icon in the title.
 -}
-dialog : String -> Icon -> msg -> Dialog msg
-dialog title icon closeMsg =
-    Dialog (Properties title icon closeMsg) (Options Element.none [] False)
+dialog : String -> Icon -> Dialog msg
+dialog title icon =
+    Dialog (Properties title icon) (Options Element.none [] Nothing)
 
 
 
@@ -77,15 +74,14 @@ dialog title icon closeMsg =
 {-| Transforms the message produced by the component.
 -}
 map : (a -> b) -> Dialog a -> Dialog b
-map applier (Dialog { title, icon, close } { body, buttons, closeOnOverlayClick }) =
+map applier (Dialog { title, icon } { body, buttons, overlayClickCloseMsg }) =
     Dialog
         { title = title
         , icon = icon
-        , close = applier close
         }
         { body = Element.map applier body
         , buttons = List.map (Button.map applier) buttons
-        , closeOnOverlayClick = closeOnOverlayClick
+        , overlayClickCloseMsg = Maybe.map applier overlayClickCloseMsg
         }
 
 

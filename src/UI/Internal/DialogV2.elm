@@ -6,18 +6,16 @@ import Element.Events as Events
 import UI.Button as Button exposing (Button)
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Colors exposing (mainBackground, overlayBackground)
-import UI.Internal.RenderConfig exposing (RenderConfig, localeTerms)
+import UI.Internal.RenderConfig exposing (RenderConfig)
 import UI.Palette as Palette
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
-import UI.Size as Size
 import UI.Text as Text
-import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element
 import UI.V2.Dialog as Dialog
 
 
 dialogViewV2 : RenderConfig -> Dialog.Dialog msg -> Element msg
-dialogViewV2 cfg ((Dialog.Dialog { close } { closeOnOverlayClick }) as dlg) =
+dialogViewV2 cfg ((Dialog.Dialog _ { overlayClickCloseMsg }) as dlg) =
     if RenderConfig.isMobile cfg then
         mobileView cfg dlg
 
@@ -26,7 +24,7 @@ dialogViewV2 cfg ((Dialog.Dialog { close } { closeOnOverlayClick }) as dlg) =
             |> Element.el
                 [ Element.width fill
                 , Element.height fill
-                , Element.behindContent (blackBlock close closeOnOverlayClick)
+                , Element.behindContent (blackBlock overlayClickCloseMsg)
                 ]
 
 
@@ -91,7 +89,7 @@ desktopHeaderRow cfg title icon =
 
 
 mobileView : RenderConfig -> Dialog.Dialog msg -> Element msg
-mobileView cfg (Dialog.Dialog { title, close } { body, buttons }) =
+mobileView cfg (Dialog.Dialog { title } { body, buttons }) =
     Element.column
         [ Element.width fill
         , Element.height fill
@@ -99,7 +97,7 @@ mobileView cfg (Dialog.Dialog { title, close } { body, buttons }) =
         , Element.spacing 8
         , mainBackground
         ]
-        [ mobileHeaderRow cfg close title
+        [ mobileHeaderRow cfg title
         , body
             |> Element.el
                 [ Element.width fill
@@ -118,8 +116,8 @@ mobileView cfg (Dialog.Dialog { title, close } { body, buttons }) =
         ]
 
 
-mobileHeaderRow : RenderConfig -> msg -> String -> Element msg
-mobileHeaderRow cfg close title =
+mobileHeaderRow : RenderConfig -> String -> Element msg
+mobileHeaderRow cfg title =
     Element.row
         [ Element.width fill
         , Element.padding 0
@@ -131,27 +129,7 @@ mobileHeaderRow cfg close title =
                     { top = 40, left = 20, right = 0, bottom = 0 }
                 , Element.width fill
                 ]
-        , closeButton cfg close
         ]
-
-
-closeButton : RenderConfig -> msg -> Element msg
-closeButton cfg close =
-    (cfg |> localeTerms >> .dialog >> .close)
-        |> Icon.close
-        |> Icon.withSize Size.small
-        |> Icon.withColor
-            (Palette.color Palette.toneGray Palette.brightnessLight)
-        |> Icon.renderElement cfg
-        |> Element.el
-            (ARIA.toElementAttributes ARIA.roleButton
-                ++ [ Events.onClick close
-                   , Element.pointer
-                   , Element.padding 12
-                   , Element.height shrink
-                   , Element.alignTop
-                   ]
-            )
 
 
 titleText : RenderConfig -> String -> Element msg
@@ -169,16 +147,17 @@ headerColor =
 {-| Making overlay part of the dialog since it is almost always used with it and
 almost all of the major UI frameworks follow this practice.
 -}
-blackBlock : msg -> Bool -> Element msg
-blackBlock close shouldCloseOnClick =
+blackBlock : Maybe msg -> Element msg
+blackBlock close =
     Element.el
         [ Element.width fill
         , Element.height fill
         , overlayBackground
-        , if shouldCloseOnClick then
-            Events.onClick close
+        , case close of
+            Just msg ->
+                Events.onClick msg
 
-          else
-            Element.width fill
+            Nothing ->
+                Element.width fill
         ]
         Element.none
