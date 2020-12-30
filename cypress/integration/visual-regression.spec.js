@@ -49,9 +49,14 @@ describe('Percy Snapshots', () => {
   })
 
   describe('Dialog', () => {
-    it('Creates a snapshot of dialog component', () => {
-      cy.visit('/#Basics/Dialog/Dialog')
-      cy.percySnapshot('Dialog')
+    it('Creates a snapshot of desktop dialog view', () => {
+      cy.visit('/#Basics/Dialog/Dialog%20Desktop')
+      cy.percySnapshot('Dialog Desktop')
+    })
+
+    it('Creates a snapshot of mobile dialog view', () => {
+      cy.visit('/#Basics/Dialog/Dialog%20Mobile')
+      cy.percySnapshot('Dialog Mobile')
     })
   })
 
