@@ -1,7 +1,7 @@
 module Dialog exposing (stories)
 
-import Element
-import Msg
+import Element exposing (Element)
+import Msg exposing (Msg)
 import PluginOptions exposing (defaultWithMenu)
 import UI.Button as Button exposing (Button)
 import UI.Icon as Icon
@@ -22,6 +22,19 @@ stories cfg =
         ]
 
 
+dialog : RenderConfig -> Element Msg
+dialog cfg =
+    Dialog.dialog demoText.title
+        (Icon.warning demoText.icon)
+        |> Dialog.withBody
+            (demoText.body
+                |> Text.body2
+                |> Text.renderElement cfg
+            )
+        |> Dialog.withButtons buttons
+        |> dialogViewV2 cfg
+
+
 dialogDesktop : RenderConfig -> ExplorerStory
 dialogDesktop cfg =
     story
@@ -34,12 +47,7 @@ dialogDesktop cfg =
             , Element.width Element.fill
             ]
             [ iconsSvgSprite
-            , Dialog.dialog demoText.title
-                (Icon.warning demoText.icon)
-                |> Dialog.withBody
-                    (demoText.body |> Text.body2 |> Text.renderElement cfg)
-                |> Dialog.withButtons buttons
-                |> dialogViewV2 cfg
+            , dialog cfg
             ]
         , { defaultWithMenu | code = code }
         )
@@ -55,16 +63,7 @@ dialogMobile =
             , Element.centerX
             ]
             [ iconsSvgSprite
-            , Dialog.dialog demoText.title
-                (Icon.warning demoText.icon)
-                |> Dialog.withBody
-                    (demoText.body
-                        |> Text.body2
-                        |> Text.renderElement
-                            mobileCfg
-                    )
-                |> Dialog.withButtons buttons
-                |> dialogViewV2 mobileCfg
+            , dialog mobileCfg
             ]
         , { defaultWithMenu | code = code }
         )
