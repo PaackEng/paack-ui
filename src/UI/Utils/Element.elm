@@ -76,10 +76,12 @@ svg altText attrs children =
         |> Element.el (ARIA.toElementAttributes <| ARIA.roleImage altText)
 
 
+{-| Utility to conditionally render an element
 
-{- Utility to conditionally render an element -}
+    Element.row [] []
+        |> renderIf model.shouldDisplay
 
-
+-}
 renderIf : Bool -> Element msg -> Element msg
 renderIf shouldRender view =
     if shouldRender then
