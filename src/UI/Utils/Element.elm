@@ -1,5 +1,6 @@
 module UI.Utils.Element exposing
-    ( colorSetOpacity, colorTransition
+    ( renderIf
+    , colorSetOpacity, colorTransition
     , desktopMaximum
     , svg, title, maxHeightVH, maxHeightPct, minHeightVH
     , disabled, onEnterPressed, onIndividualClick
@@ -8,6 +9,11 @@ module UI.Utils.Element exposing
     )
 
 {-| Utilities and functionality that are not covered by Elm UI.
+
+
+# Render
+
+@docs renderIf
 
 
 # Color
@@ -68,6 +74,22 @@ svg altText attrs children =
         |> Svg.svg attrs
         |> Element.html
         |> Element.el (ARIA.toElementAttributes <| ARIA.roleImage altText)
+
+
+{-| Utility to conditionally render an element. **This is not meant for
+big/complex view functions due to performance implications**.
+
+    Element.row [] []
+        |> renderIf model.shouldDisplay
+
+-}
+renderIf : Bool -> Element msg -> Element msg
+renderIf shouldRender view =
+    if shouldRender then
+        view
+
+    else
+        Element.none
 
 
 {-| All the attributes that define an element as disabled for modifying.
