@@ -76,7 +76,8 @@ svg altText attrs children =
         |> Element.el (ARIA.toElementAttributes <| ARIA.roleImage altText)
 
 
-{-| Utility to conditionally render an element
+{-| Utility to conditionally render an element. **This is not meant for
+big/complex view functions due to performance implications**.
 
     Element.row [] []
         |> renderIf model.shouldDisplay
