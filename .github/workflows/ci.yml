@@ -33,14 +33,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-yarn-
 
-     - name: Install dependencies
-       run: yarn install
-
-     - name: Run linter
-       run: npx elm-format --validate src/ showcase/
-
-     - name: Run elm-review
-       run: yarn run review
+     - uses: PaackEng/elm-lint-action@main
 
   validate:
      runs-on: ubuntu-latest
