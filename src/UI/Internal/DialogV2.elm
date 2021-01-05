@@ -125,6 +125,7 @@ mobileView cfg (Dialog.Dialog { title, icon } { body, buttons }) =
         , Element.centerY
         , Element.padding 32
         , Element.spacing 8
+        , Border.rounded 6
         ]
         [ mobileHeader cfg title icon
         , body
