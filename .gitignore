@@ -2,6 +2,8 @@
 .DS_Store
 
 .cache/
+.parcel-cache/
+
 node_modules/
 yarn-error.log
 docs/elm-stuff/
