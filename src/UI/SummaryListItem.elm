@@ -2,23 +2,23 @@ module UI.SummaryListItem exposing (view)
 
 {-| SummaryListItem is represents a single item in a list that is usually selectable or searchable. This component is meant to be used with [`ListView`](UI-ListView).
 
-import UI.SummaryListItem as Summary
+    import UI.SummaryListItem as Summary
 
-listItemView : AppConfig -> Bool -> Item -> Element Msg
-listItemView appConfig isSelected item =
-Summary.view appConfig.renderConfig
-isSelected
-item.name
-item.subtitle
-(Badge.grayLight "badge")
+    listItemView : AppConfig -> Bool -> Item -> Element Msg
+    listItemView appConfig isSelected item =
+        Summary.view appConfig.renderConfig
+            isSelected
+            item.name
+            item.subtitle
+            (Badge.grayLight "badge")
 
-listView : AppConfig -> Model -> ListView Item Msg
-listView appConfig model =
-listItemView appConfig
-|> ListView.selectList Msg.Select Item.id
-|> ListView.withSearchField (searchField appConfig model)
-|> ListView.withActionBar (actionBar appConfig)
-|> ListView.withDomId "item-list"
+    listView : AppConfig -> Model -> ListView Item Msg
+    listView appConfig model =
+        listItemView appConfig
+            |> ListView.selectList Msg.Select Item.id
+            |> ListView.withSearchField (searchField appConfig model)
+            |> ListView.withActionBar (actionBar appConfig)
+            |> ListView.withDomId "item-list"
 
 
 # Rendering
