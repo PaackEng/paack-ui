@@ -8,7 +8,7 @@ import Tables.Model as Stories
 import Tables.Msg as Stories
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Tables.Common as Tables
-import UI.Tables.Stateful as Stateful exposing (StatefulTable)
+import UI.Tables.Stateful as Stateful
 import UI.Tables.Stateless as Stateless
 import UI.Utils.TypeNumbers as T
 import UIExplorer exposing (storiesOf)
