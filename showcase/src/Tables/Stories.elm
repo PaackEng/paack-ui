@@ -1,6 +1,6 @@
 module Tables.Stories exposing (stories, update)
 
-import Element exposing (Element, fill)
+import Element exposing (Element, fill, px)
 import Msg exposing (Msg)
 import Return exposing (Return)
 import Tables.Book as Book exposing (Book)
@@ -53,11 +53,11 @@ desktopTableStory renderConfig =
     storyWithModel
         ( "Desktop"
         , \{ tablesStories } ->
-            demoTable
+            demoTable renderConfig
                 Book.tablePixelColumns
                 tablesStories.mainTableState
                 Stories.ForMain
-                |> withIcons renderConfig
+                |> withIcons
         , reducedToDocs "Tables-Stateful"
         )
 
@@ -67,21 +67,26 @@ mobileTableStory =
     storyWithModel
         ( "Mobile"
         , \{ tablesStories } ->
-            demoTable
+            demoTable mobileCfg
                 Book.tablePixelColumns
                 tablesStories.mainTableState
                 Stories.ForMain
-                |> withIcons mobileCfg
+                |> Element.el
+                    [ Element.width fill
+                    , Element.height (px 450)
+                    ]
+                |> withIcons
         , reducedToDocs "Tables-Stateful"
         )
 
 
 demoTable :
-    Tables.Columns T.Five
+    RenderConfig
+    -> Tables.Columns T.Five
     -> Stateful.State Msg Book T.Five
     -> (Stateful.Msg Book -> Stories.Msg)
-    -> StatefulTable Msg Book T.Five
-demoTable columns state msg =
+    -> Element Msg
+demoTable renderConfig columns state msg =
     Stateful.table
         { toExternalMsg = msg >> Msg.TablesStoriesMsg
         , columns = columns
@@ -94,12 +99,12 @@ demoTable columns state msg =
             }
         |> Stateful.withWidth Element.shrink
         |> Stateful.withItems Book.books
-
-
-withIcons : RenderConfig -> StatefulTable Msg Book T.Five -> Element Msg
-withIcons renderConfig table =
-    table
         |> Stateful.renderElement renderConfig
+
+
+withIcons : Element Msg -> Element Msg
+withIcons table =
+    table
         |> List.singleton
         |> (::) iconsSvgSprite
         |> Element.wrappedRow [ Element.width fill ]
@@ -137,13 +142,11 @@ selectableTableStory renderConfig =
     storyWithModel
         ( "Selectable"
         , \{ tablesStories } ->
-            withIcons
-                renderConfig
-                (demoTable
-                    Book.tablePixelColumns
-                    tablesStories.selecTableState
-                    Stories.ForSelectable
-                )
+            demoTable renderConfig
+                Book.tablePixelColumns
+                tablesStories.selecTableState
+                Stories.ForSelectable
+                |> withIcons
         , reducedToDocs "Tables-Stateful"
         )
 
@@ -153,10 +156,10 @@ portionColumnsTable renderConfig =
     storyWithModel
         ( "Portion Columns"
         , \{ tablesStories } ->
-            demoTable
+            demoTable renderConfig
                 Book.tablePortionColumns
                 tablesStories.selecTableState
                 Stories.ForSelectable
-                |> withIcons renderConfig
+                |> withIcons
         , reducedToDocs "Tables-Stateful"
         )
