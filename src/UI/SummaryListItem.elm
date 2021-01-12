@@ -1,5 +1,32 @@
 module UI.SummaryListItem exposing (view)
 
+{-| SummaryListItem is represents a single item in a list that is usually selectable or searchable. This component is meant to be used with [`ListView`](UI-ListView).
+
+    import UI.SummaryListItem as Summary
+
+    listItemView : AppConfig -> Bool -> Item -> Element Msg
+    listItemView appConfig isSelected item =
+        Summary.view appConfig.renderConfig
+            isSelected
+            item.name
+            item.subtitle
+            (Badge.grayLight "badge")
+
+    listView : AppConfig -> Model -> ListView Item Msg
+    listView appConfig model =
+        listItemView appConfig
+            |> ListView.selectList Msg.Select Item.id
+            |> ListView.withSearchField (searchField appConfig model)
+            |> ListView.withActionBar (actionBar appConfig)
+            |> ListView.withDomId "item-list"
+
+
+# Rendering
+
+@docs view
+
+-}
+
 import Element exposing (Element, fill)
 import Element.Keyed as Keyed
 import UI.Badge as Badge exposing (Badge)
@@ -22,6 +49,10 @@ type alias ColorsHelper =
     }
 
 
+{-| This component does not use a builder pattern so this is the only way to
+render it. The `isSelected` param alters its colors
+for contrast
+-}
 view : RenderConfig -> Bool -> String -> String -> Badge -> Element msg
 view renderConfig isSelected title caption badge =
     let
