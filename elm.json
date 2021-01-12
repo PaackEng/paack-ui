@@ -19,6 +19,7 @@
         "UI.Radio",
         "UI.RenderConfig",
         "UI.Size",
+        "UI.SummaryListItem",
         "UI.Tables.Common",
         "UI.Tables.Stateful",
         "UI.Tables.Stateless",
