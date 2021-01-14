@@ -1,6 +1,6 @@
 module Layouts.Stories exposing (stories, update)
 
-import Element exposing (Element, fill, maximum)
+import Element exposing (Element, fill, maximum, px)
 import Layouts.Model as LayoutsModel
 import Layouts.Msg as LayoutsMsg
 import Model exposing (Model)
@@ -54,6 +54,7 @@ view renderConfig { layoutsStories } =
         , selectedView = selectedView renderConfig layoutsStories
         }
         |> UI.Internal.NavigationContainer.toShowcaseElement
+        |> Element.el [ Element.height (px 450) ]
 
 
 selectedView : RenderConfig -> LayoutsModel.Model -> Element msg
