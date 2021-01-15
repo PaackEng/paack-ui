@@ -3104,23 +3104,16 @@ elm-hot@^1.1.4:
   resolved "https://registry.yarnpkg.com/elm-hot/-/elm-hot-1.1.5.tgz#bba309b592d39b5c3195c3c6f608f36b96c23b89"
   integrity sha512-HSMlAr6INTV82wkpPNG0zsHoJXo/04GwG7bnhFX8s4zyIbbzuJAovsdo27FAT6/NKx5IVTXGI+IFcK9Z7oN1Tw==
 
-elm-json@~0.2.7:
-  version "0.2.8"
-  resolved "https://registry.yarnpkg.com/elm-json/-/elm-json-0.2.8.tgz#20ec42039b62c624d1369cda6318e160ad553094"
-  integrity sha512-YfK39CNrHjB4LMnas6aAb2LP37YgqAnh69bWD7ojAs7lBNNkWIeBifeszAfmapylQt1MVuwj6zPPYwrqRQXEBA==
-  dependencies:
-    binwrap "^0.2.2"
-
-elm-review@^2.3.3:
-  version "2.3.3"
-  resolved "https://registry.yarnpkg.com/elm-review/-/elm-review-2.3.3.tgz#eb21a306213b0319242bef6e18b6538d05174719"
-  integrity sha512-1TiTnEXzpzACrc/JdB3tvmgNf5Qd0RyX8wbBqPPuc1aWvHHvPf6wi/ncz1gcILFAObr1zquCePkJkoW0uoZiBA==
+elm-review@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/elm-review/-/elm-review-2.4.0.tgz#8bc1d77669a7e6f12de023a8db465e596f2adb27"
+  integrity sha512-UXxXpmMi7/pbWGbUPB3WKEmylaANH53x/fsLj9YT742l2LBLsQxa6Y3k9RmOG+Sy6JP+njAnODi/irDBwYfh7g==
   dependencies:
     chalk "^4.0.0"
     chokidar "^3.4.0"
     cross-spawn "^7.0.3"
     cross-spawn-promise "^0.10.2"
-    elm-json "~0.2.7"
+    elm-tooling "^1.0.1"
     find-up "^4.1.0"
     folder-hash "^3.3.0"
     fs-extra "^9.0.0"
@@ -3152,6 +3145,11 @@ elm-test@^0.19.1-revision4:
     temp "^0.9.1"
     which "^2.0.2"
     xmlbuilder "^15.1.0"
+
+elm-tooling@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/elm-tooling/-/elm-tooling-1.0.1.tgz#2e98ddbbfd4bd1ffc370f7288417b9154cf74daa"
+  integrity sha512-JFc76hek44zBsjI2ATJL4ZOv8zTQDmjjf1pz6EKgDj3rXhriFMzSIfzPcfvBPFBtOmDwPm2pSS893XZuHIcDow==
 
 elm@^0.19.1-3:
   version "0.19.1-3"
