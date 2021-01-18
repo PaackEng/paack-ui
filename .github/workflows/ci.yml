@@ -7,9 +7,8 @@ on:
     tags:
       - '*'
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  lint:
+  validate:
    runs-on: ubuntu-latest
    if: github.event.pull_request.draft == false
 
@@ -33,28 +32,10 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-yarn-
 
-     - name: Install dependencies
-       run: yarn install
-
-     - name: Run linter
-       run: npx elm-format --validate src/ showcase/
-
-     - name: Run elm-review
-       run: yarn run review
-
-  validate:
-     runs-on: ubuntu-latest
-     if: github.event.pull_request.draft == false
-
-     steps:
-       - uses: actions/checkout@v2
-
-       - name: Validate showcase code
-         working-directory: ./showcase
-         run: npx elm make src/Main.elm --output /dev/null
-
-       - name: Run docs
-         run: npx elm make --docs=/tmp/docs.json
+     - uses: PaackEng/elm-lint-action@main
+       with:
+         compile-working-directory: 'showcase'
+         extra-path: 'showcase'
 
   tests:
      runs-on: ubuntu-latest
