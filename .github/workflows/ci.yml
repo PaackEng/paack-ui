@@ -34,6 +34,7 @@ jobs:
 
      - uses: PaackEng/elm-lint-action@main
        with:
+         compile-working-directory: 'showcase'
          extra-path: 'showcase'
 
   tests:
