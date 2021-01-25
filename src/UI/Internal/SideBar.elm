@@ -146,6 +146,7 @@ viewSide cfg proportional (Menu.Menu prop opt) =
     in
     Element.column
         [ height fill
+        , paddingXY 6 0
         , adaptWidth
         , Background.color Colors.gray.lightest
         ]
@@ -255,7 +256,12 @@ pagesView cfg pages navExpanded =
                 padding 0
 
         spacingAttr =
-            spacing 12
+            spacing <|
+                if navExpanded then
+                    8
+
+                else
+                    0
 
         attrs =
             [ height fill
@@ -302,12 +308,11 @@ actionsView cfg actions navExpanded =
             ]
 
 
-pageItem : RenderConfig -> Icon -> Link -> Bool -> Element msg
-pageItem cfg icon link isSelected =
+selectedItemOutline : Bool -> List (Element msg) -> Element msg
+selectedItemOutline isSelected =
     let
         baseAttrs =
             [ width fill
-            , paddingXY 4 0
             , Primitives.defaultRoundedBorders
             , spacing 4
             ]
@@ -322,11 +327,18 @@ pageItem cfg icon link isSelected =
 
             else
                 baseAttrs
+    in
+    Element.row attrs
 
+
+pageItem : RenderConfig -> Icon -> Link -> Bool -> Element msg
+pageItem cfg icon link isSelected =
+    let
         textColor =
             Palette.color tonePrimary brightnessMiddle
     in
-    Element.row attrs
+    selectedItemOutline
+        isSelected
         [ icon
             |> Icon.withSize Size.small
             |> Icon.withColor textColor
@@ -344,9 +356,11 @@ slimPageItem : RenderConfig -> Icon -> Link -> Bool -> Element msg
 slimPageItem cfg icon link isSelected =
     icon
         |> Icon.withSize Size.small
-        |> Icon.withColor (slimIconColor isSelected)
+        |> Icon.withColor Palette.primary
         |> Icon.renderElement cfg
         |> Element.el slimIconAttr
+        |> List.singleton
+        |> selectedItemOutline isSelected
         |> Link.wrapElement cfg [] link
 
 
@@ -377,7 +391,7 @@ slimActionItem : RenderConfig -> Icon -> msg -> Element msg
 slimActionItem cfg icon msg =
     icon
         |> Icon.withSize Size.small
-        |> Icon.withColor (slimIconColor True)
+        |> Icon.withColor Palette.primary
         |> Icon.renderElement cfg
         |> Element.el
             (Element.pointer
@@ -397,16 +411,7 @@ iconAttr =
 
 slimIconAttr : List (Attribute msg)
 slimIconAttr =
-    [ width (px 48)
+    [ width (px 40)
+    , padding 10
     , Font.center
     ]
-
-
-slimIconColor : Bool -> Palette.Color
-slimIconColor isSelected =
-    if isSelected then
-        Palette.color tonePrimary brightnessMiddle
-
-    else
-        Palette.color tonePrimary brightnessMiddle
-            |> Palette.withAlpha 0.4
