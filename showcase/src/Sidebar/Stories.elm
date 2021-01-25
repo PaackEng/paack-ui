@@ -1,0 +1,79 @@
+module Sidebar.Stories exposing (stories, update)
+
+import Element exposing (Element, fill, height, maximum, px)
+import Model exposing (Model)
+import Msg exposing (Msg)
+import PluginOptions exposing (defaultWithoutMenu)
+import Return exposing (Return)
+import Sidebar.Model as SidebarModel
+import Sidebar.Msg as SidebarMsg
+import Tables.Book exposing (Book, books)
+import UI.Badge as Badge
+import UI.Internal.Menu as Menu
+import UI.Internal.NavigationContainer
+import UI.Internal.SideBar as Sidebar
+import UI.Layout.SplitSelectable as SplitSelectable
+import UI.ListView as ListView exposing (ListView)
+import UI.Palette as Palette exposing (brightnessLighter, tonePrimary)
+import UI.RenderConfig exposing (RenderConfig)
+import UI.SummaryListItem as Summary
+import UI.Text as Text
+import UIExplorer exposing (storiesOf)
+import Utils
+    exposing
+        ( ExplorerStory
+        , ExplorerUI
+        , iconsSvgSprite
+        , prettifyElmCode
+        , story
+        , storyBorder
+        , storyWithModel
+        )
+
+
+update : SidebarMsg.Msg -> SidebarModel.Model -> Return SidebarMsg.Msg SidebarModel.Model
+update msg model =
+    case msg of
+        SidebarMsg.ToggleSidebar expanded ->
+            ( { model | expanded = expanded }, Cmd.none )
+
+
+stories : RenderConfig -> ExplorerUI
+stories cfg =
+    storiesOf
+        "Sidebar"
+        [ demo cfg
+        ]
+
+
+demo : RenderConfig -> ExplorerStory
+demo renderConfig =
+    storyWithModel
+        ( "Sidebar"
+        , view renderConfig
+        , { defaultWithoutMenu | code = code }
+        )
+
+
+view : RenderConfig -> Model -> Element Msg
+view renderConfig model =
+    Element.column [ height (px 600) ]
+        [ iconsSvgSprite
+        , Sidebar.desktopColumn renderConfig Element.none <|
+            Menu.default
+                (Msg.SidebarStoriesMsg << SidebarMsg.ToggleSidebar)
+                model.sidebarStories.expanded
+        ]
+
+
+code : String
+code =
+    prettifyElmCode """
+SplitSelectable.desktop renderConfig
+    { getKey = .isbn
+    , items = books
+    , listView = listView renderConfig layoutsStories
+    , selected = model.selected
+    , selectedView = selectedView model
+    }
+"""

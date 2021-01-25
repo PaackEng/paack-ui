@@ -17,6 +17,7 @@ import Palette
 import PluginOptions exposing (PluginOptions)
 import Radio.Stories as Radio
 import Return as R
+import Sidebar.Stories as Sidebar
 import Sizes
 import Tables.Stories as Tables
 import Tabs.Stories as Tabs
@@ -123,6 +124,7 @@ main =
             "Complex components"
             [ Tables.stories renderConfig
             , Paginators.stories renderConfig
+            , Sidebar.stories renderConfig
             ]
         |> exploreWithCategories config
 
@@ -178,6 +180,11 @@ updateStories msg ({ customModel } as model) =
         LayoutsStoriesMsg submsg ->
             Layouts.update submsg customModel.layoutsStories
                 |> R.map (\t -> { customModel | layoutsStories = t })
+                |> finishCustomUpdate model
+
+        SidebarStoriesMsg submsg ->
+            Sidebar.update submsg customModel.sidebarStories
+                |> R.map (\t -> { customModel | sidebarStories = t })
                 |> finishCustomUpdate model
 
         NoOp ->
