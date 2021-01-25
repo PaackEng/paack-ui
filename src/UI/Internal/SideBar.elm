@@ -290,7 +290,7 @@ selectedItemOutline isSelected =
         baseAttrs =
             [ width fill
             , Primitives.defaultRoundedBorders
-            , spacing 4
+            , spacing 8
             , padding 8
             ]
 
