@@ -40,6 +40,9 @@ update msg model =
         SidebarMsg.ToggleSidebar expanded ->
             ( { model | expanded = expanded }, Cmd.none )
 
+        SidebarMsg.NoOp ->
+            ( model, Cmd.none )
+
 
 stories : RenderConfig -> ExplorerUI
 stories cfg =
@@ -82,7 +85,11 @@ menu model =
               , isCurrent = True
               }
             ]
-        , actions = []
+        , actions =
+            [ { labeledIcon = Icon.logout "Logout"
+              , action = Msg.SidebarStoriesMsg <| SidebarMsg.NoOp
+              }
+            ]
         , logo = Nothing
         }
 

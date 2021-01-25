@@ -40,7 +40,10 @@ import UI.Utils.Element as Element
 
 desktopColumn : RenderConfig -> Element msg -> Menu msg -> Element msg
 desktopColumn cfg page menu =
-    Element.row [ width fill, height fill ]
+    Element.row
+        [ width fill
+        , height fill
+        ]
         [ viewSide cfg False menu
         , Element.el
             [ width fill
@@ -132,7 +135,7 @@ viewSide cfg proportional (Menu.Menu prop opt) =
                     width (fillPortion 75)
 
                 else
-                    width (px 228)
+                    width (px 264)
 
             else
                 width shrink
@@ -146,8 +149,12 @@ viewSide cfg proportional (Menu.Menu prop opt) =
     in
     Element.column
         [ height fill
-        , paddingXY 6 0
         , adaptWidth
+        , if prop.isExpanded then
+            paddingXY 20 24
+
+          else
+            paddingXY 6 22
         , Background.color Colors.gray.lightest
         ]
         [ adaptHeader cfg (prop.toggleMsg (not prop.isExpanded)) opt.logo
@@ -211,13 +218,10 @@ slimHeaderView cfg toggleMsg _ =
         |> Element.el
             (headerButtonAttr toggleMsg
                 ++ [ Element.centerX
-
-                   -- It has 2 levels of padding, because of the extra padding.
-                   -- As we are trying to do the 8dot grid, the top field was set to 16px
                    , Element.paddingEach
-                        { top = 22
-                        , left = 8
-                        , right = 8
+                        { top = 0
+                        , left = 0
+                        , right = 0
                         , bottom = 44
                         }
                    ]
@@ -243,18 +247,6 @@ pagesView cfg pages navExpanded =
             else
                 slimPageItem cfg labeledIcon link isCurrent
 
-        paddingAttr =
-            if navExpanded then
-                paddingEach
-                    { top = 0
-                    , left = 4
-                    , right = 7
-                    , bottom = 0
-                    }
-
-            else
-                padding 0
-
         spacingAttr =
             spacing <|
                 if navExpanded then
@@ -267,7 +259,6 @@ pagesView cfg pages navExpanded =
             [ height fill
             , width fill
             , spacingAttr
-            , paddingAttr
             ]
     in
     pages
@@ -290,21 +281,6 @@ actionsView cfg actions navExpanded =
             [ height shrink
             , width fill
             , spacing 8
-            , if navExpanded then
-                paddingEach
-                    { top = 0
-                    , left = 4
-                    , right = 7
-                    , bottom = 16
-                    }
-
-              else
-                paddingEach
-                    { top = 0
-                    , left = 0
-                    , right = 0
-                    , bottom = 16
-                    }
             ]
 
 
@@ -412,6 +388,6 @@ iconAttr =
 slimIconAttr : List (Attribute msg)
 slimIconAttr =
     [ width (px 40)
-    , padding 10
+    , padding 8
     , Font.center
     ]
