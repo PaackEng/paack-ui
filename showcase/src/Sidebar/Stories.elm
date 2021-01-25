@@ -97,11 +97,8 @@ menu model =
 code : String
 code =
     prettifyElmCode """
-SplitSelectable.desktop renderConfig
-    { getKey = .isbn
-    , items = books
-    , listView = listView renderConfig layoutsStories
-    , selected = model.selected
-    , selectedView = selectedView model
-    }
+Sidebar.desktopColumn
+    renderConfig
+    (view model)
+    menuConfig
 """

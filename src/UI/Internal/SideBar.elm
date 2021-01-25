@@ -151,7 +151,7 @@ viewSide cfg proportional (Menu.Menu prop opt) =
         [ height fill
         , adaptWidth
         , if prop.isExpanded then
-            paddingXY 20 24
+            paddingXY 16 24
 
           else
             paddingXY 6 22
