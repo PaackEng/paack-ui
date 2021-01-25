@@ -160,7 +160,7 @@ viewSide cfg proportional (Menu.Menu prop opt) =
         [ adaptHeader cfg (prop.toggleMsg (not prop.isExpanded)) opt.logo
         , pagesView cfg
             opt.pages
-            prop.isExpanded
+            prop
         , actionsView cfg
             opt.actions
             prop.isExpanded
@@ -237,11 +237,11 @@ headerButtonAttr toggleMsg =
         :: ARIA.toElementAttributes ARIA.roleButton
 
 
-pagesView : RenderConfig -> List Menu.Page -> Bool -> Element msg
-pagesView cfg pages navExpanded =
+pagesView : RenderConfig -> List Menu.Page -> Menu.Properties msg -> Element msg
+pagesView cfg pages props =
     let
         item { labeledIcon, link, isCurrent } =
-            if navExpanded then
+            if props.isExpanded then
                 pageItem cfg labeledIcon link isCurrent
 
             else
@@ -249,7 +249,7 @@ pagesView cfg pages navExpanded =
 
         spacingAttr =
             spacing <|
-                if navExpanded then
+                if props.isExpanded then
                     8
 
                 else
@@ -291,6 +291,7 @@ selectedItemOutline isSelected =
             [ width fill
             , Primitives.defaultRoundedBorders
             , spacing 4
+            , padding 8
             ]
 
         selectedColor =
@@ -319,7 +320,7 @@ pageItem cfg icon link isSelected =
             |> Icon.withSize Size.small
             |> Icon.withColor textColor
             |> Icon.renderElement cfg
-            |> Element.el iconAttr
+            |> Element.el [ Font.center ]
         , Icon.getHint icon
             |> Text.body1
             |> Text.withColor textColor
@@ -334,7 +335,7 @@ slimPageItem cfg icon link isSelected =
         |> Icon.withSize Size.small
         |> Icon.withColor Palette.primary
         |> Icon.renderElement cfg
-        |> Element.el slimIconAttr
+        |> Element.el [ Font.center ]
         |> List.singleton
         |> selectedItemOutline isSelected
         |> Link.wrapElement cfg [] link
@@ -355,7 +356,7 @@ actionItem cfg icon msg =
             |> Icon.withSize Size.small
             |> Icon.withColor (Palette.color tonePrimary brightnessMiddle)
             |> Icon.renderElement cfg
-            |> Element.el iconAttr
+            |> Element.el [ Font.center ]
         , Icon.getHint icon
             |> Text.body1
             |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
@@ -372,22 +373,7 @@ slimActionItem cfg icon msg =
         |> Element.el
             (Element.pointer
                 :: Events.onClick msg
-                :: slimIconAttr
-                ++ ARIA.toElementAttributes ARIA.roleButton
+                :: Element.centerX
+                :: Font.center
+                :: ARIA.toElementAttributes ARIA.roleButton
             )
-
-
-iconAttr : List (Attribute msg)
-iconAttr =
-    [ width (px 32)
-    , paddingXY 0 6
-    , Font.center
-    ]
-
-
-slimIconAttr : List (Attribute msg)
-slimIconAttr =
-    [ width (px 40)
-    , padding 8
-    , Font.center
-    ]
