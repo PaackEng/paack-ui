@@ -164,10 +164,10 @@ headerView cfg toggleMsg logo =
     let
         attr =
             [ paddingEach
-                { top = 20
+                { top = 22
                 , left = 32
-                , right = 20
-                , bottom = 96
+                , right = 8
+                , bottom = 44
                 }
             , width fill
             ]
@@ -189,7 +189,7 @@ headerView cfg toggleMsg logo =
         closeButton =
             (cfg |> localeTerms >> .sidebar >> .collapse)
                 |> Icon.close
-                |> Icon.withSize Size.extraSmall
+                |> Icon.withSize Size.small
                 |> Icon.withColor (Palette.color toneGray brightnessLight)
                 |> Icon.renderElement cfg
                 |> Element.el (headerButtonAttr toggleMsg)
@@ -205,7 +205,7 @@ slimHeaderView cfg toggleMsg _ =
     (cfg |> localeTerms >> .sidebar >> .expand)
         |> Icon.sandwichMenu
         |> Icon.withColor Palette.grayLight1
-        |> Icon.withSize Size.extraSmall
+        |> Icon.withSize Size.small
         |> Icon.renderElement cfg
         |> Element.el
             (headerButtonAttr toggleMsg
@@ -213,7 +213,12 @@ slimHeaderView cfg toggleMsg _ =
 
                    -- It has 2 levels of padding, because of the extra padding.
                    -- As we are trying to do the 8dot grid, the top field was set to 16px
-                   , Element.paddingEach { top = 18, left = 18, right = 18, bottom = 88 }
+                   , Element.paddingEach
+                        { top = 22
+                        , left = 8
+                        , right = 8
+                        , bottom = 44
+                        }
                    ]
             )
 
@@ -250,11 +255,7 @@ pagesView cfg pages navExpanded =
                 padding 0
 
         spacingAttr =
-            if navExpanded then
-                spacing 14
-
-            else
-                spacing 12
+            spacing 12
 
         attrs =
             [ height fill
@@ -312,8 +313,7 @@ pageItem cfg icon link isSelected =
             ]
 
         selectedColor =
-            Colors.primary.darkest
-                |> Element.colorSetOpacity 0.12
+            Palette.primaryLight3 |> Palette.toElementColor
 
         attrs =
             if isSelected then

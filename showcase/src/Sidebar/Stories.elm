@@ -9,11 +9,14 @@ import Sidebar.Model as SidebarModel
 import Sidebar.Msg as SidebarMsg
 import Tables.Book exposing (Book, books)
 import UI.Badge as Badge
+import UI.Icon as Icon
 import UI.Internal.Menu as Menu
 import UI.Internal.NavigationContainer
 import UI.Internal.SideBar as Sidebar
 import UI.Layout.SplitSelectable as SplitSelectable
+import UI.Link as Link
 import UI.ListView as ListView exposing (ListView)
+import UI.NavigationContainer as Nav
 import UI.Palette as Palette exposing (brightnessLighter, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.SummaryListItem as Summary
@@ -59,11 +62,29 @@ view : RenderConfig -> Model -> Element Msg
 view renderConfig model =
     Element.column [ height (px 600) ]
         [ iconsSvgSprite
-        , Sidebar.desktopColumn renderConfig Element.none <|
-            Menu.default
-                (Msg.SidebarStoriesMsg << SidebarMsg.ToggleSidebar)
-                model.sidebarStories.expanded
+        , Sidebar.desktopColumn renderConfig Element.none <| menu model
         ]
+
+
+menu : Model -> Menu.Menu Msg
+menu model =
+    Menu.Menu
+        (Menu.Properties (Msg.SidebarStoriesMsg << SidebarMsg.ToggleSidebar)
+            model.sidebarStories.expanded
+        )
+        { pages =
+            [ { labeledIcon = Icon.notifications "Notifications"
+              , link = Link.link "/notifications"
+              , isCurrent = False
+              }
+            , { labeledIcon = Icon.toggle "Routes"
+              , link = Link.link "/routes"
+              , isCurrent = True
+              }
+            ]
+        , actions = []
+        , logo = Nothing
+        }
 
 
 code : String
