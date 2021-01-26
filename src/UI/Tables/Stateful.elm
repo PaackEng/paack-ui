@@ -49,7 +49,10 @@ Where `Book` is:
             |> column "Author" (columnWidthPixels 240)
             |> column "Year" (columnWidthPixels 120)
 
-    toTableRow { author, title, year } =
+    toTableRow =
+        { toKey = .title, toTableRowView}
+
+    toTableRowView { author, title, year } =
         rowEmpty
             |> rowCellText (Text.body1 title)
             |> rowCellText (Text.body2 author)
@@ -77,7 +80,7 @@ And on model:
     }
 
     { -...
-    , tableState = Stateful.withFilters Book.someFilters Stateful.init
+    , tableState = Stateful.stateWithFilters Book.someFilters Stateful.init
     }
 
 
