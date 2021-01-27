@@ -1,6 +1,8 @@
 module Sidebar.Stories exposing (stories, update)
 
 import Element exposing (Element, fill, height, maximum, px, width)
+import Html
+import Html.Attributes exposing (src)
 import Model exposing (Model)
 import Msg exposing (Msg)
 import PluginOptions exposing (defaultWithMenu)
@@ -114,7 +116,11 @@ menu model =
               , action = Msg.SidebarStoriesMsg <| SidebarMsg.NoOp
               }
             ]
-        , logo = Nothing
+        , logo =
+            Just
+                { hint = "Paack logo"
+                , body = Element.html <| Html.img [ src "logo.png" ] []
+                }
         }
 
 

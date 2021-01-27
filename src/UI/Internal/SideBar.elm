@@ -254,7 +254,7 @@ headerView cfg toggleMsg logo =
         attr =
             [ paddingEach
                 { top = 0
-                , left = 32
+                , left = 8
                 , right = 8
                 , bottom = 44
                 }
