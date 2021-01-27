@@ -68,7 +68,7 @@ desktopPersistent cfg page menu =
 desktopNonPersistent : RenderConfig -> Element msg -> Menu msg -> Element msg
 desktopNonPersistent cfg page (Menu.Menu prop opt) =
     let
-        alpha =
+        overlayAlpha =
             if prop.isExpanded then
                 0.5
 
@@ -79,7 +79,7 @@ desktopNonPersistent cfg page (Menu.Menu prop opt) =
             Element.el
                 (width fill
                     :: height fill
-                    :: Element.alpha alpha
+                    :: Element.alpha overlayAlpha
                     :: (Palette.black
                             |> Palette.toElementColor
                             |> Background.color

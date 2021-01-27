@@ -1,6 +1,6 @@
 module Sidebar.Stories exposing (stories, update)
 
-import Element exposing (Element, fill, height, maximum, px, width)
+import Element exposing (Element, height, px, width)
 import Html
 import Html.Attributes exposing (src)
 import Model exposing (Model)
@@ -9,20 +9,11 @@ import PluginOptions exposing (defaultWithMenu)
 import Return exposing (Return)
 import Sidebar.Model as SidebarModel
 import Sidebar.Msg as SidebarMsg
-import Tables.Book exposing (Book, books)
-import UI.Badge as Badge
 import UI.Icon as Icon
 import UI.Internal.Menu as Menu
-import UI.Internal.NavigationContainer
 import UI.Internal.SideBar as Sidebar
-import UI.Layout.SplitSelectable as SplitSelectable
 import UI.Link as Link
-import UI.ListView as ListView exposing (ListView)
-import UI.NavigationContainer as Nav
-import UI.Palette as Palette exposing (brightnessLighter, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
-import UI.SummaryListItem as Summary
-import UI.Text as Text
 import UIExplorer exposing (storiesOf)
 import Utils
     exposing
@@ -30,7 +21,6 @@ import Utils
         , ExplorerUI
         , iconsSvgSprite
         , prettifyElmCode
-        , story
         , storyBorder
         , storyWithModel
         )
