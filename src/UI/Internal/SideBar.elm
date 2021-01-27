@@ -1,4 +1,8 @@
-module UI.Internal.SideBar exposing (desktopColumn, mobileDrawer, nonPersistentSidebar)
+module UI.Internal.SideBar exposing
+    ( desktopNonPersistent
+    , desktopPersistent
+    , mobile
+    )
 
 import Element
     exposing
@@ -44,8 +48,8 @@ type alias SidebarConfig =
     }
 
 
-desktopColumn : RenderConfig -> Element msg -> Menu msg -> Element msg
-desktopColumn cfg page menu =
+desktopPersistent : RenderConfig -> Element msg -> Menu msg -> Element msg
+desktopPersistent cfg page menu =
     Element.row
         [ width fill
         , height fill
@@ -61,8 +65,8 @@ desktopColumn cfg page menu =
         ]
 
 
-nonPersistentSidebar : RenderConfig -> Element msg -> Menu msg -> Element msg
-nonPersistentSidebar cfg page (Menu.Menu prop opt) =
+desktopNonPersistent : RenderConfig -> Element msg -> Menu msg -> Element msg
+desktopNonPersistent cfg page (Menu.Menu prop opt) =
     let
         alpha =
             if prop.isExpanded then
@@ -124,14 +128,14 @@ sidebarTransitionContainer isExpanded =
     Element.el (height fill :: css transitionStyles)
 
 
-mobileDrawer :
+mobile :
     RenderConfig
     -> Element msg
     -> Menu msg
     -> ( String, Maybe String )
     -> Maybe ( msg, Maybe (Action.WithIcon msg) )
     -> Element msg
-mobileDrawer cfg page menu title maybeStack =
+mobile cfg page menu title maybeStack =
     let
         (Menu.Menu { isExpanded, toggleMsg } _) =
             menu

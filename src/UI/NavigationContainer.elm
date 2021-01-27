@@ -495,14 +495,14 @@ toBrowserDocument cfg page (Navigator model) =
         body =
             if hasMenu then
                 if RenderConfig.isMobile cfg then
-                    SideBar.mobileDrawer cfg
+                    SideBar.mobile cfg
                         contentBody
                         model.menu
                         seenTitle
                         maybeStack
 
                 else
-                    SideBar.desktopColumn cfg contentBody model.menu
+                    SideBar.desktopPersistent cfg contentBody model.menu
 
             else
                 contentBody

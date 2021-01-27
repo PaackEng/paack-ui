@@ -75,7 +75,7 @@ persistentView : RenderConfig -> Model -> Element Msg
 persistentView renderConfig model =
     Element.column [ height (px 600) ]
         [ iconsSvgSprite
-        , Sidebar.desktopColumn renderConfig page <| menu model
+        , Sidebar.desktopPersistent renderConfig page <| menu model
         ]
 
 
@@ -83,7 +83,7 @@ nonPersistentView : RenderConfig -> Model -> Element Msg
 nonPersistentView renderConfig model =
     Element.column [ height (px 600) ]
         [ iconsSvgSprite
-        , Sidebar.nonPersistentSidebar renderConfig page <| menu model
+        , Sidebar.desktopNonPersistent renderConfig page <| menu model
         ]
 
 
