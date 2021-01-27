@@ -1,6 +1,6 @@
 module Sidebar.Stories exposing (stories, update)
 
-import Element exposing (Element, fill, height, maximum, px)
+import Element exposing (Element, fill, height, maximum, px, width)
 import Model exposing (Model)
 import Msg exposing (Msg)
 import PluginOptions exposing (defaultWithoutMenu)
@@ -65,8 +65,13 @@ view : RenderConfig -> Model -> Element Msg
 view renderConfig model =
     Element.column [ height (px 600) ]
         [ iconsSvgSprite
-        , Sidebar.desktopColumn renderConfig Element.none <| menu model
+        , Sidebar.nonPersistentSidebar renderConfig page <| menu model
         ]
+
+
+page : Element Msg
+page =
+    storyBorder <| Element.el [ width (px 800), height (px 600) ] Element.none
 
 
 menu : Model -> Menu.Menu Msg

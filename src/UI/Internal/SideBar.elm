@@ -1,4 +1,4 @@
-module UI.Internal.SideBar exposing (desktopColumn, mobileDrawer)
+module UI.Internal.SideBar exposing (desktopColumn, mobileDrawer, nonPersistentSidebar)
 
 import Element
     exposing
@@ -31,11 +31,17 @@ import UI.Size as Size
 import UI.Text as Text
 import UI.Utils.ARIA as ARIA
 import UI.Utils.Action as Action
-import UI.Utils.Element as Element
+import UI.Utils.Element as Element exposing (css)
 
 
 
 -- Render
+
+
+type alias SidebarConfig =
+    { proportional : Bool
+    , persistent : Bool
+    }
 
 
 desktopColumn : RenderConfig -> Element msg -> Menu msg -> Element msg
@@ -44,7 +50,7 @@ desktopColumn cfg page menu =
         [ width fill
         , height fill
         ]
-        [ viewSide cfg False menu
+        [ viewSide cfg { proportional = False, persistent = True } menu
         , Element.el
             [ width fill
             , height fill
@@ -53,6 +59,72 @@ desktopColumn cfg page menu =
             ]
             page
         ]
+
+
+nonPersistentSidebar : RenderConfig -> Element msg -> Menu msg -> Element msg
+nonPersistentSidebar cfg page (Menu.Menu prop opt) =
+    let
+        alpha =
+            if prop.isExpanded then
+                0.5
+
+            else
+                0
+
+        overlay =
+            Element.el
+                (width fill
+                    :: height fill
+                    :: Element.alpha alpha
+                    :: (Palette.black
+                            |> Palette.toElementColor
+                            |> Background.color
+                       )
+                    :: css [ ( "transition", "opacity .2s" ) ]
+                )
+                Element.none
+    in
+    Element.row
+        [ width fill
+        , height fill
+        , viewSide cfg
+            { proportional = False, persistent = False }
+            (Menu.Menu { prop | isExpanded = True } opt)
+            |> sidebarTransitionContainer prop.isExpanded
+            |> Element.inFront
+        ]
+        [ slimHeaderView cfg
+            (prop.toggleMsg (not prop.isExpanded))
+            Palette.primary
+            |> Element.el [ paddingXY 8 16, Element.alignTop ]
+        , Element.el
+            [ width fill
+            , height fill
+            , Element.inFront overlay
+            ]
+            page
+        ]
+
+
+sidebarTransitionContainer : Bool -> Element msg -> Element msg
+sidebarTransitionContainer isExpanded =
+    let
+        transitionStyles =
+            if isExpanded then
+                []
+
+            else
+                [ ( "transform", "translate(-100%)" )
+                , ( "opacity", "0" )
+                , ( "pointer-events", "none" )
+                ]
+
+        styles =
+            css <|
+                ( "transition", "transform .2s, opacity .2s" )
+                    :: transitionStyles
+    in
+    Element.el (height fill :: styles)
 
 
 mobileDrawer :
@@ -79,7 +151,7 @@ mobileDrawer cfg page menu title maybeStack =
 
         menuView =
             Element.row [ width fill, height fill ]
-                [ viewSide cfg True menu
+                [ viewSide cfg { proportional = True, persistent = True } menu
                 , Element.el
                     [ Colors.gray.darkest
                         |> Element.colorSetOpacity 0.85
@@ -126,12 +198,12 @@ viewHead cfg (Menu.Menu prop _) label maybeStack =
                 label
 
 
-viewSide : RenderConfig -> Bool -> Menu msg -> Element msg
-viewSide cfg proportional (Menu.Menu prop opt) =
+viewSide : RenderConfig -> SidebarConfig -> Menu msg -> Element msg
+viewSide cfg config (Menu.Menu prop opt) =
     let
         adaptWidth =
             if prop.isExpanded then
-                if proportional then
+                if config.proportional then
                     width (fillPortion 75)
 
                 else
@@ -140,12 +212,15 @@ viewSide cfg proportional (Menu.Menu prop opt) =
             else
                 width shrink
 
-        adaptHeader =
+        toggleMsg =
+            prop.toggleMsg (not prop.isExpanded)
+
+        header =
             if prop.isExpanded then
-                headerView
+                headerView cfg toggleMsg opt.logo
 
             else
-                slimHeaderView
+                slimHeaderView cfg toggleMsg Palette.primary
     in
     Element.column
         [ height fill
@@ -155,9 +230,14 @@ viewSide cfg proportional (Menu.Menu prop opt) =
 
           else
             paddingXY 6 22
-        , Background.color Colors.gray.lightest
+        , Background.color <|
+            if config.persistent then
+                Colors.gray.lightest
+
+            else
+                Colors.white
         ]
-        [ adaptHeader cfg (prop.toggleMsg (not prop.isExpanded)) opt.logo
+        [ header
         , pagesView cfg
             opt.pages
             prop
@@ -208,16 +288,17 @@ headerView cfg toggleMsg logo =
         ]
 
 
-slimHeaderView : RenderConfig -> msg -> Maybe (Menu.Logo msg) -> Element msg
-slimHeaderView cfg toggleMsg _ =
+slimHeaderView : RenderConfig -> msg -> Palette.Color -> Element msg
+slimHeaderView cfg toggleMsg color =
     (cfg |> localeTerms >> .sidebar >> .expand)
         |> Icon.sandwichMenu
-        |> Icon.withColor Palette.grayLight1
+        |> Icon.withColor color
         |> Icon.withSize Size.small
         |> Icon.renderElement cfg
         |> Element.el
             (headerButtonAttr toggleMsg
                 ++ [ Element.centerX
+                   , Element.alignTop
                    , Element.paddingEach
                         { top = 0
                         , left = 0

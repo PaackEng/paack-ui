@@ -6,6 +6,7 @@ module UI.Utils.Element exposing
     , disabled, onEnterPressed, onIndividualClick
     , nameUsername, namePassword
     , RectangleSides, zeroPadding
+    , css
     )
 
 {-| Utilities and functionality that are not covered by Elm UI.
@@ -74,6 +75,11 @@ svg altText attrs children =
         |> Svg.svg attrs
         |> Element.html
         |> Element.el (ARIA.toElementAttributes <| ARIA.roleImage altText)
+
+
+css : List ( String, String ) -> List (Attribute msg)
+css =
+    List.map tuplesToStyles
 
 
 {-| Utility to conditionally render an element. **This is not meant for
