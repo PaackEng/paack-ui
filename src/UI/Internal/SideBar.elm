@@ -221,7 +221,7 @@ viewSide cfg config (Menu.Menu prop opt) =
                 headerView cfg toggleMsg opt.logo
 
             else
-                slimHeaderView cfg toggleMsg Palette.primary
+                slimHeaderView cfg toggleMsg Palette.grayLight1
     in
     Element.column
         [ height fill
