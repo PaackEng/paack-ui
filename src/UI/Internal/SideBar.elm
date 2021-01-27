@@ -111,20 +111,17 @@ sidebarTransitionContainer isExpanded =
     let
         transitionStyles =
             if isExpanded then
-                []
+                [ ( "transition", "transform .4s" )
+                ]
 
             else
                 [ ( "transform", "translate(-100%)" )
                 , ( "opacity", "0" )
                 , ( "pointer-events", "none" )
+                , ( "transition", "transform .4s, opacity .2s .4s" )
                 ]
-
-        styles =
-            css <|
-                ( "transition", "transform .2s, opacity .2s" )
-                    :: transitionStyles
     in
-    Element.el (height fill :: styles)
+    Element.el (height fill :: css transitionStyles)
 
 
 mobileDrawer :
