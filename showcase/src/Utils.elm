@@ -75,6 +75,7 @@ storyBorder view =
         , Palette.color toneGray brightnessMiddle
             |> Palette.toElementColor
             |> Border.color
+        , Element.width Element.fill
         ]
         view
 

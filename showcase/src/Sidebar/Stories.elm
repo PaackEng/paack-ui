@@ -3,7 +3,7 @@ module Sidebar.Stories exposing (stories, update)
 import Element exposing (Element, fill, height, maximum, px, width)
 import Model exposing (Model)
 import Msg exposing (Msg)
-import PluginOptions exposing (defaultWithoutMenu)
+import PluginOptions exposing (defaultWithMenu)
 import Return exposing (Return)
 import Sidebar.Model as SidebarModel
 import Sidebar.Msg as SidebarMsg
@@ -48,21 +48,39 @@ stories : RenderConfig -> ExplorerUI
 stories cfg =
     storiesOf
         "Sidebar"
-        [ demo cfg
+        [ persistentStory cfg
+        , nonPersistentStory cfg
         ]
 
 
-demo : RenderConfig -> ExplorerStory
-demo renderConfig =
+persistentStory : RenderConfig -> ExplorerStory
+persistentStory renderConfig =
     storyWithModel
-        ( "Sidebar"
-        , view renderConfig
-        , { defaultWithoutMenu | code = code }
+        ( "Persistent"
+        , persistentView renderConfig
+        , { defaultWithMenu | code = code }
         )
 
 
-view : RenderConfig -> Model -> Element Msg
-view renderConfig model =
+nonPersistentStory : RenderConfig -> ExplorerStory
+nonPersistentStory renderConfig =
+    storyWithModel
+        ( "Non-persistent"
+        , nonPersistentView renderConfig
+        , { defaultWithMenu | code = code }
+        )
+
+
+persistentView : RenderConfig -> Model -> Element Msg
+persistentView renderConfig model =
+    Element.column [ height (px 600) ]
+        [ iconsSvgSprite
+        , Sidebar.desktopColumn renderConfig page <| menu model
+        ]
+
+
+nonPersistentView : RenderConfig -> Model -> Element Msg
+nonPersistentView renderConfig model =
     Element.column [ height (px 600) ]
         [ iconsSvgSprite
         , Sidebar.nonPersistentSidebar renderConfig page <| menu model
@@ -71,7 +89,8 @@ view renderConfig model =
 
 page : Element Msg
 page =
-    storyBorder <| Element.el [ width (px 800), height (px 600) ] Element.none
+    storyBorder <|
+        Element.el [ width (px 800), height (px 600) ] Element.none
 
 
 menu : Model -> Menu.Menu Msg
