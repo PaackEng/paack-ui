@@ -100,7 +100,7 @@ desktopNonPersistent cfg page (Menu.Menu prop opt) =
         [ slimHeaderView cfg
             (prop.toggleMsg (not prop.isExpanded))
             Palette.primary
-            |> Element.el [ paddingXY 8 16, Element.alignTop ]
+            |> Element.el [ paddingXY 14 24, Element.alignTop ]
         , Element.el
             [ width fill
             , height fill
@@ -253,7 +253,7 @@ headerView cfg toggleMsg logo =
     let
         attr =
             [ paddingEach
-                { top = 22
+                { top = 0
                 , left = 32
                 , right = 8
                 , bottom = 44
