@@ -50,7 +50,7 @@ persistentStory renderConfig =
     storyWithModel
         ( "Persistent"
         , persistentView renderConfig
-        , { defaultWithMenu | code = code }
+        , { defaultWithMenu | code = persistentSidebarCode }
         )
 
 
@@ -59,7 +59,7 @@ nonPersistentStory renderConfig =
     storyWithModel
         ( "Non-persistent"
         , nonPersistentView renderConfig
-        , { defaultWithMenu | code = code }
+        , { defaultWithMenu | code = nonPersistentSidebarCode }
         )
 
 
@@ -114,11 +114,21 @@ menu model =
         }
 
 
-code : String
-code =
+persistentSidebarCode : String
+persistentSidebarCode =
     prettifyElmCode """
-Sidebar.desktopColumn
+Sidebar.desktopPersistent
     renderConfig
     (view model)
-    menuConfig
+    (menuConfig model)
+"""
+
+
+nonPersistentSidebarCode : String
+nonPersistentSidebarCode =
+    prettifyElmCode """
+Sidebar.desktopNonPersistent
+    renderConfig
+    (view model)
+    (menuConfig model)
 """
