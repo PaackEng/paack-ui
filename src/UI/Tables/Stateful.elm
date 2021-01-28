@@ -1,7 +1,7 @@
 module UI.Tables.Stateful exposing
     ( StatefulTable, StatefulConfig, table, withItems
     , Responsive, Cover, Details, Detail, withResponsive, detailsEmpty, detailShown, detailHidden
-    , State, Msg, init, update
+    , State, Msg, init, update, stateWithItems
     , Filters, filtersEmpty, stateWithFilters
     , localSingleTextFilter, remoteSingleTextFilter
     , localMultiTextFilter, remoteMultiTextFilter
@@ -96,7 +96,7 @@ And on model:
 
 ## State
 
-@docs State, Msg, init, update
+@docs State, Msg, init, update, stateWithItems
 
 
 # Filters
@@ -208,7 +208,7 @@ type alias StatefulConfig msg item columns =
 
 
 type alias Options msg item columns =
-    { items : List item
+    { overwriteItems : Maybe (List item)
     , width : Element.Length
     , responsive : Maybe (Responsive msg item columns)
     }
@@ -232,13 +232,16 @@ table config =
 
 defaultOptions : Options msg item columns
 defaultOptions =
-    { items = []
+    { overwriteItems = Nothing
     , width = shrink
     , responsive = Nothing
     }
 
 
-{-| Each of these items will become a row in this table.
+{-| **DEPRECATED**: Use [stateWithItems](#stateWithItems) instead.
+Otherwise, by using this you'll be discarding sorting and fitlering.
+
+Each of these items will become a row in this table.
 
     withItems
         [ Book "Dan Brown" "Angels & Demons" "2000"
@@ -252,7 +255,7 @@ defaultOptions =
 -}
 withItems : List item -> StatefulTable msg item columns -> StatefulTable msg item columns
 withItems items (Table prop opt) =
-    Table prop { opt | items = items }
+    Table prop { opt | overwriteItems = Just items }
 
 
 
@@ -281,6 +284,8 @@ type alias StateModel msg item columns =
     , mobileSelected : Maybe Int
     , filterDialog : Maybe Int
     , localSelection : Maybe (Selection item)
+    , items : List item
+    , visibleItems : List item
     }
 
 
@@ -311,7 +316,15 @@ init =
         , mobileSelected = Nothing
         , filterDialog = Nothing
         , localSelection = Nothing
+        , items = []
+        , visibleItems = []
         }
+
+
+stateWithItems : List item -> State msg item columns -> State msg item columns
+stateWithItems items (State stateModel) =
+    State
+        { stateModel | items = items, visibleItems = items }
 
 
 {-| Given a message, apply an update to the [`Table.State`](#State).
@@ -543,32 +556,7 @@ detailHidden accu =
 
 
 
--- Filters
-
-
-type alias PeriodComparison =
-    DateInput.PeriodComparison
-
-
-{-| Array with all the columns' filters and their initial state.
-
-This is a type-safe sized-array.
-See [`TypeNumbers`](UI-Utils-TypeNumbers) for how to compose its phantom type.
-
--}
-type alias Filters msg item columns =
-    Filters.Filters msg item columns
-
-
-{-| Apply filters defintion to a table's [`State`](#State).
-
-    model =
-        stateWithFilters Book.filtersInit init
-
--}
-stateWithFilters : Filters msg item columns -> State msg item columns -> State msg item columns
-stateWithFilters filters (State state) =
-    State { state | filters = Just filters }
+-- Selection
 
 
 {-| Apply selection defintion to a table's [`State`](#State).
@@ -608,6 +596,35 @@ stateIsSelected item (State state) =
 
         Nothing ->
             False
+
+
+
+-- Filters
+
+
+type alias PeriodComparison =
+    DateInput.PeriodComparison
+
+
+{-| Array with all the columns' filters and their initial state.
+
+This is a type-safe sized-array.
+See [`TypeNumbers`](UI-Utils-TypeNumbers) for how to compose its phantom type.
+
+-}
+type alias Filters msg item columns =
+    Filters.Filters msg item columns
+
+
+{-| Apply filters defintion to a table's [`State`](#State).
+
+    model =
+        stateWithFilters Book.filtersInit init
+
+-}
+stateWithFilters : Filters msg item columns -> State msg item columns -> State msg item columns
+stateWithFilters filters (State state) =
+    State { state | filters = Just filters }
 
 
 {-| An empty [`Filters`](#Filters) set.
@@ -960,6 +977,10 @@ mobileView renderConfig prop opt responsive =
     let
         detailsTerms =
             renderConfig |> localeTerms >> .tables >> .details
+
+        items =
+            viewGetItems (unwrapState prop.state) opt
+                |> List.indexedMap Tuple.pair
     in
     ListView.toggleableList
         { detailsShowLabel = detailsTerms.show
@@ -973,7 +994,7 @@ mobileView renderConfig prop opt responsive =
                 >> List.filterMap (Maybe.map (detailView renderConfig))
         , selectMsg = Tuple.first >> MobileToggle >> prop.toExternalMsg
         }
-        |> ListView.withItems (List.indexedMap Tuple.pair opt.items)
+        |> ListView.withItems items
         |> ListView.withSelected (Tuple.first >> isSelected prop.state)
         |> ListView.renderElement renderConfig
 
@@ -1045,17 +1066,8 @@ viewSelectionHeader renderConfig state toExternalMsg =
 
 
 viewGetItems : StateModel msg item columns -> Options msg item columns -> List item
-viewGetItems state opt =
-    case state.filters of
-        Just filtersArr ->
-            filtersArr
-                |> NArray.toList
-                |> List.filterMap Filters.filterGet
-                |> List.foldl Filters.filtersReduce (always True)
-                |> flip List.filter opt.items
-
-        Nothing ->
-            opt.items
+viewGetItems { visibleItems } opt =
+    Maybe.withDefault visibleItems opt.overwriteItems
 
 
 unwrapState : State msg item columns -> StateModel msg item columns
