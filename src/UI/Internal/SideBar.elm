@@ -67,28 +67,7 @@ desktopPersistent cfg page menu =
 
 
 desktopNonPersistent : RenderConfig -> Element msg -> Menu msg -> Element msg
-desktopNonPersistent cfg page (Menu.Menu prop opt) =
-    let
-        overlayAlpha =
-            if prop.isExpanded then
-                0.5
-
-            else
-                0
-
-        overlay =
-            Element.el
-                (width fill
-                    :: height fill
-                    :: Element.alpha overlayAlpha
-                    :: (Palette.black
-                            |> Palette.toElementColor
-                            |> Background.color
-                       )
-                    :: css [ ( "transition", "opacity .2s" ) ]
-                )
-                Element.none
-    in
+desktopNonPersistent cfg page ((Menu.Menu prop opt) as menu) =
     Element.row
         [ width fill
         , height fill
@@ -103,12 +82,43 @@ desktopNonPersistent cfg page (Menu.Menu prop opt) =
             Palette.primary
             |> Element.el [ paddingXY 14 24, Element.alignTop ]
         , Element.el
-            [ width fill
-            , height fill
-            , Element.inFront overlay
-            ]
+            (width fill
+                :: height fill
+                :: (Element.inFront <| sidebarOverlay menu)
+                :: (if prop.isExpanded then
+                        [ Events.onClick (prop.toggleMsg False)
+                        , Element.pointer
+                        ]
+
+                    else
+                        []
+                   )
+            )
             page
         ]
+
+
+sidebarOverlay : Menu msg -> Element msg
+sidebarOverlay (Menu.Menu prop _) =
+    let
+        overlayAlpha =
+            if prop.isExpanded then
+                0.5
+
+            else
+                0
+    in
+    Element.el
+        (width fill
+            :: height fill
+            :: Element.alpha overlayAlpha
+            :: (Palette.black
+                    |> Palette.toElementColor
+                    |> Background.color
+               )
+            :: css [ ( "transition", "opacity .2s" ), ( "z-index", "-1" ) ]
+        )
+        Element.none
 
 
 sidebarTransitionContainer : Bool -> Element msg -> Element msg
