@@ -98,7 +98,6 @@ demoTable renderConfig columns state msg =
             , toCover = Book.toTableCover
             }
         |> Stateful.withWidth Element.shrink
-        |> Stateful.withItems Book.books
         |> Stateful.renderElement renderConfig
 
 

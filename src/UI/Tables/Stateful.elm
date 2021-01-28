@@ -378,11 +378,24 @@ updateFilters state subMsg =
             filters
                 |> Filters.update subMsg
                 |> (\( newFilters, subCmd ) ->
-                        ( State { state | filters = Just newFilters }, subCmd )
+                        ( applyFilters newFilters state, subCmd )
                    )
 
         Nothing ->
             ( State state, Cmd.none )
+
+
+applyFilters newFilters state =
+    State
+        { state
+            | visibleItems =
+                newFilters
+                    |> NArray.toList
+                    |> List.filterMap Filters.filterGet
+                    |> List.foldl Filters.filtersReduce (always True)
+                    |> flip List.filter state.items
+            , filters = Just newFilters
+        }
 
 
 updateSelectionToggleAll : StateModel msg item columns -> ( State msg item columns, Cmd msg )
