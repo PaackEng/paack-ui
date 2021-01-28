@@ -28,6 +28,7 @@ import UI.Internal.Menu as Menu exposing (Menu)
 import UI.Internal.Nav.StackHeader as StackHeader
 import UI.Internal.Primitives as Primitives
 import UI.Internal.RenderConfig exposing (localeTerms)
+import UI.Internal.Utils.Element exposing (css)
 import UI.Link as Link exposing (Link)
 import UI.Palette as Palette exposing (brightnessLight, brightnessMiddle, toneGray, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
@@ -35,7 +36,7 @@ import UI.Size as Size
 import UI.Text as Text
 import UI.Utils.ARIA as ARIA
 import UI.Utils.Action as Action
-import UI.Utils.Element as Element exposing (css)
+import UI.Utils.Element as Element
 
 
 
