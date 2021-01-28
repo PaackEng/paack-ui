@@ -9,6 +9,9 @@ module UI.Tables.Stateful exposing
     , localRangeDateFilter, remoteRangeDateFilter
     , periodSingle, pariodAfter, periodBefore, localPeriodDateFilter, remotePeriodDateFilter
     , localSelectFilter, remoteSelectFilter
+    , Sorters, stateWithSorters
+    , sortersEmpty, sortBy, unsortable
+    , notSorting, sortDecreasing, sortIncreasing
     , withWidth
     , stateWithSelection, stateIsSelected
     , renderElement
@@ -134,6 +137,13 @@ And on model:
 @docs localSelectFilter, remoteSelectFilter
 
 
+# Sorting
+
+@docs Sorters, stateWithSorters
+@docs sortersEmpty, sortBy, unsortable
+@docs notSorting, sortDecreasing, sortIncreasing
+
+
 # Width
 
 @docs withWidth
@@ -163,13 +173,14 @@ import Element.Keyed as Keyed
 import Set exposing (Set)
 import Time
 import UI.Checkbox as Checkbox exposing (checkbox)
-import UI.Internal.Basics exposing (flip, ifThenElse, prependMaybe)
+import UI.Internal.Basics exposing (flip, ifThenElse, maybeThen, prependMaybe)
 import UI.Internal.DateInput as DateInput exposing (DateInput, PeriodDate, RangeDate)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.Tables.Common exposing (..)
 import UI.Internal.Tables.Filters as Filters
 import UI.Internal.Tables.FiltersView as FiltersView
+import UI.Internal.Tables.Sorters as Sorters exposing (Sorters)
 import UI.Internal.Tables.View exposing (..)
 import UI.ListView as ListView
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
@@ -267,6 +278,7 @@ withItems items (Table prop opt) =
 type Msg item
     = MobileToggle Int
     | ForFilters Filters.Msg
+    | ForSorters Sorters.Msg
     | FilterDialogOpen Int
     | FilterDialogClose
     | SelectionToggleAll
@@ -286,6 +298,7 @@ type alias StateModel msg item columns =
     , localSelection : Maybe (Selection item)
     , items : List item
     , visibleItems : List item
+    , sorters : Maybe (Sorters item columns)
     }
 
 
@@ -318,6 +331,7 @@ init =
         , localSelection = Nothing
         , items = []
         , visibleItems = []
+        , sorters = Nothing
         }
 
 
@@ -342,6 +356,9 @@ update msg (State state) =
 
         ForFilters subMsg ->
             updateFilters state subMsg
+
+        ForSorters subMsg ->
+            updateSorters state subMsg
 
         FilterDialogOpen index ->
             ( State { state | filterDialog = Just index }, Cmd.none )
@@ -378,23 +395,54 @@ updateFilters state subMsg =
             filters
                 |> Filters.update subMsg
                 |> (\( newFilters, subCmd ) ->
-                        ( applyFilters newFilters state, subCmd )
+                        ( state
+                            |> applyFilters newFilters
+                        , subCmd
+                        )
                    )
 
         Nothing ->
             ( State state, Cmd.none )
 
 
+applyFilters : Filters msg item columns -> StateModel msg item columns -> State msg item columns
 applyFilters newFilters state =
     State
         { state
             | visibleItems =
-                newFilters
-                    |> NArray.toList
-                    |> List.filterMap Filters.filterGet
-                    |> List.foldl Filters.filtersReduce (always True)
-                    |> flip List.filter state.items
+                state.items
+                    |> Filters.itemsApplyFilters newFilters
+                    |> maybeThen Sorters.itemsApplySorting state.sorters
             , filters = Just newFilters
+        }
+
+
+updateSorters : StateModel msg item columns -> Sorters.Msg -> ( State msg item columns, Cmd msg )
+updateSorters state subMsg =
+    case state.sorters of
+        Just sorters ->
+            sorters
+                |> Sorters.update subMsg
+                |> (\( newSorters, subCmd ) ->
+                        ( state
+                            |> applySorters newSorters
+                        , subCmd
+                        )
+                   )
+
+        Nothing ->
+            ( State state, Cmd.none )
+
+
+applySorters : Sorters item columns -> StateModel msg item columns -> State msg item columns
+applySorters newSorters state =
+    State
+        { state
+            | visibleItems =
+                state.items
+                    |> maybeThen Filters.itemsApplyFilters state.filters
+                    |> Sorters.itemsApplySorting newSorters
+            , sorters = Just newSorters
         }
 
 
@@ -953,6 +1001,52 @@ periodBefore =
 withWidth : Element.Length -> StatefulTable msg item columns -> StatefulTable msg item columns
 withWidth width (Table prop opt_) =
     Table prop { opt_ | width = width }
+
+
+
+-- Sorting
+
+
+type alias Sorters item columns =
+    Sorters.Sorters item columns
+
+
+stateWithSorters : Sorters item columns -> State msg item columns -> State msg item columns
+stateWithSorters sorters (State state) =
+    State { state | sorters = Just sorters }
+
+
+notSorting : Sorters item columns -> Sorters item columns
+notSorting =
+    Sorters.notSorting
+
+
+sortBy :
+    (item -> String)
+    -> Sorters item columns
+    -> Sorters item (T.Increase columns)
+sortBy =
+    Sorters.sortBy
+
+
+sortDecreasing : Int -> Sorters item columns -> Sorters item columns
+sortDecreasing =
+    Sorters.sortDecreasing
+
+
+sortIncreasing : Int -> Sorters item columns -> Sorters item columns
+sortIncreasing =
+    Sorters.sortIncreasing
+
+
+sortersEmpty : Sorters item T.Zero
+sortersEmpty =
+    Sorters.sortersEmpty
+
+
+unsortable : Sorters item columns -> Sorters item (T.Increase columns)
+unsortable =
+    Sorters.unsortable
 
 
 

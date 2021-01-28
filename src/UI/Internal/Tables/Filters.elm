@@ -19,6 +19,7 @@ module UI.Internal.Tables.Filters exposing
     , filtersReduce
     , isApplied
     , isEdited
+    , itemsApplyFilters
     , multiTextLocal
     , multiTextRemote
     , periodDateLocal
@@ -58,6 +59,14 @@ type Msg
 
 type alias Filters msg item columns =
     NArray (Filter msg item) columns
+
+
+itemsApplyFilters filters items =
+    filters
+        |> NArray.toList
+        |> List.filterMap filterGet
+        |> List.foldl filtersReduce (always True)
+        |> flip List.filter items
 
 
 

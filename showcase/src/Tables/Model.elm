@@ -16,10 +16,12 @@ initModel : Model
 initModel =
     { mainTableState =
         Table.init
-            |> Table.stateWithFilters Book.someFilters
+            |> Table.stateWithFilters Book.filters
+            |> Table.stateWithSorters Book.sorters
             |> Table.stateWithItems Book.books
     , selecTableState =
         Table.init
             |> Table.stateWithSelection .isbn False
-            |> Table.stateWithFilters Book.someFilters
+            |> Table.stateWithFilters Book.filters
+            |> Table.stateWithSorters Book.sorters
     }

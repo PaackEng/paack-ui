@@ -1,4 +1,4 @@
-module UI.Internal.Basics exposing (flip, ifThenElse, lazyMap, maybeAnd, maybeNotThen, pairUncurry, prependMaybe)
+module UI.Internal.Basics exposing (flip, ifThenElse, lazyMap, maybeAnd, maybeNotThen, maybeThen, pairUncurry, prependMaybe)
 
 
 prependMaybe : Maybe a -> List a -> List a
@@ -52,3 +52,13 @@ maybeAnd condition value =
 flip : (a -> b -> c) -> b -> a -> c
 flip applier b a =
     applier a b
+
+
+maybeThen : (a -> b -> b) -> Maybe a -> b -> b
+maybeThen applier maybeValue etc =
+    case maybeValue of
+        Just value ->
+            applier value etc
+
+        Nothing ->
+            etc
