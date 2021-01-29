@@ -61,6 +61,7 @@ type alias Filters msg item columns =
     NArray (Filter msg item) columns
 
 
+itemsApplyFilters : Filters msg item columns -> List item -> List item
 itemsApplyFilters filters items =
     filters
         |> NArray.toList

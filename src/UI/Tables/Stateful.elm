@@ -173,7 +173,7 @@ import Element.Keyed as Keyed
 import Set exposing (Set)
 import Time
 import UI.Checkbox as Checkbox exposing (checkbox)
-import UI.Internal.Basics exposing (flip, ifThenElse, maybeThen, prependMaybe)
+import UI.Internal.Basics exposing (ifThenElse, maybeThen, prependMaybe)
 import UI.Internal.DateInput as DateInput exposing (DateInput, PeriodDate, RangeDate)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Internal.RenderConfig exposing (localeTerms)
@@ -336,9 +336,15 @@ init =
 
 
 stateWithItems : List item -> State msg item columns -> State msg item columns
-stateWithItems items (State stateModel) =
+stateWithItems items (State state) =
     State
-        { stateModel | items = items, visibleItems = items }
+        { state
+            | items = items
+            , visibleItems =
+                items
+                    |> maybeThen Filters.itemsApplyFilters state.filters
+                    |> maybeThen Sorters.itemsApplySorting state.sorters
+        }
 
 
 {-| Given a message, apply an update to the [`Table.State`](#State).
@@ -685,7 +691,14 @@ type alias Filters msg item columns =
 -}
 stateWithFilters : Filters msg item columns -> State msg item columns -> State msg item columns
 stateWithFilters filters (State state) =
-    State { state | filters = Just filters }
+    State
+        { state
+            | filters = Just filters
+            , visibleItems =
+                state.items
+                    |> Filters.itemsApplyFilters filters
+                    |> maybeThen Sorters.itemsApplySorting state.sorters
+        }
 
 
 {-| An empty [`Filters`](#Filters) set.
@@ -1013,7 +1026,14 @@ type alias Sorters item columns =
 
 stateWithSorters : Sorters item columns -> State msg item columns -> State msg item columns
 stateWithSorters sorters (State state) =
-    State { state | sorters = Just sorters }
+    State
+        { state
+            | sorters = Just sorters
+            , visibleItems =
+                state.items
+                    |> maybeThen Filters.itemsApplyFilters state.filters
+                    |> Sorters.itemsApplySorting sorters
+        }
 
 
 notSorting : Sorters item columns -> Sorters item columns

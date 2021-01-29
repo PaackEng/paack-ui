@@ -13,7 +13,6 @@ module UI.Internal.Tables.Sorters exposing
     , update
     )
 
-import UI.Internal.Basics exposing (flip, maybeNotThen)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Utils.TypeNumbers as T
 
