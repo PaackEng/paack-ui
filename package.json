@@ -34,7 +34,7 @@
     "elm": "^0.19.1-4",
     "elm-format": "^0.8.4",
     "elm-hot": "^1.1.6",
-    "elm-test": "^0.19.1-revision4",
+    "elm-test": "^0.19.1-revision5",
     "i18n-json-to-elm": "PedroHLC/i18n-json-to-elm",
     "node-elm-compiler": "^5.0.4",
     "paack-ui-assets": "^0.0.12",
