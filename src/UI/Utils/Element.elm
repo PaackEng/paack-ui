@@ -6,6 +6,7 @@ module UI.Utils.Element exposing
     , disabled, onEnterPressed, onIndividualClick
     , nameUsername, namePassword
     , RectangleSides, zeroPadding
+    , fadeOut, slideOutLeft, transition
     )
 
 {-| Utilities and functionality that are not covered by Elm UI.
@@ -123,6 +124,59 @@ colorTransition time =
     , ( "transition-timing-function", "linear" )
     ]
         |> List.map tuplesToStyles
+
+
+type alias Transition msg =
+    { transition : String
+    , on : List (Attribute msg)
+    , off : List (Attribute msg)
+    }
+
+
+{-| Applies the attributes of a transition for the given on/off state
+
+    Element.row
+        (onClick DoSomething
+            :: transition isCollapsed fadeOut
+        )
+        []
+
+-}
+transition : Bool -> Transition msg -> List (Attribute msg)
+transition active t =
+    tuplesToStyles ( "transition", t.transition )
+        :: (if active then
+                t.on
+
+            else
+                t.off
+           )
+
+
+{-| A transition that hides the element sliding it to the left
+-}
+slideOutLeft : Transition msg
+slideOutLeft =
+    { transition = "transform .4s"
+    , on = []
+    , off =
+        Internal.css
+            [ ( "transform", "translate(-100%)" )
+            , ( "opacity", "0" )
+            , ( "pointer-events", "none" )
+            , ( "transition", "transform .4s, opacity .2s .4s" )
+            ]
+    }
+
+
+{-| A transition that fades away an element
+-}
+fadeOut : Transition msg
+fadeOut =
+    { transition = "opacity .2s"
+    , on = [ Element.alpha 0.5 ]
+    , off = [ Element.alpha 0 ]
+    }
 
 
 {-| Trigger message when the users press return-key while element is on-focus.

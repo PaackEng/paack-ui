@@ -28,7 +28,6 @@ import UI.Internal.Menu as Menu exposing (Menu)
 import UI.Internal.Nav.StackHeader as StackHeader
 import UI.Internal.Primitives as Primitives
 import UI.Internal.RenderConfig exposing (localeTerms)
-import UI.Internal.Utils.Element exposing (css)
 import UI.Link as Link exposing (Link)
 import UI.Palette as Palette exposing (brightnessLight, brightnessMiddle, toneGray, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
@@ -36,7 +35,7 @@ import UI.Size as Size
 import UI.Text as Text
 import UI.Utils.ARIA as ARIA
 import UI.Utils.Action as Action
-import UI.Utils.Element as Element
+import UI.Utils.Element as Element exposing (fadeOut, slideOutLeft, transition)
 
 
 
@@ -74,7 +73,7 @@ desktopNonPersistent cfg page ((Menu.Menu prop opt) as menu) =
         , viewSide cfg
             { proportional = False, persistent = False }
             (Menu.Menu { prop | isExpanded = True } opt)
-            |> sidebarTransitionContainer prop.isExpanded
+            |> Element.el (height fill :: transition prop.isExpanded slideOutLeft)
             |> Element.inFront
         ]
         [ slimHeaderView cfg
@@ -100,43 +99,16 @@ desktopNonPersistent cfg page ((Menu.Menu prop opt) as menu) =
 
 sidebarOverlay : Menu msg -> Element msg
 sidebarOverlay (Menu.Menu prop _) =
-    let
-        overlayAlpha =
-            if prop.isExpanded then
-                0.5
-
-            else
-                0
-    in
     Element.el
         (width fill
             :: height fill
-            :: Element.alpha overlayAlpha
             :: (Palette.black
                     |> Palette.toElementColor
                     |> Background.color
                )
-            :: css [ ( "transition", "opacity .2s" ), ( "z-index", "-1" ) ]
+            :: transition prop.isExpanded fadeOut
         )
         Element.none
-
-
-sidebarTransitionContainer : Bool -> Element msg -> Element msg
-sidebarTransitionContainer isExpanded =
-    let
-        transitionStyles =
-            if isExpanded then
-                [ ( "transition", "transform .4s" )
-                ]
-
-            else
-                [ ( "transform", "translate(-100%)" )
-                , ( "opacity", "0" )
-                , ( "pointer-events", "none" )
-                , ( "transition", "transform .4s, opacity .2s .4s" )
-                ]
-    in
-    Element.el (height fill :: css transitionStyles)
 
 
 mobile :
