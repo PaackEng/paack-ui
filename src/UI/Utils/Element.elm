@@ -42,6 +42,11 @@ module UI.Utils.Element exposing
 
 @docs RectangleSides, zeroPadding
 
+
+# Transition
+
+@docs fadeOut, slideOutLeft, transition
+
 -}
 
 import Element exposing (Attribute, Element)
