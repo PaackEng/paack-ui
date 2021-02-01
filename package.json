@@ -31,7 +31,7 @@
   "dependencies": {
     "@percy/cypress": "^2.3.4",
     "cypress": "^6.3.0",
-    "elm": "^0.19.1-4",
+    "elm": "^0.19.1-5",
     "elm-format": "^0.8.4",
     "elm-hot": "^1.1.6",
     "elm-test": "^0.19.1-revision5",
