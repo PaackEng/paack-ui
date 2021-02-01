@@ -3061,10 +3061,10 @@ elm-review@^2.4.0:
     which "^2.0.2"
     wrap-ansi "^6.2.0"
 
-elm-test@^0.19.1-revision5:
-  version "0.19.1-revision5"
-  resolved "https://registry.yarnpkg.com/elm-test/-/elm-test-0.19.1-revision5.tgz#60f44e08872344ed469f0e75951ab649539a7126"
-  integrity sha512-QJPzXMjdnba5+gX3IlPbcwulisYP+Sf92z6w39wP7Sq/8lyI5NQGcWEBD1NavIl0ERtWBVbFp0RvHXbParwxXA==
+elm-test@^0.19.1-revision6:
+  version "0.19.1-revision6"
+  resolved "https://registry.yarnpkg.com/elm-test/-/elm-test-0.19.1-revision6.tgz#a00b5427df98892b4394aef4aa4497237c71a16f"
+  integrity sha512-4VbIyCRlCUm/py0E0AjMT3/mwd6DR4Y5Z5gEox6z5JII6ZdKIJmcQzjgWRI5qo5ERJiw9M/Nxhk7SGXFUbZsxQ==
   dependencies:
     chalk "^4.1.0"
     chokidar "^3.5.1"
