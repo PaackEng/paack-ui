@@ -109,7 +109,7 @@ menu model =
         , logo =
             Just
                 { hint = "Paack logo"
-                , body = Element.html <| Html.img [ src "logo.png" ] []
+                , body = Element.html <| Html.img [ Html.Attributes.width 84, src "logo.svg" ] []
                 }
         }
 
