@@ -1,5 +1,6 @@
 module UI.Internal.Utils.Element exposing
-    ( id
+    ( css
+    , id
     , overflowAttrs
     , overflowVisible
     , overlay
@@ -18,6 +19,11 @@ import UI.Internal.Colors as Colors
 style : String -> String -> Attribute msg
 style k v =
     Element.htmlAttribute <| HtmlAttrs.style k v
+
+
+css : List ( String, String ) -> List (Attribute msg)
+css =
+    List.map tuplesToStyles
 
 
 tuplesToStyles : ( String, String ) -> Attribute msg

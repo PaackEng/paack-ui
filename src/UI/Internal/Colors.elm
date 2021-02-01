@@ -12,6 +12,7 @@ module UI.Internal.Colors exposing
     , primary
     , success
     , warning
+    , white
     )
 
 import Element exposing (Attribute, rgb255)
@@ -81,15 +82,20 @@ warning =
     }
 
 
+white : Element.Color
+white =
+    rgb255 255 255 255
+
+
 
 -- Contrasted Tones
 
 
 darkConstrast : ToneColors
 darkConstrast =
-    { darkest = rgb255 255 255 255 -- #FFF
-    , middle = rgb255 255 255 255 -- #FFF
-    , light = rgb255 255 255 255 -- #FFF
+    { darkest = white
+    , middle = white
+    , light = white
     , lighter = gray.darkest
     , lightest = gray.darkest
     }
@@ -97,7 +103,7 @@ darkConstrast =
 
 lightContrast : ToneColors
 lightContrast =
-    { darkest = rgb255 255 255 255 -- #FFF
+    { darkest = white
     , middle = gray.darkest
     , light = gray.darkest
     , lighter = gray.darkest
@@ -132,7 +138,7 @@ contrastWarning =
 
 mainBackground : Attribute msg
 mainBackground =
-    Background.color (rgb255 255 255 255)
+    Background.color white
 
 
 overlayBackground : Attribute msg

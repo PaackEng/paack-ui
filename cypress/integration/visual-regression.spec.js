@@ -122,4 +122,23 @@ describe('Percy Snapshots', () => {
       cy.percySnapshot('Paginators')
     })
   })
+
+  describe('Layouts', () => {
+    it('Creates the Layouts page snapshot', () => {
+      cy.visit('/#Basics/Layouts/SplitSelectable')
+      cy.percySnapshot('Layouts')
+    })
+  })
+
+  describe('Sidebar', () => {
+    it('Creates the Persistent Sidebar page snapshot', () => {
+      cy.visit('/#Complex%20components/Sidebar/Persistent')
+      cy.percySnapshot('Persistent Sidebar')
+    })
+
+    it('Creates the Non-persistent Sidebar page snapshot', () => {
+      cy.visit('/#Complex%20components/Sidebar/Non-persistent')
+      cy.percySnapshot('Non-persistent Sidebar')
+    })
+  })
 })

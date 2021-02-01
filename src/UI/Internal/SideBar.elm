@@ -1,4 +1,8 @@
-module UI.Internal.SideBar exposing (desktopColumn, mobileDrawer)
+module UI.Internal.SideBar exposing
+    ( desktopNonPersistent
+    , desktopPersistent
+    , mobile
+    )
 
 import Element
     exposing
@@ -31,17 +35,26 @@ import UI.Size as Size
 import UI.Text as Text
 import UI.Utils.ARIA as ARIA
 import UI.Utils.Action as Action
-import UI.Utils.Element as Element
+import UI.Utils.Element as Element exposing (fadeOut, slideOutLeft, transition)
 
 
 
 -- Render
 
 
-desktopColumn : RenderConfig -> Element msg -> Menu msg -> Element msg
-desktopColumn cfg page menu =
-    Element.row [ width fill, height fill ]
-        [ viewSide cfg False menu
+type alias SidebarConfig =
+    { proportional : Bool
+    , persistent : Bool
+    }
+
+
+desktopPersistent : RenderConfig -> Element msg -> Menu msg -> Element msg
+desktopPersistent cfg page menu =
+    Element.row
+        [ width fill
+        , height fill
+        ]
+        [ viewSide cfg { proportional = False, persistent = True } menu
         , Element.el
             [ width fill
             , height fill
@@ -52,14 +65,60 @@ desktopColumn cfg page menu =
         ]
 
 
-mobileDrawer :
+desktopNonPersistent : RenderConfig -> Element msg -> Menu msg -> Element msg
+desktopNonPersistent cfg page ((Menu.Menu prop opt) as menu) =
+    Element.row
+        [ width fill
+        , height fill
+        , viewSide cfg
+            { proportional = False, persistent = False }
+            (Menu.Menu { prop | isExpanded = True } opt)
+            |> Element.el (height fill :: transition prop.isExpanded slideOutLeft)
+            |> Element.inFront
+        ]
+        [ slimHeaderView cfg
+            (prop.toggleMsg (not prop.isExpanded))
+            Palette.primary
+            |> Element.el [ paddingXY 14 24, Element.alignTop ]
+        , Element.el
+            (width fill
+                :: height fill
+                :: (Element.inFront <| sidebarOverlay menu)
+                :: (if prop.isExpanded then
+                        [ Events.onClick (prop.toggleMsg False)
+                        , Element.pointer
+                        ]
+
+                    else
+                        []
+                   )
+            )
+            page
+        ]
+
+
+sidebarOverlay : Menu msg -> Element msg
+sidebarOverlay (Menu.Menu prop _) =
+    Element.el
+        (width fill
+            :: height fill
+            :: (Palette.black
+                    |> Palette.toElementColor
+                    |> Background.color
+               )
+            :: transition prop.isExpanded fadeOut
+        )
+        Element.none
+
+
+mobile :
     RenderConfig
     -> Element msg
     -> Menu msg
     -> ( String, Maybe String )
     -> Maybe ( msg, Maybe (Action.WithIcon msg) )
     -> Element msg
-mobileDrawer cfg page menu title maybeStack =
+mobile cfg page menu title maybeStack =
     let
         (Menu.Menu { isExpanded, toggleMsg } _) =
             menu
@@ -76,7 +135,7 @@ mobileDrawer cfg page menu title maybeStack =
 
         menuView =
             Element.row [ width fill, height fill ]
-                [ viewSide cfg True menu
+                [ viewSide cfg { proportional = True, persistent = True } menu
                 , Element.el
                     [ Colors.gray.darkest
                         |> Element.colorSetOpacity 0.85
@@ -123,36 +182,44 @@ viewHead cfg (Menu.Menu prop _) label maybeStack =
                 label
 
 
-viewSide : RenderConfig -> Bool -> Menu msg -> Element msg
-viewSide cfg proportional (Menu.Menu prop opt) =
+viewSide : RenderConfig -> SidebarConfig -> Menu msg -> Element msg
+viewSide cfg config (Menu.Menu prop opt) =
     let
         adaptWidth =
             if prop.isExpanded then
-                if proportional then
+                if config.proportional then
                     width (fillPortion 75)
 
                 else
-                    width (px 228)
+                    width (px 264)
 
             else
                 width shrink
 
-        adaptHeader =
+        toggleMsg =
+            prop.toggleMsg (not prop.isExpanded)
+
+        header =
             if prop.isExpanded then
-                headerView
+                headerView cfg toggleMsg opt.logo
 
             else
-                slimHeaderView
+                slimHeaderView cfg toggleMsg Palette.grayLight1
     in
     Element.column
         [ height fill
         , adaptWidth
+        , if prop.isExpanded then
+            paddingXY 16 24
+
+          else
+            paddingXY 6 22
         , Background.color Colors.gray.lightest
         ]
-        [ adaptHeader cfg (prop.toggleMsg (not prop.isExpanded)) opt.logo
+        [ header
         , pagesView cfg
             opt.pages
-            prop.isExpanded
+            prop
         , actionsView cfg
             opt.actions
             prop.isExpanded
@@ -164,13 +231,12 @@ headerView cfg toggleMsg logo =
     let
         attr =
             [ paddingEach
-                { top = 20
-                , left = 32
+                { top = 0
+                , left = 8
                 , right = 8
-                , bottom = 96
+                , bottom = 44
                 }
             , width fill
-            , height (px (60 + 96))
             ]
 
         logoEl =
@@ -201,18 +267,23 @@ headerView cfg toggleMsg logo =
         ]
 
 
-slimHeaderView : RenderConfig -> msg -> Maybe (Menu.Logo msg) -> Element msg
-slimHeaderView cfg toggleMsg _ =
+slimHeaderView : RenderConfig -> msg -> Palette.Color -> Element msg
+slimHeaderView cfg toggleMsg color =
     (cfg |> localeTerms >> .sidebar >> .expand)
         |> Icon.sandwichMenu
+        |> Icon.withColor color
+        |> Icon.withSize Size.small
         |> Icon.renderElement cfg
         |> Element.el
             (headerButtonAttr toggleMsg
                 ++ [ Element.centerX
-
-                   -- It has 2 levels of padding, because of the extra padding.
-                   -- As we are trying to do the 8dot grid, the top field was set to 16px
-                   , Element.paddingEach { top = 16, left = 8, right = 8, bottom = 88 }
+                   , Element.alignTop
+                   , Element.paddingEach
+                        { top = 0
+                        , left = 0
+                        , right = 0
+                        , bottom = 44
+                        }
                    ]
             )
 
@@ -222,43 +293,32 @@ headerButtonAttr toggleMsg =
     Events.onClick toggleMsg
         :: Element.pointer
         :: Element.centerY
+        :: Element.alignRight
         :: ARIA.toElementAttributes ARIA.roleButton
 
 
-pagesView : RenderConfig -> List Menu.Page -> Bool -> Element msg
-pagesView cfg pages navExpanded =
+pagesView : RenderConfig -> List Menu.Page -> Menu.Properties msg -> Element msg
+pagesView cfg pages props =
     let
         item { labeledIcon, link, isCurrent } =
-            if navExpanded then
+            if props.isExpanded then
                 pageItem cfg labeledIcon link isCurrent
 
             else
                 slimPageItem cfg labeledIcon link isCurrent
 
-        paddingAttr =
-            if navExpanded then
-                paddingEach
-                    { top = 0
-                    , left = 4
-                    , right = 7
-                    , bottom = 0
-                    }
-
-            else
-                padding 0
-
         spacingAttr =
-            if navExpanded then
-                spacing 14
+            spacing <|
+                if props.isExpanded then
+                    8
 
-            else
-                spacing 12
+                else
+                    0
 
         attrs =
             [ height fill
             , width fill
             , spacingAttr
-            , paddingAttr
             ]
     in
     pages
@@ -281,37 +341,21 @@ actionsView cfg actions navExpanded =
             [ height shrink
             , width fill
             , spacing 8
-            , if navExpanded then
-                paddingEach
-                    { top = 0
-                    , left = 4
-                    , right = 7
-                    , bottom = 16
-                    }
-
-              else
-                paddingEach
-                    { top = 0
-                    , left = 0
-                    , right = 0
-                    , bottom = 16
-                    }
             ]
 
 
-pageItem : RenderConfig -> Icon -> Link -> Bool -> Element msg
-pageItem cfg icon link isSelected =
+selectedItemOutline : Bool -> List (Element msg) -> Element msg
+selectedItemOutline isSelected =
     let
         baseAttrs =
             [ width fill
-            , paddingXY 4 0
             , Primitives.defaultRoundedBorders
-            , spacing 4
+            , spacing 8
+            , padding 8
             ]
 
         selectedColor =
-            Colors.primary.darkest
-                |> Element.colorSetOpacity 0.12
+            Palette.primaryLight3 |> Palette.toElementColor
 
         attrs =
             if isSelected then
@@ -320,16 +364,23 @@ pageItem cfg icon link isSelected =
 
             else
                 baseAttrs
+    in
+    Element.row attrs
 
+
+pageItem : RenderConfig -> Icon -> Link -> Bool -> Element msg
+pageItem cfg icon link isSelected =
+    let
         textColor =
             Palette.color tonePrimary brightnessMiddle
     in
-    Element.row attrs
+    selectedItemOutline
+        isSelected
         [ icon
             |> Icon.withSize Size.small
             |> Icon.withColor textColor
             |> Icon.renderElement cfg
-            |> Element.el iconAttr
+            |> Element.el [ Font.center ]
         , Icon.getHint icon
             |> Text.body1
             |> Text.withColor textColor
@@ -342,9 +393,11 @@ slimPageItem : RenderConfig -> Icon -> Link -> Bool -> Element msg
 slimPageItem cfg icon link isSelected =
     icon
         |> Icon.withSize Size.small
-        |> Icon.withColor (slimIconColor isSelected)
+        |> Icon.withColor Palette.primary
         |> Icon.renderElement cfg
-        |> Element.el slimIconAttr
+        |> Element.el [ Font.center ]
+        |> List.singleton
+        |> selectedItemOutline isSelected
         |> Link.wrapElement cfg [] link
 
 
@@ -363,7 +416,7 @@ actionItem cfg icon msg =
             |> Icon.withSize Size.small
             |> Icon.withColor (Palette.color tonePrimary brightnessMiddle)
             |> Icon.renderElement cfg
-            |> Element.el iconAttr
+            |> Element.el [ Font.center ]
         , Icon.getHint icon
             |> Text.body1
             |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
@@ -375,36 +428,12 @@ slimActionItem : RenderConfig -> Icon -> msg -> Element msg
 slimActionItem cfg icon msg =
     icon
         |> Icon.withSize Size.small
-        |> Icon.withColor (slimIconColor True)
+        |> Icon.withColor Palette.primary
         |> Icon.renderElement cfg
         |> Element.el
             (Element.pointer
                 :: Events.onClick msg
-                :: slimIconAttr
-                ++ ARIA.toElementAttributes ARIA.roleButton
+                :: Element.centerX
+                :: Font.center
+                :: ARIA.toElementAttributes ARIA.roleButton
             )
-
-
-iconAttr : List (Attribute msg)
-iconAttr =
-    [ width (px 32)
-    , paddingXY 0 6
-    , Font.center
-    ]
-
-
-slimIconAttr : List (Attribute msg)
-slimIconAttr =
-    [ width (px 48)
-    , Font.center
-    ]
-
-
-slimIconColor : Bool -> Palette.Color
-slimIconColor isSelected =
-    if isSelected then
-        Palette.color tonePrimary brightnessMiddle
-
-    else
-        Palette.color tonePrimary brightnessMiddle
-            |> Palette.withAlpha 0.4

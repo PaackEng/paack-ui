@@ -173,6 +173,7 @@ type alias Container msg =
     , title : String
     , dialog : Maybe (Dialog msg)
     , hasMenu : Bool
+    , hasPersistentSidebar : Bool
     }
 
 
@@ -292,6 +293,7 @@ containerMap applier data =
     , hasMenu = data.hasMenu
     , content = contentMap applier data.content
     , dialog = Maybe.map (dialogMap applier) data.dialog
+    , hasPersistentSidebar = data.hasPersistentSidebar
     }
 
 
@@ -486,7 +488,7 @@ toBrowserDocument cfg page (Navigator model) =
         container =
             model.container page
 
-        { content, title, hasMenu } =
+        { content, title, hasMenu, hasPersistentSidebar } =
             container
 
         ( contentBody, maybeStack, seenTitle ) =
@@ -495,14 +497,17 @@ toBrowserDocument cfg page (Navigator model) =
         body =
             if hasMenu then
                 if RenderConfig.isMobile cfg then
-                    SideBar.mobileDrawer cfg
+                    SideBar.mobile cfg
                         contentBody
                         model.menu
                         seenTitle
                         maybeStack
 
+                else if hasPersistentSidebar then
+                    SideBar.desktopPersistent cfg contentBody model.menu
+
                 else
-                    SideBar.desktopColumn cfg contentBody model.menu
+                    SideBar.desktopNonPersistent cfg contentBody model.menu
 
             else
                 contentBody
