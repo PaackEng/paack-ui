@@ -214,12 +214,7 @@ viewSide cfg config (Menu.Menu prop opt) =
 
           else
             paddingXY 6 22
-        , Background.color <|
-            if config.persistent then
-                Colors.gray.lightest
-
-            else
-                Colors.white
+        , Background.color Colors.gray.lightest
         ]
         [ header
         , pagesView cfg
