@@ -136,7 +136,7 @@ logo =
         , style "display" "flex"
         , style "align-items" "center"
         ]
-        [ img [ src "logo.png" ] [] ]
+        [ img [ src "logo.svg", style "width" "112px" ] [] ]
 
 
 updateStories : Msg -> ExplorerModel -> ( ExplorerModel, Cmd Msg )
