@@ -3,10 +3,10 @@ module UI.NavigationContainer exposing
     , Navigator, navigator
     , Container, containerMap
     , Content, contentSingle, StackChild, contentStackChild
-    , withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages, MenuPage, menuPage
+    , withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages
+    , MenuPage, menuPage, withSidebarStyle, SidebarStyle(..)
     , Dialog, dialog, dialogV2
     , toBrowserDocument
-    , SidebarStyle(..), withSidebarStyle
     )
 
 {-| The `UI.NavigationContainer` (abbreviated as `Nav`) is a page presenter.
@@ -68,7 +68,8 @@ Example of usage:
 
 # Menu
 
-@docs withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages, MenuPage, menuPage
+@docs withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages
+@docs MenuPage, menuPage, withSidebarStyle, SidebarStyle
 
 
 # Dialog
@@ -289,6 +290,9 @@ withMenuLogo hint body (Navigator nav) =
     Navigator { nav | menu = menuWithLogo nav.menu }
 
 
+{-| `Nav.withSidebarStyle` takes a `SidebarStyle` setting the
+appearance/behavior of the sidebar when it is enabled by the `hasMenu` flag.
+-}
 withSidebarStyle : SidebarStyle -> Navigator page msg -> Navigator page msg
 withSidebarStyle style (Navigator nav) =
     Navigator { nav | sidebarStyle = style }
