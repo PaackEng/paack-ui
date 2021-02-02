@@ -297,7 +297,11 @@ appearance/behavior of the sidebar when it is enabled by the `hasMenu` flag.
 -}
 withSidebarStyle : SidebarStyle -> Navigator page msg -> Navigator page msg
 withSidebarStyle style (Navigator nav) =
-    Navigator { nav | sidebarStyle = style }
+    Navigator
+        { nav
+            | sidebarStyle = style
+            , menu = Menu.toggleExpanded False nav.menu
+        }
 
 
 {-| Persistent style of the sidebar. It occupies more space when open pushing
