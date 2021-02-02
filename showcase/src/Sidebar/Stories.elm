@@ -82,7 +82,8 @@ nonPersistentView renderConfig model =
 page : Element Msg
 page =
     storyBorder <|
-        Element.el [ width (px 800), height (px 600) ] Element.none
+        Element.el [ width (px 800), height (px 600) ]
+            (Element.text "Example content")
 
 
 menu : Model -> Menu.Menu Msg
