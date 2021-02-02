@@ -6,6 +6,7 @@ module UI.NavigationContainer exposing
     , withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages, MenuPage, menuPage
     , Dialog, dialog, dialogV2
     , toBrowserDocument
+    , SidebarStyle(..), withSidebarStyle
     )
 
 {-| The `UI.NavigationContainer` (abbreviated as `Nav`) is a page presenter.
@@ -173,7 +174,6 @@ type alias Container msg =
     , title : String
     , dialog : Maybe (Dialog msg)
     , hasMenu : Bool
-    , hasPersistentSidebar : Bool
     }
 
 
@@ -187,7 +187,15 @@ type Navigator page msg
 type alias NavigatorRecord page msg =
     { container : page -> Container msg
     , menu : Menu.Menu msg
+    , sidebarStyle : SidebarStyle
     }
+
+
+{-| The behavior/appearance that the sidebar will have when enabled
+-}
+type SidebarStyle
+    = PersistentSidebar
+    | NonPersistentSidebar
 
 
 {-| Stacked children are typical on mobile.
@@ -281,6 +289,11 @@ withMenuLogo hint body (Navigator nav) =
     Navigator { nav | menu = menuWithLogo nav.menu }
 
 
+withSidebarStyle : SidebarStyle -> Navigator page msg -> Navigator page msg
+withSidebarStyle style (Navigator nav) =
+    Navigator { nav | sidebarStyle = style }
+
+
 
 -- Helpers
 
@@ -293,7 +306,6 @@ containerMap applier data =
     , hasMenu = data.hasMenu
     , content = contentMap applier data.content
     , dialog = Maybe.map (dialogMap applier) data.dialog
-    , hasPersistentSidebar = data.hasPersistentSidebar
     }
 
 
@@ -423,6 +435,7 @@ navigator applier (State state) pagesContainers =
     Navigator <|
         NavigatorRecord pagesContainers
             (menu applier state)
+            PersistentSidebar
 
 
 {-| `Nav.dialog` constructs a [`Nav.Dialog`](#Dialog) from a title, a close message, and the dialog's view.
@@ -488,7 +501,7 @@ toBrowserDocument cfg page (Navigator model) =
         container =
             model.container page
 
-        { content, title, hasMenu, hasPersistentSidebar } =
+        { content, title, hasMenu } =
             container
 
         ( contentBody, maybeStack, seenTitle ) =
@@ -503,11 +516,13 @@ toBrowserDocument cfg page (Navigator model) =
                         seenTitle
                         maybeStack
 
-                else if hasPersistentSidebar then
-                    SideBar.desktopPersistent cfg contentBody model.menu
-
                 else
-                    SideBar.desktopNonPersistent cfg contentBody model.menu
+                    case model.sidebarStyle of
+                        PersistentSidebar ->
+                            SideBar.desktopPersistent cfg contentBody model.menu
+
+                        NonPersistentSidebar ->
+                            SideBar.desktopNonPersistent cfg contentBody model.menu
 
             else
                 contentBody
