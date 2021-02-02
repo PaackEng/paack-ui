@@ -3,7 +3,9 @@ module UI.NavigationContainer exposing
     , Navigator, navigator
     , Container, containerMap
     , Content, contentSingle, StackChild, contentStackChild
-    , withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages, MenuPage, menuPage
+    , withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages
+    , MenuPage, menuPage, withSidebarStyle, sidebarPersistent
+    , sidebarNonPersistent
     , Dialog, dialog, dialogV2
     , toBrowserDocument
     )
@@ -67,7 +69,9 @@ Example of usage:
 
 # Menu
 
-@docs withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages, MenuPage, menuPage
+@docs withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages
+@docs MenuPage, menuPage, withSidebarStyle, sidebarPersistent
+@docs sidebarNonPersistent
 
 
 # Dialog
@@ -173,7 +177,6 @@ type alias Container msg =
     , title : String
     , dialog : Maybe (Dialog msg)
     , hasMenu : Bool
-    , hasPersistentSidebar : Bool
     }
 
 
@@ -187,7 +190,15 @@ type Navigator page msg
 type alias NavigatorRecord page msg =
     { container : page -> Container msg
     , menu : Menu.Menu msg
+    , sidebarStyle : SidebarStyle
     }
+
+
+{-| The behavior/appearance that the sidebar will have when enabled
+-}
+type SidebarStyle
+    = SidebarPersistent
+    | SidebarNonPersistent
 
 
 {-| Stacked children are typical on mobile.
@@ -281,6 +292,30 @@ withMenuLogo hint body (Navigator nav) =
     Navigator { nav | menu = menuWithLogo nav.menu }
 
 
+{-| `Nav.withSidebarStyle` takes a `SidebarStyle` setting the
+appearance/behavior of the sidebar when it is enabled by the `hasMenu` flag.
+-}
+withSidebarStyle : SidebarStyle -> Navigator page msg -> Navigator page msg
+withSidebarStyle style (Navigator nav) =
+    Navigator { nav | sidebarStyle = style }
+
+
+{-| Persistent style of the sidebar. It occupies more space when open pushing
+the content right.
+-}
+sidebarPersistent : SidebarStyle
+sidebarPersistent =
+    SidebarPersistent
+
+
+{-| Non-persistent style of the sidebar. Like the mobile sidebar, this style
+makes the sidebar open over the content with an overlay behind it.
+-}
+sidebarNonPersistent : SidebarStyle
+sidebarNonPersistent =
+    SidebarNonPersistent
+
+
 
 -- Helpers
 
@@ -293,7 +328,6 @@ containerMap applier data =
     , hasMenu = data.hasMenu
     , content = contentMap applier data.content
     , dialog = Maybe.map (dialogMap applier) data.dialog
-    , hasPersistentSidebar = data.hasPersistentSidebar
     }
 
 
@@ -423,6 +457,7 @@ navigator applier (State state) pagesContainers =
     Navigator <|
         NavigatorRecord pagesContainers
             (menu applier state)
+            SidebarPersistent
 
 
 {-| `Nav.dialog` constructs a [`Nav.Dialog`](#Dialog) from a title, a close message, and the dialog's view.
@@ -488,7 +523,7 @@ toBrowserDocument cfg page (Navigator model) =
         container =
             model.container page
 
-        { content, title, hasMenu, hasPersistentSidebar } =
+        { content, title, hasMenu } =
             container
 
         ( contentBody, maybeStack, seenTitle ) =
@@ -503,11 +538,13 @@ toBrowserDocument cfg page (Navigator model) =
                         seenTitle
                         maybeStack
 
-                else if hasPersistentSidebar then
-                    SideBar.desktopPersistent cfg contentBody model.menu
-
                 else
-                    SideBar.desktopNonPersistent cfg contentBody model.menu
+                    case model.sidebarStyle of
+                        SidebarPersistent ->
+                            SideBar.desktopPersistent cfg contentBody model.menu
+
+                        SidebarNonPersistent ->
+                            SideBar.desktopNonPersistent cfg contentBody model.menu
 
             else
                 contentBody
