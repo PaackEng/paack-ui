@@ -6,6 +6,7 @@ module UI.Internal.Menu exposing
     , Page
     , Properties
     , default
+    , toggleExpanded
     )
 
 import Element exposing (Element)
@@ -57,3 +58,8 @@ default toggle isExpanded =
         , actions = []
         , logo = Nothing
         }
+
+
+toggleExpanded : Bool -> Menu msg -> Menu msg
+toggleExpanded expanded (Menu props options) =
+    Menu { props | isExpanded = expanded } options

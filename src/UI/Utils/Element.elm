@@ -180,7 +180,7 @@ fadeOut : Transition msg
 fadeOut =
     { transition = "opacity .2s"
     , on = [ Element.alpha 0.5 ]
-    , off = [ Element.alpha 0 ]
+    , off = [ Element.alpha 0, tuplesToStyles ( "pointer-events", "none" ) ]
     }
 
 
