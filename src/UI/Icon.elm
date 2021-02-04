@@ -98,7 +98,6 @@ type Icon
 
 type IconGlyph
     = Add
-    | BackwardContent
     | Check
     | Close
     | Collapse
