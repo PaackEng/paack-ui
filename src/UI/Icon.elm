@@ -499,9 +499,6 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
             Add ->
                 svgIcon "Add"
 
-            BackwardContent ->
-                svgIcon "Chevron.Left"
-
             Check ->
                 svgIcon "Checkmark"
 
