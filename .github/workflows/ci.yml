@@ -34,8 +34,8 @@ jobs:
 
      - uses: PaackEng/elm-lint-action@main
        with:
-         compile-working-directory: 'showcase'
-         extra-path: 'showcase'
+         elm-working-directory: 'showcase'
+         extra-path: '../src'
 
   tests:
      runs-on: ubuntu-latest
