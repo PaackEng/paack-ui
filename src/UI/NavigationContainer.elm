@@ -1,5 +1,5 @@
 module UI.NavigationContainer exposing
-    ( Msg, State, stateInit, stateUpdate
+    ( Msg, State, stateInit, stateInitWithClosedMenu, stateUpdate
     , Navigator, navigator
     , Container, containerMap
     , Content, contentSingle, StackChild, contentStackChild
@@ -49,7 +49,7 @@ Example of usage:
 
 # Model & Update
 
-@docs Msg, State, stateInit, stateUpdate
+@docs Msg, State, stateInit, stateInitWithClosedMenu, stateUpdate
 
 
 # Building
@@ -297,11 +297,7 @@ appearance/behavior of the sidebar when it is enabled by the `hasMenu` flag.
 -}
 withSidebarStyle : SidebarStyle -> Navigator page msg -> Navigator page msg
 withSidebarStyle style (Navigator nav) =
-    Navigator
-        { nav
-            | sidebarStyle = style
-            , menu = Menu.toggleExpanded False nav.menu
-        }
+    Navigator { nav | sidebarStyle = style }
 
 
 {-| Persistent style of the sidebar. It occupies more space when open pushing
@@ -366,7 +362,7 @@ stateUpdate msg (State state) =
 -- Constructors
 
 
-{-| The correct way of instantiating a [`Nav.State`](#State).
+{-| The default way of instantiating a [`Nav.State`](#State).
 
     Nav.stateInit renderConfig
 
@@ -374,6 +370,17 @@ stateUpdate msg (State state) =
 stateInit : RenderConfig -> State
 stateInit cfg =
     State { menuExpanded = not <| RenderConfig.isMobile cfg }
+
+
+{-| An alternative way to initiate the [`Nav.State`](#State) with the sidebar
+closed.
+
+    Nav.stateInitWithClosedMenu renderConfig
+
+-}
+stateInitWithClosedMenu : State
+stateInitWithClosedMenu =
+    State { menuExpanded = False }
 
 
 {-| `Nav.contentSingle` indicates that the current page is a simple single page.
