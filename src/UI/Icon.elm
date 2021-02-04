@@ -98,7 +98,6 @@ type Icon
 
 type IconGlyph
     = Add
-    | BackwardContent
     | Check
     | Close
     | Collapse
@@ -499,9 +498,6 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
         case glyph of
             Add ->
                 svgIcon "Add"
-
-            BackwardContent ->
-                svgIcon "Chevron.Left"
 
             Check ->
                 svgIcon "Checkmark"
