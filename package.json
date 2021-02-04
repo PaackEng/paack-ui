@@ -43,6 +43,6 @@
   },
   "devDependencies": {
     "elm-doc-preview": "^5.0.5",
-    "elm-review": "^2.4.0"
+    "elm-review": "^2.4.1"
   }
 }
