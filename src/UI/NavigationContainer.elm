@@ -1,5 +1,5 @@
 module UI.NavigationContainer exposing
-    ( Msg, State, stateInit, stateInitWithClosedMenu, stateUpdate
+    ( Msg, State, stateInit, stateWithClosedMenu, stateUpdate
     , Navigator, navigator
     , Container, containerMap
     , Content, contentSingle, StackChild, contentStackChild
@@ -49,7 +49,7 @@ Example of usage:
 
 # Model & Update
 
-@docs Msg, State, stateInit, stateInitWithClosedMenu, stateUpdate
+@docs Msg, State, stateInit, stateWithClosedMenu, stateUpdate
 
 
 # Building
@@ -372,15 +372,14 @@ stateInit cfg =
     State { menuExpanded = not <| RenderConfig.isMobile cfg }
 
 
-{-| An alternative way to initiate the [`Nav.State`](#State) with the sidebar
-closed.
+{-| Force the menu to be closed on the [`Nav.State`](#State).
 
     Nav.stateInitWithClosedMenu renderConfig
 
 -}
-stateInitWithClosedMenu : State
-stateInitWithClosedMenu =
-    State { menuExpanded = False }
+stateWithClosedMenu : State -> State
+stateWithClosedMenu (State state) =
+    State { state | menuExpanded = False }
 
 
 {-| `Nav.contentSingle` indicates that the current page is a simple single page.
