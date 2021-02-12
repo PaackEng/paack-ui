@@ -3020,15 +3020,15 @@ elm-hot@^1.1.6:
   resolved "https://registry.yarnpkg.com/elm-hot/-/elm-hot-1.1.6.tgz#93e3962b40670e65f0a3640951b3add2702bfd0e"
   integrity sha512-zYZJlfs7Gt4BdjA+D+857K+XAWzwwySJmXCgFpHW1dIEfaHSZCIPYPf7/jinZBLfKRkOAlKzI32AA84DY50g7Q==
 
-elm-review@^2.4.0:
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/elm-review/-/elm-review-2.4.1.tgz#a0f4685850d9697f5b36cdf9c01073edef6a3f8a"
-  integrity sha512-2nirbEpOvOCgVylf5l6mtu+IqM//8kBeuj6zELPHmzWtn7heZTC0AS7fUtLVtnkgw9Cws8oh4tFLmHgVALE+dw==
+elm-review@^2.4.2:
+  version "2.4.2"
+  resolved "https://registry.yarnpkg.com/elm-review/-/elm-review-2.4.2.tgz#e725ca51a3f82bfd119fcd450ca810588218f3cd"
+  integrity sha512-N1WIey2DB6uZDPctvbDH5Wp5M53y5K9LIUkPW/e65NxeWwghdtA4gGjD7thnI6VbNS6stGGAiH9KP+Hz7ZeqTQ==
   dependencies:
     chalk "^4.0.0"
     chokidar "^3.4.0"
     cross-spawn "^7.0.3"
-    elm-tooling "^1.0.1"
+    elm-tooling "^1.2.0"
     find-up "^4.1.0"
     folder-hash "^3.3.0"
     fs-extra "^9.0.0"
@@ -3060,10 +3060,10 @@ elm-test@^0.19.1-revision6:
     which "^2.0.2"
     xmlbuilder "^15.1.0"
 
-elm-tooling@^1.0.1, elm-tooling@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/elm-tooling/-/elm-tooling-1.1.0.tgz#3ce99b12f0ba82bdb53921a267835966f5a1432a"
-  integrity sha512-wziiwTbqBkK/905a6stCpTWJhYEKNb4CCYt36VEd5XWmaLSelMOR+SxKcEPpxsiK/tFZ4o0PbW+h1QC5tWfYUQ==
+elm-tooling@^1.1.0, elm-tooling@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/elm-tooling/-/elm-tooling-1.2.0.tgz#d5ad8302743e152f77ac76eadca22d2eb10f08a2"
+  integrity sha512-hp9HKubt41Xa8uAdlspEvVhizibwKsVHE5HA/bF5LVIaPDC0yQ43PtqrP13h5dzS6J1VYorYKtK6on9D0gkOmw==
 
 elm@^0.19.1-5:
   version "0.19.1-5"
