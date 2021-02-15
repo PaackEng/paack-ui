@@ -4145,9 +4145,10 @@ hyperlinker@^1.0.0:
   resolved "https://registry.yarnpkg.com/hyperlinker/-/hyperlinker-1.0.0.tgz#23dc9e38a206b208ee49bc2d6c8ef47027df0c0e"
   integrity sha512-Ty8UblRWFEcfSuIaajM34LdPXIhbs1ajEX/BBPv24J+enSVaEVY63xQ6lTO9VRYS5LAoghIG0IDJ+p+IPzKUQQ==
 
-i18n-json-to-elm@PedroHLC/i18n-json-to-elm:
-  version "1.1.1"
-  resolved "https://codeload.github.com/PedroHLC/i18n-json-to-elm/tar.gz/b50364908fdf02538d4729e39168fcc3fce2fd76"
+i18n-json-to-elm@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/i18n-json-to-elm/-/i18n-json-to-elm-1.1.2.tgz#acdfa3b090f670d7267fd2b71ba55f60257b0cf7"
+  integrity sha512-saKBocPnwDBk32KxSxyPChtGaEOkyBoKewGLi2/sA6TGkQ+s5mc/Cv+uEx2zhQ0M+8toVV89rFTIY58YBro+Zw==
   dependencies:
     elm-format "^0.8.3"
 
