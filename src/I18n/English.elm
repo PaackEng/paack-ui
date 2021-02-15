@@ -70,9 +70,17 @@ tablesDetails =
     }
 
 
+tablesSorting : TablesSorting
+tablesSorting =
+    { increase = "Sort from A - Z"
+    , decrease = "Sort from Z - A"
+    }
+
+
 tables : Tables
 tables =
     { details = tablesDetails
+    , sorting = tablesSorting
     }
 
 

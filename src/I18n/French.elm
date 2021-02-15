@@ -27,7 +27,7 @@ filtersSelect =
 
 filters : Filters
 filters =
-    { dateFormat = "DD/MM/YYYY"
+    { dateFormat = "JJ/MM/AAAA"
     , close = "Fermer"
     , clear = "Effacer"
     , apply = "Appliquer"
@@ -70,9 +70,17 @@ tablesDetails =
     }
 
 
+tablesSorting : TablesSorting
+tablesSorting =
+    { increase = "Sort from A - Z"
+    , decrease = "Sort from Z - A"
+    }
+
+
 tables : Tables
 tables =
     { details = tablesDetails
+    , sorting = tablesSorting
     }
 
 

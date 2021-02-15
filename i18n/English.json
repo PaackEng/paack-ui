@@ -15,11 +15,11 @@
             "to": "To: {{date}}"
         },
         "select": {
-            "description": "Select option for filtering" 
+            "description": "Select option for filtering"
         }
     },
     "paginator": {
-        "format": "{{first}} - {{last}} of {{total}}", 
+        "format": "{{first}} - {{last}} of {{total}}",
         "previous": "Previous",
         "next": "Next"
     },
@@ -34,8 +34,12 @@
     },
     "tables": {
         "details": {
-            "show" : "Expand",
+            "show": "Expand",
             "collapse": "Collapse"
+        },
+        "sorting": {
+            "increase": "Sort from A - Z",
+            "decrease": "Sort from Z - A"
         }
     },
     "dateInput": {

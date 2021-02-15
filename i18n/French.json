@@ -1,6 +1,6 @@
 {
     "filters": {
-        "dateFormat": "DD/MM/YYYY",
+        "dateFormat": "JJ/MM/AAAA",
         "close": "Fermer",
         "clear": "Effacer",
         "apply": "Appliquer",
@@ -36,6 +36,10 @@
         "details": {
             "show": "Elargir",
             "collapse": "Crash"
+        },
+        "sorting": {
+            "increase": "Sort from A - Z",
+            "decrease": "Sort from Z - A"
         }
     },
     "dateInput": {

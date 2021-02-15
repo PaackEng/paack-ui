@@ -59,8 +59,15 @@ type alias TablesDetails =
     }
 
 
+type alias TablesSorting =
+    { increase : String
+    , decrease : String
+    }
+
+
 type alias Tables =
     { details : TablesDetails
+    , sorting : TablesSorting
     }
 
 

@@ -17,12 +17,14 @@ import UI.Internal.Primitives as Primitives
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.Size as Size exposing (Size)
 import UI.Internal.Tables.Filters as Filters
+import UI.Internal.Tables.Sorters as Sorters exposing (SortingDirection(..))
 import UI.Internal.Text as Text
 import UI.Internal.Utils.Element exposing (overlay, tuplesToStyles, zIndex)
-import UI.Palette as Palette
+import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
 import UI.Radio as Radio
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
+import UI.Text as Text
 import UI.TextField as TextField exposing (TextField)
 import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element exposing (zeroPadding)
@@ -32,6 +34,7 @@ type alias Config msg =
     { openMsg : msg
     , discardMsg : msg
     , fromFiltersMsg : Filters.Msg -> msg
+    , fromSortersMsg : Sorters.Msg -> msg
     , index : Int
     , label : String
     , isOpen : Bool
@@ -41,9 +44,10 @@ type alias Config msg =
 header :
     RenderConfig
     -> Filters.Filter msg item
+    -> Sorters.ColumnStatus
     -> Config msg
     -> Element msg
-header renderConfig filter config =
+header renderConfig filter sorter config =
     let
         clearMsg =
             config.fromFiltersMsg <| Filters.Clear config.index
@@ -53,7 +57,7 @@ header renderConfig filter config =
 
         filterRender renderer editable =
             renderer renderConfig applyMsg config editable
-                |> dialog renderConfig config filter clearMsg applyMsg
+                |> dialog renderConfig config filter sorter clearMsg applyMsg
     in
     if config.isOpen then
         case filter of
@@ -74,7 +78,7 @@ header renderConfig filter config =
 
             Filters.SelectFilter list { editable } ->
                 selectFilterRender renderConfig config list editable
-                    |> dialog renderConfig config filter clearMsg applyMsg
+                    |> dialog renderConfig config filter sorter clearMsg applyMsg
 
     else if Filters.isApplied filter then
         headerApplied renderConfig
@@ -169,8 +173,8 @@ headerAttrs isApplied =
             if isApplied then
                 [ Background.color Colors.primary.middle
                 , Palette.color
-                    Palette.tonePrimary
-                    Palette.brightnessMiddle
+                    tonePrimary
+                    brightnessMiddle
                     |> Palette.setContrasting True
                     |> Palette.toElementColor
                     |> Font.color
@@ -288,11 +292,12 @@ dialog :
     RenderConfig
     -> Config msg
     -> Filters.Filter msg item
+    -> Sorters.ColumnStatus
     -> msg
     -> msg
     -> Element msg
     -> Element msg
-dialog renderConfig config filter clearMsg applyMsg content =
+dialog renderConfig config filter sorter clearMsg applyMsg content =
     let
         applied =
             Filters.isApplied filter
@@ -310,6 +315,7 @@ dialog renderConfig config filter clearMsg applyMsg content =
             , tuplesToStyles ( "width", "min-content" )
             ]
             [ dialogHeader renderConfig config.discardMsg config.label
+            , sortingView renderConfig config sorter
             , Element.column
                 [ Element.width fill
                 , Element.spacing 12
@@ -319,6 +325,51 @@ dialog renderConfig config filter clearMsg applyMsg content =
                     |> internalPaddingBox
                 ]
             ]
+
+
+sortingView : RenderConfig -> Config msg -> Sorters.ColumnStatus -> Element msg
+sortingView renderConfig config sorter =
+    case sorter of
+        Just direction ->
+            Element.column [ Element.width fill ]
+                [ sortAs renderConfig config SortIncreasing
+                , sortAs renderConfig config SortDecreasing
+                ]
+
+        Nothing ->
+            -- Unsortable
+            Element.none
+
+
+sortAs : RenderConfig -> Config msg -> SortingDirection -> Element msg
+sortAs renderConfig config direction =
+    let
+        terms =
+            localeTerms renderConfig
+
+        ( content, icon ) =
+            case direction of
+                SortIncreasing ->
+                    ( terms.tables.sorting.increase, Icon.sortIncreasing )
+
+                SortDecreasing ->
+                    ( terms.tables.sorting.decrease, Icon.sortDecreasing )
+    in
+    Element.row
+        ([ Element.width fill
+         , Element.paddingEach { top = 4, left = 12, bottom = 4, right = 8 }
+         , Border.color Colors.gray.lighter
+         , Border.widthEach { zeroPadding | bottom = 1 }
+         , Element.pointer
+         ]
+            ++ ARIA.toElementAttributes ARIA.roleButton
+        )
+        [ Text.caption content
+            |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
+            |> Text.renderElement renderConfig
+        , icon content
+            |> Icon.renderElement renderConfig
+        ]
 
 
 

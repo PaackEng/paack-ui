@@ -1,8 +1,10 @@
 module UI.Internal.Tables.Sorters exposing
-    ( Msg
+    ( ColumnStatus
+    , Msg(..)
     , Sorter(..)
     , Sorters
     , SortingDirection(..)
+    , get
     , itemsApplySorting
     , notSorting
     , sortBy
@@ -13,6 +15,7 @@ module UI.Internal.Tables.Sorters exposing
     , update
     )
 
+import UI.Internal.Basics exposing (flip)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Utils.TypeNumbers as T
 
@@ -40,6 +43,10 @@ type Sorters item columns
         { columns : NArray (Sorter item) columns
         , status : Maybe (SortingStatus item)
         }
+
+
+type alias ColumnStatus =
+    Maybe (Maybe SortingDirection)
 
 
 update : Msg -> Sorters item columns -> ( Sorters item columns, Cmd msg )
@@ -127,3 +134,26 @@ sort direction column ((Sorters accu) as sorters) =
 notSorting : Sorters item columns -> Sorters item columns
 notSorting (Sorters sorters) =
     Sorters { sorters | status = Nothing }
+
+
+get : Int -> Sorters item columns -> ColumnStatus
+get index (Sorters { columns, status }) =
+    let
+        getDirection currentSorting =
+            if currentSorting.column == index then
+                Just currentSorting.direction
+
+            else
+                Nothing
+
+        isSortableThen sortable =
+            case sortable of
+                Sortable _ ->
+                    Just (Maybe.andThen getDirection status)
+
+                Unsortable ->
+                    Nothing
+    in
+    Maybe.andThen
+        isSortableThen
+        (NArray.get index columns)

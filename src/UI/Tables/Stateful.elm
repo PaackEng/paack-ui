@@ -1170,6 +1170,7 @@ desktopView renderConfig prop opt =
                 prop.toExternalMsg
                 state.filterDialog
                 state.filters
+                state.sorters
                 columns
                 selectionHeader
     in
@@ -1233,10 +1234,11 @@ headersRender :
     -> (Msg item -> msg)
     -> Maybe Int
     -> Maybe (Filters.Filters msg item columns)
+    -> Maybe (Sorters.Sorters item columns)
     -> List Column
     -> Maybe (Element msg)
     -> ( String, Element msg )
-headersRender renderConfig toExternalMsg selected filters columns selectionHeader =
+headersRender renderConfig toExternalMsg selected filters sorters columns selectionHeader =
     ( "@headers"
     , Element.row headersAttr <|
         case filters of
@@ -1244,7 +1246,10 @@ headersRender renderConfig toExternalMsg selected filters columns selectionHeade
                 filterArr
                     |> NArray.toList
                     |> List.map2 (filterHeader renderConfig toExternalMsg selected) columns
-                    |> List.indexedMap (\index val -> val index)
+                    |> List.indexedMap
+                        (\index val ->
+                            val (Maybe.andThen (Sorters.get index) sorters) index
+                        )
                     |> prependMaybe selectionHeader
 
             Nothing ->
@@ -1264,14 +1269,17 @@ filterHeader :
     -> Maybe Int
     -> Column
     -> Filters.Filter msg item
+    -> Sorters.ColumnStatus
     -> Int
     -> Element msg
-filterHeader renderConfig toExternalMsg selected (Column header { width }) filter index =
+filterHeader renderConfig toExternalMsg selected (Column header { width }) filter sorter index =
     FiltersView.header renderConfig
         filter
+        sorter
         { openMsg = toExternalMsg <| FilterDialogOpen index
         , discardMsg = toExternalMsg <| FilterDialogClose
         , fromFiltersMsg = ForFilters >> toExternalMsg
+        , fromSortersMsg = ForSorters >> toExternalMsg
         , index = index
         , label = header
         , isOpen = selected == Just index
