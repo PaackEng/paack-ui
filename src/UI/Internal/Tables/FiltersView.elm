@@ -368,6 +368,8 @@ sortAs renderConfig config direction =
             |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
             |> Text.renderElement renderConfig
         , icon content
+            |> Icon.withColor (Palette.color tonePrimary brightnessMiddle)
+            |> Icon.withSize Size.extraSmall
             |> Icon.renderElement renderConfig
         ]
 

@@ -538,7 +538,7 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
                 svgIcon "Trash"
 
             DownArrow ->
-                svgIcon "Chevron.Down"
+                svgIcon "Chevron-Down"
 
             Download ->
                 svgIcon "Download"
@@ -565,7 +565,7 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
                 svgIcon "Move"
 
             NextContent ->
-                svgIcon "Chevron.Right"
+                svgIcon "Chevron-Right"
 
             Notifications ->
                 svgIcon "Bell"
@@ -574,10 +574,10 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
                 svgIcon "Space"
 
             Packages ->
-                svgIcon "Box.Outlined"
+                svgIcon "Box-Outlined"
 
             PreviousContent ->
-                svgIcon "Chevron.Left"
+                svgIcon "Chevron-Left"
 
             Print ->
                 svgIcon "Printer"
@@ -592,22 +592,22 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
                 svgIcon "Search"
 
             SearchSpace ->
-                svgIcon "Space.Search"
+                svgIcon "Space-Search"
 
             SeeMore ->
                 svgIcon "Ellipsis"
 
             SortDecreasing ->
-                svgIcon "Arrow.Up"
+                svgIcon "Arrow-Up"
 
             SortIncreasing ->
-                svgIcon "Arrow.Down"
+                svgIcon "Arrow-Down"
 
             Toggle ->
                 svgIcon "Map"
 
             ToggleUp ->
-                svgIcon "Chevron.Up"
+                svgIcon "Chevron-Up"
 
             Warning ->
                 svgIcon "Warning"
