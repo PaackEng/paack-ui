@@ -98,9 +98,10 @@ type Icon
     = Icon Properties Options
 
 
-type
-    IconGlyph
-    -- When addig, name the icons as "actions" and not what they look like
+{-| When addig new icons, name them as "actions" and not what they look like.
+For more information read this module's main documentation.
+-}
+type IconGlyph
     = Add
     | Check
     | Close

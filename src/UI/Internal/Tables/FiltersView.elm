@@ -359,13 +359,13 @@ sortAs renderConfig { fromSortersMsg, index } direction current =
             current == Just (Just direction)
     in
     Element.row
-        (ARIA.toElementAttributes ARIA.roleButton
+        (Events.onClick (fromSortersMsg <| Sorters.SetSorting index direction)
+            :: Element.pointer
             :: Element.width fill
             :: Element.paddingEach { top = 4, left = 12, bottom = 4, right = 8 }
             :: Border.color Colors.gray.lighter
             :: Border.widthEach { zeroPadding | bottom = 1 }
-            :: Element.pointer
-            :: Events.onClick (fromSortersMsg <| Sorters.SetSorting index direction)
+            :: ARIA.toElementAttributes ARIA.roleButton
             |> prependIf selected (Background.color <| Colors.gray.lightest)
         )
         [ Text.caption content
