@@ -27,7 +27,7 @@ filtersSelect =
 
 filters : Filters
 filters =
-    { dateFormat = "JJ/MM/AAAA"
+    { dateFormat = "DD/MM/YYYY"
     , close = "Fermer"
     , clear = "Effacer"
     , apply = "Appliquer"
