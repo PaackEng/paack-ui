@@ -10,7 +10,7 @@ import Element.Events as Events
 import Element.Font as Font
 import UI.Button as Button
 import UI.Icon as Icon
-import UI.Internal.Basics exposing (maybeNotThen)
+import UI.Internal.Basics exposing (maybeNotThen, prependIf)
 import UI.Internal.Colors as Colors
 import UI.Internal.DateInput as DateInput exposing (DateInput(..), PeriodComparison(..), PeriodDate, RangeDate)
 import UI.Internal.Primitives as Primitives
@@ -330,10 +330,10 @@ dialog renderConfig config filter sorter clearMsg applyMsg content =
 sortingView : RenderConfig -> Config msg -> Sorters.ColumnStatus -> Element msg
 sortingView renderConfig config sorter =
     case sorter of
-        Just direction ->
+        Just _ ->
             Element.column [ Element.width fill ]
-                [ sortAs renderConfig config SortIncreasing
-                , sortAs renderConfig config SortDecreasing
+                [ sortAs renderConfig config SortIncreasing sorter
+                , sortAs renderConfig config SortDecreasing sorter
                 ]
 
         Nothing ->
@@ -341,8 +341,8 @@ sortingView renderConfig config sorter =
             Element.none
 
 
-sortAs : RenderConfig -> Config msg -> SortingDirection -> Element msg
-sortAs renderConfig config direction =
+sortAs : RenderConfig -> Config msg -> SortingDirection -> Sorters.ColumnStatus -> Element msg
+sortAs renderConfig { fromSortersMsg, index } direction current =
     let
         terms =
             localeTerms renderConfig
@@ -354,15 +354,19 @@ sortAs renderConfig config direction =
 
                 SortDecreasing ->
                     ( terms.tables.sorting.decrease, Icon.sortDecreasing )
+
+        selected =
+            current == Just (Just direction)
     in
     Element.row
-        ([ Element.width fill
-         , Element.paddingEach { top = 4, left = 12, bottom = 4, right = 8 }
-         , Border.color Colors.gray.lighter
-         , Border.widthEach { zeroPadding | bottom = 1 }
-         , Element.pointer
-         ]
-            ++ ARIA.toElementAttributes ARIA.roleButton
+        (ARIA.toElementAttributes ARIA.roleButton
+            :: Element.width fill
+            :: Element.paddingEach { top = 4, left = 12, bottom = 4, right = 8 }
+            :: Border.color Colors.gray.lighter
+            :: Border.widthEach { zeroPadding | bottom = 1 }
+            :: Element.pointer
+            :: Events.onClick (fromSortersMsg <| Sorters.SetSorting index direction)
+            |> prependIf selected (Background.color <| Colors.gray.lightest)
         )
         [ Text.caption content
             |> Text.withColor (Palette.color tonePrimary brightnessMiddle)

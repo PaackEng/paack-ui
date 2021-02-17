@@ -1,4 +1,4 @@
-module UI.Internal.Basics exposing (flip, ifThenElse, lazyMap, maybeAnd, maybeNotThen, maybeThen, pairUncurry, prependMaybe)
+module UI.Internal.Basics exposing (..)
 
 
 prependMaybe : Maybe a -> List a -> List a
@@ -9,6 +9,15 @@ prependMaybe maybeSomething items =
 
         Nothing ->
             items
+
+
+prependIf : Bool -> a -> List a -> List a
+prependIf condition something items =
+    if condition then
+        something :: items
+
+    else
+        items
 
 
 lazyMap : (a -> b) -> (c -> a) -> (c -> b)

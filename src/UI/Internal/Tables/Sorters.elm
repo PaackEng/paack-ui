@@ -15,13 +15,12 @@ module UI.Internal.Tables.Sorters exposing
     , update
     )
 
-import UI.Internal.Basics exposing (flip)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Utils.TypeNumbers as T
 
 
 type Msg
-    = ToDo
+    = SetSorting Int SortingDirection
 
 
 type Sorter item
@@ -50,8 +49,20 @@ type alias ColumnStatus =
 
 
 update : Msg -> Sorters item columns -> ( Sorters item columns, Cmd msg )
-update _ sorters =
-    ( sorters, Cmd.none )
+update msg ((Sorters sorters) as sorters_) =
+    case msg of
+        SetSorting index direction ->
+            case NArray.get index sorters.columns of
+                Just (Sortable by) ->
+                    ( Sorters
+                        { sorters
+                            | status = Just { column = index, by = by, direction = direction }
+                        }
+                    , Cmd.none
+                    )
+
+                _ ->
+                    ( sorters_, Cmd.none )
 
 
 itemsApplySorting : Sorters item columns -> List item -> List item
