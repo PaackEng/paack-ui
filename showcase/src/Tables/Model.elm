@@ -24,4 +24,5 @@ initModel =
             |> Table.stateWithSelection .isbn False
             |> Table.stateWithFilters Book.filters
             |> Table.stateWithSorters Book.sorters
+            |> Table.stateWithItems Book.books
     }
