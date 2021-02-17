@@ -335,6 +335,18 @@ init =
         }
 
 
+{-| Each of these items will become a row in this table.
+
+    stateWithItems
+        [ Book "Dan Brown" "Angels & Demons" "2000"
+        , Book "Dan Brown" "The Da Vinci Code" "2003"
+        , Book "Dan Brown" "The Lost Symbol" "2009"
+        , Book "Dan Brown" "Inferno" "2013"
+        , Book "Dan Brown" "Origin" "2017"
+        ]
+        someTableState
+
+-}
 stateWithItems : List item -> State msg item columns -> State msg item columns
 stateWithItems items (State state) =
     State
@@ -1048,6 +1060,15 @@ stateWithSorters sorters (State state) =
         }
 
 
+{-| Describes how to convert a column's value to a sortable `List String`.
+
+    sortersInit =
+        sortersEmpty
+            |> sortBy .title
+            |> sortBy .author
+            |> unsortable
+
+-}
 sortBy :
     (item -> String)
     -> Sorters item columns
@@ -1056,21 +1077,55 @@ sortBy =
     Sorters.sortBy
 
 
+{-| Changes the initial sorting to some columns as descreasing.
+
+    model =
+        stateWithSorters
+            (Book.sortersInit |> sortDecreasing 1)
+            init
+
+-}
 sortDecreasing : Int -> Sorters item columns -> Sorters item columns
 sortDecreasing =
     Sorters.sortDecreasing
 
 
+{-| Changes the initial sorting to some columns as increasing.
+
+    model =
+        stateWithSorters
+            (Book.sortersInit |> sortIncreasing 1)
+            init
+
+-}
 sortIncreasing : Int -> Sorters item columns -> Sorters item columns
 sortIncreasing =
     Sorters.sortIncreasing
 
 
+{-| An empty [`Sorters`](#Sorters) set.
+
+    sortersInit =
+        sortersEmpty
+            |> sortBy .title
+            |> sortBy .author
+            |> unsortable
+
+-}
 sortersEmpty : Sorters item T.Zero
 sortersEmpty =
     Sorters.sortersEmpty
 
 
+{-| Describes that some column is not sortable.
+
+    sortersInit =
+        sortersEmpty
+            |> sortBy .title
+            |> sortBy .author
+            |> unsortable
+
+-}
 unsortable : Sorters item columns -> Sorters item (T.Increase columns)
 unsortable =
     Sorters.unsortable

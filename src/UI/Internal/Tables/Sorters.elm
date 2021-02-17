@@ -6,7 +6,6 @@ module UI.Internal.Tables.Sorters exposing
     , SortingDirection(..)
     , get
     , itemsApplySorting
-    , notSorting
     , sortBy
     , sortDecreasing
     , sortIncreasing
@@ -49,20 +48,10 @@ type alias ColumnStatus =
 
 
 update : Msg -> Sorters item columns -> ( Sorters item columns, Cmd msg )
-update msg ((Sorters sorters) as sorters_) =
+update msg sorters =
     case msg of
         SetSorting index direction ->
-            case NArray.get index sorters.columns of
-                Just (Sortable by) ->
-                    ( Sorters
-                        { sorters
-                            | status = Just { column = index, by = by, direction = direction }
-                        }
-                    , Cmd.none
-                    )
-
-                _ ->
-                    ( sorters_, Cmd.none )
+            ( sort direction index sorters, Cmd.none )
 
 
 itemsApplySorting : Sorters item columns -> List item -> List item
@@ -140,11 +129,6 @@ sort direction column ((Sorters accu) as sorters) =
 
         Nothing ->
             sorters
-
-
-notSorting : Sorters item columns -> Sorters item columns
-notSorting (Sorters sorters) =
-    Sorters { sorters | status = Nothing }
 
 
 get : Int -> Sorters item columns -> ColumnStatus
