@@ -11,7 +11,7 @@ module UI.Tables.Stateful exposing
     , localSelectFilter, remoteSelectFilter
     , Sorters, stateWithSorters
     , sortersEmpty, sortBy, unsortable
-    , notSorting, sortDecreasing, sortIncreasing
+    , sortDecreasing, sortIncreasing
     , withWidth
     , stateWithSelection, stateIsSelected
     , renderElement
@@ -141,7 +141,7 @@ And on model:
 
 @docs Sorters, stateWithSorters
 @docs sortersEmpty, sortBy, unsortable
-@docs notSorting, sortDecreasing, sortIncreasing
+@docs sortDecreasing, sortIncreasing
 
 
 # Width
@@ -1020,10 +1020,22 @@ withWidth width (Table prop opt_) =
 -- Sorting
 
 
+{-| Array with all the columns' sorting definitions.
+
+This is a type-safe sized-array.
+See [`TypeNumbers`](UI-Utils-TypeNumbers) for how to compose its phantom type.
+
+-}
 type alias Sorters item columns =
     Sorters.Sorters item columns
 
 
+{-| Apply sortings defintion to a table's [`State`](#State).
+
+    model =
+        stateWithSorters Book.sortersInit init
+
+-}
 stateWithSorters : Sorters item columns -> State msg item columns -> State msg item columns
 stateWithSorters sorters (State state) =
     State
@@ -1034,11 +1046,6 @@ stateWithSorters sorters (State state) =
                     |> maybeThen Filters.itemsApplyFilters state.filters
                     |> Sorters.itemsApplySorting sorters
         }
-
-
-notSorting : Sorters item columns -> Sorters item columns
-notSorting =
-    Sorters.notSorting
 
 
 sortBy :
