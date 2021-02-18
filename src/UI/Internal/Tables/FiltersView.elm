@@ -119,29 +119,23 @@ headerSelectToggle renderConfig toggleMsg =
 headerNormal : RenderConfig -> msg -> String -> Sorters.ColumnStatus -> Element msg
 headerNormal renderConfig openMsg label sorting =
     -- Button.light
-    Element.row (Element.onIndividualClick openMsg :: headerAttrs False)
-        [ headerText renderConfig False label
-        , headerSorting renderConfig False sorting
-        , Icon.filter label
-            |> Icon.withSize contextSize
-            |> Icon.withColor (headerColor False)
-            |> Icon.renderElement renderConfig
-            |> Element.el [ Element.alignRight ]
-        ]
+    Icon.filter label
+        |> Icon.withSize contextSize
+        |> Icon.withColor (headerColor False)
+        |> Icon.renderElement renderConfig
+        |> Element.el [ Element.alignRight ]
+        |> headerBox renderConfig openMsg label sorting False
 
 
 headerApplied : RenderConfig -> msg -> msg -> String -> String -> Sorters.ColumnStatus -> Element msg
 headerApplied renderConfig openMsg clearMsg clearHint label sorting =
     -- Button.primary
-    Element.row (Element.onIndividualClick openMsg :: headerAttrs True)
-        [ headerText renderConfig True label
-        , headerSorting renderConfig True sorting
-        , Button.fromIcon (Icon.close clearHint)
-            |> Button.cmd clearMsg Button.primary
-            |> Button.withSize contextSize
-            |> Button.renderElement renderConfig
-            |> Element.el [ Element.alignRight ]
-        ]
+    Button.fromIcon (Icon.close clearHint)
+        |> Button.cmd clearMsg Button.primary
+        |> Button.withSize contextSize
+        |> Button.renderElement renderConfig
+        |> Element.el [ Element.alignRight ]
+        |> headerBox renderConfig openMsg label sorting True
 
 
 headerText : RenderConfig -> Bool -> String -> Element msg
@@ -149,11 +143,23 @@ headerText renderConfig isApplied label =
     label
         |> Text.ellipsizedText renderConfig Text.SizeCaption
         |> Element.el
-            (Font.size textSize
-                :: Font.semiBold
-                :: Font.color (Palette.toElementColor <| headerColor isApplied)
-                :: shrinkButClip
-            )
+            [ Font.size textSize
+            , Font.semiBold
+            , Font.color (Palette.toElementColor <| headerColor isApplied)
+            , Element.centerY
+            ]
+
+
+headerBox : RenderConfig -> msg -> String -> Sorters.ColumnStatus -> Bool -> Element msg -> Element msg
+headerBox renderConfig openMsg label sorting isFilterApplied rightIcon =
+    Element.row (Element.onIndividualClick openMsg :: headerAttrs isFilterApplied)
+        [ Element.row shrinkButClip
+            [ headerText renderConfig isFilterApplied label
+            , headerSorting renderConfig isFilterApplied sorting
+            ]
+            |> Element.el [ Element.width fill, Element.clip ]
+        , rightIcon
+        ]
 
 
 headerColor : Bool -> Palette.Color

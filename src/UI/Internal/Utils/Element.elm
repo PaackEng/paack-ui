@@ -83,9 +83,11 @@ overlay closeMsg content =
 
 shrinkButClip : List (Attribute msg)
 shrinkButClip =
-    [ Element.htmlAttribute <| HtmlAttrs.style "width" "min-content"
-    , Element.htmlAttribute <| HtmlAttrs.style "max-width" "100%"
-    ]
+    List.map tuplesToStyles
+        [ ( "width", "min-content" )
+        , ( "max-width", "100%" )
+        , ( "overflow", "clip" )
+        ]
 
 
 
