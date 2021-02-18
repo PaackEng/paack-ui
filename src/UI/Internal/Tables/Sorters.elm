@@ -20,6 +20,7 @@ import UI.Utils.TypeNumbers as T
 
 type Msg
     = SetSorting Int SortingDirection
+    | ClearSorting
 
 
 type Sorter item
@@ -52,6 +53,14 @@ update msg sorters =
     case msg of
         SetSorting index direction ->
             ( sort direction index sorters, Cmd.none )
+
+        ClearSorting ->
+            ( clear sorters, Cmd.none )
+
+
+clear : Sorters item columns -> Sorters item columns
+clear (Sorters sorters) =
+    Sorters { sorters | status = Nothing }
 
 
 itemsApplySorting : Sorters item columns -> List item -> List item

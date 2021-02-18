@@ -4,6 +4,7 @@ module UI.Internal.Utils.Element exposing
     , overflowAttrs
     , overflowVisible
     , overlay
+    , shrinkButClip
     , style
     , title
     , tuplesToStyles
@@ -78,6 +79,13 @@ overlay closeMsg content =
         , Element.inFront content
         ]
         (overlayBackground closeMsg)
+
+
+shrinkButClip : List (Attribute msg)
+shrinkButClip =
+    [ Element.htmlAttribute <| HtmlAttrs.style "width" "min-content"
+    , Element.htmlAttribute <| HtmlAttrs.style "max-width" "100%"
+    ]
 
 
 

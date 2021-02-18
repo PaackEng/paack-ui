@@ -38,8 +38,8 @@
             "collapse": "Crash"
         },
         "sorting": {
-            "increase": "Sort from A - Z",
-            "decrease": "Sort from Z - A"
+            "increase": "Trier de A à Z",
+            "decrease": "Trier de Z à A"
         }
     },
     "dateInput": {
