@@ -101,7 +101,8 @@ header renderConfig filter sorting config =
 
 headerSelectToggle : RenderConfig -> msg -> Element msg
 headerSelectToggle renderConfig toggleMsg =
-    Icon.check ""
+    (localeTerms renderConfig |> .tables |> .selectAll)
+        |> Icon.check
         |> Icon.withSize contextSize
         |> Icon.renderElement renderConfig
         |> Element.el

@@ -40,7 +40,9 @@
         "sorting": {
             "increase": "Sort from A - Z",
             "decrease": "Sort from Z - A"
-        }
+        },
+        "selectRow": "Select this row.",
+        "selectAll": "Select all rows"
     },
     "dateInput": {
         "invalid": "Invalid date format."

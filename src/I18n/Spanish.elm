@@ -81,6 +81,8 @@ tables : Tables
 tables =
     { details = tablesDetails
     , sorting = tablesSorting
+    , selectRow = "Select this row."
+    , selectAll = "Select all rows"
     }
 
 

@@ -1372,7 +1372,7 @@ selectionCell : RenderConfig -> Selection item -> item -> ( String, Element (Msg
 selectionCell renderConfig selection item =
     item
         |> internalIsSelected selection
-        |> checkbox "Select row" (SelectionSet item)
+        |> checkbox (localeTerms renderConfig |> .tables |> .selectRow) (SelectionSet item)
         |> Checkbox.withLabelVisible False
         |> Checkbox.renderElement renderConfig
         |> Element.el

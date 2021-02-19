@@ -68,6 +68,8 @@ type alias TablesSorting =
 type alias Tables =
     { details : TablesDetails
     , sorting : TablesSorting
+    , selectRow : String
+    , selectAll : String
     }
 
 
