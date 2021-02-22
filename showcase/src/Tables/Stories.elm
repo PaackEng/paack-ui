@@ -54,9 +54,8 @@ desktopTableStory renderConfig =
         ( "Desktop"
         , \{ tablesStories } ->
             demoTable renderConfig
-                Book.tablePixelColumns
+                forMainDemoTableConfig
                 tablesStories.mainTableState
-                Stories.ForMain
                 |> withIcons
         , reducedToDocs "Tables-Stateful"
         )
@@ -68,9 +67,8 @@ mobileTableStory =
         ( "Mobile"
         , \{ tablesStories } ->
             demoTable mobileCfg
-                Book.tablePixelColumns
+                forMainDemoTableConfig
                 tablesStories.mainTableState
-                Stories.ForMain
                 |> Element.el
                     [ Element.width fill
                     , Element.height (px 450)
@@ -80,19 +78,31 @@ mobileTableStory =
         )
 
 
+forMainDemoTableConfig : Stateful.StatefulConfig Msg Book T.Five
+forMainDemoTableConfig =
+    { columns = Book.tablePixelColumns
+    , toRow = Book.toTableRow
+    , toExternalMsg = Stories.ForMain >> Msg.TablesStoriesMsg
+    }
+
+
+forSelecteableDemoTableConfig : Stateful.StatefulConfig Msg Book T.Five
+forSelecteableDemoTableConfig =
+    { columns = Book.tablePortionColumns
+    , toRow = Book.toTableRow
+    , toExternalMsg = Stories.ForSelectable >> Msg.TablesStoriesMsg
+    }
+
+
 demoTable :
     RenderConfig
-    -> Tables.Columns T.Five
+    -> Stateful.StatefulConfig Msg Book T.Five
     -> Stateful.State Msg Book T.Five
-    -> (Stateful.Msg Book -> Stories.Msg)
     -> Element Msg
-demoTable renderConfig columns state msg =
+demoTable renderConfig config state =
     Stateful.table
-        { toExternalMsg = msg >> Msg.TablesStoriesMsg
-        , columns = columns
-        , toRow = Book.toTableRow
-        , state = state
-        }
+        config
+        state
         |> Stateful.withResponsive
             { toDetails = Book.toTableDetails
             , toCover = Book.toTableCover
@@ -142,9 +152,8 @@ selectableTableStory renderConfig =
         ( "Selectable"
         , \{ tablesStories } ->
             demoTable renderConfig
-                Book.tablePixelColumns
+                forSelecteableDemoTableConfig
                 tablesStories.selecTableState
-                Stories.ForSelectable
                 |> withIcons
         , reducedToDocs "Tables-Stateful"
         )
@@ -156,9 +165,8 @@ portionColumnsTable renderConfig =
         ( "Portion Columns"
         , \{ tablesStories } ->
             demoTable renderConfig
-                Book.tablePortionColumns
+                forSelecteableDemoTableConfig
                 tablesStories.selecTableState
-                Stories.ForSelectable
                 |> withIcons
         , reducedToDocs "Tables-Stateful"
         )

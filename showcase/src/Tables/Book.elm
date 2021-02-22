@@ -130,6 +130,8 @@ books =
       , isbn = "9780618002245"
       }
     ]
+        |> List.repeat 300
+        |> List.concat
 
 
 tablePixelColumns : Tables.Columns T.Five

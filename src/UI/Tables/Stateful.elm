@@ -170,6 +170,7 @@ TODO: withRemoteSelection
 
 import Element exposing (Element, fill, px, shrink)
 import Element.Keyed as Keyed
+import Element.Lazy exposing (lazy4)
 import Set exposing (Set)
 import Time
 import UI.Checkbox as Checkbox exposing (checkbox)
@@ -195,7 +196,7 @@ See [`TypeNumbers`](UI-Utils-TypeNumbers) for how to compose its phantom type.
 
 -}
 type StatefulTable msg item columns
-    = Table (StatefulConfig msg item columns) (Options msg item columns)
+    = Table (StatefulConfig msg item columns) (State msg item columns) (Options msg item columns)
 
 
 {-| Record with parameters for the creation of a [`StatefulTable`](#table).
@@ -214,7 +215,6 @@ type alias StatefulConfig msg item columns =
     { columns : Columns columns
     , toRow : ToRow msg item columns
     , toExternalMsg : Msg item -> msg
-    , state : State msg item columns
     }
 
 
@@ -236,9 +236,9 @@ Also defines the handling function for messages, and the current table's state.
         }
 
 -}
-table : StatefulConfig msg item columns -> StatefulTable msg item columns
-table config =
-    Table config defaultOptions
+table : StatefulConfig msg item columns -> State msg item columns -> StatefulTable msg item columns
+table config state =
+    Table config state defaultOptions
 
 
 defaultOptions : Options msg item columns
@@ -265,8 +265,8 @@ Each of these items will become a row in this table.
 
 -}
 withItems : List item -> StatefulTable msg item columns -> StatefulTable msg item columns
-withItems items (Table prop opt) =
-    Table prop { opt | overwriteItems = Just items }
+withItems items (Table prop state opt) =
+    Table prop state { opt | overwriteItems = Just items }
 
 
 
@@ -288,17 +288,21 @@ type Msg item
 {-| Keep this one in your Model, it holds the table's current state.
 -}
 type State msg item columns
-    = State (StateModel msg item columns)
+    = State (HeaderModel msg item columns) (RowModel item)
 
 
-type alias StateModel msg item columns =
+type alias HeaderModel msg item columns =
     { filters : Maybe (Filters msg item columns)
-    , mobileSelected : Maybe Int
     , filterDialog : Maybe Int
+    , sorters : Maybe (Sorters item columns)
+    }
+
+
+type alias RowModel item =
+    { mobileSelected : Maybe Int
     , localSelection : Maybe (Selection item)
     , items : List item
     , visibleItems : List item
-    , sorters : Maybe (Sorters item columns)
     }
 
 
@@ -326,12 +330,13 @@ init : State msg item columns
 init =
     State
         { filters = Nothing
-        , mobileSelected = Nothing
         , filterDialog = Nothing
+        , sorters = Nothing
+        }
+        { mobileSelected = Nothing
         , localSelection = Nothing
         , items = []
         , visibleItems = []
-        , sorters = Nothing
         }
 
 
@@ -348,14 +353,15 @@ init =
 
 -}
 stateWithItems : List item -> State msg item columns -> State msg item columns
-stateWithItems items (State state) =
+stateWithItems items (State headerModel rowModel) =
     State
-        { state
-            | items = items
+        headerModel
+        { rowModel
+            | items = rowModel.items
             , visibleItems =
                 items
-                    |> maybeThen Filters.itemsApplyFilters state.filters
-                    |> maybeThen Sorters.itemsApplySorting state.sorters
+                    |> maybeThen Filters.itemsApplyFilters headerModel.filters
+                    |> maybeThen Sorters.itemsApplySorting headerModel.sorters
         }
 
 
@@ -367,7 +373,7 @@ Do not ignore the returned `Cmd`, it may include remote filter's messages.
 
 -}
 update : Msg item -> State msg item columns -> ( State msg item columns, Cmd msg )
-update msg (State state) =
+update msg ((State headerModel rowModel) as state) =
     case msg of
         MobileToggle index ->
             updateMobileToggle state index
@@ -379,10 +385,10 @@ update msg (State state) =
             updateSorters state subMsg
 
         FilterDialogOpen index ->
-            ( State { state | filterDialog = Just index }, Cmd.none )
+            ( State { headerModel | filterDialog = Just index } rowModel, Cmd.none )
 
         FilterDialogClose ->
-            ( State { state | filterDialog = Nothing }, Cmd.none )
+            ( State { headerModel | filterDialog = Nothing } rowModel, Cmd.none )
 
         SelectionToggleAll ->
             updateSelectionToggleAll state
@@ -391,12 +397,13 @@ update msg (State state) =
             updateSelectionSet state item value
 
 
-updateMobileToggle : StateModel msg item columns -> Int -> ( State msg item columns, Cmd msg )
-updateMobileToggle state index =
+updateMobileToggle : State msg item columns -> Int -> ( State msg item columns, Cmd msg )
+updateMobileToggle (State headerModel rowModel) index =
     ( State
-        { state
+        headerModel
+        { rowModel
             | mobileSelected =
-                if state.mobileSelected == Just index then
+                if rowModel.mobileSelected == Just index then
                     Nothing
 
                 else
@@ -406,66 +413,64 @@ updateMobileToggle state index =
     )
 
 
-updateFilters : StateModel msg item columns -> Filters.Msg -> ( State msg item columns, Cmd msg )
-updateFilters state subMsg =
-    case state.filters of
+updateFilters : State msg item columns -> Filters.Msg -> ( State msg item columns, Cmd msg )
+updateFilters ((State headerModel _) as state) subMsg =
+    case headerModel.filters of
         Just filters ->
             filters
                 |> Filters.update subMsg
                 |> (\( newFilters, subCmd ) ->
-                        ( state
-                            |> applyFilters newFilters
+                        ( applyFilters newFilters state
                         , subCmd
                         )
                    )
 
         Nothing ->
-            ( State state, Cmd.none )
+            ( state, Cmd.none )
 
 
-applyFilters : Filters msg item columns -> StateModel msg item columns -> State msg item columns
-applyFilters newFilters state =
+applyFilters : Filters msg item columns -> State msg item columns -> State msg item columns
+applyFilters newFilters (State headerModel rowModel) =
     State
-        { state
+        { headerModel | filters = Just newFilters }
+        { rowModel
             | visibleItems =
-                state.items
+                rowModel.items
                     |> Filters.itemsApplyFilters newFilters
-                    |> maybeThen Sorters.itemsApplySorting state.sorters
-            , filters = Just newFilters
+                    |> maybeThen Sorters.itemsApplySorting headerModel.sorters
         }
 
 
-updateSorters : StateModel msg item columns -> Sorters.Msg -> ( State msg item columns, Cmd msg )
-updateSorters state subMsg =
-    case state.sorters of
+updateSorters : State msg item columns -> Sorters.Msg -> ( State msg item columns, Cmd msg )
+updateSorters ((State headerModel _) as state) subMsg =
+    case headerModel.sorters of
         Just sorters ->
             sorters
                 |> Sorters.update subMsg
                 |> (\( newSorters, subCmd ) ->
-                        ( state
-                            |> applySorters newSorters
+                        ( applySorters newSorters state
                         , subCmd
                         )
                    )
 
         Nothing ->
-            ( State state, Cmd.none )
+            ( state, Cmd.none )
 
 
-applySorters : Sorters item columns -> StateModel msg item columns -> State msg item columns
-applySorters newSorters state =
+applySorters : Sorters item columns -> State msg item columns -> State msg item columns
+applySorters newSorters (State headerModel rowModel) =
     State
-        { state
+        { headerModel | sorters = Just newSorters }
+        { rowModel
             | visibleItems =
-                state.items
-                    |> maybeThen Filters.itemsApplyFilters state.filters
+                rowModel.items
+                    |> maybeThen Filters.itemsApplyFilters headerModel.filters
                     |> Sorters.itemsApplySorting newSorters
-            , sorters = Just newSorters
         }
 
 
-updateSelectionToggleAll : StateModel msg item columns -> ( State msg item columns, Cmd msg )
-updateSelectionToggleAll state =
+updateSelectionToggleAll : State msg item columns -> ( State msg item columns, Cmd msg )
+updateSelectionToggleAll (State headerModel rowModel) =
     let
         invertAll old =
             { old
@@ -485,13 +490,13 @@ updateSelectionToggleAll state =
                                 All
             }
     in
-    ( State { state | localSelection = Maybe.map invertAll state.localSelection }
+    ( State headerModel { rowModel | localSelection = Maybe.map invertAll rowModel.localSelection }
     , Cmd.none
     )
 
 
-updateSelectionSet : StateModel msg item columns -> item -> Bool -> ( State msg item columns, Cmd msg )
-updateSelectionSet state item value =
+updateSelectionSet : State msg item columns -> item -> Bool -> ( State msg item columns, Cmd msg )
+updateSelectionSet (State headerModel rowModel) item value =
     let
         setItem old =
             { old
@@ -507,7 +512,7 @@ updateSelectionSet state item value =
                             selectExcept old item value set
             }
     in
-    ( State { state | localSelection = Maybe.map setItem state.localSelection }
+    ( State headerModel { rowModel | localSelection = Maybe.map setItem rowModel.localSelection }
     , Cmd.none
     )
 
@@ -586,8 +591,8 @@ type alias Details msg columns =
 
 -}
 withResponsive : Responsive msg item columns -> StatefulTable msg item columns -> StatefulTable msg item columns
-withResponsive responsive (Table prop opt) =
-    Table prop { opt | responsive = Just responsive }
+withResponsive responsive (Table prop state opt) =
+    Table prop state { opt | responsive = Just responsive }
 
 
 {-| An empty [`Details`](#Details) set.
@@ -645,9 +650,10 @@ detailHidden accu =
 
 -}
 stateWithSelection : (item -> String) -> Bool -> State msg item columns -> State msg item columns
-stateWithSelection identifier default (State state) =
+stateWithSelection identifier default (State headerModel rowModel) =
     State
-        { state
+        headerModel
+        { rowModel
             | localSelection =
                 Just
                     { checks =
@@ -668,8 +674,8 @@ stateWithSelection identifier default (State state) =
 
 -}
 stateIsSelected : item -> State msg item columns -> Bool
-stateIsSelected item (State state) =
-    case state.localSelection of
+stateIsSelected item (State _ rowModel) =
+    case rowModel.localSelection of
         Just selection ->
             internalIsSelected selection item
 
@@ -702,14 +708,14 @@ type alias Filters msg item columns =
 
 -}
 stateWithFilters : Filters msg item columns -> State msg item columns -> State msg item columns
-stateWithFilters filters (State state) =
+stateWithFilters filters (State headerModel rowModel) =
     State
-        { state
-            | filters = Just filters
-            , visibleItems =
-                state.items
+        { headerModel | filters = Just filters }
+        { rowModel
+            | visibleItems =
+                rowModel.items
                     |> Filters.itemsApplyFilters filters
-                    |> maybeThen Sorters.itemsApplySorting state.sorters
+                    |> maybeThen Sorters.itemsApplySorting headerModel.sorters
         }
 
 
@@ -1024,8 +1030,8 @@ periodBefore =
 
 -}
 withWidth : Element.Length -> StatefulTable msg item columns -> StatefulTable msg item columns
-withWidth width (Table prop opt_) =
-    Table prop { opt_ | width = width }
+withWidth width (Table prop state opt) =
+    Table prop state { opt | width = width }
 
 
 
@@ -1049,13 +1055,13 @@ type alias Sorters item columns =
 
 -}
 stateWithSorters : Sorters item columns -> State msg item columns -> State msg item columns
-stateWithSorters sorters (State state) =
+stateWithSorters sorters (State headerModel rowModel) =
     State
-        { state
-            | sorters = Just sorters
-            , visibleItems =
-                state.items
-                    |> maybeThen Filters.itemsApplyFilters state.filters
+        { headerModel | sorters = Just sorters }
+        { rowModel
+            | visibleItems =
+                rowModel.items
+                    |> maybeThen Filters.itemsApplyFilters headerModel.filters
                     |> Sorters.itemsApplySorting sorters
         }
 
@@ -1139,17 +1145,17 @@ unsortable =
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
 renderElement : RenderConfig -> StatefulTable msg item columns -> Element msg
-renderElement renderConfig (Table prop opt) =
+renderElement renderConfig (Table prop state opt) =
     case opt.responsive of
         Just responsive ->
             if RenderConfig.isMobile renderConfig then
-                mobileView renderConfig prop opt responsive
+                mobileView renderConfig prop state opt responsive
 
             else
-                desktopView renderConfig prop opt
+                desktopView renderConfig prop state opt
 
         Nothing ->
-            desktopView renderConfig prop opt
+            desktopView renderConfig prop state opt
 
 
 
@@ -1159,16 +1165,17 @@ renderElement renderConfig (Table prop opt) =
 mobileView :
     RenderConfig
     -> StatefulConfig msg item columns
+    -> State msg item columns
     -> Options msg item columns
     -> Responsive msg item columns
     -> Element msg
-mobileView renderConfig prop opt responsive =
+mobileView renderConfig prop state opt responsive =
     let
         detailsTerms =
             renderConfig |> localeTerms >> .tables >> .details
 
         items =
-            viewGetItems (unwrapState prop.state) opt
+            viewGetItems (unwrapRowModel state) opt
                 |> List.indexedMap Tuple.pair
     in
     ListView.toggleableList
@@ -1184,12 +1191,12 @@ mobileView renderConfig prop opt responsive =
         , selectMsg = Tuple.first >> MobileToggle >> prop.toExternalMsg
         }
         |> ListView.withItems items
-        |> ListView.withSelected (Tuple.first >> isSelected prop.state)
+        |> ListView.withSelected (Tuple.first >> isSelected state)
         |> ListView.renderElement renderConfig
 
 
 isSelected : State msg item columns -> Int -> Bool
-isSelected (State { mobileSelected }) position =
+isSelected (State _ { mobileSelected }) position =
     Just position == mobileSelected
 
 
@@ -1202,38 +1209,61 @@ detailView renderConfig { label, content } =
 -- Dekstop rendering
 
 
+desktopRows :
+    RenderConfig
+    -> StatefulConfig msg item columns
+    -> RowModel item
+    -> List item
+    -> Element msg
+desktopRows lzRenderConfig lzProp lzRowModel lzItems =
+    List.map
+        (rowWithSelection
+            lzRenderConfig
+            lzProp.toExternalMsg
+            lzRowModel
+            lzProp.toRow
+            (NArray.toList lzProp.columns)
+        )
+        lzItems
+        |> Keyed.column
+            [ Element.spacing 2
+            , Element.width fill
+            ]
+
+
 desktopView :
     RenderConfig
     -> StatefulConfig msg item columns
+    -> State msg item columns
     -> Options msg item columns
     -> Element msg
-desktopView renderConfig prop opt =
+desktopView renderConfig prop (State headerModel rowModel) opt =
     let
-        columns =
-            NArray.toList prop.columns
-
-        state =
-            unwrapState prop.state
-
         items =
-            viewGetItems state opt
+            viewGetItems rowModel opt
 
         rows =
-            List.map (rowWithSelection renderConfig prop.toExternalMsg state prop.toRow columns) items
+            lazy4
+                desktopRows
+                renderConfig
+                prop
+                rowModel
+                items
+                |> Tuple.pair "@rows"
 
         padding =
             { top = 20, left = 20, right = 20, bottom = 0 }
 
         selectionHeader =
-            viewSelectionHeader renderConfig state prop.toExternalMsg
+            viewSelectionHeader renderConfig rowModel prop.toExternalMsg
 
         headers =
             headersRender renderConfig
                 prop.toExternalMsg
-                state.filterDialog
-                state.filters
-                state.sorters
-                columns
+                headerModel.filterDialog
+                headerModel.filters
+                headerModel.sorters
+                (NArray.toList prop.columns)
                 selectionHeader
     in
     Keyed.column
@@ -1241,41 +1271,48 @@ desktopView renderConfig prop opt =
         , Element.width opt.width
         , Element.paddingEach padding
         ]
-        (headers :: rows)
+        [ headers
+        , rows
+        ]
 
 
-viewSelectionHeader : RenderConfig -> StateModel msg item columns -> (Msg item -> msg) -> Maybe (Element msg)
-viewSelectionHeader renderConfig state toExternalMsg =
+viewSelectionHeader : RenderConfig -> RowModel item -> (Msg item -> msg) -> Maybe (Element msg)
+viewSelectionHeader renderConfig { localSelection } toExternalMsg =
     Maybe.map
         (SelectionToggleAll
             |> toExternalMsg
             |> FiltersView.headerSelectToggle renderConfig
             |> always
         )
-        state.localSelection
+        localSelection
 
 
-viewGetItems : StateModel msg item columns -> Options msg item columns -> List item
+viewGetItems : RowModel item -> Options msg item columns -> List item
 viewGetItems { visibleItems } opt =
     Maybe.withDefault visibleItems opt.overwriteItems
 
 
-unwrapState : State msg item columns -> StateModel msg item columns
-unwrapState (State model) =
-    model
+unwrapHeaderModel : State msg item columns -> HeaderModel msg item columns
+unwrapHeaderModel (State headerModel _) =
+    headerModel
+
+
+unwrapRowModel : State msg item columns -> RowModel item
+unwrapRowModel (State _ rowModel) =
+    rowModel
 
 
 rowWithSelection :
     RenderConfig
     -> (Msg item -> msg)
-    -> StateModel msg item columns
+    -> RowModel item
     -> ToRow msg item columns
     -> List Column
     -> item
     -> ( String, Element msg )
-rowWithSelection renderConfig msgMap state toRow columns item =
+rowWithSelection renderConfig msgMap { localSelection } toRow columns item =
     rowBox <|
-        case state.localSelection of
+        case localSelection of
             Just selection ->
                 item
                     |> rowRender renderConfig toRow columns
