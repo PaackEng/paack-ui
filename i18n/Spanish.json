@@ -1,1 +1,58 @@
-English.json
+{
+    "filters": {
+        "dateFormat": "DD/MM/YYYY",
+        "close": "Cerrar",
+        "clear": "Limpiar",
+        "apply": "Aplicar",
+        "period": {
+            "after": "Después",
+            "before": "Antes",
+            "on": "En",
+            "description": "Seleccionar período de referencia"
+        },
+        "range": {
+            "from": "Desde: {{date}}",
+            "to": "Hasta: {{date}}"
+        },
+        "select": {
+            "description": "Seleccionar opción para filtrar"
+        }
+    },
+    "paginator": {
+        "format": "{{first}} - {{last}} de {{total}}",
+        "previous": "Anterior",
+        "next": "Siguiente"
+    },
+    "checkbox": {
+        "toggle": "Agrupar"
+    },
+    "listView": {
+        "search": "Buscar"
+    },
+    "radio": {
+        "select": "Seleccionar item"
+    },
+    "tables": {
+        "details": {
+            "show": "Expandir",
+            "collapse": "Colapsar"
+        },
+        "sorting": {
+            "increase": "Ordenar A-Z",
+            "decrease": "Ordenar Z-A"
+        },
+        "selectRow": "Select this row.",
+        "selectAll": "Select all rows"
+    },
+    "dateInput": {
+        "invalid": "Formato de fecha inválido"
+    },
+    "dialog": {
+        "close": "Cerrar dialogo"
+    },
+    "sidebar": {
+        "expand": "Expandir barra lateral",
+        "collapse": "Minimizar barra lateral",
+        "previous": "Atrás"
+    }
+}

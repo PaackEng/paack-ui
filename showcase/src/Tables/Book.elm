@@ -1,7 +1,8 @@
 module Tables.Book exposing
     ( Book
     , books
-    , someFilters
+    , filters
+    , sorters
     , tablePixelColumns
     , tablePortionColumns
     , toTableCover
@@ -9,7 +10,7 @@ module Tables.Book exposing
     , toTableRow
     )
 
-import Time exposing (millisToPosix)
+import Time exposing (millisToPosix, posixToMillis)
 import UI.Internal.DateInput as DateInput
 import UI.Tables.Common as Tables exposing (cellFromText, column, columnWidthPixels, columnWidthPortion, columnsEmpty, rowCellText, rowEmpty)
 import UI.Tables.Stateful as Stateful exposing (detailHidden, detailShown, detailsEmpty)
@@ -27,8 +28,8 @@ type alias Book =
     }
 
 
-someFilters : Stateful.Filters msg Book T.Five
-someFilters =
+filters : Stateful.Filters msg Book T.Five
+filters =
     Stateful.filtersEmpty
         |> Stateful.localMultiTextFilter [] .title
         |> Stateful.localMultiTextFilter [] .author
@@ -51,6 +52,16 @@ someFilters =
             )
         |> Stateful.localRangeDateFilter Time.utc Nothing Nothing .acquired
         |> Stateful.localPeriodDateFilter Time.utc Nothing Nothing .read
+
+
+sorters : Stateful.Sorters Book T.Five
+sorters =
+    Stateful.sortersEmpty
+        |> Stateful.sortBy .title
+        |> Stateful.sortBy .author
+        |> Stateful.sortBy .year
+        |> Stateful.sortBy (.acquired >> posixToMillis >> String.fromInt)
+        |> Stateful.sortBy (.read >> posixToMillis >> String.fromInt)
 
 
 books : List Book

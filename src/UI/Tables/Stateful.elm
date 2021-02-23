@@ -1,7 +1,7 @@
 module UI.Tables.Stateful exposing
     ( StatefulTable, StatefulConfig, table, withItems
     , Responsive, Cover, Details, Detail, withResponsive, detailsEmpty, detailShown, detailHidden
-    , State, Msg, init, update
+    , State, Msg, init, update, stateWithItems
     , Filters, filtersEmpty, stateWithFilters
     , localSingleTextFilter, remoteSingleTextFilter
     , localMultiTextFilter, remoteMultiTextFilter
@@ -9,6 +9,9 @@ module UI.Tables.Stateful exposing
     , localRangeDateFilter, remoteRangeDateFilter
     , periodSingle, pariodAfter, periodBefore, localPeriodDateFilter, remotePeriodDateFilter
     , localSelectFilter, remoteSelectFilter
+    , Sorters, stateWithSorters
+    , sortersEmpty, sortBy, unsortable
+    , sortDecreasing, sortIncreasing
     , withWidth
     , stateWithSelection, stateIsSelected
     , renderElement
@@ -49,7 +52,10 @@ Where `Book` is:
             |> column "Author" (columnWidthPixels 240)
             |> column "Year" (columnWidthPixels 120)
 
-    toTableRow { author, title, year } =
+    toTableRow =
+        { toKey = .title, toTableRowView}
+
+    toTableRowView { author, title, year } =
         rowEmpty
             |> rowCellText (Text.body1 title)
             |> rowCellText (Text.body2 author)
@@ -77,7 +83,7 @@ And on model:
     }
 
     { -...
-    , tableState = Stateful.withFilters Book.someFilters Stateful.init
+    , tableState = Stateful.stateWithFilters Book.someFilters Stateful.init
     }
 
 
@@ -93,7 +99,7 @@ And on model:
 
 ## State
 
-@docs State, Msg, init, update
+@docs State, Msg, init, update, stateWithItems
 
 
 # Filters
@@ -131,6 +137,13 @@ And on model:
 @docs localSelectFilter, remoteSelectFilter
 
 
+# Sorting
+
+@docs Sorters, stateWithSorters
+@docs sortersEmpty, sortBy, unsortable
+@docs sortDecreasing, sortIncreasing
+
+
 # Width
 
 @docs withWidth
@@ -160,13 +173,14 @@ import Element.Keyed as Keyed
 import Set exposing (Set)
 import Time
 import UI.Checkbox as Checkbox exposing (checkbox)
-import UI.Internal.Basics exposing (flip, ifThenElse, prependMaybe)
+import UI.Internal.Basics exposing (ifThenElse, maybeThen, prependMaybe)
 import UI.Internal.DateInput as DateInput exposing (DateInput, PeriodDate, RangeDate)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.Tables.Common exposing (..)
 import UI.Internal.Tables.Filters as Filters
 import UI.Internal.Tables.FiltersView as FiltersView
+import UI.Internal.Tables.Sorters as Sorters exposing (Sorters)
 import UI.Internal.Tables.View exposing (..)
 import UI.ListView as ListView
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
@@ -205,7 +219,7 @@ type alias StatefulConfig msg item columns =
 
 
 type alias Options msg item columns =
-    { items : List item
+    { overwriteItems : Maybe (List item)
     , width : Element.Length
     , responsive : Maybe (Responsive msg item columns)
     }
@@ -229,13 +243,16 @@ table config =
 
 defaultOptions : Options msg item columns
 defaultOptions =
-    { items = []
+    { overwriteItems = Nothing
     , width = shrink
     , responsive = Nothing
     }
 
 
-{-| Each of these items will become a row in this table.
+{-| **DEPRECATED**: Use [stateWithItems](#stateWithItems) instead.
+Otherwise, by using this you'll be discarding sorting and fitlering.
+
+Each of these items will become a row in this table.
 
     withItems
         [ Book "Dan Brown" "Angels & Demons" "2000"
@@ -249,7 +266,7 @@ defaultOptions =
 -}
 withItems : List item -> StatefulTable msg item columns -> StatefulTable msg item columns
 withItems items (Table prop opt) =
-    Table prop { opt | items = items }
+    Table prop { opt | overwriteItems = Just items }
 
 
 
@@ -261,6 +278,7 @@ withItems items (Table prop opt) =
 type Msg item
     = MobileToggle Int
     | ForFilters Filters.Msg
+    | ForSorters Sorters.Msg
     | FilterDialogOpen Int
     | FilterDialogClose
     | SelectionToggleAll
@@ -278,6 +296,9 @@ type alias StateModel msg item columns =
     , mobileSelected : Maybe Int
     , filterDialog : Maybe Int
     , localSelection : Maybe (Selection item)
+    , items : List item
+    , visibleItems : List item
+    , sorters : Maybe (Sorters item columns)
     }
 
 
@@ -308,6 +329,33 @@ init =
         , mobileSelected = Nothing
         , filterDialog = Nothing
         , localSelection = Nothing
+        , items = []
+        , visibleItems = []
+        , sorters = Nothing
+        }
+
+
+{-| Each of these items will become a row in this table.
+
+    stateWithItems
+        [ Book "Dan Brown" "Angels & Demons" "2000"
+        , Book "Dan Brown" "The Da Vinci Code" "2003"
+        , Book "Dan Brown" "The Lost Symbol" "2009"
+        , Book "Dan Brown" "Inferno" "2013"
+        , Book "Dan Brown" "Origin" "2017"
+        ]
+        someTableState
+
+-}
+stateWithItems : List item -> State msg item columns -> State msg item columns
+stateWithItems items (State state) =
+    State
+        { state
+            | items = items
+            , visibleItems =
+                items
+                    |> maybeThen Filters.itemsApplyFilters state.filters
+                    |> maybeThen Sorters.itemsApplySorting state.sorters
         }
 
 
@@ -326,6 +374,9 @@ update msg (State state) =
 
         ForFilters subMsg ->
             updateFilters state subMsg
+
+        ForSorters subMsg ->
+            updateSorters state subMsg
 
         FilterDialogOpen index ->
             ( State { state | filterDialog = Just index }, Cmd.none )
@@ -362,11 +413,55 @@ updateFilters state subMsg =
             filters
                 |> Filters.update subMsg
                 |> (\( newFilters, subCmd ) ->
-                        ( State { state | filters = Just newFilters }, subCmd )
+                        ( state
+                            |> applyFilters newFilters
+                        , subCmd
+                        )
                    )
 
         Nothing ->
             ( State state, Cmd.none )
+
+
+applyFilters : Filters msg item columns -> StateModel msg item columns -> State msg item columns
+applyFilters newFilters state =
+    State
+        { state
+            | visibleItems =
+                state.items
+                    |> Filters.itemsApplyFilters newFilters
+                    |> maybeThen Sorters.itemsApplySorting state.sorters
+            , filters = Just newFilters
+        }
+
+
+updateSorters : StateModel msg item columns -> Sorters.Msg -> ( State msg item columns, Cmd msg )
+updateSorters state subMsg =
+    case state.sorters of
+        Just sorters ->
+            sorters
+                |> Sorters.update subMsg
+                |> (\( newSorters, subCmd ) ->
+                        ( state
+                            |> applySorters newSorters
+                        , subCmd
+                        )
+                   )
+
+        Nothing ->
+            ( State state, Cmd.none )
+
+
+applySorters : Sorters item columns -> StateModel msg item columns -> State msg item columns
+applySorters newSorters state =
+    State
+        { state
+            | visibleItems =
+                state.items
+                    |> maybeThen Filters.itemsApplyFilters state.filters
+                    |> Sorters.itemsApplySorting newSorters
+            , sorters = Just newSorters
+        }
 
 
 updateSelectionToggleAll : StateModel msg item columns -> ( State msg item columns, Cmd msg )
@@ -540,32 +635,7 @@ detailHidden accu =
 
 
 
--- Filters
-
-
-type alias PeriodComparison =
-    DateInput.PeriodComparison
-
-
-{-| Array with all the columns' filters and their initial state.
-
-This is a type-safe sized-array.
-See [`TypeNumbers`](UI-Utils-TypeNumbers) for how to compose its phantom type.
-
--}
-type alias Filters msg item columns =
-    Filters.Filters msg item columns
-
-
-{-| Apply filters defintion to a table's [`State`](#State).
-
-    model =
-        stateWithFilters Book.filtersInit init
-
--}
-stateWithFilters : Filters msg item columns -> State msg item columns -> State msg item columns
-stateWithFilters filters (State state) =
-    State { state | filters = Just filters }
+-- Selection
 
 
 {-| Apply selection defintion to a table's [`State`](#State).
@@ -605,6 +675,42 @@ stateIsSelected item (State state) =
 
         Nothing ->
             False
+
+
+
+-- Filters
+
+
+type alias PeriodComparison =
+    DateInput.PeriodComparison
+
+
+{-| Array with all the columns' filters and their initial state.
+
+This is a type-safe sized-array.
+See [`TypeNumbers`](UI-Utils-TypeNumbers) for how to compose its phantom type.
+
+-}
+type alias Filters msg item columns =
+    Filters.Filters msg item columns
+
+
+{-| Apply filters defintion to a table's [`State`](#State).
+
+    model =
+        stateWithFilters Book.filtersInit init
+
+-}
+stateWithFilters : Filters msg item columns -> State msg item columns -> State msg item columns
+stateWithFilters filters (State state) =
+    State
+        { state
+            | filters = Just filters
+            , visibleItems =
+                state.items
+                    |> Filters.itemsApplyFilters filters
+                    |> maybeThen Sorters.itemsApplySorting state.sorters
+        }
 
 
 {-| An empty [`Filters`](#Filters) set.
@@ -923,6 +1029,109 @@ withWidth width (Table prop opt_) =
 
 
 
+-- Sorting
+
+
+{-| Array with all the columns' sorting definitions.
+
+This is a type-safe sized-array.
+See [`TypeNumbers`](UI-Utils-TypeNumbers) for how to compose its phantom type.
+
+-}
+type alias Sorters item columns =
+    Sorters.Sorters item columns
+
+
+{-| Apply sortings defintion to a table's [`State`](#State).
+
+    model =
+        stateWithSorters Book.sortersInit init
+
+-}
+stateWithSorters : Sorters item columns -> State msg item columns -> State msg item columns
+stateWithSorters sorters (State state) =
+    State
+        { state
+            | sorters = Just sorters
+            , visibleItems =
+                state.items
+                    |> maybeThen Filters.itemsApplyFilters state.filters
+                    |> Sorters.itemsApplySorting sorters
+        }
+
+
+{-| Describes how to convert a column's value to a sortable `List String`.
+
+    sortersInit =
+        sortersEmpty
+            |> sortBy .title
+            |> sortBy .author
+            |> unsortable
+
+-}
+sortBy :
+    (item -> String)
+    -> Sorters item columns
+    -> Sorters item (T.Increase columns)
+sortBy =
+    Sorters.sortBy
+
+
+{-| Changes the initial sorting to some columns as descreasing.
+
+    model =
+        stateWithSorters
+            (Book.sortersInit |> sortDecreasing 1)
+            init
+
+-}
+sortDecreasing : Int -> Sorters item columns -> Sorters item columns
+sortDecreasing =
+    Sorters.sortDecreasing
+
+
+{-| Changes the initial sorting to some columns as increasing.
+
+    model =
+        stateWithSorters
+            (Book.sortersInit |> sortIncreasing 1)
+            init
+
+-}
+sortIncreasing : Int -> Sorters item columns -> Sorters item columns
+sortIncreasing =
+    Sorters.sortIncreasing
+
+
+{-| An empty [`Sorters`](#Sorters) set.
+
+    sortersInit =
+        sortersEmpty
+            |> sortBy .title
+            |> sortBy .author
+            |> unsortable
+
+-}
+sortersEmpty : Sorters item T.Zero
+sortersEmpty =
+    Sorters.sortersEmpty
+
+
+{-| Describes that some column is not sortable.
+
+    sortersInit =
+        sortersEmpty
+            |> sortBy .title
+            |> sortBy .author
+            |> unsortable
+
+-}
+unsortable : Sorters item columns -> Sorters item (T.Increase columns)
+unsortable =
+    Sorters.unsortable
+
+
+
 -- Rendering
 
 
@@ -957,6 +1166,10 @@ mobileView renderConfig prop opt responsive =
     let
         detailsTerms =
             renderConfig |> localeTerms >> .tables >> .details
+
+        items =
+            viewGetItems (unwrapState prop.state) opt
+                |> List.indexedMap Tuple.pair
     in
     ListView.toggleableList
         { detailsShowLabel = detailsTerms.show
@@ -970,7 +1183,7 @@ mobileView renderConfig prop opt responsive =
                 >> List.filterMap (Maybe.map (detailView renderConfig))
         , selectMsg = Tuple.first >> MobileToggle >> prop.toExternalMsg
         }
-        |> ListView.withItems (List.indexedMap Tuple.pair opt.items)
+        |> ListView.withItems items
         |> ListView.withSelected (Tuple.first >> isSelected prop.state)
         |> ListView.renderElement renderConfig
 
@@ -1019,6 +1232,7 @@ desktopView renderConfig prop opt =
                 prop.toExternalMsg
                 state.filterDialog
                 state.filters
+                state.sorters
                 columns
                 selectionHeader
     in
@@ -1042,17 +1256,8 @@ viewSelectionHeader renderConfig state toExternalMsg =
 
 
 viewGetItems : StateModel msg item columns -> Options msg item columns -> List item
-viewGetItems state opt =
-    case state.filters of
-        Just filtersArr ->
-            filtersArr
-                |> NArray.toList
-                |> List.filterMap Filters.filterGet
-                |> List.foldl Filters.filtersReduce (always True)
-                |> flip List.filter opt.items
-
-        Nothing ->
-            opt.items
+viewGetItems { visibleItems } opt =
+    Maybe.withDefault visibleItems opt.overwriteItems
 
 
 unwrapState : State msg item columns -> StateModel msg item columns
@@ -1091,10 +1296,11 @@ headersRender :
     -> (Msg item -> msg)
     -> Maybe Int
     -> Maybe (Filters.Filters msg item columns)
+    -> Maybe (Sorters.Sorters item columns)
     -> List Column
     -> Maybe (Element msg)
     -> ( String, Element msg )
-headersRender renderConfig toExternalMsg selected filters columns selectionHeader =
+headersRender renderConfig toExternalMsg selected filters sorters columns selectionHeader =
     ( "@headers"
     , Element.row headersAttr <|
         case filters of
@@ -1102,7 +1308,10 @@ headersRender renderConfig toExternalMsg selected filters columns selectionHeade
                 filterArr
                     |> NArray.toList
                     |> List.map2 (filterHeader renderConfig toExternalMsg selected) columns
-                    |> List.indexedMap (\index val -> val index)
+                    |> List.indexedMap
+                        (\index val ->
+                            val (Maybe.andThen (Sorters.get index) sorters) index
+                        )
                     |> prependMaybe selectionHeader
 
             Nothing ->
@@ -1122,14 +1331,17 @@ filterHeader :
     -> Maybe Int
     -> Column
     -> Filters.Filter msg item
+    -> Sorters.ColumnStatus
     -> Int
     -> Element msg
-filterHeader renderConfig toExternalMsg selected (Column header { width }) filter index =
+filterHeader renderConfig toExternalMsg selected (Column header { width }) filter sorter index =
     FiltersView.header renderConfig
         filter
+        sorter
         { openMsg = toExternalMsg <| FilterDialogOpen index
         , discardMsg = toExternalMsg <| FilterDialogClose
         , fromFiltersMsg = ForFilters >> toExternalMsg
+        , fromSortersMsg = ForSorters >> toExternalMsg
         , index = index
         , label = header
         , isOpen = selected == Just index
@@ -1160,7 +1372,7 @@ selectionCell : RenderConfig -> Selection item -> item -> ( String, Element (Msg
 selectionCell renderConfig selection item =
     item
         |> internalIsSelected selection
-        |> checkbox "Select row" (SelectionSet item)
+        |> checkbox (localeTerms renderConfig |> .tables |> .selectRow) (SelectionSet item)
         |> Checkbox.withLabelVisible False
         |> Checkbox.renderElement renderConfig
         |> Element.el

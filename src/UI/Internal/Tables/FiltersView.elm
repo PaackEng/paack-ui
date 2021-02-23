@@ -9,20 +9,22 @@ import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
 import UI.Button as Button
-import UI.Icon as Icon
-import UI.Internal.Basics exposing (maybeNotThen)
+import UI.Icon as Icon exposing (Icon)
+import UI.Internal.Basics exposing (maybeNotThen, prependIf)
 import UI.Internal.Colors as Colors
 import UI.Internal.DateInput as DateInput exposing (DateInput(..), PeriodComparison(..), PeriodDate, RangeDate)
 import UI.Internal.Primitives as Primitives
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.Size as Size exposing (Size)
 import UI.Internal.Tables.Filters as Filters
+import UI.Internal.Tables.Sorters as Sorters exposing (SortingDirection(..))
 import UI.Internal.Text as Text
-import UI.Internal.Utils.Element exposing (overlay, tuplesToStyles, zIndex)
-import UI.Palette as Palette
+import UI.Internal.Utils.Element exposing (overlay, shrinkButClip, tuplesToStyles, zIndex)
+import UI.Palette as Palette exposing (brightnessDarkest, brightnessMiddle, tonePrimary)
 import UI.Radio as Radio
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
+import UI.Text as Text
 import UI.TextField as TextField exposing (TextField)
 import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element exposing (zeroPadding)
@@ -32,6 +34,7 @@ type alias Config msg =
     { openMsg : msg
     , discardMsg : msg
     , fromFiltersMsg : Filters.Msg -> msg
+    , fromSortersMsg : Sorters.Msg -> msg
     , index : Int
     , label : String
     , isOpen : Bool
@@ -41,9 +44,10 @@ type alias Config msg =
 header :
     RenderConfig
     -> Filters.Filter msg item
+    -> Sorters.ColumnStatus
     -> Config msg
     -> Element msg
-header renderConfig filter config =
+header renderConfig filter sorting config =
     let
         clearMsg =
             config.fromFiltersMsg <| Filters.Clear config.index
@@ -53,7 +57,7 @@ header renderConfig filter config =
 
         filterRender renderer editable =
             renderer renderConfig applyMsg config editable
-                |> dialog renderConfig config filter clearMsg applyMsg
+                |> dialog renderConfig config filter sorting clearMsg applyMsg
     in
     if config.isOpen then
         case filter of
@@ -74,7 +78,7 @@ header renderConfig filter config =
 
             Filters.SelectFilter list { editable } ->
                 selectFilterRender renderConfig config list editable
-                    |> dialog renderConfig config filter clearMsg applyMsg
+                    |> dialog renderConfig config filter sorting clearMsg applyMsg
 
     else if Filters.isApplied filter then
         headerApplied renderConfig
@@ -82,11 +86,13 @@ header renderConfig filter config =
             clearMsg
             (renderConfig |> localeTerms >> .filters >> .clear)
             config.label
+            sorting
 
     else
         headerNormal renderConfig
             config.openMsg
             config.label
+            sorting
 
 
 
@@ -95,7 +101,8 @@ header renderConfig filter config =
 
 headerSelectToggle : RenderConfig -> msg -> Element msg
 headerSelectToggle renderConfig toggleMsg =
-    Icon.check ""
+    (localeTerms renderConfig |> .tables |> .selectAll)
+        |> Icon.check
         |> Icon.withSize contextSize
         |> Icon.renderElement renderConfig
         |> Element.el
@@ -110,39 +117,64 @@ headerSelectToggle renderConfig toggleMsg =
 -- Mostly ripped from Button with Size.Small and WidthFull
 
 
-headerNormal : RenderConfig -> msg -> String -> Element msg
-headerNormal renderConfig openMsg label =
+headerNormal : RenderConfig -> msg -> String -> Sorters.ColumnStatus -> Element msg
+headerNormal renderConfig openMsg label sorting =
     -- Button.light
-    Element.row (Element.onIndividualClick openMsg :: headerAttrs False)
-        [ headerText renderConfig label
-        , Icon.filter label
-            |> Icon.withSize contextSize
-            |> Icon.renderElement renderConfig
-            |> Element.el [ Element.alignRight ]
-        ]
+    Icon.filter label
+        |> Icon.withSize contextSize
+        |> Icon.withColor (headerColor False)
+        |> Icon.renderElement renderConfig
+        |> Element.el [ Element.alignRight ]
+        |> headerBox renderConfig openMsg label sorting False
 
 
-headerApplied : RenderConfig -> msg -> msg -> String -> String -> Element msg
-headerApplied renderConfig openMsg clearMsg clearHint label =
+headerApplied : RenderConfig -> msg -> msg -> String -> String -> Sorters.ColumnStatus -> Element msg
+headerApplied renderConfig openMsg clearMsg clearHint label sorting =
     -- Button.primary
-    Element.row (Element.onIndividualClick openMsg :: headerAttrs True)
-        [ headerText renderConfig label
-        , Button.fromIcon (Icon.close clearHint)
-            |> Button.cmd clearMsg Button.primary
-            |> Button.withSize contextSize
-            |> Button.renderElement renderConfig
-            |> Element.el [ Element.alignRight ]
-        ]
+    Button.fromIcon (Icon.close clearHint)
+        |> Button.cmd clearMsg Button.primary
+        |> Button.withSize contextSize
+        |> Button.renderElement renderConfig
+        |> Element.el [ Element.alignRight ]
+        |> headerBox renderConfig openMsg label sorting True
 
 
-headerText : RenderConfig -> String -> Element msg
-headerText renderConfig label =
+headerText : RenderConfig -> Bool -> String -> Element msg
+headerText renderConfig isApplied label =
     label
         |> Text.ellipsizedText renderConfig Text.SizeCaption
         |> Element.el
-            [ Element.width fill
-            , Element.clipX
+            [ Font.size textSize
+            , Font.semiBold
+            , Font.color (Palette.toElementColor <| headerColor isApplied)
+            , Element.centerY
             ]
+
+
+headerBox : RenderConfig -> msg -> String -> Sorters.ColumnStatus -> Bool -> Element msg -> Element msg
+headerBox renderConfig openMsg label sorting isFilterApplied rightIcon =
+    Element.row (Element.onIndividualClick openMsg :: headerAttrs isFilterApplied)
+        [ Element.row shrinkButClip
+            [ headerText renderConfig isFilterApplied label
+            , headerSorting renderConfig isFilterApplied sorting
+            ]
+            |> Element.el [ Element.width fill, Element.clip ]
+        , rightIcon
+        ]
+
+
+headerColor : Bool -> Palette.Color
+headerColor isApplied =
+    if isApplied then
+        Palette.color
+            tonePrimary
+            brightnessMiddle
+            |> Palette.setContrasting True
+
+    else
+        Palette.color
+            tonePrimary
+            brightnessDarkest
 
 
 headerPadX : Int
@@ -167,19 +199,11 @@ headerAttrs isApplied =
 
         workingTheme =
             if isApplied then
-                [ Background.color Colors.primary.middle
-                , Palette.color
-                    Palette.tonePrimary
-                    Palette.brightnessMiddle
-                    |> Palette.setContrasting True
-                    |> Palette.toElementColor
-                    |> Font.color
-                ]
+                [ Background.color Colors.primary.middle ]
 
             else
                 Background.color
                     Colors.gray.lightest
-                    :: Font.color Colors.primary.darkest
                     :: Element.mouseOver [ Background.color Colors.primary.lightest ]
                     :: Element.colorTransition 100
     in
@@ -188,12 +212,24 @@ headerAttrs isApplied =
         :: Element.width Element.fill
         :: paddingXY
         :: Element.spacing 8
-        :: Font.size textSize
-        :: Font.semiBold
         :: Element.pointer
         :: (ARIA.toElementAttributes ARIA.roleButton
                 ++ workingTheme
            )
+
+
+headerSorting : RenderConfig -> Bool -> Sorters.ColumnStatus -> Element msg
+headerSorting renderConfig isFilterApplied status =
+    case Maybe.andThen identity status of
+        Just direction ->
+            sortingDirectionToIcon renderConfig direction
+                |> Icon.withCustomSize 12
+                |> Icon.withColor (headerColor isFilterApplied)
+                |> Icon.renderElement renderConfig
+                |> Element.el [ Element.centerY ]
+
+        Nothing ->
+            Element.none
 
 
 
@@ -288,11 +324,12 @@ dialog :
     RenderConfig
     -> Config msg
     -> Filters.Filter msg item
+    -> Sorters.ColumnStatus
     -> msg
     -> msg
     -> Element msg
     -> Element msg
-dialog renderConfig config filter clearMsg applyMsg content =
+dialog renderConfig config filter sorter clearMsg applyMsg content =
     let
         applied =
             Filters.isApplied filter
@@ -310,6 +347,7 @@ dialog renderConfig config filter clearMsg applyMsg content =
             , tuplesToStyles ( "width", "min-content" )
             ]
             [ dialogHeader renderConfig config.discardMsg config.label
+            , sortingView renderConfig config sorter
             , Element.column
                 [ Element.width fill
                 , Element.spacing 12
@@ -319,6 +357,65 @@ dialog renderConfig config filter clearMsg applyMsg content =
                     |> internalPaddingBox
                 ]
             ]
+
+
+sortingView : RenderConfig -> Config msg -> Sorters.ColumnStatus -> Element msg
+sortingView renderConfig config sorter =
+    case sorter of
+        Just _ ->
+            Element.column [ Element.width fill ]
+                [ sortAs renderConfig config SortIncreasing sorter
+                , sortAs renderConfig config SortDecreasing sorter
+                ]
+
+        Nothing ->
+            -- Unsortable
+            Element.none
+
+
+sortAs : RenderConfig -> Config msg -> SortingDirection -> Sorters.ColumnStatus -> Element msg
+sortAs renderConfig { fromSortersMsg, index } direction current =
+    let
+        terms =
+            localeTerms renderConfig
+
+        ( content, icon ) =
+            case direction of
+                SortIncreasing ->
+                    ( terms.tables.sorting.increase, Icon.sortIncreasing )
+
+                SortDecreasing ->
+                    ( terms.tables.sorting.decrease, Icon.sortDecreasing )
+
+        selected =
+            current == Just (Just direction)
+
+        msg =
+            if selected then
+                Sorters.ClearSorting
+
+            else
+                Sorters.SetSorting index direction
+    in
+    Element.row
+        (Events.onClick (fromSortersMsg msg)
+            :: Element.pointer
+            :: Element.width fill
+            :: Element.paddingEach { top = 4, left = 12, bottom = 4, right = 8 }
+            :: Border.color Colors.gray.lighter
+            :: Border.widthEach { zeroPadding | bottom = 1 }
+            :: Element.mouseOver [ Background.color Colors.gray.lightest ]
+            :: ARIA.toElementAttributes ARIA.roleButton
+            |> prependIf selected (Background.color <| Colors.primary.lightest)
+        )
+        [ Text.caption content
+            |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
+            |> Text.renderElement renderConfig
+        , icon content
+            |> Icon.withColor (Palette.color tonePrimary brightnessMiddle)
+            |> Icon.withSize Size.extraSmall
+            |> Icon.renderElement renderConfig
+        ]
 
 
 
@@ -518,3 +615,13 @@ internalPadding =
 internalPaddingBox : Element msg -> Element msg
 internalPaddingBox child =
     Element.el [ internalPadding ] child
+
+
+sortingDirectionToIcon : RenderConfig -> SortingDirection -> Icon
+sortingDirectionToIcon _ direction =
+    case direction of
+        SortIncreasing ->
+            Icon.sortIncreasing ""
+
+        SortDecreasing ->
+            Icon.sortDecreasing ""

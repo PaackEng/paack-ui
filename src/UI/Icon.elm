@@ -5,6 +5,7 @@ module UI.Icon exposing
     , groups, logout, move, nextContent, notifications, paackSpaces, packages
     , previousContent, print, remove, sandwichMenu, search, searchSpace
     , seeMore, toggle, toggleDown, toggleUp, delete, warning
+    , sortDecreasing, sortIncreasing
     , getHint
     , withColor
     , withSize, withCustomSize
@@ -39,6 +40,7 @@ An icon can be created and rendered as in the following pipeline:
 @docs groups, logout, move, nextContent, notifications, paackSpaces, packages
 @docs previousContent, print, remove, sandwichMenu, search, searchSpace
 @docs seeMore, toggle, toggleDown, toggleUp, delete, warning
+@docs sortDecreasing, sortIncreasing
 
 
 # Disassemble
@@ -96,11 +98,15 @@ type Icon
     = Icon Properties Options
 
 
+{-| When addig new icons, name them as "actions" and not what they look like.
+For more information read this module's main documentation.
+-}
 type IconGlyph
     = Add
     | Check
     | Close
     | Collapse
+    | Delete
     | DownArrow
     | Download
     | Edit
@@ -108,22 +114,23 @@ type IconGlyph
     | Expand
     | Filter
     | Groups
-    | LeftArrow
     | Logout
     | Move
+    | NextContent
     | Notifications
     | PaackSpaces
     | Packages
+    | PreviousContent
     | Print
     | Remove
-    | RightArrow
     | SandwichMenu
     | Search
     | SearchSpace
     | SeeMore
+    | SortDecreasing
+    | SortIncreasing
     | Toggle
-    | Delete
-    | UpArrow
+    | ToggleUp
     | Warning
 
 
@@ -185,7 +192,7 @@ withCustomSize size (Icon prop opt) =
 -}
 previousContent : String -> Icon
 previousContent hint =
-    Icon (Properties hint LeftArrow) defaultOptions
+    Icon (Properties hint PreviousContent) defaultOptions
 
 
 {-| An arrow pointing to the right used in chevrons and paginators.
@@ -195,7 +202,7 @@ previousContent hint =
 -}
 nextContent : String -> Icon
 nextContent hint =
-    Icon (Properties hint RightArrow) defaultOptions
+    Icon (Properties hint NextContent) defaultOptions
 
 
 {-| A foldable paper, toggle some content between showing/hiding, or full/collapsed.
@@ -216,7 +223,7 @@ May indicate the collapsing of the content below.
 -}
 toggleUp : String -> Icon
 toggleUp hint =
-    Icon (Properties hint UpArrow) defaultOptions
+    Icon (Properties hint ToggleUp) defaultOptions
 
 
 {-| An arrow pointing down.
@@ -464,6 +471,26 @@ move hint =
     Icon (Properties hint Move) defaultOptions
 
 
+{-| An arrow pointing down.
+
+    Icon.sortIncreasing "Sort from A to Z"
+
+-}
+sortIncreasing : String -> Icon
+sortIncreasing hint =
+    Icon (Properties hint SortIncreasing) defaultOptions
+
+
+{-| An arrow pointing up.
+
+    Icon.sortDecreasing "Sort from Z to A"
+
+-}
+sortDecreasing : String -> Icon
+sortDecreasing hint =
+    Icon (Properties hint SortDecreasing) defaultOptions
+
+
 
 -- Rendering
 
@@ -508,8 +535,11 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
             Collapse ->
                 svgIcon "Collapse"
 
+            Delete ->
+                svgIcon "Trash"
+
             DownArrow ->
-                svgIcon "Chevron.Down"
+                svgIcon "Chevron-Down"
 
             Download ->
                 svgIcon "Download"
@@ -529,11 +559,14 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
             Groups ->
                 svgIcon "Groups"
 
-            LeftArrow ->
-                svgIcon "Chevron.Left"
-
             Logout ->
                 svgIcon "Logout"
+
+            Move ->
+                svgIcon "Move"
+
+            NextContent ->
+                svgIcon "Chevron-Right"
 
             Notifications ->
                 svgIcon "Bell"
@@ -542,16 +575,16 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
                 svgIcon "Space"
 
             Packages ->
-                svgIcon "Box.Outlined"
+                svgIcon "Box-Outlined"
+
+            PreviousContent ->
+                svgIcon "Chevron-Left"
 
             Print ->
                 svgIcon "Printer"
 
             Remove ->
                 svgIcon "Remove"
-
-            RightArrow ->
-                svgIcon "Chevron.Right"
 
             SandwichMenu ->
                 svgIcon "Hamburger"
@@ -560,25 +593,25 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
                 svgIcon "Search"
 
             SearchSpace ->
-                svgIcon "Space.Search"
+                svgIcon "Space-Search"
 
             SeeMore ->
                 svgIcon "Ellipsis"
 
+            SortDecreasing ->
+                svgIcon "Arrow-Up"
+
+            SortIncreasing ->
+                svgIcon "Arrow-Down"
+
             Toggle ->
                 svgIcon "Map"
 
-            UpArrow ->
-                svgIcon "Chevron.Up"
+            ToggleUp ->
+                svgIcon "Chevron-Up"
 
             Warning ->
                 svgIcon "Warning"
-
-            Delete ->
-                svgIcon "Trash"
-
-            Move ->
-                svgIcon "Move"
 
 
 

@@ -70,9 +70,19 @@ tablesDetails =
     }
 
 
+tablesSorting : TablesSorting
+tablesSorting =
+    { increase = "Trier de A à Z"
+    , decrease = "Trier de Z à A"
+    }
+
+
 tables : Tables
 tables =
     { details = tablesDetails
+    , sorting = tablesSorting
+    , selectRow = "Select this row."
+    , selectAll = "Select all rows"
     }
 
 

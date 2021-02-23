@@ -1,7 +1,7 @@
 module Tables.Model exposing (Model, initModel)
 
 import Msg exposing (Msg)
-import Tables.Book exposing (..)
+import Tables.Book as Book exposing (Book)
 import UI.Tables.Stateful as Table
 import UI.Utils.TypeNumbers exposing (Five)
 
@@ -16,9 +16,13 @@ initModel : Model
 initModel =
     { mainTableState =
         Table.init
-            |> Table.stateWithFilters someFilters
+            |> Table.stateWithFilters Book.filters
+            |> Table.stateWithSorters Book.sorters
+            |> Table.stateWithItems Book.books
     , selecTableState =
         Table.init
             |> Table.stateWithSelection .isbn False
-            |> Table.stateWithFilters someFilters
+            |> Table.stateWithFilters Book.filters
+            |> Table.stateWithSorters Book.sorters
+            |> Table.stateWithItems Book.books
     }

@@ -36,7 +36,13 @@
         "details": {
             "show": "Elargir",
             "collapse": "Crash"
-        }
+        },
+        "sorting": {
+            "increase": "Trier de A à Z",
+            "decrease": "Trier de Z à A"
+        },
+        "selectRow": "Sélectionner la ligne",
+        "selectAll": "Sélectionner toutes les lignes"
     },
     "dateInput": {
         "invalid": "Format de date invalide"

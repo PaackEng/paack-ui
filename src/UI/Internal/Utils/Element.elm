@@ -4,6 +4,7 @@ module UI.Internal.Utils.Element exposing
     , overflowAttrs
     , overflowVisible
     , overlay
+    , shrinkButClip
     , style
     , title
     , tuplesToStyles
@@ -78,6 +79,15 @@ overlay closeMsg content =
         , Element.inFront content
         ]
         (overlayBackground closeMsg)
+
+
+shrinkButClip : List (Attribute msg)
+shrinkButClip =
+    List.map tuplesToStyles
+        [ ( "width", "min-content" )
+        , ( "max-width", "100%" )
+        , ( "overflow", "clip" )
+        ]
 
 
 
