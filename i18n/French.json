@@ -41,8 +41,8 @@
             "increase": "Trier de A à Z",
             "decrease": "Trier de Z à A"
         },
-        "selectRow": "Select this row.",
-        "selectAll": "Select all rows"
+        "selectRow": "Sélectionner la ligne",
+        "selectAll": "Sélectionner toutes les lignes"
     },
     "dateInput": {
         "invalid": "Format de date invalide"
