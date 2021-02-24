@@ -6,6 +6,7 @@ import Return exposing (Return)
 import Tables.Book as Book exposing (Book)
 import Tables.Model as Stories
 import Tables.Msg as Stories
+import UI.Effect as Effect
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Tables.Common as Tables
 import UI.Tables.Stateful as Stateful
@@ -29,11 +30,13 @@ update msg ({ mainTableState, selecTableState } as model) =
             mainTableState
                 |> Stateful.update subMsg
                 |> Tuple.mapFirst (\s -> { model | mainTableState = s })
+                |> Tuple.mapSecond Effect.perform
 
         Stories.ForSelectable subMsg ->
             selecTableState
                 |> Stateful.update subMsg
                 |> Tuple.mapFirst (\s -> { model | selecTableState = s })
+                |> Tuple.mapSecond Effect.perform
 
 
 stories : RenderConfig -> ExplorerUI
