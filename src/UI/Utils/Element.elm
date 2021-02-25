@@ -6,7 +6,8 @@ module UI.Utils.Element exposing
     , disabled, onEnterPressed, onIndividualClick
     , nameUsername, namePassword
     , RectangleSides, zeroPadding
-    , fadeOut, slideOutLeft, transition
+    , transition
+    , Transition, fadeOut, slideOutLeft, easyPadding
     )
 
 {-| Utilities and functionality that are not covered by Elm UI.
@@ -45,7 +46,8 @@ module UI.Utils.Element exposing
 
 # Transition
 
-@docs fadeOut, slideOutLeft, transition
+@docs transition
+@docs Transition, fadeOut, slideOutLeft, easyPadding
 
 -}
 
@@ -131,11 +133,14 @@ colorTransition time =
         |> List.map tuplesToStyles
 
 
-type alias Transition msg =
-    { transition : String
-    , on : List (Attribute msg)
-    , off : List (Attribute msg)
-    }
+{-| Describes which transition to apply
+-}
+type Transition msg
+    = Transition
+        { transition : String
+        , on : List (Attribute msg)
+        , off : List (Attribute msg)
+        }
 
 
 {-| Applies the attributes of a transition for the given on/off state
@@ -148,7 +153,7 @@ type alias Transition msg =
 
 -}
 transition : Bool -> Transition msg -> List (Attribute msg)
-transition active t =
+transition active (Transition t) =
     tuplesToStyles ( "transition", t.transition )
         :: (if active then
                 t.on
@@ -172,6 +177,7 @@ slideOutLeft =
             , ( "transition", "transform .4s, opacity .2s .4s" )
             ]
     }
+        |> Transition
 
 
 {-| A transition that fades away an element
@@ -182,6 +188,18 @@ fadeOut =
     , on = [ Element.alpha 0.5 ]
     , off = [ Element.alpha 0, tuplesToStyles ( "pointer-events", "none" ) ]
     }
+        |> Transition
+
+
+{-| A transition that easies paddings
+-}
+easyPadding : RectangleSides -> RectangleSides -> Transition msg
+easyPadding whenOff whenOn =
+    { transition = "padding .4s"
+    , on = [ Element.paddingEach whenOn ]
+    , off = [ Element.paddingEach whenOff ]
+    }
+        |> Transition
 
 
 {-| Trigger message when the users press return-key while element is on-focus.

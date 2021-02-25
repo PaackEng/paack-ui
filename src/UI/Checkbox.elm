@@ -9,7 +9,6 @@ module UI.Checkbox exposing
     Checkbox.checkbox "I agree with terms of service."
         Msg.ToggleThis
         True
-        |> Checkbox.withSize Size.small
         |> Checkbox.withLabelVisible False
         |> Checkbox.renderElement renderConfig
 

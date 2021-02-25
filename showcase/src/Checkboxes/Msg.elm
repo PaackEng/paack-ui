@@ -6,3 +6,4 @@ type Msg
     | Box2Set Bool
     | Box3Check
     | Box3Uncheck
+    | SwitchSet Bool

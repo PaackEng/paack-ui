@@ -10,6 +10,7 @@ import Return exposing (Return)
 import UI.Checkbox as Checkbox
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.RenderConfig exposing (RenderConfig)
+import UI.Switch as Switch
 import UI.Text as Text
 import UIExplorer exposing (storiesOf)
 import Utils exposing (ExplorerStory, ExplorerUI, goToDocsCallToAction, iconsSvgSprite, prettifyElmCode, storyWithModel)
@@ -29,6 +30,9 @@ update msg model =
 
         Checkboxes.Box3Uncheck ->
             ( { model | box3 = False }, Cmd.none )
+
+        Checkboxes.SwitchSet newValue ->
+            ( { model | switch = newValue }, Cmd.none )
 
 
 stories : RenderConfig -> ExplorerUI
@@ -60,7 +64,7 @@ implicitMessages newState =
 
 
 boxView : RenderConfig -> Model -> Element Msg
-boxView renderConfig { checkboxesStories } =
+boxView renderConfig ({ checkboxesStories } as model) =
     Element.column [ Element.spacing 8 ]
         [ iconsSvgSprite
         , Checkbox.checkbox "Extra ketchup (Free)"
@@ -75,12 +79,29 @@ boxView renderConfig { checkboxesStories } =
             (implicitMessages >> Msg.CheckboxesStoriesMsg)
             checkboxesStories.box3
             |> Checkbox.renderElement renderConfig
+        , switchView renderConfig model
         , ("Total: "
             ++ (String.fromFloat <| totalPrice checkboxesStories)
             ++ " USD"
           )
             |> Text.body1
             |> Text.renderElement renderConfig
+        ]
+
+
+switchView : RenderConfig -> Model -> Element Msg
+switchView renderConfig { checkboxesStories } =
+    let
+        label =
+            "Donate 10¢ to charity"
+    in
+    Element.row [ Element.spacing 8 ]
+        [ Switch.switch label
+            (Checkboxes.SwitchSet >> Msg.CheckboxesStoriesMsg)
+            checkboxesStories.switch
+            |> Switch.withActivatedColor Switch.success
+            |> Switch.renderElement renderConfig
+        , Element.text label
         ]
 
 
@@ -101,14 +122,23 @@ boxCode =
             Msg.Box1Set
             "Extra ketchup (Free)"
             model.box1
+            |> Checkbox.renderElement renderConfig
         , Checkbox.checkbox renderConfig
             Msg.Box2Set
             "Large french fries (+0.50 USD)"
             model.box2
+            |> Checkbox.renderElement renderConfig
         , Checkbox.checkbox renderConfig
             (\\newState -> ifThenElse newState Msg.Box3Check Msg.Box3Uncheck)
             "Heinz® Mayonnaise (+0.75 USD)"
             model.box3
+            |> Checkbox.renderElement renderConfig
+        , Switch.switch "Donate 10¢ to charity"
+            Msg.SwitchSet
+            model.switch
+            |> Switch.withActivatedColor Switch.success
+            |> Switch.renderElement renderConfig
+            |> appenSwitchLabel
         , ("Total: "
             ++ (String.fromFloat <| totalPrice model)
             ++ " USD"

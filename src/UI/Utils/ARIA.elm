@@ -1,6 +1,6 @@
 module UI.Utils.ARIA exposing
     ( ElementSemantics
-    , roleButton, roleImage, rolePresentation, roleCheckbox, roleTab
+    , roleButton, roleImage, rolePresentation, roleCheckbox, roleTab, roleSwitch
     , roleRadioGroup, roleRadio
     , withLabel
     , toElementAttributes
@@ -13,7 +13,7 @@ module UI.Utils.ARIA exposing
 
 # Building
 
-@docs roleButton, roleImage, rolePresentation, roleCheckbox, roleTab
+@docs roleButton, roleImage, rolePresentation, roleCheckbox, roleTab, roleSwitch
 
 
 ## Radio buttons
@@ -50,6 +50,7 @@ type alias ElementSemantics =
 type Role
     = RoleButton
     | RoleCheckbox Bool
+    | RoleSwitch Bool
     | RoleImage
     | RolePresentation
     | RoleRadio Bool
@@ -60,7 +61,7 @@ type Role
 {-| "The button role should be used for clickable elements that trigger a response when activated by the user." - MDN
 
     Element.el
-        (Events.onClick Msg.SomeEvent :: (ARIA.toElementAttributes <| ARIA.roleButton))
+        (Events.onClick Msg.SomeEvent :: ARIA.toElementAttributes ARIA.roleButton)
         someChildElement
 
 -}
@@ -83,6 +84,20 @@ roleCheckbox checked =
     fromRole (RoleCheckbox checked)
 
 
+{-| "The ARIA switch role is functionally identical to the checkbox role,
+except that instead of representing checked/unchecked states, which are fairly generic in meaning,
+the switch role represents the states on/off." -MDN
+
+    Element.el
+        (Event.onClick turnOnMsg :: (ARIA.toElementAttributes <| ARIA.roleSwitch False))
+        offSwitchIcon
+
+-}
+roleSwitch : Bool -> ElementSemantics
+roleSwitch state =
+    fromRole (RoleSwitch state)
+
+
 {-| "Can be used to identify multiple elements inside page content that should be considered as a single image." - MDN
 
     Element.el
@@ -100,7 +115,7 @@ roleImage label =
 {-| "An element whose content is completely presentational (like a spacer image, decorative graphic, or clearing element)" - W3C
 
     Element.el
-        (ARIA.toElementAttributes <| ARIA.rolePresentation)
+        (ARIA.toElementAttributes ARIA.rolePresentation)
         totallyRedundantElement
 
 -}
@@ -196,6 +211,11 @@ toElementAttributes { role, label } =
             RoleCheckbox checked ->
                 [ roleAttr "checkbox"
                 , checkedAttr checked
+                ]
+
+            RoleSwitch state ->
+                [ roleAttr "checkbox"
+                , checkedAttr state
                 ]
 
             RoleImage ->
