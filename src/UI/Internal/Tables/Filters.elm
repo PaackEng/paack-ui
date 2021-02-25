@@ -664,28 +664,28 @@ update : Msg -> Filters msg item columns -> ( Filters msg item columns, Effect m
 update msg model =
     case msg of
         EditSingleText { column, value } ->
-            ( singleTextEdit column value model, Effect.None )
+            ( singleTextEdit column value model, Effect.none )
 
         EditMultiText { column, field, value } ->
-            ( multiTextEdit column field value model, Effect.None )
+            ( multiTextEdit column field value model, Effect.none )
 
         EditSingleDate { column, value } ->
-            ( singleDateEdit column value model, Effect.None )
+            ( singleDateEdit column value model, Effect.none )
 
         EditRangeFromDate { column, value } ->
-            ( rangeDateFromEdit column value model, Effect.None )
+            ( rangeDateFromEdit column value model, Effect.none )
 
         EditRangeToDate { column, value } ->
-            ( rangeDateToEdit column value model, Effect.None )
+            ( rangeDateToEdit column value model, Effect.none )
 
         EditPeriodDate { column, value } ->
-            ( periodDateEdit column value model, Effect.None )
+            ( periodDateEdit column value model, Effect.none )
 
         EditPeriodComparison { column, value } ->
-            ( periodDateComparisonEdit column value model, Effect.None )
+            ( periodDateComparisonEdit column value model, Effect.none )
 
         EditSelect { column, value } ->
-            ( selectEdit column value model, Effect.None )
+            ( selectEdit column value model, Effect.none )
 
         Apply column ->
             applyFilter column model
@@ -699,12 +699,12 @@ dispatchApply strategy value newModel =
     case strategy of
         Local _ ->
             ( newModel
-            , Effect.None
+            , Effect.none
             )
 
         Remote { applyMsg } ->
             ( newModel
-            , Effect.MsgToCmd <| applyMsg value
+            , Effect.msgToCmd <| applyMsg value
             )
 
 
@@ -713,12 +713,12 @@ dispatchClear strategy newModel =
     case strategy of
         Local _ ->
             ( newModel
-            , Effect.None
+            , Effect.none
             )
 
         Remote { clearMsg } ->
             ( newModel
-            , Effect.MsgToCmd clearMsg
+            , Effect.msgToCmd clearMsg
             )
 
 
@@ -738,7 +738,7 @@ applyShortcut model column config constructor =
                 |> dispatchApply config.strategy newValue
 
         Nothing ->
-            ( model, Effect.None )
+            ( model, Effect.none )
 
 
 applyFilter : Int -> Filters msg item columns -> ( Filters msg item columns, Effect msg )
@@ -763,7 +763,7 @@ applyFilter column model =
             applyShortcut model column config (SelectFilter list)
 
         Nothing ->
-            ( model, Effect.None )
+            ( model, Effect.none )
 
 
 filterClear : Int -> Filters msg item columns -> ( Filters msg item columns, Effect msg )
@@ -812,7 +812,7 @@ filterClear column model =
                 |> dispatchClear config.strategy
 
         Nothing ->
-            ( model, Effect.None )
+            ( model, Effect.none )
 
 
 editableSetCurrent : value -> Editable value -> Editable value

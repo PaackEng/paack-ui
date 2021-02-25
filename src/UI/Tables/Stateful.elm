@@ -377,13 +377,13 @@ update msg (State state) =
             updateFilters state subMsg
 
         ForSorters subMsg ->
-            updateSorters state subMsg
+            ( updateSorters state subMsg, Effect.none )
 
         FilterDialogOpen index ->
-            ( State { state | filterDialog = Just index }, Effect.None )
+            ( State { state | filterDialog = Just index }, Effect.none )
 
         FilterDialogClose ->
-            ( State { state | filterDialog = Nothing }, Effect.None )
+            ( State { state | filterDialog = Nothing }, Effect.none )
 
         SelectionToggleAll ->
             updateSelectionToggleAll state
@@ -403,7 +403,7 @@ updateMobileToggle state index =
                 else
                     Just index
         }
-    , Effect.None
+    , Effect.none
     )
 
 
@@ -421,7 +421,7 @@ updateFilters state subMsg =
                    )
 
         Nothing ->
-            ( State state, Effect.None )
+            ( State state, Effect.none )
 
 
 applyFilters : Filters msg item columns -> StateModel msg item columns -> State msg item columns
@@ -436,18 +436,16 @@ applyFilters newFilters state =
         }
 
 
-updateSorters : StateModel msg item columns -> Sorters.Msg -> ( State msg item columns, Effect msg )
+updateSorters : StateModel msg item columns -> Sorters.Msg -> State msg item columns
 updateSorters state subMsg =
     case state.sorters of
         Just sorters ->
-            ( sorters
+            sorters
                 |> Sorters.update subMsg
                 |> flip applySorters state
-            , Effect.None
-            )
 
         Nothing ->
-            ( State state, Effect.None )
+            State state
 
 
 applySorters : Sorters item columns -> StateModel msg item columns -> State msg item columns
@@ -484,7 +482,7 @@ updateSelectionToggleAll state =
             }
     in
     ( State { state | localSelection = Maybe.map invertAll state.localSelection }
-    , Effect.None
+    , Effect.none
     )
 
 
@@ -506,7 +504,7 @@ updateSelectionSet state item value =
             }
     in
     ( State { state | localSelection = Maybe.map setItem state.localSelection }
-    , Effect.None
+    , Effect.none
     )
 
 
