@@ -37,6 +37,7 @@ module UI.Internal.Tables.Filters exposing
 
 import Array exposing (Array)
 import Time exposing (Posix)
+import UI.Analytics as Analytics
 import UI.Effect as Effect exposing (Effect)
 import UI.Internal.Basics exposing (flip, maybeNotThen)
 import UI.Internal.DateInput as DateInput exposing (DateInput(..), PeriodComparison(..), PeriodDate, RangeDate)
@@ -689,9 +690,11 @@ update msg model =
 
         Apply column ->
             applyFilter column model
+                |> withApplyAnalytics column
 
         Clear column ->
             filterClear column model
+                |> withClearAnalytics column
 
 
 dispatchApply : Strategy msg value item -> value -> Filters msg item columns -> ( Filters msg item columns, Effect msg )
@@ -708,6 +711,17 @@ dispatchApply strategy value newModel =
             )
 
 
+withApplyAnalytics : Int -> ( Filters msg item columns, Effect msg ) -> ( Filters msg item columns, Effect msg )
+withApplyAnalytics column ( model, effects ) =
+    let
+        analytics =
+            Analytics.ApplyFilter column
+                |> Analytics.TableAnalytics
+                |> Effect.analytics
+    in
+    ( model, Effect.batch [ effects, analytics ] )
+
+
 dispatchClear : Strategy msg value item -> Filters msg item columns -> ( Filters msg item columns, Effect msg )
 dispatchClear strategy newModel =
     case strategy of
@@ -720,6 +734,17 @@ dispatchClear strategy newModel =
             ( newModel
             , Effect.msgToCmd clearMsg
             )
+
+
+withClearAnalytics : Int -> ( Filters msg item columns, Effect msg ) -> ( Filters msg item columns, Effect msg )
+withClearAnalytics column ( model, effects ) =
+    let
+        analytics =
+            Analytics.ClearFilter column
+                |> Analytics.TableAnalytics
+                |> Effect.analytics
+    in
+    ( model, Effect.batch [ effects, analytics ] )
 
 
 applyShortcut :

@@ -174,7 +174,7 @@ import Set exposing (Set)
 import Time
 import UI.Checkbox as Checkbox exposing (checkbox)
 import UI.Effect as Effect exposing (Effect)
-import UI.Internal.Basics exposing (flip, ifThenElse, maybeThen, prependMaybe)
+import UI.Internal.Basics exposing (ifThenElse, maybeThen, prependMaybe)
 import UI.Internal.DateInput as DateInput exposing (DateInput, PeriodDate, RangeDate)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Internal.RenderConfig exposing (localeTerms)
@@ -377,7 +377,7 @@ update msg (State state) =
             updateFilters state subMsg
 
         ForSorters subMsg ->
-            ( updateSorters state subMsg, Effect.none )
+            updateSorters state subMsg
 
         FilterDialogOpen index ->
             ( State { state | filterDialog = Just index }, Effect.none )
@@ -436,16 +436,21 @@ applyFilters newFilters state =
         }
 
 
-updateSorters : StateModel msg item columns -> Sorters.Msg -> State msg item columns
+updateSorters : StateModel msg item columns -> Sorters.Msg -> ( State msg item columns, Effect msg )
 updateSorters state subMsg =
     case state.sorters of
         Just sorters ->
             sorters
                 |> Sorters.update subMsg
-                |> flip applySorters state
+                |> (\( newSorters, subCmd ) ->
+                        ( state
+                            |> applySorters newSorters
+                        , subCmd
+                        )
+                   )
 
         Nothing ->
-            State state
+            ( State state, Effect.none )
 
 
 applySorters : Sorters item columns -> StateModel msg item columns -> State msg item columns
