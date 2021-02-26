@@ -48,14 +48,14 @@ type alias ColumnStatus =
     Maybe (Maybe SortingDirection)
 
 
-update : Msg -> Sorters item columns -> ( Sorters item columns, Cmd msg )
+update : Msg -> Sorters item columns -> Sorters item columns
 update msg sorters =
     case msg of
         SetSorting index direction ->
-            ( sort direction index sorters, Cmd.none )
+            sort direction index sorters
 
         ClearSorting ->
-            ( clear sorters, Cmd.none )
+            clear sorters
 
 
 clear : Sorters item columns -> Sorters item columns

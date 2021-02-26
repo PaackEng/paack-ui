@@ -173,7 +173,8 @@ import Element.Keyed as Keyed
 import Set exposing (Set)
 import Time
 import UI.Checkbox as Checkbox exposing (checkbox)
-import UI.Internal.Basics exposing (ifThenElse, maybeThen, prependMaybe)
+import UI.Effect as Effect exposing (Effect)
+import UI.Internal.Basics exposing (flip, ifThenElse, maybeThen, prependMaybe)
 import UI.Internal.DateInput as DateInput exposing (DateInput, PeriodDate, RangeDate)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Internal.RenderConfig exposing (localeTerms)
@@ -366,7 +367,7 @@ Do not ignore the returned `Cmd`, it may include remote filter's messages.
         Table.update subMsg oldModel.tableState
 
 -}
-update : Msg item -> State msg item columns -> ( State msg item columns, Cmd msg )
+update : Msg item -> State msg item columns -> ( State msg item columns, Effect msg )
 update msg (State state) =
     case msg of
         MobileToggle index ->
@@ -379,10 +380,10 @@ update msg (State state) =
             updateSorters state subMsg
 
         FilterDialogOpen index ->
-            ( State { state | filterDialog = Just index }, Cmd.none )
+            ( State { state | filterDialog = Just index }, Effect.None )
 
         FilterDialogClose ->
-            ( State { state | filterDialog = Nothing }, Cmd.none )
+            ( State { state | filterDialog = Nothing }, Effect.None )
 
         SelectionToggleAll ->
             updateSelectionToggleAll state
@@ -391,7 +392,7 @@ update msg (State state) =
             updateSelectionSet state item value
 
 
-updateMobileToggle : StateModel msg item columns -> Int -> ( State msg item columns, Cmd msg )
+updateMobileToggle : StateModel msg item columns -> Int -> ( State msg item columns, Effect msg )
 updateMobileToggle state index =
     ( State
         { state
@@ -402,11 +403,11 @@ updateMobileToggle state index =
                 else
                     Just index
         }
-    , Cmd.none
+    , Effect.None
     )
 
 
-updateFilters : StateModel msg item columns -> Filters.Msg -> ( State msg item columns, Cmd msg )
+updateFilters : StateModel msg item columns -> Filters.Msg -> ( State msg item columns, Effect msg )
 updateFilters state subMsg =
     case state.filters of
         Just filters ->
@@ -420,7 +421,7 @@ updateFilters state subMsg =
                    )
 
         Nothing ->
-            ( State state, Cmd.none )
+            ( State state, Effect.None )
 
 
 applyFilters : Filters msg item columns -> StateModel msg item columns -> State msg item columns
@@ -435,21 +436,18 @@ applyFilters newFilters state =
         }
 
 
-updateSorters : StateModel msg item columns -> Sorters.Msg -> ( State msg item columns, Cmd msg )
+updateSorters : StateModel msg item columns -> Sorters.Msg -> ( State msg item columns, Effect msg )
 updateSorters state subMsg =
     case state.sorters of
         Just sorters ->
-            sorters
+            ( sorters
                 |> Sorters.update subMsg
-                |> (\( newSorters, subCmd ) ->
-                        ( state
-                            |> applySorters newSorters
-                        , subCmd
-                        )
-                   )
+                |> flip applySorters state
+            , Effect.None
+            )
 
         Nothing ->
-            ( State state, Cmd.none )
+            ( State state, Effect.None )
 
 
 applySorters : Sorters item columns -> StateModel msg item columns -> State msg item columns
@@ -464,7 +462,7 @@ applySorters newSorters state =
         }
 
 
-updateSelectionToggleAll : StateModel msg item columns -> ( State msg item columns, Cmd msg )
+updateSelectionToggleAll : StateModel msg item columns -> ( State msg item columns, Effect msg )
 updateSelectionToggleAll state =
     let
         invertAll old =
@@ -486,11 +484,11 @@ updateSelectionToggleAll state =
             }
     in
     ( State { state | localSelection = Maybe.map invertAll state.localSelection }
-    , Cmd.none
+    , Effect.None
     )
 
 
-updateSelectionSet : StateModel msg item columns -> item -> Bool -> ( State msg item columns, Cmd msg )
+updateSelectionSet : StateModel msg item columns -> item -> Bool -> ( State msg item columns, Effect msg )
 updateSelectionSet state item value =
     let
         setItem old =
@@ -508,7 +506,7 @@ updateSelectionSet state item value =
             }
     in
     ( State { state | localSelection = Maybe.map setItem state.localSelection }
-    , Cmd.none
+    , Effect.None
     )
 
 
