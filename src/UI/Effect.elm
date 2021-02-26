@@ -3,6 +3,7 @@ module UI.Effect exposing
     , SideEffect(..)
     , analytics
     , batch
+    , map
     , msgToCmd
     , none
     , perform
@@ -29,6 +30,20 @@ none =
 batch : List (Effect msg) -> Effect msg
 batch =
     List.concat
+
+
+map : (a -> b) -> Effect a -> Effect b
+map =
+    let
+        mapSideEffect f e =
+            case e of
+                MsgToCmd msg ->
+                    MsgToCmd (f msg)
+
+                Analytics data ->
+                    Analytics data
+    in
+    mapSideEffect >> List.map
 
 
 msgToCmd : msg -> Effect msg
