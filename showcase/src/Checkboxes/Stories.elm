@@ -31,9 +31,6 @@ update msg model =
         Checkboxes.Box3Uncheck ->
             ( { model | box3 = False }, Cmd.none )
 
-        Checkboxes.SwitchSet newValue ->
-            ( { model | switch = newValue }, Cmd.none )
-
 
 stories : RenderConfig -> ExplorerUI
 stories renderConfig =
@@ -79,29 +76,12 @@ boxView renderConfig ({ checkboxesStories } as model) =
             (implicitMessages >> Msg.CheckboxesStoriesMsg)
             checkboxesStories.box3
             |> Checkbox.renderElement renderConfig
-        , switchView renderConfig model
         , ("Total: "
             ++ (String.fromFloat <| totalPrice checkboxesStories)
             ++ " USD"
           )
             |> Text.body1
             |> Text.renderElement renderConfig
-        ]
-
-
-switchView : RenderConfig -> Model -> Element Msg
-switchView renderConfig { checkboxesStories } =
-    let
-        label =
-            "Donate 10¢ to charity"
-    in
-    Element.row [ Element.spacing 8 ]
-        [ Switch.switch label
-            (Checkboxes.SwitchSet >> Msg.CheckboxesStoriesMsg)
-            checkboxesStories.switch
-            |> Switch.withActivatedColor Switch.success
-            |> Switch.renderElement renderConfig
-        , Element.text label
         ]
 
 
@@ -133,12 +113,6 @@ boxCode =
             "Heinz® Mayonnaise (+0.75 USD)"
             model.box3
             |> Checkbox.renderElement renderConfig
-        , Switch.switch "Donate 10¢ to charity"
-            Msg.SwitchSet
-            model.switch
-            |> Switch.withActivatedColor Switch.success
-            |> Switch.renderElement renderConfig
-            |> appenSwitchLabel
         , ("Total: "
             ++ (String.fromFloat <| totalPrice model)
             ++ " USD"

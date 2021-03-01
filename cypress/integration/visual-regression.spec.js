@@ -75,6 +75,14 @@ describe('Percy Snapshots', () => {
     })
   })
 
+
+  describe('Switches', () => {
+    it('Creates the Switches page snapshot', () => {
+      cy.visit('/#Basics/Switches/Switches')
+      cy.percySnapshot('Switches')
+    })
+  })
+
   describe('Radio', () => {
     it('Creates a snapshot for horizontal and vertical arrangement of radio groups', () => {
       cy.visit('/#Basics/Radio/United')

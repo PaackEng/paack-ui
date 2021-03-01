@@ -19,6 +19,7 @@ import Radio.Stories as Radio
 import Return as R
 import Sidebar.Stories as Sidebar
 import Sizes
+import Switches.Stories as Switches
 import Tables.Stories as Tables
 import Tabs.Stories as Tabs
 import TextField
@@ -116,6 +117,7 @@ main =
             , TextField.stories renderConfig
             , LoadingView.stories
             , Checkboxes.stories renderConfig
+            , Switches.stories renderConfig
             , Radio.stories renderConfig
             , Tabs.stories renderConfig
             , Layouts.stories renderConfig
@@ -160,6 +162,11 @@ updateStories msg ({ customModel } as model) =
         CheckboxesStoriesMsg subMsg ->
             Checkboxes.update subMsg customModel.checkboxesStories
                 |> R.map (\t -> { customModel | checkboxesStories = t })
+                |> finishCustomUpdate model
+
+        SwitchesStoriesMsg subMsg ->
+            Switches.update subMsg customModel.switchesStories
+                |> R.map (\t -> { customModel | switchesStories = t })
                 |> finishCustomUpdate model
 
         RadioStoriesMsg subMsg ->

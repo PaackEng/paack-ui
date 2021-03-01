@@ -9,6 +9,7 @@ import Layouts.Model as Layouts
 import Paginators.Model as Paginators
 import Radio.Model as Radio
 import Sidebar.Model as Sidebar
+import Switches.Model as Switches
 import Tables.Model as Tables
 import Tabs.Model as Tabs
 import UIExplorer.Plugins.Tabs as TabsPlugin
@@ -19,6 +20,7 @@ type alias Model =
     , paginatorsStories : Paginators.Model
     , tablesStories : Tables.Model
     , checkboxesStories : Checkboxes.Model
+    , switchesStories : Switches.Model
     , radioStories : Radio.Model
     , tabsStories : Tabs.Model
     , tabs : TabsPlugin.Model
@@ -33,6 +35,7 @@ init =
     , paginatorsStories = Paginators.initModel
     , tablesStories = Tables.initModel
     , checkboxesStories = Checkboxes.initModel
+    , switchesStories = Switches.initModel
     , radioStories = Radio.initModel
     , tabsStories = Tabs.initModel
     , tabs = TabsPlugin.initialModel

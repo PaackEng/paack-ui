@@ -1,28 +1,20 @@
 module UI.Switch exposing
-    ( Switch, switch
-    , withActivatedColor
-    , ActivatedColor, success, danger
+    ( Switch, default, success, danger
     , renderElement
     )
 
 {-| Accessible and uniform-styled implementation of a switch.
 
-    Switch.switch "Flying mode."
+    Switch.default "Flying mode."
         Msg.ToggleThis
         True
-        |> Switch.withActivatedColor Switch.success
+        |> Switch.withColor Switch.success
         |> Switch.renderElement renderConfig
 
 
 # Building
 
-@docs Switch, switch
-
-
-# Coloring
-
-@docs withActivatedColor
-@docs ActivatedColor, success, danger
+@docs Switch, default, success, danger
 
 
 # Rendering
@@ -31,10 +23,11 @@ module UI.Switch exposing
 
 -}
 
-import Element exposing (Element)
+import Element exposing (Attribute, Element)
 import Element.Background as Background
 import Element.Border as Border
 import UI.Internal.Colors as Colors
+import UI.Internal.Utils.Element as Element
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element
@@ -54,7 +47,7 @@ type alias Properties msg =
 
 
 type alias Options =
-    { activatedColor : ActivatedColor
+    { color : Color
     }
 
 
@@ -63,67 +56,63 @@ type alias Options =
 The default color is half-opaque black.
 
 -}
-type ActivatedColor
-    = NoColor
+type Color
+    = HalfOpaque
     | ColorSuccess
     | ColorDanger
 
 
-{-| Defines all the required properties for creating a switch.
+{-| Defines all the required properties for creating a switch. This default switch is half-opaque black.
 
-    switch "Flight mode"
+    Switch.default "Flight mode"
         (Msg.SetFlightMode <| not model.flightModeEnabled)
         model.flightModeEnabled
 
 -}
-switch : String -> (Bool -> msg) -> Bool -> Switch msg
-switch label message state =
+default : String -> (Bool -> msg) -> Bool -> Switch msg
+default label message state =
     Switch { message = message, label = label, state = state }
-        { activatedColor = NoColor }
+        { color = HalfOpaque }
 
 
-{-| Change the switch's color when activated.
+{-| This switch has the success-color, and it's greenish for enforcing success.
 
-    TextField.setLabelVisible True someTextField
-
--}
-withActivatedColor : ActivatedColor -> Switch msg -> Switch msg
-withActivatedColor activatedColor (Switch prop opt) =
-    Switch prop { opt | activatedColor = activatedColor }
-
-
-{-| This is the success-color, and it's greenish for enforcing success.
-
-    Switch.withActivatedColor Switch.success
-        someSwitch
+    Switch.success "Toggle Firewall"
+        (Msg.SetFirewall <| not model.hasFirewall)
+        model.hasFirewall
 
 -}
-success : ActivatedColor
-success =
-    ColorSuccess
+success : String -> (Bool -> msg) -> Bool -> Switch msg
+success label message state =
+    Switch { message = message, label = label, state = state }
+        { color = ColorSuccess }
 
 
-{-| This is the danger-color, and it's reddish for enforcing the user's attention.
+{-| This switch has the danger-color, and it's reddish for enforcing the user's attention.
 
-    Switch.withActivatedColor Switch.danger
-        someSwitch
+    Switch.danger "Toggle root access"
+        (Msg.SetRootAccess <| not model.hasRoot)
+        model.hasRoot
 
 -}
-danger : ActivatedColor
-danger =
-    ColorDanger
+danger : String -> (Bool -> msg) -> Bool -> Switch msg
+danger label message state =
+    Switch { message = message, label = label, state = state }
+        { color = ColorDanger }
 
 
 {-| End of the builder's life.
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
 renderElement : RenderConfig -> Switch msg -> Element msg
-renderElement _ (Switch { message, label, state } { activatedColor }) =
+renderElement _ (Switch { message, label, state } { color }) =
     let
         boxAttrs =
             Border.rounded 32
                 :: Element.onIndividualClick (message (not state))
                 :: Element.pointer
+                :: Element.paddingEach { top = 1, left = 1, right = 21, bottom = 1 }
+                :: Element.style "transition" "background-color .2s"
                 :: aria
 
         aria =
@@ -131,31 +120,9 @@ renderElement _ (Switch { message, label, state } { activatedColor }) =
                 |> ARIA.withLabel label
                 |> ARIA.toElementAttributes
 
-        knobAttrs =
-            [ Border.rounded 10
-            , Colors.mainBackground
-            , Border.shadow
-                { offset = ( 0, 3 )
-                , size = 0
-                , blur = 8
-                , color = Element.rgba 0 0 0 0.15
-                }
-            ]
-
-        thinBorder =
-            Element.el
-                [ Border.shadow
-                    { offset = ( 0, 3 )
-                    , size = 0
-                    , blur = 1
-                    , color = Element.rgba 0 0 0 0.06
-                    }
-                , Border.rounded 10
-                ]
-
-        activatedColorAttr =
-            case activatedColor of
-                NoColor ->
+        colorAttr =
+            case color of
+                HalfOpaque ->
                     Colors.overlayBackground
 
                 ColorSuccess ->
@@ -167,12 +134,8 @@ renderElement _ (Switch { message, label, state } { activatedColor }) =
     if state then
         Element.none
             |> Element.el (Element.padding 10 :: knobAttrs)
-            |> thinBorder
-            |> Element.el
-                (activatedColorAttr
-                    :: boxAttrs
-                    ++ Element.transition True paddingTransition
-                )
+            |> Element.el (paddingRight :: thinBorder)
+            |> Element.el (colorAttr :: boxAttrs)
 
     else
         Element.none
@@ -182,16 +145,36 @@ renderElement _ (Switch { message, label, state } { activatedColor }) =
                     :: Element.padding 9
                     :: knobAttrs
                 )
-            |> thinBorder
-            |> Element.el
-                (Background.color Colors.gray.lighter
-                    :: boxAttrs
-                    ++ Element.transition False paddingTransition
-                )
+            |> Element.el thinBorder
+            |> Element.el (Background.color Colors.gray.lighter :: boxAttrs)
 
 
-paddingTransition : Element.Transition msg
-paddingTransition =
-    Element.easyPadding
-        { top = 1, bottom = 1, left = 1, right = 20 }
-        { top = 1, bottom = 1, left = 20, right = 1 }
+knobAttrs : List (Attribute msg)
+knobAttrs =
+    [ Border.rounded 10
+    , Colors.mainBackground
+    , Border.shadow
+        { offset = ( 0, 3 )
+        , size = 0
+        , blur = 8
+        , color = Element.rgba 0 0 0 0.15
+        }
+    ]
+
+
+paddingRight : Attribute msg
+paddingRight =
+    Element.style "transform" "translate(20px)"
+
+
+thinBorder : List (Attribute msg)
+thinBorder =
+    [ Border.shadow
+        { offset = ( 0, 3 )
+        , size = 0
+        , blur = 1
+        , color = Element.rgba 0 0 0 0.06
+        }
+    , Border.rounded 10
+    , Element.style "transition" "transform .4s"
+    ]

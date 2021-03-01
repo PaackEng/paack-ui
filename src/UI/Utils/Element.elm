@@ -7,7 +7,7 @@ module UI.Utils.Element exposing
     , nameUsername, namePassword
     , RectangleSides, zeroPadding
     , transition
-    , Transition, fadeOut, slideOutLeft, easyPadding
+    , Transition, fadeOut, slideOutLeft
     )
 
 {-| Utilities and functionality that are not covered by Elm UI.
@@ -187,17 +187,6 @@ fadeOut =
     { transition = "opacity .2s"
     , on = [ Element.alpha 0.5 ]
     , off = [ Element.alpha 0, tuplesToStyles ( "pointer-events", "none" ) ]
-    }
-        |> Transition
-
-
-{-| A transition that easies paddings
--}
-easyPadding : RectangleSides -> RectangleSides -> Transition msg
-easyPadding whenOff whenOn =
-    { transition = "padding .4s"
-    , on = [ Element.paddingEach whenOn ]
-    , off = [ Element.paddingEach whenOff ]
     }
         |> Transition
 
