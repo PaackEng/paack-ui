@@ -7,10 +7,8 @@ import PluginOptions exposing (defaultWithoutMenu)
 import Return exposing (Return)
 import Switches.Model as Switches
 import Switches.Msg as Switches
-import UI.Internal.Basics exposing (ifThenElse)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Switch as Switch exposing (Switch)
-import UI.Text as Text
 import UIExplorer exposing (storiesOf)
 import Utils exposing (ExplorerStory, ExplorerUI, goToDocsCallToAction, iconsSvgSprite, prettifyElmCode, storyWithModel)
 
@@ -60,7 +58,7 @@ implicitMessages newState =
 
 
 switchesView : RenderConfig -> Model -> Element Msg
-switchesView renderConfig ({ switchesStories } as model) =
+switchesView renderConfig { switchesStories } =
     Element.column [ Element.spacing 8 ]
         [ iconsSvgSprite
         , switchView renderConfig "Friendly mode" <|

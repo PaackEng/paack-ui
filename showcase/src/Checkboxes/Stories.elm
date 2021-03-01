@@ -10,7 +10,6 @@ import Return exposing (Return)
 import UI.Checkbox as Checkbox
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.RenderConfig exposing (RenderConfig)
-import UI.Switch as Switch
 import UI.Text as Text
 import UIExplorer exposing (storiesOf)
 import Utils exposing (ExplorerStory, ExplorerUI, goToDocsCallToAction, iconsSvgSprite, prettifyElmCode, storyWithModel)
@@ -61,7 +60,7 @@ implicitMessages newState =
 
 
 boxView : RenderConfig -> Model -> Element Msg
-boxView renderConfig ({ checkboxesStories } as model) =
+boxView renderConfig { checkboxesStories } =
     Element.column [ Element.spacing 8 ]
         [ iconsSvgSprite
         , Checkbox.checkbox "Extra ketchup (Free)"
