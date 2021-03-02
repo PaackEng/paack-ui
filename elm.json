@@ -20,6 +20,7 @@
         "UI.RenderConfig",
         "UI.Size",
         "UI.SummaryListItem",
+        "UI.Switch",
         "UI.Tables.Common",
         "UI.Tables.Stateful",
         "UI.Tables.Stateless",

@@ -101,14 +101,17 @@ boxCode =
             Msg.Box1Set
             "Extra ketchup (Free)"
             model.box1
+            |> Checkbox.renderElement renderConfig
         , Checkbox.checkbox renderConfig
             Msg.Box2Set
             "Large french fries (+0.50 USD)"
             model.box2
+            |> Checkbox.renderElement renderConfig
         , Checkbox.checkbox renderConfig
             (\\newState -> ifThenElse newState Msg.Box3Check Msg.Box3Uncheck)
             "Heinz® Mayonnaise (+0.75 USD)"
             model.box3
+            |> Checkbox.renderElement renderConfig
         , ("Total: "
             ++ (String.fromFloat <| totalPrice model)
             ++ " USD"
