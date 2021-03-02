@@ -57,7 +57,7 @@ The default color is half-opaque black.
 
 -}
 type Color
-    = HalfOpaque
+    = ColorHalfOpaque
     | ColorSuccess
     | ColorDanger
 
@@ -72,7 +72,7 @@ type Color
 default : String -> (Bool -> msg) -> Bool -> Switch msg
 default label message state =
     Switch { message = message, label = label, state = state }
-        { color = HalfOpaque }
+        { color = ColorHalfOpaque }
 
 
 {-| This switch has the success-color, and it's greenish for enforcing success.
@@ -122,7 +122,7 @@ renderElement _ (Switch { message, label, state } { color }) =
 
         colorAttr =
             case color of
-                HalfOpaque ->
+                ColorHalfOpaque ->
                     Colors.overlayBackground
 
                 ColorSuccess ->
@@ -164,7 +164,7 @@ knobAttrs =
 
 paddingRight : Attribute msg
 paddingRight =
-    Element.style "transform" "translate(20px)"
+    Element.style "transform" "translateX(20px)"
 
 
 thinBorder : List (Attribute msg)

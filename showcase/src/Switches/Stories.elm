@@ -9,6 +9,7 @@ import Switches.Model as Switches
 import Switches.Msg as Switches
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Switch as Switch exposing (Switch)
+import UI.Text as Text
 import UIExplorer exposing (storiesOf)
 import Utils exposing (ExplorerStory, ExplorerUI, goToDocsCallToAction, iconsSvgSprite, prettifyElmCode, storyWithModel)
 
@@ -83,13 +84,20 @@ switchView : RenderConfig -> String -> (String -> Switch Msg) -> Element Msg
 switchView renderConfig label switch =
     Element.row [ Element.spacing 8 ]
         [ Switch.renderElement renderConfig <| switch ("Toggle " ++ label)
-        , Element.text label
+        , Text.renderElement renderConfig <| Text.body1 label
         ]
 
 
 switchCode : String
 switchCode =
     prettifyElmCode """
+    let
+        appendSwitchLabel label switchElement =
+            Element.row [ Element.spacing 8 ]
+                [ switchElement
+                , Text.renderElement renderConfig <| Text.body1 label
+                ]
+    in
     Element.column [ Element.spacing 8 ]
         [ Switch.default "Toggle friendly mode"
             Msg.Switch1Set
