@@ -4,6 +4,7 @@ module Utils exposing
     , ExplorerUI
     , goToDocsCallToAction
     , iconsSvgSprite
+    , mobileRenderConfig
     , prettifyElmCode
     , reducedToDocs
     , story
@@ -19,6 +20,7 @@ import Model exposing (Model)
 import Msg exposing (Msg)
 import PluginOptions exposing (PluginOptions, defaultWithMenu)
 import UI.Palette as Palette exposing (brightnessMiddle, toneGray)
+import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UIExplorer
 
 
@@ -108,3 +110,10 @@ reducedToDocs path =
                 ++ path
                 ++ ") for the exact code of this example."
     }
+
+
+mobileRenderConfig : RenderConfig
+mobileRenderConfig =
+    RenderConfig.init
+        { width = 375, height = 667 }
+        RenderConfig.localeEnglish

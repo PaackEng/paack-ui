@@ -54,5 +54,11 @@
         "expand": "Elargir la barre latérale",
         "collapse": "Réduire la barre latérale",
         "previous": "Retourner"
+    },
+    "contentPlaceholders": {
+        "nothingToSeeHere": {
+            "title": "Nothing to see here",
+            "body": "Look, you tried looking here. It’s ok, life can be difficult at times when we don’t find what we’re looking for..."
+        }
     }
 }
