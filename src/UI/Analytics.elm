@@ -1,58 +1,16 @@
-module UI.Analytics exposing (Analytics(..), TableAnalytics(..), encode)
+module UI.Analytics exposing (Analytics, Property, encode)
 
-import Json.Encode as Encode exposing (Value)
-
-
-type Analytics
-    = TableAnalytics TableAnalytics
+import UI.Internal.Analytics as Internal
 
 
-type TableAnalytics
-    = ApplyFilter Int
-    | ClearFilter Int
-    | SetSorting Int Bool
-    | ClearSorting
+type alias Analytics =
+    Internal.Analytics
 
 
 type alias Property =
-    ( String, Value )
+    Internal.Property
 
 
 encode : Analytics -> List Property
-encode analytics =
-    case analytics of
-        TableAnalytics a ->
-            encodeTable a
-
-
-encodeAction : String -> Property
-encodeAction name =
-    ( "action", Encode.string name )
-
-
-encodeColumn : Int -> Property
-encodeColumn column =
-    ( "column", Encode.int column )
-
-
-encodeTable : TableAnalytics -> List Property
-encodeTable analytics =
-    case analytics of
-        ApplyFilter column ->
-            [ encodeAction "apply_filter"
-            , encodeColumn column
-            ]
-
-        ClearFilter column ->
-            [ encodeAction "clear_filter"
-            , encodeColumn column
-            ]
-
-        SetSorting column reverse ->
-            [ encodeAction "set_sorting"
-            , encodeColumn column
-            , ( "reverse", Encode.bool reverse )
-            ]
-
-        ClearSorting ->
-            [ encodeAction "clear_sorting" ]
+encode =
+    Internal.encode

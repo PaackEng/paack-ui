@@ -14,8 +14,8 @@ module UI.Internal.Tables.Sorters exposing
     , update
     )
 
-import UI.Analytics as Analytics
 import UI.Effect as Effect exposing (Effect)
+import UI.Internal.Analytics as Analytics
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Utils.TypeNumbers as T
 

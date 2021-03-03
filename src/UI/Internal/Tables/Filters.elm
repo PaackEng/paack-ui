@@ -37,8 +37,8 @@ module UI.Internal.Tables.Filters exposing
 
 import Array exposing (Array)
 import Time exposing (Posix)
-import UI.Analytics as Analytics
 import UI.Effect as Effect exposing (Effect)
+import UI.Internal.Analytics as Analytics
 import UI.Internal.Basics exposing (flip, maybeNotThen)
 import UI.Internal.DateInput as DateInput exposing (DateInput(..), PeriodComparison(..), PeriodDate, RangeDate)
 import UI.Internal.NArray as NArray exposing (NArray)
