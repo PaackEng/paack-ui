@@ -14,44 +14,45 @@ type TableAnalytics
     | ClearSorting
 
 
-encode : Analytics -> Value
+type alias Property =
+    ( String, Value )
+
+
+encode : Analytics -> List Property
 encode analytics =
     case analytics of
         TableAnalytics a ->
             encodeTable a
 
 
-encodeAction : String -> ( String, Value )
+encodeAction : String -> Property
 encodeAction name =
     ( "action", Encode.string name )
 
 
-encodeColumn : Int -> ( String, Value )
+encodeColumn : Int -> Property
 encodeColumn column =
     ( "column", Encode.int column )
 
 
-encodeTable : TableAnalytics -> Value
+encodeTable : TableAnalytics -> List Property
 encodeTable analytics =
     case analytics of
         ApplyFilter column ->
-            Encode.object
-                [ encodeAction "apply_filter"
-                , encodeColumn column
-                ]
+            [ encodeAction "apply_filter"
+            , encodeColumn column
+            ]
 
         ClearFilter column ->
-            Encode.object
-                [ encodeAction "clear_filter"
-                , encodeColumn column
-                ]
+            [ encodeAction "clear_filter"
+            , encodeColumn column
+            ]
 
         SetSorting column reverse ->
-            Encode.object
-                [ encodeAction "set_sorting"
-                , encodeColumn column
-                , ( "reverse", Encode.bool reverse )
-                ]
+            [ encodeAction "set_sorting"
+            , encodeColumn column
+            , ( "reverse", Encode.bool reverse )
+            ]
 
         ClearSorting ->
-            Encode.object [ encodeAction "clear_sorting" ]
+            [ encodeAction "clear_sorting" ]
