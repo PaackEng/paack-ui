@@ -68,7 +68,7 @@ danger =
     , middle = rgb255 239 19 49 -- #EF1331
     , light = rgb255 255 94 116 -- #FF5E74
     , lighter = rgb255 255 174 185 -- #FFAEB9
-    , lightest = rgb255 255 218 223 -- #FFDADF
+    , lightest = rgb255 255 232 235 -- #FFE8EB
     }
 
 
