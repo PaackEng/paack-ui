@@ -38,6 +38,7 @@ module UI.Internal.Tables.Filters exposing
 import Array exposing (Array)
 import Time exposing (Posix)
 import UI.Effect as Effect exposing (Effect)
+import UI.Internal.Analytics as Analytics
 import UI.Internal.Basics exposing (flip, maybeNotThen)
 import UI.Internal.DateInput as DateInput exposing (DateInput(..), PeriodComparison(..), PeriodDate, RangeDate)
 import UI.Internal.NArray as NArray exposing (NArray)
@@ -664,34 +665,36 @@ update : Msg -> Filters msg item columns -> ( Filters msg item columns, Effect m
 update msg model =
     case msg of
         EditSingleText { column, value } ->
-            ( singleTextEdit column value model, Effect.None )
+            ( singleTextEdit column value model, Effect.none )
 
         EditMultiText { column, field, value } ->
-            ( multiTextEdit column field value model, Effect.None )
+            ( multiTextEdit column field value model, Effect.none )
 
         EditSingleDate { column, value } ->
-            ( singleDateEdit column value model, Effect.None )
+            ( singleDateEdit column value model, Effect.none )
 
         EditRangeFromDate { column, value } ->
-            ( rangeDateFromEdit column value model, Effect.None )
+            ( rangeDateFromEdit column value model, Effect.none )
 
         EditRangeToDate { column, value } ->
-            ( rangeDateToEdit column value model, Effect.None )
+            ( rangeDateToEdit column value model, Effect.none )
 
         EditPeriodDate { column, value } ->
-            ( periodDateEdit column value model, Effect.None )
+            ( periodDateEdit column value model, Effect.none )
 
         EditPeriodComparison { column, value } ->
-            ( periodDateComparisonEdit column value model, Effect.None )
+            ( periodDateComparisonEdit column value model, Effect.none )
 
         EditSelect { column, value } ->
-            ( selectEdit column value model, Effect.None )
+            ( selectEdit column value model, Effect.none )
 
         Apply column ->
             applyFilter column model
+                |> withApplyAnalytics column
 
         Clear column ->
             filterClear column model
+                |> withClearAnalytics column
 
 
 dispatchApply : Strategy msg value item -> value -> Filters msg item columns -> ( Filters msg item columns, Effect msg )
@@ -699,13 +702,24 @@ dispatchApply strategy value newModel =
     case strategy of
         Local _ ->
             ( newModel
-            , Effect.None
+            , Effect.none
             )
 
         Remote { applyMsg } ->
             ( newModel
-            , Effect.MsgToCmd <| applyMsg value
+            , Effect.msgToCmd <| applyMsg value
             )
+
+
+withApplyAnalytics : Int -> ( Filters msg item columns, Effect msg ) -> ( Filters msg item columns, Effect msg )
+withApplyAnalytics column ( model, effects ) =
+    let
+        analytics =
+            Analytics.ApplyFilter column
+                |> Analytics.TableAnalytics
+                |> Effect.analytics
+    in
+    ( model, Effect.batch [ effects, analytics ] )
 
 
 dispatchClear : Strategy msg value item -> Filters msg item columns -> ( Filters msg item columns, Effect msg )
@@ -713,13 +727,24 @@ dispatchClear strategy newModel =
     case strategy of
         Local _ ->
             ( newModel
-            , Effect.None
+            , Effect.none
             )
 
         Remote { clearMsg } ->
             ( newModel
-            , Effect.MsgToCmd clearMsg
+            , Effect.msgToCmd clearMsg
             )
+
+
+withClearAnalytics : Int -> ( Filters msg item columns, Effect msg ) -> ( Filters msg item columns, Effect msg )
+withClearAnalytics column ( model, effects ) =
+    let
+        analytics =
+            Analytics.ClearFilter column
+                |> Analytics.TableAnalytics
+                |> Effect.analytics
+    in
+    ( model, Effect.batch [ effects, analytics ] )
 
 
 applyShortcut :
@@ -738,7 +763,7 @@ applyShortcut model column config constructor =
                 |> dispatchApply config.strategy newValue
 
         Nothing ->
-            ( model, Effect.None )
+            ( model, Effect.none )
 
 
 applyFilter : Int -> Filters msg item columns -> ( Filters msg item columns, Effect msg )
@@ -763,7 +788,7 @@ applyFilter column model =
             applyShortcut model column config (SelectFilter list)
 
         Nothing ->
-            ( model, Effect.None )
+            ( model, Effect.none )
 
 
 filterClear : Int -> Filters msg item columns -> ( Filters msg item columns, Effect msg )
@@ -812,7 +837,7 @@ filterClear column model =
                 |> dispatchClear config.strategy
 
         Nothing ->
-            ( model, Effect.None )
+            ( model, Effect.none )
 
 
 editableSetCurrent : value -> Editable value -> Editable value

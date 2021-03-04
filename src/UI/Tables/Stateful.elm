@@ -174,7 +174,7 @@ import Set exposing (Set)
 import Time
 import UI.Checkbox as Checkbox exposing (checkbox)
 import UI.Effect as Effect exposing (Effect)
-import UI.Internal.Basics exposing (flip, ifThenElse, maybeThen, prependMaybe)
+import UI.Internal.Basics exposing (ifThenElse, maybeThen, prependMaybe)
 import UI.Internal.DateInput as DateInput exposing (DateInput, PeriodDate, RangeDate)
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Internal.RenderConfig exposing (localeTerms)
@@ -380,10 +380,10 @@ update msg (State state) =
             updateSorters state subMsg
 
         FilterDialogOpen index ->
-            ( State { state | filterDialog = Just index }, Effect.None )
+            ( State { state | filterDialog = Just index }, Effect.none )
 
         FilterDialogClose ->
-            ( State { state | filterDialog = Nothing }, Effect.None )
+            ( State { state | filterDialog = Nothing }, Effect.none )
 
         SelectionToggleAll ->
             updateSelectionToggleAll state
@@ -403,7 +403,7 @@ updateMobileToggle state index =
                 else
                     Just index
         }
-    , Effect.None
+    , Effect.none
     )
 
 
@@ -421,7 +421,7 @@ updateFilters state subMsg =
                    )
 
         Nothing ->
-            ( State state, Effect.None )
+            ( State state, Effect.none )
 
 
 applyFilters : Filters msg item columns -> StateModel msg item columns -> State msg item columns
@@ -440,14 +440,17 @@ updateSorters : StateModel msg item columns -> Sorters.Msg -> ( State msg item c
 updateSorters state subMsg =
     case state.sorters of
         Just sorters ->
-            ( sorters
+            sorters
                 |> Sorters.update subMsg
-                |> flip applySorters state
-            , Effect.None
-            )
+                |> (\( newSorters, subCmd ) ->
+                        ( state
+                            |> applySorters newSorters
+                        , subCmd
+                        )
+                   )
 
         Nothing ->
-            ( State state, Effect.None )
+            ( State state, Effect.none )
 
 
 applySorters : Sorters item columns -> StateModel msg item columns -> State msg item columns
@@ -484,7 +487,7 @@ updateSelectionToggleAll state =
             }
     in
     ( State { state | localSelection = Maybe.map invertAll state.localSelection }
-    , Effect.None
+    , Effect.none
     )
 
 
@@ -506,7 +509,7 @@ updateSelectionSet state item value =
             }
     in
     ( State { state | localSelection = Maybe.map setItem state.localSelection }
-    , Effect.None
+    , Effect.none
     )
 
 
