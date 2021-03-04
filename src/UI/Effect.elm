@@ -1,37 +1,65 @@
 module UI.Effect exposing
-    ( Effect
-    , SideEffect(..)
-    , analytics
-    , batch
-    , map
-    , msgToCmd
-    , none
-    , perform
+    ( Effect, SideEffect(..), none, batch, msgToCmd, analytics
+    , map, perform
     )
+
+{-| `UI.Effect` is a combination of every command required for `paack-ui` to work correctly.
+The data describing each side-effect is publicly available, performing the side-effects is left to the user.
+
+Can be used along with [`elm-program-test`](https://elm-program-test.netlify.app/cmds.html#defining-an-effect-type) to test your application flow.
+
+This module parallels [elm/core's `Platform.Cmd` module](https://package.elm-lang.org/packages/elm/core/1.0.5/Platform-Cmd),
+but with some additional helpers for creating `Effect` values.
+
+Note: If you don't know about commands yet, do not worry if this seems confusing at first,
+commands will make more sense if you go through the Elm Architecture Tutorial first to see how
+they fit in real applications.
+
+
+# Create
+
+@docs Effect, SideEffect, none, batch, msgToCmd, analytics
+
+
+# Transform
+
+@docs map, perform
+
+-}
 
 import Task
 import UI.Analytics exposing (Analytics)
 
 
+{-| A list of side-effects to be performed later.
+-}
 type alias Effect msg =
     List (SideEffect msg)
 
 
+{-| The `SideEffect msg` type is used for describing commands for later inspection.
+-}
 type SideEffect msg
     = MsgToCmd msg
     | Analytics Analytics
 
 
+{-| Tells the `perform` function that there are no side-effects. Parallels `Cmd.none`.
+-}
 none : Effect msg
 none =
     []
 
 
+{-| Batch effects together. Parallels `Cmd.batch`.
+-}
 batch : List (Effect msg) -> Effect msg
 batch =
     List.concat
 
 
+{-| Transform the messages produced by a effect. Parallels `Cmd.map`.
+-}
 map : (a -> b) -> Effect a -> Effect b
 map =
     let
@@ -46,16 +74,23 @@ map =
     mapSideEffect >> List.map
 
 
+{-| The effect of returning a `msg`.
+-}
 msgToCmd : msg -> Effect msg
 msgToCmd msg =
     [ MsgToCmd msg ]
 
 
+{-| The effect of returning `Analytics`.
+-}
 analytics : Analytics -> Effect msg
 analytics analytics_ =
     [ Analytics analytics_ ]
 
 
+{-| Perform a minimal interpretation of side-effects into commands.
+Use this if you don't care to change how to interpret them.
+-}
 perform : Effect msg -> Cmd msg
 perform effect =
     effect
