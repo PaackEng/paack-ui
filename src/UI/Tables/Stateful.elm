@@ -462,6 +462,7 @@ applySorters newSorters state =
                     |> maybeThen Filters.itemsApplyFilters state.filters
                     |> Sorters.itemsApplySorting newSorters
             , sorters = Just newSorters
+            , filterDialog = Nothing
         }
 
 
