@@ -4,6 +4,7 @@ import Alerts
 import Badges
 import Buttons.Stories as Buttons
 import Checkboxes.Stories as Checkboxes
+import ContentPlaceholders
 import Dialog
 import Html exposing (Html, div, img)
 import Html.Attributes exposing (src, style)
@@ -121,6 +122,7 @@ main =
             , Radio.stories renderConfig
             , Tabs.stories renderConfig
             , Layouts.stories renderConfig
+            , ContentPlaceholders.stories renderConfig
             ]
         |> category
             "Complex components"

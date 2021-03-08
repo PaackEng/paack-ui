@@ -90,6 +90,17 @@ type alias Sidebar =
     }
 
 
+type alias ContentPlaceholdersNothingToSeeHere =
+    { title : String
+    , body : String
+    }
+
+
+type alias ContentPlaceholders =
+    { nothingToSeeHere : ContentPlaceholdersNothingToSeeHere
+    }
+
+
 type alias Root =
     { filters : Filters
     , paginator : Paginator
@@ -100,4 +111,5 @@ type alias Root =
     , dateInput : DateInput
     , dialog : Dialog
     , sidebar : Sidebar
+    , contentPlaceholders : ContentPlaceholders
     }

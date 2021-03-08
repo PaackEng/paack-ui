@@ -10,6 +10,7 @@
         "UI.Badge",
         "UI.Button",
         "UI.Checkbox",
+        "UI.ContentPlaceholder",
         "UI.Effect",
         "UI.Icon",
         "UI.Link",

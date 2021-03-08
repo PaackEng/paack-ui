@@ -81,8 +81,8 @@ tables : Tables
 tables =
     { details = tablesDetails
     , sorting = tablesSorting
-    , selectRow = "Select this row."
-    , selectAll = "Select all rows"
+    , selectRow = "Sélectionner la ligne"
+    , selectAll = "Sélectionner toutes les lignes"
     }
 
 
@@ -106,6 +106,19 @@ sidebar =
     }
 
 
+contentPlaceholdersNothingToSeeHere : ContentPlaceholdersNothingToSeeHere
+contentPlaceholdersNothingToSeeHere =
+    { title = "Nothing to see here"
+    , body = "Look, you tried looking here. It’s ok, life can be difficult at times when we don’t find what we’re looking for..."
+    }
+
+
+contentPlaceholders : ContentPlaceholders
+contentPlaceholders =
+    { nothingToSeeHere = contentPlaceholdersNothingToSeeHere
+    }
+
+
 root : Root
 root =
     { filters = filters
@@ -117,4 +130,5 @@ root =
     , dateInput = dateInput
     , dialog = dialog
     , sidebar = sidebar
+    , contentPlaceholders = contentPlaceholders
     }

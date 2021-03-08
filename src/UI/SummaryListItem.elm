@@ -1,6 +1,7 @@
 module UI.SummaryListItem exposing (view)
 
-{-| SummaryListItem is represents a single item in a list that is usually selectable or searchable. This component is meant to be used with [`ListView`](UI-ListView).
+{-| `SummaryListItem` represents a single item in a list that is usually selectable or searchable.
+This component is meant to be used with [`ListView`](UI-ListView).
 
     import UI.SummaryListItem as Summary
 

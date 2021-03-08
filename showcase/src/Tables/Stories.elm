@@ -7,7 +7,7 @@ import Tables.Book as Book exposing (Book)
 import Tables.Model as Stories
 import Tables.Msg as Stories
 import UI.Effect as Effect
-import UI.RenderConfig as RenderConfig exposing (RenderConfig)
+import UI.RenderConfig exposing (RenderConfig)
 import UI.Tables.Common as Tables
 import UI.Tables.Stateful as Stateful
 import UI.Tables.Stateless as Stateless
@@ -18,6 +18,7 @@ import Utils
         ( ExplorerStory
         , ExplorerUI
         , iconsSvgSprite
+        , mobileRenderConfig
         , reducedToDocs
         , storyWithModel
         )
@@ -70,7 +71,7 @@ mobileTableStory =
     storyWithModel
         ( "Mobile"
         , \{ tablesStories } ->
-            demoTable mobileCfg
+            demoTable mobileRenderConfig
                 Book.tablePixelColumns
                 tablesStories.mainTableState
                 Stories.ForMain
@@ -110,13 +111,6 @@ withIcons table =
         |> List.singleton
         |> (::) iconsSvgSprite
         |> Element.wrappedRow [ Element.width fill ]
-
-
-mobileCfg : RenderConfig
-mobileCfg =
-    RenderConfig.init
-        { width = 375, height = 667 }
-        RenderConfig.localeEnglish
 
 
 statelessTableStory : RenderConfig -> ExplorerStory

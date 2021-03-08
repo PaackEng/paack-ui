@@ -124,6 +124,13 @@ describe('Percy Snapshots', () => {
     })
   })
 
+  describe('ContentPlaceholder', () => {
+    it('Creates a snapshot for all arrangement of content placeholders', () => {
+      cy.visit('/#Basics/ContentPlaceholder/United')
+      cy.percySnapshot('ContentPlaceholder')
+    })
+  })
+
   describe('Paginators', () => {
     it('Creates the Paginators page snapshot', () => {
       cy.visit('/#Complex%20components/Paginators/NonNumeric')

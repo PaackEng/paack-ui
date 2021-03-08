@@ -1,11 +1,11 @@
 module UI.Icon exposing
     ( svgSpriteImport
     , Icon
-    , add, check, close, collapse, download, edit, eventLog, expand, filter
-    , groups, logout, move, nextContent, notifications, paackSpaces, packages
-    , previousContent, print, remove, sandwichMenu, search, searchSpace
-    , seeMore, toggle, toggleDown, toggleUp, delete, warning
-    , sortDecreasing, sortIncreasing
+    , add, check, close, collapse, configure, download, edit, fix, eventLog
+    , expand, filter, groups, logout, move, nextContent, notifications
+    , paackSpaces, packages, previousContent, print, remove, sandwichMenu
+    , search, searchSpace, seeMore, sortDecreasing, sortIncreasing, toggle
+    , toggleDown, toggleUp, delete, warning
     , getHint
     , withColor
     , withSize, withCustomSize
@@ -36,11 +36,11 @@ An icon can be created and rendered as in the following pipeline:
 # Building
 
 @docs Icon
-@docs add, check, close, collapse, download, edit, eventLog, expand, filter
-@docs groups, logout, move, nextContent, notifications, paackSpaces, packages
-@docs previousContent, print, remove, sandwichMenu, search, searchSpace
-@docs seeMore, toggle, toggleDown, toggleUp, delete, warning
-@docs sortDecreasing, sortIncreasing
+@docs add, check, close, collapse, configure, download, edit, fix, eventLog
+@docs expand, filter, groups, logout, move, nextContent, notifications
+@docs paackSpaces, packages, previousContent, print, remove, sandwichMenu
+@docs search, searchSpace, seeMore, sortDecreasing, sortIncreasing, toggle
+@docs toggleDown, toggleUp, delete, warning
 
 
 # Disassemble
@@ -106,6 +106,7 @@ type IconGlyph
     | Check
     | Close
     | Collapse
+    | Configure
     | Delete
     | DownArrow
     | Download
@@ -113,6 +114,7 @@ type IconGlyph
     | EventLog
     | Expand
     | Filter
+    | Fix
     | Groups
     | Logout
     | Move
@@ -265,6 +267,16 @@ check hint =
 close : String -> Icon
 close hint =
     Icon (Properties hint Close) defaultOptions
+
+
+{-| A gear. Usually used for opening settings managers.
+
+    Icon.configure "Open display settings"
+
+-}
+configure : String -> Icon
+configure hint =
+    Icon (Properties hint Configure) defaultOptions
 
 
 {-| Tree-bar stacked vertically.
@@ -491,6 +503,16 @@ sortDecreasing hint =
     Icon (Properties hint SortDecreasing) defaultOptions
 
 
+{-| A monkey wrench.
+
+    Icon.fix "Fix all invalid values"
+
+-}
+fix : String -> Icon
+fix hint =
+    Icon (Properties hint Fix) defaultOptions
+
+
 
 -- Rendering
 
@@ -535,6 +557,9 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
             Collapse ->
                 svgIcon "Collapse"
 
+            Configure ->
+                svgIcon "Settings"
+
             Delete ->
                 svgIcon "Trash"
 
@@ -555,6 +580,9 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
 
             Filter ->
                 svgIcon "Filter"
+
+            Fix ->
+                svgIcon "Fix"
 
             Groups ->
                 svgIcon "Groups"
