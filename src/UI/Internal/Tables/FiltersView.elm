@@ -3,7 +3,7 @@ module UI.Internal.Tables.FiltersView exposing (Config, header, headerSelectTogg
 -- WARNING: Don't use any other Size.* beyond "contextSize"
 
 import Array exposing (Array)
-import Element exposing (Attribute, Element, fill, px, shrink)
+import Element exposing (Attribute, Element, fill, minimum, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
@@ -349,7 +349,7 @@ dialog renderConfig config filter sorter clearMsg applyMsg content =
             [ dialogHeader renderConfig config.discardMsg config.label
             , sortingView renderConfig config sorter
             , Element.column
-                [ Element.width fill
+                [ Element.width (fill |> minimum 160)
                 , Element.spacing 12
                 ]
                 [ content
