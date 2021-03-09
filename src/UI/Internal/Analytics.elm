@@ -51,7 +51,14 @@ encodeTable analytics =
         SetSorting column reverse ->
             [ encodeAction "set_sorting"
             , encodeColumn column
-            , ( "reverse", Encode.bool reverse )
+            , ( "direction"
+              , Encode.string <|
+                    if reverse then
+                        "descending"
+
+                    else
+                        "ascending"
+              )
             ]
 
         ClearSorting ->
