@@ -53,7 +53,8 @@
     "sidebar": {
         "expand": "Expand sidebar",
         "collapse": "Minimize sidebar",
-        "previous": "Go back"
+        "previous": "Go back",
+        "moreActions": "More actions"
     },
     "contentPlaceholders": {
         "nothingToSeeHere": {

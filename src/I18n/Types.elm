@@ -87,6 +87,7 @@ type alias Sidebar =
     { expand : String
     , collapse : String
     , previous : String
+    , moreActions : String
     }
 
 
