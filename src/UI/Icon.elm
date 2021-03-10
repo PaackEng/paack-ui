@@ -10,6 +10,7 @@ module UI.Icon exposing
     , withColor
     , withSize, withCustomSize
     , renderElement
+    , moreActions
     )
 
 {-| `UI.Icon` is an implementation of icons using an SVG-spritesheet.
@@ -126,6 +127,7 @@ type IconGlyph
     | Print
     | Remove
     | SandwichMenu
+    | MoreActions
     | Search
     | SearchSpace
     | SeeMore
@@ -288,6 +290,17 @@ It's usually used in mobile to toggle left bar menus.
 sandwichMenu : String -> Icon
 sandwichMenu hint =
     Icon (Properties hint SandwichMenu) defaultOptions
+
+
+{-| Three-dot in series horizontally.
+It's usually used in the web to access less commonly used actions.
+
+    Icon.moreActions "More actions"
+
+-}
+moreActions : String -> Icon
+moreActions hint =
+    Icon (Properties hint MoreActions) defaultOptions
 
 
 {-| A bell for indicating notifications.
@@ -616,6 +629,9 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
 
             SandwichMenu ->
                 svgIcon "Hamburger"
+
+            MoreActions ->
+                svgIcon "Ellipsis"
 
             Search ->
                 svgIcon "Search"
