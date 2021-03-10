@@ -97,6 +97,7 @@ import UI.Internal.Basics exposing (maybeAnd, prependMaybe)
 import UI.Internal.Clickable as Clickable
 import UI.Internal.Colors as Colors
 import UI.Internal.RenderConfig exposing (localeTerms)
+import UI.Internal.Size as Size
 import UI.Internal.ToggleableList as ToggleableList
 import UI.Internal.Utils.Element as Element
 import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
@@ -134,7 +135,8 @@ type ListView object msg
 
 {-| `SearchConfig` assembles the required configuration for having a search field and filter.
 
-    { label = "Search for elements matching name.."
+    { title = "Elements"
+    , label = "Search for elements matching name.."
     , searchMsg = Msg.FilterSet
     , currentFilter =
         Maybe.map
@@ -144,7 +146,8 @@ type ListView object msg
 
 -}
 type alias SearchConfig object msg =
-    { label : String
+    { title : String
+    , label : String
     , searchMsg : String -> msg
     , currentFilter : Maybe ( String, String -> object -> Bool )
     }
@@ -467,12 +470,13 @@ actionBarView cfg actionBar =
 searchFieldView : RenderConfig -> Maybe (SearchConfig object msg) -> Element msg
 searchFieldView cfg searchField =
     case searchField of
-        Just { label, searchMsg, currentFilter } ->
-            Element.row
+        Just { title, label, searchMsg, currentFilter } ->
+            Element.column
                 [ Element.width fill
                 , Element.padding 12
                 ]
-                [ currentFilter
+                [ headerView cfg title
+                , currentFilter
                     |> Maybe.map Tuple.first
                     |> Maybe.withDefault ""
                     |> TextField.search searchMsg label
@@ -485,6 +489,28 @@ searchFieldView cfg searchField =
 
         Nothing ->
             Element.none
+
+
+headerView : RenderConfig -> String -> Element msg
+headerView cfg label =
+    Element.row
+        [ Element.width fill
+        , Element.height fill
+        , Element.paddingXY 0 12
+        ]
+        [ Text.heading5 label
+            |> Text.renderElement cfg
+        , (cfg |> localeTerms >> .sidebar >> .moreActions)
+            |> Icon.moreActions
+            |> Icon.withColor Palette.primary
+            |> Icon.withSize Size.Small
+            |> Icon.renderElement cfg
+            |> Element.el
+                [ Element.centerX
+                , Element.pointer
+                , Element.alignTop
+                ]
+        ]
 
 
 itemView :
