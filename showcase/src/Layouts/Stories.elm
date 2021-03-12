@@ -102,10 +102,11 @@ selectedView renderConfig model =
 listView : RenderConfig -> LayoutsModel.Model -> ListView Book Msg
 listView renderConfig model =
     listItemView renderConfig
-    |>  ListView.selectList
-        (Msg.LayoutsStoriesMsg << LayoutsMsg.Select)
-        .isbn
-    |> ListView.withSearchField (searchField model)
+        |> ListView.selectList
+            (Msg.LayoutsStoriesMsg << LayoutsMsg.Select)
+            .isbn
+        |> ListView.withSearchField (searchField model)
+
 
 searchField : LayoutsModel.Model -> ListView.SearchConfig Book Msg
 searchField model =
@@ -121,11 +122,9 @@ bookFilter =
     Maybe.map (\str -> ( str, bookHasString ))
 
 
-
 bookHasString : String -> Book -> Bool
 bookHasString str { title } =
     String.contains (String.toLower str) (String.toLower title)
-
 
 
 listItemView : RenderConfig -> Bool -> Book -> Element Msg

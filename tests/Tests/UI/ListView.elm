@@ -113,7 +113,8 @@ withSearchField =
                 (.id >> String.fromInt)
                 mockView
                 |> ListView.withSearchField
-                    { label = searchLabel
+                    { title = "Cats"
+                    , label = searchLabel
                     , searchMsg = FilterSet
                     , currentFilter = filterState
                     }
