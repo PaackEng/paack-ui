@@ -53,7 +53,8 @@
     "sidebar": {
         "expand": "Elargir la barre latérale",
         "collapse": "Réduire la barre latérale",
-        "previous": "Retourner"
+        "previous": "Retourner",
+        "moreActions": "More actions"
     },
     "contentPlaceholders": {
         "nothingToSeeHere": {

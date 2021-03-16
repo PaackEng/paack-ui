@@ -26,6 +26,12 @@ update msg model =
         LayoutsMsg.Select book ->
             ( { model | selected = Just book }, Cmd.none )
 
+        LayoutsMsg.Filter "" ->
+            ( { model | filter = Nothing }, Cmd.none )
+
+        LayoutsMsg.Filter text ->
+            ( { model | filter = Just text }, Cmd.none )
+
 
 stories : RenderConfig -> ExplorerUI
 stories cfg =
@@ -49,7 +55,7 @@ view renderConfig { layoutsStories } =
     SplitSelectable.desktop renderConfig
         { getKey = .isbn
         , items = books
-        , listView = listView renderConfig
+        , listView = listView renderConfig layoutsStories
         , selected = Maybe.map .isbn layoutsStories.selected
         , selectedView = selectedView renderConfig layoutsStories
         }
@@ -93,12 +99,32 @@ selectedView renderConfig model =
             Element.none
 
 
-listView : RenderConfig -> ListView Book Msg
-listView renderConfig =
-    ListView.selectList
-        (Msg.LayoutsStoriesMsg << LayoutsMsg.Select)
-        .isbn
-        (listItemView renderConfig)
+listView : RenderConfig -> LayoutsModel.Model -> ListView Book Msg
+listView renderConfig model =
+    listItemView renderConfig
+        |> ListView.selectList
+            (Msg.LayoutsStoriesMsg << LayoutsMsg.Select)
+            .isbn
+        |> ListView.withSearchField (searchField model)
+        |> ListView.withHeader "Books"
+
+
+searchField : LayoutsModel.Model -> ListView.SearchConfig Book Msg
+searchField model =
+    { label = "Search"
+    , searchMsg = Msg.LayoutsStoriesMsg << LayoutsMsg.Filter
+    , currentFilter = bookFilter model.filter
+    }
+
+
+bookFilter : Maybe String -> Maybe ( String, String -> Book -> Bool )
+bookFilter =
+    Maybe.map (\str -> ( str, bookHasString ))
+
+
+bookHasString : String -> Book -> Bool
+bookHasString str { title } =
+    String.contains (String.toLower str) (String.toLower title)
 
 
 listItemView : RenderConfig -> Bool -> Book -> Element Msg

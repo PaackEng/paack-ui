@@ -1,7 +1,7 @@
 module UI.ListView exposing
     ( ListView, selectList
     , ToggleableConfig, ToggleableCover, toggleableList
-    , withItems, withSelected, withDomId
+    , withItems, withSelected, withDomId, withHeader
     , SearchConfig, withSearchField, withActionBar
     , withWidth
     , SelectStyle, withSelectStyle
@@ -62,7 +62,7 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
 # Options
 
-@docs withItems, withSelected, withDomId
+@docs withItems, withSelected, withDomId, withHeader
 
 
 ## Extra elements
@@ -97,6 +97,7 @@ import UI.Internal.Basics exposing (maybeAnd, prependMaybe)
 import UI.Internal.Clickable as Clickable
 import UI.Internal.Colors as Colors
 import UI.Internal.RenderConfig exposing (localeTerms)
+import UI.Internal.Size as Size
 import UI.Internal.ToggleableList as ToggleableList
 import UI.Internal.Utils.Element as Element
 import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
@@ -116,6 +117,8 @@ type alias Options object msg =
     , width : Element.Length
     , selectStyle : SelectStyle
     , containerId : Maybe String
+    , header : Maybe String
+    , moreActions : Maybe ()
     }
 
 
@@ -134,7 +137,8 @@ type ListView object msg
 
 {-| `SearchConfig` assembles the required configuration for having a search field and filter.
 
-    { label = "Search for elements matching name.."
+    { title = "Elements"
+    , label = "Search for elements matching name.."
     , searchMsg = Msg.FilterSet
     , currentFilter =
         Maybe.map
@@ -379,6 +383,16 @@ withDomId containerId (SelectList prop opt) =
     SelectList prop { opt | containerId = Just containerId }
 
 
+{-| Adds a header above the list.
+
+    ListView.withHeader "ListView Header" someListView
+
+-}
+withHeader : String -> ListView object msg -> ListView object msg
+withHeader header (SelectList prop opt) =
+    SelectList prop { opt | header = Just header }
+
+
 
 -- Render
 
@@ -402,7 +416,7 @@ renderElement cfg (SelectList prop opt) =
         , Element.height fill
         , Element.scrollbarY
         ]
-        [ searchFieldView cfg opt.searchField
+        [ searchFieldView cfg opt
         , opt.items
             |> filterOptions opt.searchField
             |> List.map
@@ -464,15 +478,16 @@ actionBarView cfg actionBar =
             Element.none
 
 
-searchFieldView : RenderConfig -> Maybe (SearchConfig object msg) -> Element msg
-searchFieldView cfg searchField =
-    case searchField of
+searchFieldView : RenderConfig -> Options object msg -> Element msg
+searchFieldView cfg opt =
+    case opt.searchField of
         Just { label, searchMsg, currentFilter } ->
-            Element.row
+            Element.column
                 [ Element.width fill
                 , Element.padding 12
                 ]
-                [ currentFilter
+                [ headerView cfg opt
+                , currentFilter
                     |> Maybe.map Tuple.first
                     |> Maybe.withDefault ""
                     |> TextField.search searchMsg label
@@ -482,6 +497,43 @@ searchFieldView cfg searchField =
                         (cfg |> localeTerms >> .listView >> .search |> Icon.search)
                     |> TextField.renderElement cfg
                 ]
+
+        Nothing ->
+            Element.none
+
+
+headerView : RenderConfig -> Options object msg -> Element a
+headerView cfg opt =
+    case opt.header of
+        Just header ->
+            Element.row
+                [ Element.width fill
+                , Element.height fill
+                , Element.paddingXY 0 12
+                ]
+                [ Text.heading5 header
+                    |> Text.renderElement cfg
+                , moreActions cfg opt.moreActions
+                ]
+
+        Nothing ->
+            Element.none
+
+
+moreActions : RenderConfig -> Maybe () -> Element a
+moreActions cfg actions =
+    case actions of
+        Just () ->
+            (cfg |> localeTerms >> .sidebar >> .moreActions)
+                |> Icon.moreActions
+                |> Icon.withColor Palette.primary
+                |> Icon.withSize Size.Small
+                |> Icon.renderElement cfg
+                |> Element.el
+                    [ Element.centerX
+                    , Element.pointer
+                    , Element.alignTop
+                    ]
 
         Nothing ->
             Element.none
@@ -531,6 +583,8 @@ defaultOptions =
     , width = Element.fill
     , selectStyle = defaultSelectStyle
     , containerId = Nothing
+    , header = Nothing
+    , moreActions = Nothing
     }
 
 

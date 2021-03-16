@@ -103,6 +103,7 @@ sidebar =
     { expand = "Elargir la barre latérale"
     , collapse = "Réduire la barre latérale"
     , previous = "Retourner"
+    , moreActions = "More actions"
     }
 
 
