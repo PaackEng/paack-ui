@@ -106,12 +106,12 @@ listView renderConfig model =
             (Msg.LayoutsStoriesMsg << LayoutsMsg.Select)
             .isbn
         |> ListView.withSearchField (searchField model)
+        |> ListView.withHeader "Books"
 
 
 searchField : LayoutsModel.Model -> ListView.SearchConfig Book Msg
 searchField model =
-    { title = "Books"
-    , label = "Search"
+    { label = "Search"
     , searchMsg = Msg.LayoutsStoriesMsg << LayoutsMsg.Filter
     , currentFilter = bookFilter model.filter
     }
