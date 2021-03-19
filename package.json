@@ -30,7 +30,7 @@
   "homepage": "https://paackeng.github.io/paack-ui/",
   "dependencies": {
     "@percy/cypress": "^2.3.4",
-    "cypress": "^6.7.1",
+    "cypress": "^6.8.0",
     "elm": "^0.19.1-5",
     "elm-format": "^0.8.5",
     "elm-hot": "^1.1.6",
