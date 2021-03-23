@@ -9,16 +9,17 @@ import PluginOptions exposing (defaultWithoutMenu)
 import Return exposing (Return)
 import Tables.Book exposing (Book, books)
 import UI.Badge as Badge
+import UI.Checkbox as Checkbox
 import UI.Internal.NavigationContainer
 import UI.Layout.SplitSelectable as SplitSelectable
 import UI.ListView as ListView exposing (ListView)
 import UI.Palette as Palette exposing (brightnessLighter, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
-import UI.SummaryListItem as Summary
 import UI.Text as Text
+import UI.V2.SummaryListItem as Summary
+import UI.Palette as Palette
 import UIExplorer exposing (storiesOf)
-import Utils exposing (ExplorerStory, ExplorerUI, prettifyElmCode, storyBorder, storyWithModel)
-
+import Utils exposing (ExplorerStory, ExplorerUI, prettifyElmCode, storyList, storyBorder, storyWithModel, iconsSvgSprite)
 
 update : LayoutsMsg.Msg -> LayoutsModel.Model -> Return LayoutsMsg.Msg LayoutsModel.Model
 update msg model =
@@ -45,7 +46,11 @@ demo : RenderConfig -> ExplorerStory
 demo renderConfig =
     storyWithModel
         ( "SplitSelectable"
-        , storyBorder << view renderConfig
+        , view renderConfig
+            >> storyBorder
+            >> List.singleton
+            >> (::) iconsSvgSprite
+            >> Element.column []
         , { defaultWithoutMenu | code = code }
         )
 
@@ -129,11 +134,10 @@ bookHasString str { title } =
 
 listItemView : RenderConfig -> Bool -> Book -> Element Msg
 listItemView renderConfig isSelected book =
-    Summary.view renderConfig
-        isSelected
-        book.title
-        book.author
-        (Badge.grayLight <| String.fromInt 1)
+    Summary.summaryListItem book.title book.author
+        |> Summary.withBadge (Badge.grayLight <| String.fromInt 1)
+        |> Summary.withSelected isSelected
+        |> Summary.renderElement renderConfig
 
 
 code : String
