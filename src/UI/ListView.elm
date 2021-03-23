@@ -1,7 +1,7 @@
 module UI.ListView exposing
-    ( ListView, selectList
+    ( ListView, selectList, simpleList
     , ToggleableConfig, ToggleableCover, toggleableList
-    , withItems, withSelected, withDomId, withHeader
+    , withItems, withSelect, withSelected, withDomId, withHeader
     , SearchConfig, withSearchField, withActionBar
     , withWidth
     , SelectStyle, withSelectStyle
@@ -52,7 +52,7 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
 # Building
 
-@docs ListView, selectList
+@docs ListView, selectList, simpleList
 
 
 # Toggleable variation
@@ -62,7 +62,7 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
 # Options
 
-@docs withItems, withSelected, withDomId, withHeader
+@docs withItems, withSelect, withSelected, withDomId, withHeader
 
 
 ## Extra elements
@@ -106,13 +106,14 @@ import UI.Size as Size
 import UI.Text as Text
 import UI.TextField as TextField
 import UI.Utils.Action as Action
-import UI.Utils.Element as Element exposing (zeroPadding)
+import UI.Utils.Element exposing (zeroPadding)
 
 
 type alias Options object msg =
     { items : List object
     , searchField : Maybe (SearchConfig object msg)
     , actionBar : Maybe (Action.WithIcon msg)
+    , select : Maybe (object -> msg)
     , isSelected : Maybe (object -> Bool)
     , width : Element.Length
     , selectStyle : SelectStyle
@@ -123,8 +124,7 @@ type alias Options object msg =
 
 
 type alias Properties object msg =
-    { select : object -> msg
-    , toKey : object -> String
+    { toKey : object -> String
     , renderItem : RenderConfig -> Bool -> object -> Element msg
     }
 
@@ -219,7 +219,22 @@ selectList :
     -> (Bool -> object -> Element msg)
     -> ListView object msg
 selectList selectMsg toKey renderItem =
-    SelectList (Properties selectMsg toKey (always renderItem))
+    simpleList toKey renderItem
+        |> withSelect selectMsg
+
+
+{-| A `UI.ListView` without built-in selection support.
+
+    ListView.simpleList
+        (\{ name } ->
+            Element.el [ Element.padding 8 ]
+                (Element.text name)
+        )
+
+-}
+simpleList : (object -> String) -> (Bool -> object -> Element msg) -> ListView object msg
+simpleList toKey renderItem =
+    SelectList (Properties toKey (always renderItem))
         defaultOptions
 
 
@@ -255,8 +270,9 @@ toggleableList config =
             else
                 ToggleableList.defaultRow parentCfg config selected item
     in
-    SelectList (Properties config.selectMsg config.toKey toggleableItemView)
-        defaultOptions
+    defaultOptions
+        |> SelectList (Properties config.toKey toggleableItemView)
+        |> withSelect config.selectMsg
 
 
 
@@ -323,6 +339,18 @@ withSearchField options (SelectList prop opt) =
         |> SelectList prop
 
 
+{-| Adds a message to be dispatched when an item is selected.
+
+    ListView.withItems Msg.ElementSelect
+        someListView
+
+-}
+withSelect : (object -> msg) -> ListView object msg -> ListView object msg
+withSelect options (SelectList prop opt) =
+    { opt | select = Just options }
+        |> SelectList prop
+
+
 {-| Marks every element as selected or not using a boolean-resulted lambda.
 
     ListView.withSelected
@@ -349,7 +377,7 @@ withWidth width (SelectList prop opt) =
 
 {-| Overwrite the appearance of the selected item.
 
-    ListView.withWidth
+    ListView.withSelectStyle
         { backgroundColor = Palette.color toneDanger brightnessMiddle }
         someListView
 
@@ -547,18 +575,18 @@ itemView :
     -> Bool
     -> object
     -> ( String, Element msg )
-itemView cfg { select, renderItem, toKey } { containerId } background selected obj =
+itemView cfg { renderItem, toKey } { select, containerId } background selected obj =
     let
         key =
             toKey obj
 
         attributes =
-            [ Events.onClick (select obj)
-            , Element.pointer
+            [ Element.pointer
             , Element.width fill
             , Border.widthEach { zeroPadding | bottom = 1 }
             , Border.color Colors.gray.lightest
             ]
+                |> prependMaybe (Maybe.map ((|>) obj >> Events.onClick) select)
                 |> prependMaybe
                     (background
                         |> Maybe.map (Palette.toElementColor >> Background.color)
@@ -579,6 +607,7 @@ defaultOptions =
     { items = []
     , searchField = Nothing
     , actionBar = Nothing
+    , select = Nothing
     , isSelected = Nothing
     , width = Element.fill
     , selectStyle = defaultSelectStyle
