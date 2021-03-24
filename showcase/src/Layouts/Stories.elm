@@ -17,9 +17,9 @@ import UI.Palette as Palette exposing (brightnessLighter, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UI.V2.SummaryListItem as Summary
-import UI.Palette as Palette
 import UIExplorer exposing (storiesOf)
-import Utils exposing (ExplorerStory, ExplorerUI, prettifyElmCode, storyList, storyBorder, storyWithModel, iconsSvgSprite)
+import Utils exposing (ExplorerStory, ExplorerUI, iconsSvgSprite, prettifyElmCode, storyBorder, storyList, storyWithModel)
+
 
 update : LayoutsMsg.Msg -> LayoutsModel.Model -> Return LayoutsMsg.Msg LayoutsModel.Model
 update msg model =
