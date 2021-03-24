@@ -96,7 +96,6 @@ import UI.Internal.SideBar as SideBar
 import UI.Link exposing (Link)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Utils.Action as Action
-import UI.Utils.Element as Element
 import UI.V2.Dialog as Dialog2
 
 

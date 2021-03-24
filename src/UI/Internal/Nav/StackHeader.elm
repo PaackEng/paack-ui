@@ -12,7 +12,7 @@ import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text exposing (ellipsize)
 import UI.Utils.Action as Action
-import UI.Utils.Element as Element exposing (zeroPadding)
+import UI.Utils.Element exposing (zeroPadding)
 
 
 type LeftButton msg

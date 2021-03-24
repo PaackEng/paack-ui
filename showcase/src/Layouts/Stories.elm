@@ -9,7 +9,6 @@ import PluginOptions exposing (defaultWithoutMenu)
 import Return exposing (Return)
 import Tables.Book exposing (Book, books)
 import UI.Badge as Badge
-import UI.Checkbox as Checkbox
 import UI.Internal.NavigationContainer
 import UI.Layout.SplitSelectable as SplitSelectable
 import UI.ListView as ListView exposing (ListView)
@@ -18,7 +17,7 @@ import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UI.V2.SummaryListItem as Summary
 import UIExplorer exposing (storiesOf)
-import Utils exposing (ExplorerStory, ExplorerUI, iconsSvgSprite, prettifyElmCode, storyBorder, storyList, storyWithModel)
+import Utils exposing (ExplorerStory, ExplorerUI, iconsSvgSprite, prettifyElmCode, storyBorder, storyWithModel)
 
 
 update : LayoutsMsg.Msg -> LayoutsModel.Model -> Return LayoutsMsg.Msg LayoutsModel.Model

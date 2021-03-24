@@ -18,7 +18,6 @@ import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Size as Size exposing (Size)
 import UI.Link exposing (Link)
 import UI.RenderConfig exposing (RenderConfig)
-import UI.Utils.Element as Element
 
 
 type alias Options =

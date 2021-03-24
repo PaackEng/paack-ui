@@ -33,7 +33,6 @@ it. Body and buttons can be specified optionally as in the following pipeline:
 import Element exposing (Element)
 import UI.Button as Button exposing (Button)
 import UI.Icon exposing (Icon)
-import UI.Utils.Element as Element
 
 
 

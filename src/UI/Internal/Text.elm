@@ -28,7 +28,6 @@ import UI.Internal.Basics exposing (ifThenElse)
 import UI.Internal.Utils.Element exposing (overflowAttrs, overflowVisible)
 import UI.Palette as Palette exposing (brightnessDarkest, toneGray)
 import UI.RenderConfig exposing (RenderConfig, isMobile)
-import UI.Utils.Element as Element
 
 
 type Text

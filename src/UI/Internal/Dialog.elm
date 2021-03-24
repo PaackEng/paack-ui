@@ -11,7 +11,7 @@ import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
 import UI.Utils.ARIA as ARIA
-import UI.Utils.Element as Element exposing (RectangleSides)
+import UI.Utils.Element exposing (RectangleSides)
 
 
 type alias Dialog msg =
