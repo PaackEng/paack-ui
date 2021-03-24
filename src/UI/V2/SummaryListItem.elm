@@ -7,7 +7,7 @@ module UI.V2.SummaryListItem exposing
 {-| `SummaryListItem` represents a single item in a list that is usually selectable or searchable.
 This component is meant to be used with [`ListView`](UI-ListView).
 
-    import UI.SummaryListItem as Summary
+    import UI.V2.SummaryListItem as Summary
 
     listItemView : AppConfig -> Bool -> Item -> Element Msg
     listItemView appConfig isSelected item =
@@ -84,11 +84,7 @@ type alias Options msg =
 
 {-| Constructs a summary by receiving its title and caption.
 
-    Summary.withItems
-        [ { id = 0, name = "Catarina" }
-        , { id = 1, name = "Gabriel" }
-        ]
-        someListView
+    Summary.summaryListItem "Item title" "Item caption"
 
 -}
 summaryListItem : String -> String -> SummaryListItem msg
