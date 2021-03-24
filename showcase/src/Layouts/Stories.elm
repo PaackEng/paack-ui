@@ -49,7 +49,7 @@ demo renderConfig =
             >> storyBorder
             >> List.singleton
             >> (::) iconsSvgSprite
-            >> Element.column []
+            >> Element.column [ Element.width fill ]
         , { defaultWithoutMenu | code = code }
         )
 
