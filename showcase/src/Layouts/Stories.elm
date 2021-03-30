@@ -12,10 +12,10 @@ import UI.Badge as Badge
 import UI.Internal.NavigationContainer
 import UI.Layout.SplitSelectable as SplitSelectable
 import UI.ListView as ListView exposing (ListView)
+import UI.ListView.SummaryItem as Summary
 import UI.Palette as Palette exposing (brightnessLighter, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
-import UI.V2.SummaryListItem as Summary
 import UIExplorer exposing (storiesOf)
 import Utils exposing (ExplorerStory, ExplorerUI, iconsSvgSprite, prettifyElmCode, storyBorder, storyWithModel)
 
@@ -133,7 +133,7 @@ bookHasString str { title } =
 
 listItemView : RenderConfig -> Bool -> Book -> Element Msg
 listItemView renderConfig isSelected book =
-    Summary.summaryListItem book.title book.author
+    Summary.summaryItem book.title book.author
         |> Summary.withBadge (Badge.grayLight <| String.fromInt 1)
         |> Summary.withSelected isSelected
         |> Summary.renderElement renderConfig

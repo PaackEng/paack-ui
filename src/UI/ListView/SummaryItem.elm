@@ -1,17 +1,17 @@
-module UI.V2.SummaryListItem exposing
-    ( SummaryListItem, summaryListItem
+module UI.ListView.SummaryItem exposing
+    ( SummaryItem, summaryItem
     , withSelected, withBadge, withCheckbox
     , renderElement
     )
 
-{-| `SummaryListItem` represents a single item in a list that is usually selectable or searchable.
+{-| `SummaryItem` represents a single item in a list that is usually selectable or searchable.
 This component is meant to be used with [`ListView`](UI-ListView).
 
-    import UI.V2.SummaryListItem as Summary
+    import UI.ListView.SummaryItem as Summary
 
     listItemView : AppConfig -> Bool -> Item -> Element Msg
     listItemView appConfig isSelected item =
-        Summary.summaryListItem item.name item.subtitle
+        Summary.summaryItem item.name item.subtitle
             |> Summary.withSelected isSelected
             |> Summary.withBadge (Badge.grayLight "badge")
             |> Summary.renderElement appConfig.renderConfig
@@ -27,7 +27,7 @@ This component is meant to be used with [`ListView`](UI-ListView).
 
 # Building
 
-@docs SummaryListItem, summaryListItem
+@docs SummaryItem, summaryItem
 
 
 # Options
@@ -62,11 +62,11 @@ import UI.Text as Text exposing (ellipsize)
 -- Building
 
 
-{-| The `SummaryListItem msg` type is used for describing the component for later
+{-| The `SummaryItem msg` type is used for describing the component for later
 rendering.
 -}
-type SummaryListItem msg
-    = SummaryListItem Properties (Options msg)
+type SummaryItem msg
+    = SummaryItem Properties (Options msg)
 
 
 type alias Properties =
@@ -84,12 +84,12 @@ type alias Options msg =
 
 {-| Constructs a summary by receiving its title and caption.
 
-    Summary.summaryListItem "Item title" "Item caption"
+    Summary.summaryItem "Item title" "Item caption"
 
 -}
-summaryListItem : String -> String -> SummaryListItem msg
-summaryListItem title caption =
-    SummaryListItem (Properties title caption) (Options False Nothing Nothing)
+summaryItem : String -> String -> SummaryItem msg
+summaryItem title caption =
+    SummaryItem (Properties title caption) (Options False Nothing Nothing)
 
 
 {-| Indicates whether the summary is selected or not.
@@ -98,9 +98,9 @@ summaryListItem title caption =
         someListView
 
 -}
-withSelected : Bool -> SummaryListItem msg -> SummaryListItem msg
-withSelected selected (SummaryListItem prop opt) =
-    SummaryListItem prop { opt | selected = selected }
+withSelected : Bool -> SummaryItem msg -> SummaryItem msg
+withSelected selected (SummaryItem prop opt) =
+    SummaryItem prop { opt | selected = selected }
 
 
 {-| Adds a badge to the right side of the summary.
@@ -109,9 +109,9 @@ withSelected selected (SummaryListItem prop opt) =
         someListView
 
 -}
-withBadge : Badge -> SummaryListItem msg -> SummaryListItem msg
-withBadge badge (SummaryListItem prop opt) =
-    SummaryListItem prop { opt | badge = Just badge }
+withBadge : Badge -> SummaryItem msg -> SummaryItem msg
+withBadge badge (SummaryItem prop opt) =
+    SummaryItem prop { opt | badge = Just badge }
 
 
 {-| Adds a checkbox to the left side of the summary.
@@ -120,16 +120,16 @@ withBadge badge (SummaryListItem prop opt) =
         someListView
 
 -}
-withCheckbox : Checkbox msg -> SummaryListItem msg -> SummaryListItem msg
-withCheckbox checkbox (SummaryListItem prop opt) =
-    SummaryListItem prop { opt | checkbox = Just checkbox }
+withCheckbox : Checkbox msg -> SummaryItem msg -> SummaryItem msg
+withCheckbox checkbox (SummaryItem prop opt) =
+    SummaryItem prop { opt | checkbox = Just checkbox }
 
 
 {-| End of the builder's life.
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
-renderElement : RenderConfig -> SummaryListItem msg -> Element msg
-renderElement renderConfig (SummaryListItem { title, caption } opt) =
+renderElement : RenderConfig -> SummaryItem msg -> Element msg
+renderElement renderConfig (SummaryItem { title, caption } opt) =
     let
         colors =
             listItemColors opt
