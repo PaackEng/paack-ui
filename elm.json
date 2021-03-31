@@ -15,6 +15,7 @@
         "UI.Icon",
         "UI.Link",
         "UI.ListView",
+        "UI.ListView.SummaryItem",
         "UI.LoadingView",
         "UI.NavigationContainer",
         "UI.Paginator",

@@ -34,10 +34,9 @@ import Element.Font as Font
 import Element.Input as Input
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.Internal.Colors as Colors
-import UI.Internal.Utils.Element as Element
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Utils.ARIA as ARIA
-import UI.Utils.Element as Element exposing (zeroPadding)
+import UI.Utils.Element exposing (zeroPadding)
 
 
 {-| The `TabList msg a` type is used for describing the component for later rendering.

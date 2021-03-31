@@ -87,7 +87,6 @@ import UI.Internal.Text as Text exposing (TextColor)
 import UI.Link as Link exposing (Link)
 import UI.Palette as Palette exposing (brightnessDarkest, brightnessLight, brightnessLighter, brightnessLightest, brightnessMiddle, tonePrimary)
 import UI.RenderConfig exposing (RenderConfig)
-import UI.Text as Text
 import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element
 

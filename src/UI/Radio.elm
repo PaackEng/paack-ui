@@ -63,7 +63,6 @@ import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UI.Utils.ARIA as ARIA
-import UI.Utils.Element as Element
 
 
 {-| The `RadioGroup id msg` type is used for describing the component for later rendering.
