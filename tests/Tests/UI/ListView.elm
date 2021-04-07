@@ -1,6 +1,6 @@
 module Tests.UI.ListView exposing (tests)
 
-import Element as Element exposing (Element)
+import Element exposing (Element)
 import Html.Attributes as HtmlAttr
 import Test exposing (Test, describe, test)
 import Test.Html.Event as Event
