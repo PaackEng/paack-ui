@@ -29,7 +29,7 @@ jobs:
 
      - uses: PaackEng/elm-validate-action@move-to-project-flags
        with:
-         elm-make-options: --
+         elm-make-options:
          elm-review-extra-options: --ignore-dirs 'src/I18n'
 
      - uses: PaackEng/elm-validate-action@move-to-project-flags
