@@ -6,13 +6,15 @@
   "assetsPath": "showcase/public/assets/",
   "scripts": {
     "docs": "elm make --docs=dist/docs.json",
-    "docs-preview": "npx edp",
+    "docs-preview": "yarn exec edp",
     "build": "parcel build showcase/public/index.html --public-url ./",
     "showcase": "parcel showcase/public/index.html",
     "test": "elm-test",
     "i18n": "i18n-json-to-elm",
     "percy": "percy exec -- cypress run",
-    "review": "cd showcase && elm-review --template PaackEng/elm-review-config src ../src"
+    "review:showcase": "cd showcase && elm-review --template PaackEng/elm-review-config#1.1.0 --ignore-dirs ../src",
+    "review:ui": "elm-review --template PaackEng/elm-review-config#1.1.0",
+    "review": "yarn run review:ui && yarn run review:showcase"
   },
   "prettier": {
     "singleQuote": true,
