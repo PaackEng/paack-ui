@@ -312,6 +312,7 @@ withActionBar config (SelectList prop opt) =
 
     ListView.withCustomDropdown customDropdownView
         someListView
+
 -}
 withCustomDropdown : msg -> Bool -> Element msg -> ListView object msg -> ListView object msg
 withCustomDropdown toggleMsg isEnabled body (SelectList prop opt) =
@@ -591,11 +592,10 @@ dropdown cfg dropdownOptions =
                 |> Button.withSize Size.small
                 |> Button.renderElement cfg
                 |> Element.el
-                    ([ Element.centerX
-                     , Element.pointer
-                     , Element.alignTop
-                     ]
-                        ++ body
+                    (Element.centerX
+                        :: Element.pointer
+                        :: Element.alignTop
+                        :: body
                     )
 
         Nothing ->
