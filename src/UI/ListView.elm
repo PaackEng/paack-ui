@@ -2,7 +2,7 @@ module UI.ListView exposing
     ( ListView, selectList, simpleList
     , ToggleableConfig, ToggleableCover, toggleableList
     , withItems, withSelect, withSelected, withDomId, withHeader
-    , SearchConfig, withSearchField, withActionBar
+    , SearchConfig, withSearchField, withActionBar, withCustomExtraMenu
     , withWidth
     , SelectStyle, withSelectStyle
     , renderElement
@@ -67,7 +67,7 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
 ## Extra elements
 
-@docs SearchConfig, withSearchField, withActionBar
+@docs SearchConfig, withSearchField, withActionBar, withCustomExtraMenu
 
 
 ## Width
@@ -92,6 +92,7 @@ import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
 import Element.Keyed as Keyed
+import UI.Button as Button
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (maybeAnd, prependMaybe)
 import UI.Internal.Clickable as Clickable
@@ -119,7 +120,7 @@ type alias Options object msg =
     , selectStyle : SelectStyle
     , containerId : Maybe String
     , header : Maybe String
-    , moreActions : Maybe ()
+    , dropdown : Maybe (Dropdown msg)
     }
 
 
@@ -197,6 +198,14 @@ type alias ToggleableConfig object msg =
 -}
 type alias ToggleableCover =
     ToggleableList.Cover
+
+
+type alias Dropdown msg =
+    { toggleMsg : msg, isEnabled : Bool, body : DropdownBody msg }
+
+
+type DropdownBody msg
+    = CustomDropdown (Element msg)
 
 
 
@@ -297,6 +306,20 @@ withActionBar :
     -> ListView object msg
 withActionBar config (SelectList prop opt) =
     SelectList prop { opt | actionBar = Just config }
+
+
+{-| Adds button to toggle a custom menu element.
+
+    ListView.withCustomExtraMenu customDropdownView
+        someListView
+
+-}
+withCustomExtraMenu : msg -> Bool -> Element msg -> ListView object msg -> ListView object msg
+withCustomExtraMenu toggleMsg isEnabled body (SelectList prop opt) =
+    SelectList prop
+        { opt
+            | dropdown = Just <| Dropdown toggleMsg isEnabled (CustomDropdown body)
+        }
 
 
 {-| Replaces the component's list of elements.
@@ -530,7 +553,7 @@ searchFieldView cfg opt =
             Element.none
 
 
-headerView : RenderConfig -> Options object msg -> Element a
+headerView : RenderConfig -> Options object msg -> Element msg
 headerView cfg opt =
     case opt.header of
         Just header ->
@@ -541,30 +564,49 @@ headerView cfg opt =
                 ]
                 [ Text.heading5 header
                     |> Text.renderElement cfg
-                , moreActions cfg opt.moreActions
+                , dropdown cfg opt.dropdown
                 ]
 
         Nothing ->
             Element.none
 
 
-moreActions : RenderConfig -> Maybe () -> Element a
-moreActions cfg actions =
-    case actions of
-        Just () ->
+dropdown : RenderConfig -> Maybe (Dropdown msg) -> Element msg
+dropdown cfg dropdownOptions =
+    case dropdownOptions of
+        Just opt ->
+            let
+                body =
+                    if opt.isEnabled then
+                        [ Element.below <| dropdownBody opt.body ]
+
+                    else
+                        []
+            in
             (cfg |> localeTerms >> .sidebar >> .moreActions)
                 |> Icon.moreActions
                 |> Icon.withColor Palette.primary
                 |> Icon.withSize Size.Small
-                |> Icon.renderElement cfg
+                |> Button.fromIcon
+                |> Button.cmd opt.toggleMsg Button.clear
+                |> Button.withSize Size.small
+                |> Button.renderElement cfg
                 |> Element.el
-                    [ Element.centerX
-                    , Element.pointer
-                    , Element.alignTop
-                    ]
+                    (Element.centerX
+                        :: Element.pointer
+                        :: Element.alignTop
+                        :: body
+                    )
 
         Nothing ->
             Element.none
+
+
+dropdownBody : DropdownBody msg -> Element msg
+dropdownBody body =
+    case body of
+        CustomDropdown html ->
+            html
 
 
 itemView :
@@ -613,7 +655,7 @@ defaultOptions =
     , selectStyle = defaultSelectStyle
     , containerId = Nothing
     , header = Nothing
-    , moreActions = Nothing
+    , dropdown = Nothing
     }
 
 

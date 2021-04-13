@@ -7,6 +7,7 @@ import UI.Button as Button exposing (Button)
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Colors exposing (mainBackground, overlayBackground)
 import UI.Internal.RenderConfig exposing (RenderConfig)
+import UI.Internal.Utils.Element exposing (zIndex)
 import UI.Palette as Palette
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Size as Size
@@ -37,6 +38,7 @@ viewWithOverlay padding overlayClickCloseMsg dialogView =
         , Element.height fill
         , Element.behindContent (blackBlock overlayClickCloseMsg)
         , Element.paddingEach padding
+        , zIndex 20
         ]
         dialogView
 
