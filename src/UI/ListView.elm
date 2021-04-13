@@ -2,7 +2,7 @@ module UI.ListView exposing
     ( ListView, selectList, simpleList
     , ToggleableConfig, ToggleableCover, toggleableList
     , withItems, withSelect, withSelected, withDomId, withHeader
-    , SearchConfig, withSearchField, withActionBar, withCustomDropdown
+    , SearchConfig, withSearchField, withActionBar, withCustomExtraMenu
     , withWidth
     , SelectStyle, withSelectStyle
     , renderElement
@@ -67,7 +67,7 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
 ## Extra elements
 
-@docs SearchConfig, withSearchField, withActionBar, withCustomDropdown
+@docs SearchConfig, withSearchField, withActionBar, withCustomExtraMenu
 
 
 ## Width
@@ -308,14 +308,14 @@ withActionBar config (SelectList prop opt) =
     SelectList prop { opt | actionBar = Just config }
 
 
-{-| Adds a button to toggle a custom dropdown element.
+{-| Adds button to toggle a custom menu element.
 
-    ListView.withCustomDropdown customDropdownView
+    ListView.withCustomExtraMenu customDropdownView
         someListView
 
 -}
-withCustomDropdown : msg -> Bool -> Element msg -> ListView object msg -> ListView object msg
-withCustomDropdown toggleMsg isEnabled body (SelectList prop opt) =
+withCustomExtraMenu : msg -> Bool -> Element msg -> ListView object msg -> ListView object msg
+withCustomExtraMenu toggleMsg isEnabled body (SelectList prop opt) =
     SelectList prop
         { opt
             | dropdown = Just <| Dropdown toggleMsg isEnabled (CustomDropdown body)
