@@ -18,24 +18,11 @@ jobs:
        - name: Setup Node
          uses: actions/setup-node@v2.1.5
 
-       - name: Get yarn cache directory path
-         id: yarn-cache-dir-path
-         run: echo "::set-output name=dir::$(yarn cache dir)"
-
-       - uses: actions/cache@v2.1.5
-         id: yarn-cache
-         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-
-       - name: Install dependencies
-         run: yarn install
-
        - name: Percy test
          uses: cypress-io/github-action@v2
          with:
+          install-command: yarn --frozen-lockfile --silent
+          cache-key: percy-${{ hashFiles('yarn.lock') }}
           start: yarn showcase
           wait-on: 'http://localhost:1234'
           command-prefix: 'percy exec --'
