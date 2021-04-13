@@ -1,7 +1,7 @@
 module UI.Icon exposing
     ( svgSpriteImport
     , Icon
-    , add, check, close, collapse, configure, download, edit, fix, eventLog
+    , add, check, close, collapse, configure, download, edit, fix, fixIssues, eventLog
     , expand, filter, groups, logout, move, nextContent, notifications
     , paackSpaces, packages, previousContent, print, remove, sandwichMenu
     , search, searchSpace, seeMore, sortDecreasing, sortIncreasing, toggle
@@ -37,7 +37,7 @@ An icon can be created and rendered as in the following pipeline:
 # Building
 
 @docs Icon
-@docs add, check, close, collapse, configure, download, edit, fix, eventLog
+@docs add, check, close, collapse, configure, download, edit, fix, fixIssues, eventLog
 @docs expand, filter, groups, logout, move, nextContent, notifications
 @docs paackSpaces, packages, previousContent, print, remove, sandwichMenu
 @docs search, searchSpace, seeMore, sortDecreasing, sortIncreasing, toggle
@@ -116,6 +116,7 @@ type IconGlyph
     | Expand
     | Filter
     | Fix
+    | FixIssues
     | Groups
     | Logout
     | Move
@@ -526,6 +527,16 @@ fix hint =
     Icon (Properties hint Fix) defaultOptions
 
 
+{-| A thunder bolt.
+
+    Icon.fixIssues "Fix issues from selected groups"
+
+-}
+fixIssues : String -> Icon
+fixIssues hint =
+    Icon (Properties hint FixIssues) defaultOptions
+
+
 
 -- Rendering
 
@@ -596,6 +607,9 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
 
             Fix ->
                 svgIcon "Fix"
+
+            FixIssues ->
+                svgIcon "Bolt"
 
             Groups ->
                 svgIcon "Groups"
