@@ -169,11 +169,12 @@ selectedKey { selected } =
         Nothing ->
             "@none"
 
+
 withAboveElement : Maybe (Element msg) -> Element msg -> Element msg
 withAboveElement maybeHeader body =
     case maybeHeader of
         Just header ->
-            Element.column [Element.width fill, Element.height fill]
+            Element.column [ Element.width fill, Element.height fill ]
                 [ header, body ]
 
         Nothing ->
