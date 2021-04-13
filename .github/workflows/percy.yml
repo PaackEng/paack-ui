@@ -17,8 +17,6 @@ jobs:
 
        - name: Setup Node
          uses: actions/setup-node@v2.1.5
-         with:
-          node-version: '12'
 
        - name: Get yarn cache directory path
          id: yarn-cache-dir-path
@@ -36,11 +34,7 @@ jobs:
          run: yarn install
 
        - name: Percy test
-         uses: cypress-io/github-action@v2
-         with:
-          start: yarn showcase
-          wait-on: 'http://localhost:1234'
-          command-prefix: 'percy exec --'
+         run: yarn run percy
          env:
           PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
           NODE_ENV: 'production'
