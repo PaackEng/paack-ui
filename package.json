@@ -31,14 +31,15 @@
   },
   "homepage": "https://paackeng.github.io/paack-ui/",
   "dependencies": {
-    "@percy/cypress": "^2.3.4",
-    "cypress": "^6.8.0",
+    "@percy/cli": "^1.0.0-beta.47",
+    "@percy/cypress": "^3.0.0",
+    "cypress": "^6.9.1",
     "elm": "^0.19.1-5",
     "elm-format": "^0.8.5",
     "elm-hot": "^1.1.6",
     "elm-test": "^0.19.1-revision6",
     "i18n-json-to-elm": "^1.1.2",
-    "node-elm-compiler": "^5.0.4",
+    "node-elm-compiler": "^5.0.6",
     "paack-ui-assets": "^0.1.1",
     "parcel-bundler": "^1.12.5",
     "parcel-plugin-asset-copier": "^1.1.0"
