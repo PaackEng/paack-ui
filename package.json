@@ -31,7 +31,7 @@
   },
   "homepage": "https://paackeng.github.io/paack-ui/",
   "dependencies": {
-    "@percy/cypress": "^2.3.4",
+    "@percy/cypress": "^3.0.0",
     "cypress": "^6.9.1",
     "elm": "^0.19.1-5",
     "elm-format": "^0.8.5",
@@ -44,6 +44,7 @@
     "parcel-plugin-asset-copier": "^1.1.0"
   },
   "devDependencies": {
+    "@percy/cli": "^1.0.0-beta.47",
     "elm-doc-preview": "^5.0.5",
     "elm-review": "^2.4.6"
   }
