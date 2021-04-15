@@ -1139,10 +1139,10 @@
     rimraf "^3.0.2"
     ws "^7.4.1"
 
-"@percy/cypress@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@percy/cypress/-/cypress-3.0.0.tgz#a4fc43f159010fc577e1075c4ef692803156cda1"
-  integrity sha512-3jGpqIWwibnBL7oC0D4QZJypPkk4pbJ9GtLVPH2LxY+rpsEB5oDAqQA+nXpzkpw3CYZLhxpbtYvEEVvGqj8BXQ==
+"@percy/cypress@^3.1.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@percy/cypress/-/cypress-3.1.0.tgz#19533772739b35759c30e3edd3070922f6ea6b6d"
+  integrity sha512-x4RPo7vMEGA6hmLbQIFwawZZlmiZknhSqPyzckxXgj8VyoW17QQOINxZo/DZTfV0UoUVOzNoHNrJcV3XJnN4FQ==
   dependencies:
     "@percy/sdk-utils" "^1.0.0-beta.44"
 
