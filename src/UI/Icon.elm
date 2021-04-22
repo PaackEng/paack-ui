@@ -5,12 +5,11 @@ module UI.Icon exposing
     , expand, filter, groups, logout, move, nextContent, notifications
     , paackSpaces, packages, previousContent, print, remove, sandwichMenu
     , search, searchSpace, seeMore, sortDecreasing, sortIncreasing, toggle
-    , toggleDown, toggleUp, delete, warning
+    , toggleDown, toggleUp, delete, warning, moreActions
     , getHint
     , withColor
     , withSize, withCustomSize
     , renderElement
-    , moreActions
     )
 
 {-| `UI.Icon` is an implementation of icons using an SVG-spritesheet.
@@ -41,7 +40,7 @@ An icon can be created and rendered as in the following pipeline:
 @docs expand, filter, groups, logout, move, nextContent, notifications
 @docs paackSpaces, packages, previousContent, print, remove, sandwichMenu
 @docs search, searchSpace, seeMore, sortDecreasing, sortIncreasing, toggle
-@docs toggleDown, toggleUp, delete, warning
+@docs toggleDown, toggleUp, delete, warning, moreActions
 
 
 # Disassemble
