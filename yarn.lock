@@ -4047,10 +4047,10 @@ human-signals@^1.1.1:
   resolved "https://registry.yarnpkg.com/human-signals/-/human-signals-1.1.1.tgz#c5b1cd14f50aeae09ab6c59fe63ba3395fe4dfa3"
   integrity sha512-SEQu7vl8KjNL2eoGBLF3+wAjpsNfA9XMlXAYj/3EdaNfAlxKthD1xjEQfGOUhllCGGJVNY34bRr6lPINhNjyZw==
 
-i18n-json-to-elm@^1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/i18n-json-to-elm/-/i18n-json-to-elm-1.1.2.tgz#acdfa3b090f670d7267fd2b71ba55f60257b0cf7"
-  integrity sha512-saKBocPnwDBk32KxSxyPChtGaEOkyBoKewGLi2/sA6TGkQ+s5mc/Cv+uEx2zhQ0M+8toVV89rFTIY58YBro+Zw==
+i18n-json-to-elm@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/i18n-json-to-elm/-/i18n-json-to-elm-1.2.0.tgz#1f479881146012f176db49895ae94c9bb90f0e9f"
+  integrity sha512-5L2vY8XylF/oTpQmVBx4Tcm5kPmZX9/JYxHExqOhWRlk2v01r1TyML4d4oc2vrC1ggDqZhfJ2KexcTZhFFeXYQ==
   dependencies:
     elm-format "^0.8.3"
 
