@@ -2992,10 +2992,10 @@ elm-hot@^1.1.6:
   resolved "https://registry.yarnpkg.com/elm-hot/-/elm-hot-1.1.6.tgz#93e3962b40670e65f0a3640951b3add2702bfd0e"
   integrity sha512-zYZJlfs7Gt4BdjA+D+857K+XAWzwwySJmXCgFpHW1dIEfaHSZCIPYPf7/jinZBLfKRkOAlKzI32AA84DY50g7Q==
 
-elm-review@^2.4.6:
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/elm-review/-/elm-review-2.5.0.tgz#bd2ec1b6f9b8787b17d9ca4a7e1e6aea9b857f1d"
-  integrity sha512-LPi38MoUJ0/j8s5iP49nqGKroRrnM+FCmnGPwXRUzEAgYz/H9mmoVlyjuyM9fA85D+zok0yO3Kf1d7//0EXS1A==
+elm-review@^2.5.1:
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/elm-review/-/elm-review-2.5.1.tgz#267ad8d55cb25306b30b8a2d2c3dee97f48f1a34"
+  integrity sha512-LUIUy7yX0MBtQIhhsAqX4PmB7xpMGysN4oPWa/dnNvnqAkkIJcMQJBd6vudt2rNqPCE0KLupPbvUiSQCulxmDQ==
   dependencies:
     chalk "^4.0.0"
     chokidar "^3.4.0"
@@ -3033,12 +3033,7 @@ elm-test@^0.19.1-revision6:
     which "^2.0.2"
     xmlbuilder "^15.1.0"
 
-elm-tooling@^1.1.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/elm-tooling/-/elm-tooling-1.2.0.tgz#d5ad8302743e152f77ac76eadca22d2eb10f08a2"
-  integrity sha512-hp9HKubt41Xa8uAdlspEvVhizibwKsVHE5HA/bF5LVIaPDC0yQ43PtqrP13h5dzS6J1VYorYKtK6on9D0gkOmw==
-
-elm-tooling@^1.2.0:
+elm-tooling@^1.1.0, elm-tooling@^1.2.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/elm-tooling/-/elm-tooling-1.3.0.tgz#9969d5778ae458007b32124b2ab6040ca11aa3a0"
   integrity sha512-OLRg8D7QCbzMmi8QTaebIIsH2qaIj4NiltuJ8vZj4JFHOIVa3utyD5tlfySBGZNfDG7+vZ2K8iDk82TalFaAbw==
