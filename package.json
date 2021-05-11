@@ -46,6 +46,6 @@
   },
   "devDependencies": {
     "elm-doc-preview": "^5.0.5",
-    "elm-review": "^2.4.6"
+    "elm-review": "^2.5.1"
   }
 }
