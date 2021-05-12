@@ -747,12 +747,7 @@ svgIcon iconId =
             , SvgAttrs.height "100%"
             , SvgAttrs.fill "currentColor"
             ]
-            [ Svg.use
-                [ SvgAttrs.id iconId
-                , SvgAttrs.xlinkHref ("#" ++ iconId)
-                ]
-                []
-            ]
+            [ Svg.use [ SvgAttrs.xlinkHref ("#" ++ iconId) ] [] ]
 
 
 sizeToInt : Size -> Int
