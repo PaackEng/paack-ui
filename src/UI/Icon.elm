@@ -1,7 +1,7 @@
 module UI.Icon exposing
     ( svgSpriteImport
     , Icon
-    , add, check, close, collapse, configure, download, edit, fix, fixIssues, eventLog
+    , add, check, close, collapse, configure, download, edit, fix, fixing, fixIssues, eventLog
     , expand, filter, groups, logout, move, nextContent, notifications
     , paackSpaces, packages, previousContent, print, remove, sandwichMenu
     , search, searchSpace, seeMore, sortDecreasing, sortIncreasing, toggle
@@ -36,7 +36,7 @@ An icon can be created and rendered as in the following pipeline:
 # Building
 
 @docs Icon
-@docs add, check, close, collapse, configure, download, edit, fix, fixIssues, eventLog
+@docs add, check, close, collapse, configure, download, edit, fix, fixing, fixIssues, eventLog
 @docs expand, filter, groups, logout, move, nextContent, notifications
 @docs paackSpaces, packages, previousContent, print, remove, sandwichMenu
 @docs search, searchSpace, seeMore, sortDecreasing, sortIncreasing, toggle
@@ -67,7 +67,7 @@ An icon can be created and rendered as in the following pipeline:
 import Element exposing (..)
 import Element.Font as Font
 import Html
-import Svg
+import Svg exposing (Svg)
 import Svg.Attributes as SvgAttrs
 import UI.Internal.Size as Size exposing (Size)
 import UI.Palette as Palette
@@ -115,6 +115,7 @@ type IconGlyph
     | Expand
     | Filter
     | Fix
+    | Fixing
     | FixIssues
     | Groups
     | Logout
@@ -526,6 +527,16 @@ fix hint =
     Icon (Properties hint Fix) defaultOptions
 
 
+{-| A monkey wrench with a red ball.
+
+    Icon.fixing "Fixing something"
+
+-}
+fixing : String -> Icon
+fixing hint =
+    Icon (Properties hint Fixing) defaultOptions
+
+
 {-| A thunder bolt.
 
     Icon.fixIssues "Fix issues from selected groups"
@@ -606,6 +617,9 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
 
             Fix ->
                 svgIcon "Fix"
+
+            Fixing ->
+                notificationSvgIcon "Fix"
 
             FixIssues ->
                 svgIcon "Bolt"
@@ -723,9 +737,10 @@ But, in case you aren't, you need to insert this function on the most top compon
 -}
 svgSpriteImport : Html.Html msg
 svgSpriteImport =
-    Html.node "paack-svg-icon-sprite"
-        []
-        []
+    Html.div []
+        [ Html.node "paack-svg-icon-sprite" [] []
+        , circleMask
+        ]
 
 
 
@@ -741,13 +756,50 @@ defaultOptions =
 
 svgIcon : String -> Element msg
 svgIcon iconId =
-    Element.html <|
-        Svg.svg
+    svgToHtml [ useIcon iconId ]
+
+
+notificationSvgIcon : String -> Element msg
+notificationSvgIcon iconId =
+    svgToHtml
+        [ Svg.g [ SvgAttrs.mask "url(#icon-circle-mask)" ]
+            [ Svg.rect
+                [ SvgAttrs.x "0"
+                , SvgAttrs.y "0"
+                , SvgAttrs.width "100%"
+                , SvgAttrs.height "100%"
+                , SvgAttrs.fill "transparent"
+                ]
+                []
+            , useIcon iconId
+            ]
+        , Svg.circle
+            [ SvgAttrs.fill <| Palette.toCssColor Palette.danger
+            , SvgAttrs.r "20%"
+            , SvgAttrs.cx "75%"
+            , SvgAttrs.cy "25%"
+            ]
+            []
+        ]
+
+
+svgToHtml : List (Svg msg) -> Element msg
+svgToHtml =
+    Element.html
+        << Svg.svg
             [ SvgAttrs.width "100%"
             , SvgAttrs.height "100%"
             , SvgAttrs.fill "currentColor"
             ]
-            [ Svg.use [ SvgAttrs.xlinkHref ("#" ++ iconId) ] [] ]
+
+
+useIcon : String -> Svg msg
+useIcon iconId =
+    Svg.use
+        [ SvgAttrs.id iconId
+        , SvgAttrs.xlinkHref ("#" ++ iconId)
+        ]
+        []
 
 
 sizeToInt : Size -> Int
@@ -764,3 +816,38 @@ sizeToInt size =
 
         Size.ExtraSmall ->
             16
+
+
+circleMask : Svg msg
+circleMask =
+    Svg.svg
+        [ SvgAttrs.version "1.1"
+        , SvgAttrs.style "position:absolute"
+        , SvgAttrs.width "0"
+        , SvgAttrs.height "0"
+        ]
+        [ Svg.defs
+            []
+            [ Svg.mask
+                [ SvgAttrs.id "icon-circle-mask"
+                , SvgAttrs.maskUnits "objectBoundingBox"
+                , SvgAttrs.maskContentUnits "objectBoundingBox"
+                ]
+                [ Svg.rect
+                    [ SvgAttrs.fill "white"
+                    , SvgAttrs.x "0"
+                    , SvgAttrs.y "0"
+                    , SvgAttrs.height "1"
+                    , SvgAttrs.width "1"
+                    ]
+                    []
+                , Svg.circle
+                    [ SvgAttrs.fill "black"
+                    , SvgAttrs.r "0.25"
+                    , SvgAttrs.cx "0.75"
+                    , SvgAttrs.cy "0.25"
+                    ]
+                    []
+                ]
+            ]
+        ]
