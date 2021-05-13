@@ -775,9 +775,9 @@ notificationSvgIcon iconId =
             ]
         , Svg.circle
             [ SvgAttrs.fill <| Palette.toCssColor Palette.danger
-            , SvgAttrs.r "20%"
+            , SvgAttrs.r "17%"
             , SvgAttrs.cx "75%"
-            , SvgAttrs.cy "25%"
+            , SvgAttrs.cy "20%"
             ]
             []
         ]
@@ -843,9 +843,9 @@ circleMask =
                     []
                 , Svg.circle
                     [ SvgAttrs.fill "black"
-                    , SvgAttrs.r "0.25"
+                    , SvgAttrs.r "0.21"
                     , SvgAttrs.cx "0.75"
-                    , SvgAttrs.cy "0.25"
+                    , SvgAttrs.cy "0.20"
                     ]
                     []
                 ]
