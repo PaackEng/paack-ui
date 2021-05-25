@@ -137,7 +137,7 @@ mobile cfg page menu title maybeStack =
             Element.row [ width fill, height fill ]
                 [ viewSide cfg { proportional = True, persistent = True } menu
                 , Element.el
-                    [ Colors.gray.darkest
+                    [ Colors.gray.dark1
                         |> Element.colorSetOpacity 0.85
                         |> Background.color
                     , width (fillPortion 25)
@@ -214,7 +214,7 @@ viewSide cfg config (Menu.Menu prop opt) =
 
           else
             paddingXY 6 22
-        , Background.color Colors.gray.lightest
+        , Background.color Colors.gray.light3
         ]
         [ header
         , pagesView cfg
