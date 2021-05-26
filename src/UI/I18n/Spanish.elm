@@ -1,36 +1,36 @@
-module I18n.English exposing (..)
+module UI.I18n.Spanish exposing (..)
 
-import I18n.Types exposing (..)
+import UI.I18n.Types exposing (..)
 
 
 filtersPeriod : FiltersPeriod
 filtersPeriod =
-    { after = "After"
-    , before = "Before"
-    , on = "On"
-    , description = "Select period reference"
+    { after = "Después"
+    , before = "Antes"
+    , on = "En"
+    , description = "Seleccionar período de referencia"
     }
 
 
 filtersRange : FiltersRange
 filtersRange =
-    { from = \{ date } -> "From: " ++ date ++ ""
-    , to = \{ date } -> "To: " ++ date ++ ""
+    { from = \{ date } -> "Desde: " ++ date ++ ""
+    , to = \{ date } -> "Hasta: " ++ date ++ ""
     }
 
 
 filtersSelect : FiltersSelect
 filtersSelect =
-    { description = "Select option for filtering"
+    { description = "Seleccionar opción para filtrar"
     }
 
 
 filters : Filters
 filters =
     { dateFormat = "DD/MM/YYYY"
-    , close = "Close"
-    , clear = "Clear"
-    , apply = "Apply"
+    , close = "Cerrar"
+    , clear = "Limpiar"
+    , apply = "Aplicar"
     , period = filtersPeriod
     , range = filtersRange
     , select = filtersSelect
@@ -39,41 +39,41 @@ filters =
 
 paginator : Paginator
 paginator =
-    { format = \{ first, last, total } -> "" ++ first ++ " - " ++ last ++ " of " ++ total ++ ""
-    , previous = "Previous"
-    , next = "Next"
+    { format = \{ first, last, total } -> "" ++ first ++ " - " ++ last ++ " de " ++ total ++ ""
+    , previous = "Anterior"
+    , next = "Siguiente"
     }
 
 
 checkbox : Checkbox
 checkbox =
-    { toggle = "Toggle"
+    { toggle = "Agrupar"
     }
 
 
 listView : ListView
 listView =
-    { search = "Search"
+    { search = "Buscar"
     }
 
 
 radio : Radio
 radio =
-    { select = "Select item"
+    { select = "Seleccionar item"
     }
 
 
 tablesDetails : TablesDetails
 tablesDetails =
-    { show = "Expand"
-    , collapse = "Collapse"
+    { show = "Expandir"
+    , collapse = "Colapsar"
     }
 
 
 tablesSorting : TablesSorting
 tablesSorting =
-    { increase = "Sort from A - Z"
-    , decrease = "Sort from Z - A"
+    { increase = "Ordenar A-Z"
+    , decrease = "Ordenar Z-A"
     }
 
 
@@ -88,21 +88,21 @@ tables =
 
 dateInput : DateInput
 dateInput =
-    { invalid = "Invalid date format."
+    { invalid = "Formato de fecha inválido"
     }
 
 
 dialog : Dialog
 dialog =
-    { close = "Close dialog"
+    { close = "Cerrar dialogo"
     }
 
 
 sidebar : Sidebar
 sidebar =
-    { expand = "Expand sidebar"
-    , collapse = "Minimize sidebar"
-    , previous = "Go back"
+    { expand = "Expandir barra lateral"
+    , collapse = "Minimizar barra lateral"
+    , previous = "Atrás"
     , moreActions = "More actions"
     }
 

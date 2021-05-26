@@ -1,6 +1,6 @@
-module I18n.French exposing (..)
+module UI.I18n.French exposing (..)
 
-import I18n.Types exposing (..)
+import UI.I18n.Types exposing (..)
 
 
 filtersPeriod : FiltersPeriod

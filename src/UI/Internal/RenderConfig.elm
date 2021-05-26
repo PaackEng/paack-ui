@@ -1,10 +1,10 @@
 module UI.Internal.RenderConfig exposing (Locale(..), RenderConfig(..), RenderConfigData, localeTerms)
 
 import Element
-import I18n.English as LangEnglish
-import I18n.French as LangFrench
-import I18n.Spanish as LangSpanish
-import I18n.Types as I18n
+import UI.I18n.English as LangEnglish
+import UI.I18n.French as LangFrench
+import UI.I18n.Spanish as LangSpanish
+import UI.I18n.Types as I18n
 
 
 type alias RenderConfigData =
