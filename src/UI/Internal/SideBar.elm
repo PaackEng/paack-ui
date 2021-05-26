@@ -76,11 +76,7 @@ desktopNonPersistent cfg page ((Menu.Menu prop opt) as menu) =
             |> Element.el (height fill :: transition prop.isExpanded slideOutLeft)
             |> Element.inFront
         ]
-        [ slimHeaderView cfg
-            (prop.toggleMsg (not prop.isExpanded))
-            Palette.primary
-            |> Element.el [ paddingXY 14 24, Element.alignTop ]
-        , Element.el
+        [ Element.el
             (width fill
                 :: height fill
                 :: (Element.inFront <| sidebarOverlay menu)

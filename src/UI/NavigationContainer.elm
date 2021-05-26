@@ -5,7 +5,7 @@ module UI.NavigationContainer exposing
     , Content, contentSingle, StackChild, contentStackChild
     , withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages
     , MenuPage, menuPage, withSidebarStyle, sidebarPersistent
-    , sidebarNonPersistent
+    , sidebarNonPersistent, showMenu, hideMenu
     , Dialog, dialog, dialogV2
     , toBrowserDocument
     )
@@ -71,7 +71,7 @@ Example of usage:
 
 @docs withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages
 @docs MenuPage, menuPage, withSidebarStyle, sidebarPersistent
-@docs sidebarNonPersistent
+@docs sidebarNonPersistent, showMenu, hideMenu
 
 
 # Dialog
@@ -313,6 +313,20 @@ makes the sidebar open over the content with an overlay behind it.
 sidebarNonPersistent : SidebarStyle
 sidebarNonPersistent =
     SidebarNonPersistent
+
+
+{-| Message to force the exhibition of the sidebar/menu.
+-}
+showMenu : Msg
+showMenu =
+    ToggleMenu True
+
+
+{-| Message to force hiding the sidebar/menu.
+-}
+hideMenu : Msg
+hideMenu =
+    ToggleMenu False
 
 
 
