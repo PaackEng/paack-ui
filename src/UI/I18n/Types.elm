@@ -1,4 +1,4 @@
-module I18n.Types exposing (..)
+module UI.I18n.Types exposing (..)
 
 
 type alias FiltersPeriod =

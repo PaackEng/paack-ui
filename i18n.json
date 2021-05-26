@@ -1,4 +1,5 @@
 {
 	"source": "i18n",
-	"dest": "src"
+	"dest": "src",
+  "namespace": "UI.I18n"
 }
