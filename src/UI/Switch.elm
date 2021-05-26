@@ -146,7 +146,7 @@ renderElement _ (Switch { message, label, state } { color }) =
                     :: knobAttrs
                 )
             |> Element.el thinBorder
-            |> Element.el (Background.color Colors.gray.lighter :: boxAttrs)
+            |> Element.el (Background.color Colors.gray.light2 :: boxAttrs)
 
 
 knobAttrs : List (Attribute msg)

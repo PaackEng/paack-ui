@@ -31,7 +31,7 @@ view renderConfig leftButton rightAction label =
         [ Element.width fill
         , Element.paddingEach { top = 14, bottom = 4, left = 4, right = 4 }
         , Border.widthEach { zeroPadding | bottom = 1 }
-        , Border.color Colors.gray.lightest
+        , Border.color Colors.gray.light3
         ]
         [ leftButtonView renderConfig leftButton
         , labelView renderConfig label

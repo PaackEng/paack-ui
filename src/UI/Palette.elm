@@ -1,11 +1,11 @@
 module UI.Palette exposing
-    ( primaryDark1, primary, primaryLight1, primaryLight2, primaryLight3
-    , successDark1, success, successLight1, successLight2, successLight3
-    , dangerDark1, danger, dangerLight1, dangerLight2, dangerLight3
-    , warningDark1, warning, warningLight1, warningLight2, warningLight3
-    , black, gray, grayLight1, grayLight2, grayLight3
+    ( primaryDark1, primary, primaryLight1, primaryLight2, primaryLight3, primaryLight4
+    , successDark1, success, successLight1, successLight2, successLight3, successLight4
+    , dangerDark1, danger, dangerLight1, dangerLight2, dangerLight3, dangerLight4
+    , warningDark1, warning, warningLight1, warningLight2, warningLight3, warningLight4
+    , black, gray, grayLight1, grayLight2, grayLight3, grayLight4
     , Tone, toneGray, tonePrimary, toneSuccess, toneWarning, toneDanger
-    , Brightness, brightnessDarkest, brightnessMiddle, brightnessLight, brightnessLighter, brightnessLightest
+    , Brightness, brightnessDarkest, brightnessMiddle, brightnessLight, brightnessLighter, brightnessLightest, brightnessLight4
     , Color, color
     , setContrasting
     , withAlpha
@@ -20,11 +20,11 @@ module UI.Palette exposing
 
 # What color
 
-@docs primaryDark1, primary, primaryLight1, primaryLight2, primaryLight3
-@docs successDark1, success, successLight1, successLight2, successLight3
-@docs dangerDark1, danger, dangerLight1, dangerLight2, dangerLight3
-@docs warningDark1, warning, warningLight1, warningLight2, warningLight3
-@docs black, gray, grayLight1, grayLight2, grayLight3
+@docs primaryDark1, primary, primaryLight1, primaryLight2, primaryLight3, primaryLight4
+@docs successDark1, success, successLight1, successLight2, successLight3, successLight4
+@docs dangerDark1, danger, dangerLight1, dangerLight2, dangerLight3, dangerLight4
+@docs warningDark1, warning, warningLight1, warningLight2, warningLight3, warningLight4
+@docs black, gray, grayLight1, grayLight2, grayLight3, grayLight4
 
 
 # What tone
@@ -34,7 +34,7 @@ module UI.Palette exposing
 
 # How much bright
 
-@docs Brightness, brightnessDarkest, brightnessMiddle, brightnessLight, brightnessLighter, brightnessLightest
+@docs Brightness, brightnessDarkest, brightnessMiddle, brightnessLight, brightnessLighter, brightnessLightest, brightnessLight4
 
 
 # Building
@@ -101,18 +101,19 @@ The five variations are Darkest, Middle, Light, Lighter, Lightest.
 
 -}
 type Brightness
-    = BrightnessDarkest
+    = BrightnessDark1
     | BrightnessMiddle
-    | BrightnessLight
-    | BrightnessLighter
-    | BrightnessLightest
+    | BrightnessLight1
+    | BrightnessLight2
+    | BrightnessLight3
+    | BrightnessLight4
 
 
 {-| Shorthand for the primary tone with dark brightness
 -}
 primaryDark1 : Color
 primaryDark1 =
-    color TonePrimary BrightnessDarkest
+    color TonePrimary BrightnessDark1
 
 
 {-| Shorthand for the default primary tone
@@ -126,28 +127,35 @@ primary =
 -}
 primaryLight1 : Color
 primaryLight1 =
-    color TonePrimary BrightnessLight
+    color TonePrimary BrightnessLight1
 
 
 {-| Shorthand for the primary tone with light brightness
 -}
 primaryLight2 : Color
 primaryLight2 =
-    color TonePrimary BrightnessLighter
+    color TonePrimary BrightnessLight2
 
 
 {-| Shorthand for the primary tone with light brightness
 -}
 primaryLight3 : Color
 primaryLight3 =
-    color TonePrimary BrightnessLightest
+    color TonePrimary BrightnessLight3
+
+
+{-| Shorthand for the primary tone with light brightness
+-}
+primaryLight4 : Color
+primaryLight4 =
+    color TonePrimary BrightnessLight4
 
 
 {-| Shorthand for the success tone with dark brightness
 -}
 successDark1 : Color
 successDark1 =
-    color ToneSuccess BrightnessDarkest
+    color ToneSuccess BrightnessDark1
 
 
 {-| Shorthand for the default success tone
@@ -161,28 +169,35 @@ success =
 -}
 successLight1 : Color
 successLight1 =
-    color ToneSuccess BrightnessLight
+    color ToneSuccess BrightnessLight1
 
 
 {-| Shorthand for the success tone with light brightness
 -}
 successLight2 : Color
 successLight2 =
-    color ToneSuccess BrightnessLighter
+    color ToneSuccess BrightnessLight2
 
 
 {-| Shorthand for the success tone with light brightness
 -}
 successLight3 : Color
 successLight3 =
-    color ToneSuccess BrightnessLightest
+    color ToneSuccess BrightnessLight3
+
+
+{-| Shorthand for the success tone with light brightness
+-}
+successLight4 : Color
+successLight4 =
+    color ToneSuccess BrightnessLight4
 
 
 {-| Shorthand for the success danger tone with dark brightness
 -}
 dangerDark1 : Color
 dangerDark1 =
-    color ToneDanger BrightnessDarkest
+    color ToneDanger BrightnessDark1
 
 
 {-| Shorthand for the default danger tone
@@ -196,28 +211,35 @@ danger =
 -}
 dangerLight1 : Color
 dangerLight1 =
-    color ToneDanger BrightnessLight
+    color ToneDanger BrightnessLight1
 
 
 {-| Shorthand for the danger tone with light brightness
 -}
 dangerLight2 : Color
 dangerLight2 =
-    color ToneDanger BrightnessLighter
+    color ToneDanger BrightnessLight2
 
 
 {-| Shorthand for the danger tone with light brightness
 -}
 dangerLight3 : Color
 dangerLight3 =
-    color ToneDanger BrightnessLightest
+    color ToneDanger BrightnessLight3
+
+
+{-| Shorthand for the danger tone with light brightness
+-}
+dangerLight4 : Color
+dangerLight4 =
+    color ToneDanger BrightnessLight4
 
 
 {-| Shorthand for the danger warning with dark brightness
 -}
 warningDark1 : Color
 warningDark1 =
-    color ToneWarning BrightnessDarkest
+    color ToneWarning BrightnessDark1
 
 
 {-| Shorthand for the default warning
@@ -231,28 +253,35 @@ warning =
 -}
 warningLight1 : Color
 warningLight1 =
-    color ToneWarning BrightnessLight
+    color ToneWarning BrightnessLight1
 
 
 {-| Shorthand for the warning with light brightness
 -}
 warningLight2 : Color
 warningLight2 =
-    color ToneWarning BrightnessLighter
+    color ToneWarning BrightnessLight2
 
 
 {-| Shorthand for the warning with light brightness
 -}
 warningLight3 : Color
 warningLight3 =
-    color ToneWarning BrightnessLightest
+    color ToneWarning BrightnessLight3
+
+
+{-| Shorthand for the warning with light brightness
+-}
+warningLight4 : Color
+warningLight4 =
+    color ToneWarning BrightnessLight4
 
 
 {-| Shorthand for the gray tone with dark brightness
 -}
 black : Color
 black =
-    color ToneGray BrightnessDarkest
+    color ToneGray BrightnessDark1
 
 
 {-| Shorthand for the default gray tone
@@ -266,21 +295,28 @@ gray =
 -}
 grayLight1 : Color
 grayLight1 =
-    color ToneGray BrightnessLight
+    color ToneGray BrightnessLight1
 
 
 {-| Shorthand for the gray tone with light brightness
 -}
 grayLight2 : Color
 grayLight2 =
-    color ToneGray BrightnessLighter
+    color ToneGray BrightnessLight2
 
 
 {-| Shorthand for the gray tone with light brightness
 -}
 grayLight3 : Color
 grayLight3 =
-    color ToneGray BrightnessLightest
+    color ToneGray BrightnessLight3
+
+
+{-| Shorthand for the gray tone with light brightness
+-}
+grayLight4 : Color
+grayLight4 =
+    color ToneGray BrightnessLight4
 
 
 {-| Given a tone and brightness, initiates the building of a color.
@@ -374,28 +410,35 @@ toCssColor data =
 -}
 brightnessDarkest : Brightness
 brightnessDarkest =
-    BrightnessDarkest
+    BrightnessDark1
 
 
 {-| The first light variation of some tone.
 -}
 brightnessLight : Brightness
 brightnessLight =
-    BrightnessLight
+    BrightnessLight1
 
 
 {-| The increased-light variation of some tone.
 -}
 brightnessLighter : Brightness
 brightnessLighter =
-    BrightnessLighter
+    BrightnessLight2
+
+
+{-| The greatly increased-light variation of some tone.
+-}
+brightnessLightest : Brightness
+brightnessLightest =
+    BrightnessLight3
 
 
 {-| The lightest variation of some tone.
 -}
-brightnessLightest : Brightness
-brightnessLightest =
-    BrightnessLightest
+brightnessLight4 : Brightness
+brightnessLight4 =
+    BrightnessLight4
 
 
 {-| The base of all variations of some tone.
@@ -447,20 +490,23 @@ toneWarning =
 getBrightness : Brightness -> ToneColors -> Element.Color
 getBrightness brightness =
     case brightness of
-        BrightnessDarkest ->
-            .darkest
+        BrightnessDark1 ->
+            .dark1
 
         BrightnessMiddle ->
             .middle
 
-        BrightnessLight ->
-            .light
+        BrightnessLight1 ->
+            .light1
 
-        BrightnessLighter ->
-            .lighter
+        BrightnessLight2 ->
+            .light2
 
-        BrightnessLightest ->
-            .lightest
+        BrightnessLight3 ->
+            .light3
+
+        BrightnessLight4 ->
+            .light4
 
 
 toColors : Tone -> ToneColors

@@ -261,7 +261,7 @@ renderButton renderConfig message label state =
                 :: Element.paddingXY 12 4
                 :: Events.onClick message
                 :: Element.pointer
-                :: Element.mouseOver [ Background.color <| Colors.gray.lightest ]
+                :: Element.mouseOver [ Background.color <| Colors.gray.light3 ]
                 :: (ARIA.toElementAttributes <| ARIA.roleRadio state)
     in
     Element.row rowAttrs

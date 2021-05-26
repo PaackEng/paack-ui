@@ -203,8 +203,8 @@ headerAttrs isApplied =
 
             else
                 Background.color
-                    Colors.gray.lightest
-                    :: Element.mouseOver [ Background.color Colors.primary.lightest ]
+                    Colors.gray.light3
+                    :: Element.mouseOver [ Background.color Colors.primary.light3 ]
                     :: Element.colorTransition 100
     in
     Primitives.roundedBorders
@@ -287,7 +287,7 @@ dialogHeader renderConfig discardMsg label =
     Element.row
         [ Element.paddingEach { top = 10, left = headerPadX, right = 10, bottom = 9 }
         , Element.width fill
-        , Border.color Colors.gray.lighter
+        , Border.color Colors.gray.light2
         , Border.widthEach { zeroPadding | bottom = 1 }
         ]
         [ filteredHeaderLabel label
@@ -402,11 +402,11 @@ sortAs renderConfig { fromSortersMsg, index } direction current =
             :: Element.pointer
             :: Element.width fill
             :: Element.paddingEach { top = 4, left = 12, bottom = 4, right = 8 }
-            :: Border.color Colors.gray.lighter
+            :: Border.color Colors.gray.light2
             :: Border.widthEach { zeroPadding | bottom = 1 }
-            :: Element.mouseOver [ Background.color Colors.gray.lightest ]
+            :: Element.mouseOver [ Background.color Colors.gray.light3 ]
             :: ARIA.toElementAttributes ARIA.roleButton
-            |> prependIf selected (Background.color <| Colors.primary.lightest)
+            |> prependIf selected (Background.color <| Colors.primary.light3)
         )
         [ Text.caption content
             |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
