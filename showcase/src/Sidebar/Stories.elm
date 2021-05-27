@@ -1,6 +1,6 @@
 module Sidebar.Stories exposing (stories, update)
 
-import Element exposing (Element, height, px, width)
+import Element exposing (Element, fill, height, px, width)
 import Html
 import Html.Attributes exposing (src)
 import Model exposing (Model)
@@ -9,6 +9,7 @@ import PluginOptions exposing (defaultWithMenu)
 import Return exposing (Return)
 import Sidebar.Model as SidebarModel
 import Sidebar.Msg as SidebarMsg
+import UI.Button as Button
 import UI.Icon as Icon
 import UI.Internal.Menu as Menu
 import UI.Internal.SideBar as Sidebar
@@ -65,25 +66,36 @@ nonPersistentStory renderConfig =
 
 persistentView : RenderConfig -> Model -> Element Msg
 persistentView renderConfig model =
-    Element.column [ height (px 600) ]
+    Element.column [ width fill, height (px 600) ]
         [ iconsSvgSprite
-        , Sidebar.desktopPersistent renderConfig page <| menu model
+        , Sidebar.desktopPersistent renderConfig
+            (Element.text "Example content")
+            (menu model)
         ]
+        |> storyBorder
 
 
 nonPersistentView : RenderConfig -> Model -> Element Msg
 nonPersistentView renderConfig model =
-    Element.column [ height (px 600) ]
+    Element.column [ width fill, height (px 600) ]
         [ iconsSvgSprite
-        , Sidebar.desktopNonPersistent renderConfig page <| menu model
+        , Sidebar.desktopNonPersistent renderConfig
+            (Element.column [ Element.width fill ]
+                [ Icon.sandwichMenu "Reopen menu"
+                    |> Button.fromIcon
+                    |> Button.cmd
+                        (not model.sidebarStories.expanded
+                            |> SidebarMsg.ToggleSidebar
+                            |> Msg.SidebarStoriesMsg
+                        )
+                        Button.clear
+                    |> Button.renderElement renderConfig
+                , Element.text "Example content"
+                ]
+            )
+            (menu model)
         ]
-
-
-page : Element Msg
-page =
-    storyBorder <|
-        Element.el [ width (px 800), height (px 600) ]
-            (Element.text "Example content")
+        |> storyBorder
 
 
 menu : Model -> Menu.Menu Msg
@@ -104,7 +116,7 @@ menu model =
             ]
         , actions =
             [ { labeledIcon = Icon.logout "Logout"
-              , action = Msg.SidebarStoriesMsg <| SidebarMsg.NoOp
+              , action = Msg.SidebarStoriesMsg SidebarMsg.NoOp
               }
             ]
         , logo =
