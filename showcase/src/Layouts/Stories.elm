@@ -110,7 +110,8 @@ listView renderConfig model =
             (Msg.LayoutsStoriesMsg << LayoutsMsg.Select)
             .isbn
         |> ListView.withSearchField (searchField model)
-        |> ListView.withHeader "Books"
+        |> ListView.withBadgedHeader "Books"
+            (Badge.primaryLight "NEW")
 
 
 searchField : LayoutsModel.Model -> ListView.SearchConfig Book Msg

@@ -88,7 +88,7 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
 -}
 
-import Element exposing (Element, fill)
+import Element exposing (Element, fill, shrink)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
@@ -577,9 +577,11 @@ headerView cfg opt =
                 [ Element.width fill
                 , Element.height fill
                 , Element.paddingXY 0 12
+                , Element.spacing 8
                 ]
                 [ Text.heading5 header
                     |> Text.renderElement cfg
+                    |> Element.el [ Element.width shrink ]
                 , headerBadge cfg opt
                 , dropdown cfg opt.dropdown
                 ]
