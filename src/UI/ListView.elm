@@ -314,7 +314,9 @@ withActionBar config (SelectList prop opt) =
 
 {-| Adds button to toggle a custom menu element.
 
-    ListView.withCustomExtraMenu customDropdownView
+    ListView.withCustomExtraMenu toggleMsg
+        isMenuVisible
+        menuBody
         someListView
 
 -}
@@ -611,7 +613,7 @@ dropdown cfg dropdownOptions =
                 |> Button.withSize Size.small
                 |> Button.renderElement cfg
                 |> Element.el
-                    (Element.centerX
+                    (Element.alignRight
                         :: Element.pointer
                         :: Element.alignTop
                         :: body

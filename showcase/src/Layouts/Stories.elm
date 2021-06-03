@@ -32,6 +32,9 @@ update msg model =
         LayoutsMsg.Filter text ->
             ( { model | filter = Just text }, Cmd.none )
 
+        LayoutsMsg.ToggleExtraMenu ->
+            ( { model | showExtraMenu = not <| model.showExtraMenu }, Cmd.none )
+
 
 stories : RenderConfig -> ExplorerUI
 stories cfg =
@@ -112,6 +115,9 @@ listView renderConfig model =
         |> ListView.withSearchField (searchField model)
         |> ListView.withBadgedHeader "Books"
             (Badge.primaryLight "NEW")
+        |> ListView.withCustomExtraMenu (Msg.LayoutsStoriesMsg LayoutsMsg.ToggleExtraMenu)
+            model.showExtraMenu
+            ("Hello" |> Badge.grayLight |> Badge.renderElement renderConfig)
 
 
 searchField : LayoutsModel.Model -> ListView.SearchConfig Book Msg
