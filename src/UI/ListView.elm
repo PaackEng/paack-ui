@@ -1,8 +1,9 @@
 module UI.ListView exposing
     ( ListView, selectList, simpleList
     , ToggleableConfig, ToggleableCover, toggleableList
-    , withItems, withSelect, withSelected, withDomId, withHeader
-    , SearchConfig, withSearchField, withActionBar, withCustomExtraMenu
+    , withItems, withSelect, withSelected, withDomId
+    , SearchConfig, withSearchField, withActionBar
+    , withCustomExtraMenu, withHeader, withBadgedHeader
     , withWidth
     , SelectStyle, withSelectStyle
     , renderElement
@@ -62,12 +63,13 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
 # Options
 
-@docs withItems, withSelect, withSelected, withDomId, withHeader
+@docs withItems, withSelect, withSelected, withDomId
 
 
 ## Extra elements
 
-@docs SearchConfig, withSearchField, withActionBar, withCustomExtraMenu
+@docs SearchConfig, withSearchField, withActionBar
+@docs withCustomExtraMenu, withHeader, withBadgedHeader
 
 
 ## Width
@@ -86,12 +88,13 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
 -}
 
-import Element exposing (Element, fill)
+import Element exposing (Element, fill, shrink)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
 import Element.Keyed as Keyed
+import UI.Badge as Badge exposing (Badge)
 import UI.Button as Button
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (maybeAnd, prependMaybe)
@@ -120,6 +123,7 @@ type alias Options object msg =
     , selectStyle : SelectStyle
     , containerId : Maybe String
     , header : Maybe String
+    , headerBadge : Maybe Badge
     , dropdown : Maybe (Dropdown msg)
     }
 
@@ -310,7 +314,9 @@ withActionBar config (SelectList prop opt) =
 
 {-| Adds button to toggle a custom menu element.
 
-    ListView.withCustomExtraMenu customDropdownView
+    ListView.withCustomExtraMenu toggleMsg
+        isMenuVisible
+        menuBody
         someListView
 
 -}
@@ -444,6 +450,18 @@ withHeader header (SelectList prop opt) =
     SelectList prop { opt | header = Just header }
 
 
+{-| Adds a header above the list, including a badge.
+
+    ListView.withBadgedHeader "ListView Header"
+        (Badge.primaryLight "NEW")
+        someListView
+
+-}
+withBadgedHeader : String -> Badge -> ListView object msg -> ListView object msg
+withBadgedHeader header badge (SelectList prop opt) =
+    SelectList prop { opt | header = Just header, headerBadge = Just badge }
+
+
 
 -- Render
 
@@ -561,9 +579,12 @@ headerView cfg opt =
                 [ Element.width fill
                 , Element.height fill
                 , Element.paddingXY 0 12
+                , Element.spacing 8
                 ]
                 [ Text.heading5 header
                     |> Text.renderElement cfg
+                    |> Element.el [ Element.width shrink ]
+                , headerBadge cfg opt
                 , dropdown cfg opt.dropdown
                 ]
 
@@ -592,11 +613,23 @@ dropdown cfg dropdownOptions =
                 |> Button.withSize Size.small
                 |> Button.renderElement cfg
                 |> Element.el
-                    (Element.centerX
+                    (Element.alignRight
                         :: Element.pointer
                         :: Element.alignTop
                         :: body
                     )
+
+        Nothing ->
+            Element.none
+
+
+headerBadge : RenderConfig -> Options object msg -> Element msg
+headerBadge cfg opt =
+    case opt.headerBadge of
+        Just badge ->
+            badge
+                |> Badge.renderElement cfg
+                |> Element.el [ Element.centerY ]
 
         Nothing ->
             Element.none
@@ -655,6 +688,7 @@ defaultOptions =
     , selectStyle = defaultSelectStyle
     , containerId = Nothing
     , header = Nothing
+    , headerBadge = Nothing
     , dropdown = Nothing
     }
 
