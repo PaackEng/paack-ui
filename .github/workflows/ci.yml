@@ -28,7 +28,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Don't forget to bump
-        run: bash -c "! echo 'n' | elm bump | grep update > /dev/null"
+        run: bash -c "! echo 'n' | elm bump | grep update"
 
       - uses: PaackEng/elm-validate-action@v1.1.1
         with:
