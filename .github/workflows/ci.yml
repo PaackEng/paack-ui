@@ -27,9 +27,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - name: Don't forget to bump
-        run: bash -c "! echo 'n' | yarn exec elm bump | grep update"
-
       - uses: PaackEng/elm-validate-action@v1.1.1
         with:
           elm-make-options:
@@ -39,6 +36,9 @@ jobs:
         with:
           elm-working-directory: 'showcase'
           elm-review-extra-options: --ignore-dirs '../src'
+
+      - name: Don't forget to bump
+        run: bash -c "! echo 'n' | yarn exec elm bump | grep update"
 
   tests:
     runs-on: ubuntu-latest
