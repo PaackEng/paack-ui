@@ -54,6 +54,7 @@ checkbox =
 listView : ListView
 listView =
     { search = "Buscar"
+    , selectAll = "Select All"
     }
 
 

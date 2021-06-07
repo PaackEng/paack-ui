@@ -2,7 +2,7 @@ module UI.ListView exposing
     ( ListView, selectList, simpleList
     , ToggleableConfig, ToggleableCover, toggleableList
     , withItems, withSelect, withSelected, withDomId
-    , SearchConfig, withSearchField, withActionBar
+    , SearchConfig, withSearchField, withActionBar, withSelectAllButton
     , withCustomExtraMenu, withHeader, withBadgedHeader
     , withWidth
     , SelectStyle, withSelectStyle
@@ -68,7 +68,7 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
 ## Extra elements
 
-@docs SearchConfig, withSearchField, withActionBar
+@docs SearchConfig, withSearchField, withActionBar, withSelectAllButton
 @docs withCustomExtraMenu, withHeader, withBadgedHeader
 
 
@@ -88,7 +88,7 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
 -}
 
-import Element exposing (Element, fill, shrink)
+import Element exposing (Element, fill, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
@@ -109,8 +109,9 @@ import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
 import UI.TextField as TextField
+import UI.Utils.ARIA as ARIA
 import UI.Utils.Action as Action
-import UI.Utils.Element exposing (zeroPadding)
+import UI.Utils.Element as Utils exposing (zeroPadding)
 
 
 type alias Options object msg =
@@ -125,6 +126,7 @@ type alias Options object msg =
     , header : Maybe String
     , headerBadge : Maybe Badge
     , dropdown : Maybe (Dropdown msg)
+    , selectAll : Maybe (SelectAll msg)
     }
 
 
@@ -328,6 +330,18 @@ withCustomExtraMenu toggleMsg isEnabled body (SelectList prop opt) =
         }
 
 
+{-| Adds a button to select every entry.
+
+    ListView.withSelectAllButton Msg.SelectAll
+        isEverythingSelected
+        someListView
+
+-}
+withSelectAllButton : (Bool -> msg) -> Bool -> ListView object msg -> ListView object msg
+withSelectAllButton message state (SelectList prop opt) =
+    SelectList prop { opt | selectAll = Just <| SelectAll state message }
+
+
 {-| Replaces the component's list of elements.
 
     ListView.withItems
@@ -466,6 +480,12 @@ withBadgedHeader header badge (SelectList prop opt) =
 -- Render
 
 
+type alias SelectAll msg =
+    { state : Bool
+    , message : Bool -> msg
+    }
+
+
 {-| End of the builder's life.
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
@@ -486,6 +506,7 @@ renderElement cfg (SelectList prop opt) =
         , Element.scrollbarY
         ]
         [ searchFieldView cfg opt
+        , selectAllButtonView cfg opt.selectAll
         , opt.items
             |> filterOptions opt.searchField
             |> List.map
@@ -569,6 +590,89 @@ searchFieldView cfg opt =
 
         Nothing ->
             Element.none
+
+
+selectAllButtonView : RenderConfig -> Maybe (SelectAll msg) -> Element msg
+selectAllButtonView cfg selectAll =
+    case selectAll of
+        Just { state, message } ->
+            let
+                color =
+                    if state then
+                        Palette.primaryDark1
+
+                    else
+                        Palette.primary
+
+                checkAttrs =
+                    Element.width (px 12)
+                        :: Element.height (px 12)
+                        :: Border.color (Palette.toElementColor color)
+                        :: Border.width 1
+                        :: Border.rounded 4
+                        :: (ARIA.toElementAttributes <| ARIA.rolePresentation)
+
+                checkIcon =
+                    if state then
+                        Element.el
+                            (Background.color (Palette.toElementColor color) :: checkAttrs)
+                            (selectAllCheck cfg)
+
+                    else
+                        Element.el
+                            checkAttrs
+                            Element.none
+
+                rowAttrs =
+                    Element.spacing 6
+                        :: Element.paddingXY 8 6
+                        :: Utils.onIndividualClick (message (not state))
+                        :: Element.pointer
+                        :: Background.color
+                            (Palette.toElementColor <|
+                                if state then
+                                    Palette.grayLight2
+
+                                else
+                                    Palette.grayLight3
+                            )
+                        :: Element.mouseOver
+                            [ Background.color <| Palette.toElementColor Palette.grayLight2 ]
+                        :: Border.rounded 4
+                        :: (ARIA.toElementAttributes <| ARIA.roleRadio state)
+                        ++ Utils.colorTransition 100
+            in
+            Element.row rowAttrs
+                [ Text.caption (cfg |> localeTerms >> .listView >> .selectAll)
+                    |> Text.withColor color
+                    |> Text.renderElement cfg
+                , checkIcon
+                ]
+                |> Element.el
+                    [ Element.paddingEach
+                        { top = 0, bottom = 12, left = 12, right = 12 }
+                    ]
+
+        Nothing ->
+            Element.none
+
+
+selectAllCheck : RenderConfig -> Element msg
+selectAllCheck cfg =
+    (cfg |> localeTerms >> .listView >> .selectAll)
+        |> Icon.check
+        |> Icon.withCustomSize 10
+        |> Icon.withColor
+            (Palette.color
+                Palette.tonePrimary
+                Palette.brightnessMiddle
+                |> Palette.setContrasting True
+            )
+        |> Icon.renderElement cfg
+        |> Element.el
+            [ Element.centerY
+            , Element.centerX
+            ]
 
 
 headerView : RenderConfig -> Options object msg -> Element msg
@@ -690,6 +794,7 @@ defaultOptions =
     , header = Nothing
     , headerBadge = Nothing
     , dropdown = Nothing
+    , selectAll = Nothing
     }
 
 

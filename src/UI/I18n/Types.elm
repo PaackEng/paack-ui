@@ -45,6 +45,7 @@ type alias Checkbox =
 
 type alias ListView =
     { search : String
+    , selectAll : String
     }
 
 

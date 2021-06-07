@@ -27,7 +27,8 @@
         "toggle": "Basculer"
     },
     "listView": {
-        "search": "Rechercher"
+        "search": "Rechercher",
+        "selectAll": "Select All"
     },
     "radio": {
         "select": "Sélectionner l'élément"
