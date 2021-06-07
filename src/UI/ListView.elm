@@ -687,13 +687,22 @@ headerView cfg opt =
                 ]
                 [ Text.heading5 header
                     |> Text.renderElement cfg
-                    |> Element.el [ Element.width shrink ]
+                    |> Element.el [ Element.width <| headerWidth opt ]
                 , headerBadge cfg opt
                 , dropdown cfg opt.dropdown
                 ]
 
         Nothing ->
             Element.none
+
+headerWidth : Options object msg -> Element.Length
+headerWidth opt =
+    case opt.headerBadge of
+        Just _ ->
+            shrink
+
+        Nothing ->
+            fill
 
 
 dropdown : RenderConfig -> Maybe (Dropdown msg) -> Element msg
