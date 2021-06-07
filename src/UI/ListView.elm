@@ -111,7 +111,7 @@ import UI.Text as Text
 import UI.TextField as TextField
 import UI.Utils.ARIA as ARIA
 import UI.Utils.Action as Action
-import UI.Utils.Element as Element exposing (zeroPadding)
+import UI.Utils.Element as Utils exposing (zeroPadding)
 
 
 type alias Options object msg =
@@ -619,7 +619,7 @@ selectAllButtonView cfg selectAll =
                 rowAttrs =
                     Element.spacing 6
                         :: Element.paddingXY 8 6
-                        :: Element.onIndividualClick (message (not state))
+                        :: Utils.onIndividualClick (message (not state))
                         :: Element.pointer
                         :: Background.color
                             (Palette.toElementColor <|
@@ -633,7 +633,7 @@ selectAllButtonView cfg selectAll =
                             [ Background.color <| Palette.toElementColor Palette.grayLight2 ]
                         :: Border.rounded 4
                         :: (ARIA.toElementAttributes <| ARIA.roleRadio state)
-                        ++ Element.colorTransition 100
+                        ++ Utils.colorTransition 100
             in
             Element.row rowAttrs
                 [ Text.caption (cfg |> localeTerms >> .listView >> .selectAll)
