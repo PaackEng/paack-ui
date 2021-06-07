@@ -597,10 +597,17 @@ selectAllButtonView cfg selectAll =
     case selectAll of
         Just { state, message } ->
             let
+                color =
+                    if state then
+                        Palette.primaryDark1
+
+                    else
+                        Palette.primary
+
                 checkAttrs =
                     Element.width (px 12)
                         :: Element.height (px 12)
-                        :: Border.color Colors.primary.middle
+                        :: Border.color (Palette.toElementColor color)
                         :: Border.width 1
                         :: Border.rounded 4
                         :: (ARIA.toElementAttributes <| ARIA.rolePresentation)
@@ -608,7 +615,7 @@ selectAllButtonView cfg selectAll =
                 checkIcon =
                     if state then
                         Element.el
-                            (Background.color Colors.primary.middle :: checkAttrs)
+                            (Background.color (Palette.toElementColor color) :: checkAttrs)
                             (selectAllCheck cfg)
 
                     else
@@ -637,13 +644,7 @@ selectAllButtonView cfg selectAll =
             in
             Element.row rowAttrs
                 [ Text.caption (cfg |> localeTerms >> .listView >> .selectAll)
-                    |> Text.withColor
-                        (if state then
-                            Palette.primaryDark1
-
-                         else
-                            Palette.primary
-                        )
+                    |> Text.withColor color
                     |> Text.renderElement cfg
                 , checkIcon
                 ]
