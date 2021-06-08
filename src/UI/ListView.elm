@@ -695,6 +695,7 @@ headerView cfg opt =
         Nothing ->
             Element.none
 
+
 headerWidth : Options object msg -> Element.Length
 headerWidth opt =
     case opt.headerBadge of
