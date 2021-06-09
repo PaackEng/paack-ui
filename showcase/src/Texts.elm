@@ -3,7 +3,7 @@ module Texts exposing (stories)
 import Element exposing (Element)
 import Html exposing (Html)
 import PluginOptions exposing (defaultWithoutMenu)
-import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
+import UI.Palette as Palette
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Text as Text exposing (Text)
 import UIExplorer exposing (storiesOf)
