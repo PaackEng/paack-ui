@@ -66,7 +66,7 @@ styles =
     , ( Text.subtitle2, "Subtitle 2" )
     , ( Text.body1, "Body 1" )
     , ( Text.body2, "Body 2" )
-    , ( Text.caption, "Caption:" )
+    , ( Text.caption, "Caption" )
     , ( Text.overline, "OVERLINE" )
     ]
 
@@ -100,7 +100,10 @@ textsView renderConfig _ =
                 [ stylesView renderConfig "DESKTOP"
                 , stylesView mobileRenderConfig "MOBILE"
                 ]
-            , Element.column [ Element.spacing 20 ]
+            , Element.column
+                [ Element.width (Element.px 400)
+                , Element.spacing 20
+                ]
                 [ Text.heading3 "Example" |> Text.renderElement renderConfig
                 , Text.body1 "While working on the Tron: Legacy soundtrack in 2010, Daft Punk met with Casablancas in their studio through a mutual friend. The duo, who are fans of Casablancas' band The Strokes, presented him with an instrumental demo track intended for use on Daft Punk's next album. Casablancas responded favorably to the demo upon listening to it and subsequently agreed to provide accompanying vocals, forming the basis for what would become \"Instant Crush\"."
                     |> Text.renderElement renderConfig
