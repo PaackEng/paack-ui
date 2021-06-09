@@ -147,7 +147,7 @@ deskAttributes : TextSize -> List (Attribute msg)
 deskAttributes size =
     case size of
         SizeHeading1 ->
-            [ Font.size 92
+            [ Font.size 80
             , Font.letterSpacing -4.5
             , Font.semiBold
             ]
@@ -212,7 +212,7 @@ deskAttributes size =
             ]
 
         SizeOverline ->
-            [ Font.size 10
+            [ Font.size 14
             , Font.letterSpacing 2
             , Font.extraBold
             ]
@@ -291,7 +291,7 @@ mobileAttributes size =
             ]
 
         SizeOverline ->
-            [ Font.size 10
+            [ Font.size 12
             , Font.letterSpacing 2
             , Font.extraBold
             ]
