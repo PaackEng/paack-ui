@@ -147,26 +147,26 @@ deskAttributes : TextSize -> List (Attribute msg)
 deskAttributes size =
     case size of
         SizeHeading1 ->
-            [ Font.size 92
-            , Font.letterSpacing -4.5
+            [ Font.size 80
+            , Font.letterSpacing -2
             , Font.semiBold
             ]
 
         SizeHeading2 ->
             [ Font.size 64
-            , Font.letterSpacing -3
+            , Font.letterSpacing -1.6
             , Font.semiBold
             ]
 
         SizeHeading3 ->
             [ Font.size 48
-            , Font.letterSpacing -2
+            , Font.letterSpacing -1
             , Font.semiBold
             ]
 
         SizeHeading4 ->
             [ Font.size 32
-            , Font.letterSpacing -1
+            , Font.letterSpacing -0.4
             , Font.semiBold
             ]
 
@@ -177,31 +177,26 @@ deskAttributes size =
 
         SizeHeading6 ->
             [ Font.size 20
-            , Font.letterSpacing 0.15
             , Font.semiBold
             ]
 
         SizeSubtitle1 ->
             [ Font.size 16
-            , Font.letterSpacing 0.2
             , Font.medium
             ]
 
         SizeSubtitle2 ->
             [ Font.size 14
-            , Font.letterSpacing 0.25
             , Font.semiBold
             ]
 
         SizeBody1 ->
             [ Font.size 16
-            , Font.letterSpacing 0.2
             , Font.regular
             ]
 
         SizeBody2 ->
             [ Font.size 14
-            , Font.letterSpacing 0.25
             , Font.regular
             ]
 
@@ -212,7 +207,7 @@ deskAttributes size =
             ]
 
         SizeOverline ->
-            [ Font.size 10
+            [ Font.size 14
             , Font.letterSpacing 2
             , Font.extraBold
             ]
@@ -223,63 +218,59 @@ mobileAttributes size =
     case size of
         SizeHeading1 ->
             [ Font.size 56
-            , Font.letterSpacing -2
+            , Font.letterSpacing -1
             , Font.semiBold
             ]
 
         SizeHeading2 ->
             [ Font.size 48
-            , Font.letterSpacing -1.5
+            , Font.letterSpacing -1
             , Font.semiBold
             ]
 
         SizeHeading3 ->
             [ Font.size 40
-            , Font.letterSpacing -1
+            , Font.letterSpacing -0.6
             , Font.semiBold
             ]
 
         SizeHeading4 ->
             [ Font.size 32
-            , Font.letterSpacing -0.5
+            , Font.letterSpacing -0.2
             , Font.semiBold
             ]
 
         SizeHeading5 ->
             [ Font.size 24
-            , Font.letterSpacing 0
             , Font.semiBold
             ]
 
         SizeHeading6 ->
             [ Font.size 20
-            , Font.letterSpacing 0.15
             , Font.semiBold
             ]
 
         SizeSubtitle1 ->
             [ Font.size 16
-            , Font.letterSpacing 0.2
+            , Font.letterSpacing 0.1
             , Font.medium
             ]
 
         SizeSubtitle2 ->
             [ Font.size 14
-            , Font.letterSpacing 0.25
+            , Font.letterSpacing 0.2
             , Font.semiBold
             ]
 
         SizeBody1 ->
             [ Font.size 16
             , Element.spacing 8
-            , Font.letterSpacing 0.2
             , Font.regular
             ]
 
         SizeBody2 ->
             [ Font.size 14
             , Element.spacing 10
-            , Font.letterSpacing 0.25
             , Font.regular
             ]
 
@@ -291,8 +282,8 @@ mobileAttributes size =
             ]
 
         SizeOverline ->
-            [ Font.size 10
-            , Font.letterSpacing 2
+            [ Font.size 12
+            , Font.letterSpacing 1.6
             , Font.extraBold
             ]
 
@@ -301,40 +292,40 @@ lineHeight : Bool -> TextSize -> Int
 lineHeight isMobile size =
     case size of
         SizeHeading1 ->
-            ifThenElse isMobile 68 111
+            ifThenElse isMobile 64 80
 
         SizeHeading2 ->
-            ifThenElse isMobile 58 77
+            ifThenElse isMobile 58 72
 
         SizeHeading3 ->
-            ifThenElse isMobile 48 58
+            ifThenElse isMobile 48 52
 
         SizeHeading4 ->
-            40
+            38
 
         SizeHeading5 ->
-            30
+            29
 
         SizeHeading6 ->
             24
 
         SizeSubtitle1 ->
-            20
+            19
 
         SizeSubtitle2 ->
-            18
+            17
 
         SizeBody1 ->
-            24
+            23
 
         SizeBody2 ->
-            24
+            22
 
         SizeCaption ->
             16
 
         SizeOverline ->
-            12
+            ifThenElse isMobile 14 17
 
 
 oneLineHeight : Bool -> TextSize -> Attribute msg

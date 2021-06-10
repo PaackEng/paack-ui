@@ -180,7 +180,7 @@ If the app is using [`UI.NavigationContainer.navigator`](UI-NavigationContainer#
 elLayoutAttributes : RenderConfig -> List (Attribute msg)
 elLayoutAttributes _ =
     -- Why here? Accessibility settings may change fonts, backgrounds, etc...
-    [ Font.family [ Font.typeface "Inter", Font.sansSerif ] ]
+    [ Font.family [ Font.typeface "Fira Sans", Font.sansSerif ] ]
 
 
 

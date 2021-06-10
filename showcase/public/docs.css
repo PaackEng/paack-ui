@@ -7,6 +7,8 @@
   background: #282c34;
 }
 
-body, .font-open-sanshelveticaverdanasans-serif {
-    font-family: 'Inter', sans-serif !important;
+body,
+.font-open-sanshelveticaverdanasans-serif {
+  font-family: 'Fira Sans', sans-serif !important;
 }
+
