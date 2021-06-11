@@ -287,7 +287,7 @@ renderButton renderConfig label state =
         rowAttrs =
             [ Element.spacing 8
             , Element.width fill
-            , Element.paddingXY 12 4
+            , Element.padding 8
             , Element.pointer
             , Border.rounded 6
             , Element.mouseOver [ Background.color <| Colors.gray.light3 ]
