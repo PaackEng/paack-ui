@@ -56,6 +56,8 @@ import Element exposing (Attribute, Element, fill, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
+import Element.Input as Input
+import Html.Attributes as HtmlAttrs
 import UI.Icon as Icon
 import UI.Internal.Colors as Colors
 import UI.Internal.RenderConfig exposing (localeTerms)
@@ -214,40 +216,67 @@ renderElement renderConfig (RadioGroup { label, message } { selected, buttons, w
         layoutFunc =
             case direction of
                 Vertical ->
-                    Element.column
+                    Input.radio
 
                 Horizontal ->
-                    Element.row
+                    Input.radioRow
     in
-    buttons
-        |> List.map
-            (\(RadioButton id buttonLabel) ->
-                renderButton renderConfig
-                    (message id)
-                    buttonLabel
-                    (selected == Just id)
-            )
-        |> layoutFunc
-            (widthToEl width
-                :: (ARIA.toElementAttributes <| ARIA.roleRadioGroup label)
-            )
+    layoutFunc [ widthToEl width ]
+        { onChange = message
+        , selected = selected
+        , label =
+            Text.body2 label
+                |> Text.renderElement renderConfig
+                |> Input.labelAbove
+                    [ Element.paddingEach
+                        { top = 0
+                        , right = 0
+                        , bottom = 8
+                        , left = 0
+                        }
+                    ]
+        , options =
+            List.map
+                (\(RadioButton id buttonLabel) ->
+                    Input.optionWith
+                        id
+                        (renderButton renderConfig buttonLabel)
+                )
+                buttons
+        }
 
 
-renderButton : RenderConfig -> msg -> String -> Bool -> Element msg
-renderButton renderConfig message label state =
+optionStateToBool : Input.OptionState -> Bool
+optionStateToBool state =
+    case state of
+        Input.Idle ->
+            False
+
+        Input.Focused ->
+            False
+
+        Input.Selected ->
+            True
+
+
+renderButton : RenderConfig -> String -> Input.OptionState -> Element msg
+renderButton renderConfig label state =
     let
+        isSelected =
+            optionStateToBool state
+
         radioAttrs =
             Element.width (px 20)
                 :: Element.height (px 20)
                 :: Border.color Colors.primary.middle
                 :: Border.width 2
-                :: Border.rounded 8
+                :: Border.rounded 999
                 :: (ARIA.toElementAttributes <| ARIA.rolePresentation)
 
         radioIcon =
-            if state then
+            if isSelected then
                 Element.el
-                    (radioSelected :: radioAttrs)
+                    radioAttrs
                     (radioCheck renderConfig)
 
             else
@@ -256,13 +285,17 @@ renderButton renderConfig message label state =
                     Element.none
 
         rowAttrs =
-            Element.spacing 8
-                :: Element.width fill
-                :: Element.paddingXY 12 4
-                :: Events.onClick message
-                :: Element.pointer
-                :: Element.mouseOver [ Background.color <| Colors.gray.light3 ]
-                :: (ARIA.toElementAttributes <| ARIA.roleRadio state)
+            [ Element.spacing 8
+            , Element.width fill
+            , Element.paddingXY 12 4
+            , Element.pointer
+            , Border.rounded 6
+            , Element.mouseOver [ Background.color <| Colors.gray.light3 ]
+            , Element.htmlAttribute <| HtmlAttrs.tabindex 0
+            , Element.focused
+                [ Border.innerShadow { offset = ( 0, 0 ), size = 2, blur = 0, color = Colors.primary.middle }
+                ]
+            ]
     in
     Element.row rowAttrs
         [ radioIcon
@@ -271,27 +304,17 @@ renderButton renderConfig message label state =
         ]
 
 
-radioSelected : Attribute msg
-radioSelected =
-    Background.color Colors.primary.middle
-
-
 radioCheck : RenderConfig -> Element msg
 radioCheck renderConfig =
-    (renderConfig |> localeTerms >> .radio >> .select)
-        |> Icon.check
-        |> Icon.withCustomSize 14
-        |> Icon.withColor
-            (Palette.color
-                Palette.tonePrimary
-                Palette.brightnessMiddle
-                |> Palette.setContrasting True
-            )
-        |> Icon.renderElement renderConfig
-        |> Element.el
-            [ Element.centerY
-            , Element.centerX
-            ]
+    Element.el
+        [ Background.color Colors.primary.middle
+        , Element.width (px 12)
+        , Element.height (px 12)
+        , Element.centerY
+        , Element.centerX
+        , Border.rounded 999
+        ]
+        Element.none
 
 
 widthToEl : RadioWidth -> Attribute msg

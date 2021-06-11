@@ -91,8 +91,6 @@ radioGroupView direction renderConfig msg { selected } =
     Element.column
         [ Element.spacing 8 ]
         [ iconsSvgSprite
-        , Text.body2 label
-            |> Text.renderElement renderConfig
         , Radio.group
             label
             msg
