@@ -273,16 +273,20 @@ renderButton renderConfig label state =
                 :: Border.rounded 999
                 :: (ARIA.toElementAttributes <| ARIA.rolePresentation)
 
-        radioIcon =
+        radioBulletContent =
             if isSelected then
                 Element.el
-                    radioAttrs
-                    (radioCheck renderConfig)
+                    [ Background.color Colors.primary.middle
+                    , Element.width (px 12)
+                    , Element.height (px 12)
+                    , Element.centerY
+                    , Element.centerX
+                    , Border.rounded 999
+                    ]
+                    Element.none
 
             else
-                Element.el
-                    radioAttrs
-                    Element.none
+                Element.none
 
         rowAttrs =
             [ Element.spacing 8
@@ -292,29 +296,25 @@ renderButton renderConfig label state =
             , Border.rounded 6
             , Element.mouseOver [ Background.color <| Colors.gray.light3 ]
             , Element.htmlAttribute <| HtmlAttrs.tabindex 0
-            , Element.focused
-                [ Border.innerShadow { offset = ( 0, 0 ), size = 2, blur = 0, color = Colors.primary.middle }
-                ]
+            , Element.focused <|
+                if isSelected then
+                    [ Border.innerShadow
+                        { offset = ( 0, 0 )
+                        , size = 2
+                        , blur = 0
+                        , color = Colors.primary.middle
+                        }
+                    ]
+
+                else
+                    []
             ]
     in
     Element.row rowAttrs
-        [ radioIcon
+        [ Element.el radioAttrs radioBulletContent
         , Text.caption label
             |> Text.renderElement renderConfig
         ]
-
-
-radioCheck : RenderConfig -> Element msg
-radioCheck renderConfig =
-    Element.el
-        [ Background.color Colors.primary.middle
-        , Element.width (px 12)
-        , Element.height (px 12)
-        , Element.centerY
-        , Element.centerX
-        , Border.rounded 999
-        ]
-        Element.none
 
 
 widthToEl : RadioWidth -> Attribute msg
