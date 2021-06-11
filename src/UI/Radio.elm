@@ -5,6 +5,7 @@ module UI.Radio exposing
     , RadioWidth, withWidth, widthFull, widthRelative
     , Direction, horizontal, vertical, withDirection
     , renderElement
+    , sizeMD, sizeSM, withSize
     )
 
 {-| Accessible and uniform-styled implementation of a radio buttons.
@@ -93,6 +94,11 @@ type Direction
     | Horizontal
 
 
+type RadioSize
+    = SizeSM
+    | SizeMD
+
+
 type alias Properties id msg =
     { label : String
     , message : id -> msg
@@ -104,6 +110,7 @@ type alias Options id =
     , buttons : List (RadioButton id)
     , width : RadioWidth
     , direction : Direction
+    , size : RadioSize
     }
 
 
@@ -118,7 +125,12 @@ The second is the message triggered when there is a selection.
 group : String -> (id -> msg) -> RadioGroup id msg
 group label message =
     RadioGroup { label = label, message = message }
-        { selected = Nothing, buttons = [], width = WidthRelative, direction = Vertical }
+        { selected = Nothing
+        , buttons = []
+        , width = WidthRelative
+        , direction = Vertical
+        , size = SizeSM
+        }
 
 
 {-| A radio button and an element of a radio group.
@@ -176,6 +188,11 @@ withDirection direction (RadioGroup prop opt) =
     RadioGroup prop { opt | direction = direction }
 
 
+withSize : RadioSize -> RadioGroup id msg -> RadioGroup id msg
+withSize size (RadioGroup prop opt) =
+    RadioGroup prop { opt | size = size }
+
+
 {-| When displaying, arrange the buttons in horizontal lines.
 -}
 horizontal : Direction
@@ -207,13 +224,23 @@ widthRelative =
     WidthRelative
 
 
+sizeSM : RadioSize
+sizeSM =
+    SizeSM
+
+
+sizeMD : RadioSize
+sizeMD =
+    SizeMD
+
+
 {-| End of the builder's life.
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
 renderElement : RenderConfig -> RadioGroup id msg -> Element msg
-renderElement renderConfig (RadioGroup { label, message } { selected, buttons, width, direction }) =
+renderElement renderConfig (RadioGroup { label, message } { size, selected, buttons, width, direction }) =
     let
-        layoutFunc =
+        radio =
             case direction of
                 Vertical ->
                     Input.radio
@@ -221,7 +248,7 @@ renderElement renderConfig (RadioGroup { label, message } { selected, buttons, w
                 Horizontal ->
                     Input.radioRow
     in
-    layoutFunc [ widthToEl width ]
+    radio [ widthToEl width ]
         { onChange = message
         , selected = selected
         , label =
@@ -240,7 +267,7 @@ renderElement renderConfig (RadioGroup { label, message } { selected, buttons, w
                 (\(RadioButton id buttonLabel) ->
                     Input.optionWith
                         id
-                        (renderButton renderConfig buttonLabel)
+                        (renderButton renderConfig size buttonLabel)
                 )
                 buttons
         }
@@ -256,28 +283,45 @@ optionStateToBool state =
             False
 
 
-renderButton : RenderConfig -> String -> Input.OptionState -> Element msg
-renderButton renderConfig label state =
+renderButton : RenderConfig -> RadioSize -> String -> Input.OptionState -> Element msg
+renderButton renderConfig size label state =
     let
         isSelected =
             optionStateToBool state
 
+        color =
+            if isSelected then
+                Colors.primary.middle
+
+            else
+                Colors.gray.light1
+
+        ( bulletSize, borderWidth ) =
+            case size of
+                SizeSM ->
+                    ( 20, 2 )
+
+                SizeMD ->
+                    ( 28, 3 )
+
         radioAttrs =
-            [ Element.width (px 20)
-            , Element.height (px 20)
-            , Border.color Colors.primary.middle
-            , Border.width 2
+            [ Element.width (px bulletSize)
+            , Element.height (px bulletSize)
+            , Border.color color
+            , Border.width borderWidth
             , Border.rounded 999
             ]
 
         radioBulletContent =
             if isSelected then
                 Element.el
-                    [ Background.color Colors.primary.middle
-                    , Element.width (px 12)
-                    , Element.height (px 12)
+                    [ Background.color color
+                    , Element.width fill
+                    , Element.height fill
                     , Element.centerY
                     , Element.centerX
+                    , Border.color Colors.white
+                    , Border.width 2
                     , Border.rounded 999
                     ]
                     Element.none
@@ -309,7 +353,7 @@ renderButton renderConfig label state =
     in
     Element.row rowAttrs
         [ Element.el radioAttrs radioBulletContent
-        , Text.caption label
+        , Text.body1 label
             |> Text.renderElement renderConfig
         ]
 
