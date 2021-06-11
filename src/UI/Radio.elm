@@ -249,14 +249,11 @@ renderElement renderConfig (RadioGroup { label, message } { selected, buttons, w
 optionStateToBool : Input.OptionState -> Bool
 optionStateToBool state =
     case state of
-        Input.Idle ->
-            False
-
-        Input.Focused ->
-            False
-
         Input.Selected ->
             True
+
+        _ ->
+            False
 
 
 renderButton : RenderConfig -> String -> Input.OptionState -> Element msg
@@ -266,12 +263,12 @@ renderButton renderConfig label state =
             optionStateToBool state
 
         radioAttrs =
-            Element.width (px 20)
-                :: Element.height (px 20)
-                :: Border.color Colors.primary.middle
-                :: Border.width 2
-                :: Border.rounded 999
-                :: (ARIA.toElementAttributes <| ARIA.rolePresentation)
+            [ Element.width (px 20)
+            , Element.height (px 20)
+            , Border.color Colors.primary.middle
+            , Border.width 2
+            , Border.rounded 999
+            ]
 
         radioBulletContent =
             if isSelected then
