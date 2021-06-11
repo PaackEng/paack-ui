@@ -5,7 +5,7 @@ module UI.Radio exposing
     , RadioWidth, withWidth, widthFull, widthRelative
     , Direction, horizontal, vertical, withDirection
     , renderElement
-    , sizeMD, sizeSM, withSize
+    , RadioSize, sizeMD, sizeSM, withSize
     )
 
 {-| Accessible and uniform-styled implementation of a radio buttons.
@@ -94,6 +94,8 @@ type Direction
     | Horizontal
 
 
+{-| Describes the size of the radio buttons
+-}
 type RadioSize
     = SizeSM
     | SizeMD
@@ -188,6 +190,11 @@ withDirection direction (RadioGroup prop opt) =
     RadioGroup prop { opt | direction = direction }
 
 
+{-| `Radio.withSize` changes the size of the radio buttons
+
+    Radio.withSize Radio.sizeMD someRadioGroup
+
+-}
 withSize : RadioSize -> RadioGroup id msg -> RadioGroup id msg
 withSize size (RadioGroup prop opt) =
     RadioGroup prop { opt | size = size }
@@ -224,11 +231,15 @@ widthRelative =
     WidthRelative
 
 
+{-| Small radio buttons (default value)
+-}
 sizeSM : RadioSize
 sizeSM =
     SizeSM
 
 
+{-| Medium radio buttons
+-}
 sizeMD : RadioSize
 sizeMD =
     SizeMD
