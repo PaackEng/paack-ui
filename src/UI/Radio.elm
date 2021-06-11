@@ -56,16 +56,11 @@ module UI.Radio exposing
 import Element exposing (Attribute, Element, fill, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
-import Element.Events as Events
 import Element.Input as Input
 import Html.Attributes as HtmlAttrs
-import UI.Icon as Icon
 import UI.Internal.Colors as Colors
-import UI.Internal.RenderConfig exposing (localeTerms)
-import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
-import UI.Utils.ARIA as ARIA
 
 
 {-| The `RadioGroup id msg` type is used for describing the component for later rendering.

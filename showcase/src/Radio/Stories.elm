@@ -9,7 +9,6 @@ import Radio.Msg as RadioMsg
 import Return exposing (Return)
 import UI.Radio as Radio
 import UI.RenderConfig exposing (RenderConfig)
-import UI.Text as Text
 import UIExplorer exposing (storiesOf)
 import Utils
     exposing
