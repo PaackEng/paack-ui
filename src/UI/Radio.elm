@@ -302,13 +302,13 @@ renderButton renderConfig size label state =
             else
                 Colors.gray.light1
 
-        ( bulletSize, borderWidth ) =
+        ( bulletSize, padding, borderWidth ) =
             case size of
                 SizeSM ->
-                    ( 20, 2 )
+                    ( 20, 8, 2 )
 
                 SizeMD ->
-                    ( 28, 3 )
+                    ( 28, 10, 3 )
 
         radioAttrs =
             [ Element.width (px bulletSize)
@@ -336,9 +336,9 @@ renderButton renderConfig size label state =
                 Element.none
 
         rowAttrs =
-            [ Element.spacing 8
+            [ Element.spacing 10
             , Element.width fill
-            , Element.padding 8
+            , Element.padding padding
             , Element.pointer
             , Border.rounded 6
             , Element.mouseOver [ Background.color <| Colors.gray.light3 ]

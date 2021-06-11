@@ -38,6 +38,7 @@ stories renderConfig =
         "Radio"
         [ radioGroupVertical renderConfig
         , radioGroupHorizontal renderConfig
+        , radioGroupMedium renderConfig
         , united renderConfig
         ]
 
@@ -46,7 +47,7 @@ radioGroupVertical : RenderConfig -> ExplorerStory
 radioGroupVertical renderConfig =
     storyWithModel
         ( "Vertical"
-        , view Radio.vertical renderConfig
+        , view Radio.vertical Radio.sizeSM renderConfig
         , { defaultWithMenu
             | code = codeForVerticalRadioGroup
             , note = goToDocsCallToAction "Radio"
@@ -58,7 +59,19 @@ radioGroupHorizontal : RenderConfig -> ExplorerStory
 radioGroupHorizontal renderConfig =
     storyWithModel
         ( "Horizontal"
-        , view Radio.horizontal renderConfig
+        , view Radio.horizontal Radio.sizeSM renderConfig
+        , { defaultWithMenu
+            | code = codeForHorizontalRadioGroup
+            , note = goToDocsCallToAction "Radio"
+          }
+        )
+
+
+radioGroupMedium : RenderConfig -> ExplorerStory
+radioGroupMedium renderConfig =
+    storyWithModel
+        ( "Medium"
+        , view Radio.vertical Radio.sizeMD renderConfig
         , { defaultWithMenu
             | code = codeForHorizontalRadioGroup
             , note = goToDocsCallToAction "Radio"
@@ -80,13 +93,13 @@ label =
     "Pick one classic rock band"
 
 
-view : Radio.Direction -> RenderConfig -> Model -> Element Msg
-view direction renderConfig { radioStories } =
-    radioGroupView direction renderConfig (RadioMsg.Set >> Msg.RadioStoriesMsg) radioStories
+view : Radio.Direction -> Radio.RadioSize -> RenderConfig -> Model -> Element Msg
+view direction size renderConfig { radioStories } =
+    radioGroupView direction size renderConfig (RadioMsg.Set >> Msg.RadioStoriesMsg) radioStories
 
 
-radioGroupView : Radio.Direction -> RenderConfig -> (Options -> msg) -> RadioModel.Model -> Element msg
-radioGroupView direction renderConfig msg { selected } =
+radioGroupView : Radio.Direction -> Radio.RadioSize -> RenderConfig -> (Options -> msg) -> RadioModel.Model -> Element msg
+radioGroupView direction size renderConfig msg { selected } =
     Element.column
         [ Element.spacing 8 ]
         [ iconsSvgSprite
@@ -95,6 +108,7 @@ radioGroupView direction renderConfig msg { selected } =
             msg
             |> Radio.withSelected selected
             |> Radio.withDirection direction
+            |> Radio.withSize size
             |> Radio.withButtons
                 [ Radio.button RadioModel.Queen "Queen"
                 , Radio.button RadioModel.Beatles "Beatles"
@@ -110,8 +124,9 @@ unitedView : RenderConfig -> Element Msg
 unitedView renderConfig =
     Element.column
         [ Element.spacing 8 ]
-        [ radioGroupView Radio.vertical renderConfig (RadioMsg.NoOp >> Msg.RadioStoriesMsg) { selected = Nothing }
-        , radioGroupView Radio.horizontal renderConfig (RadioMsg.NoOp >> Msg.RadioStoriesMsg) { selected = Nothing }
+        [ radioGroupView Radio.vertical Radio.sizeSM renderConfig (RadioMsg.NoOp >> Msg.RadioStoriesMsg) { selected = Nothing }
+        , radioGroupView Radio.horizontal Radio.sizeSM renderConfig (RadioMsg.NoOp >> Msg.RadioStoriesMsg) { selected = Nothing }
+        , radioGroupView Radio.vertical Radio.sizeMD renderConfig (RadioMsg.NoOp >> Msg.RadioStoriesMsg) { selected = Nothing }
         ]
 
 
