@@ -26,6 +26,10 @@
     "checkbox": {
         "toggle": "Agrupar"
     },
+    "dropdown": {
+        "show": "Expandir",
+        "collapse": "Colapsar"
+    },
     "listView": {
         "search": "Buscar",
         "selectAll": "Select All"

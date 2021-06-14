@@ -6,6 +6,7 @@ import Buttons.Stories as Buttons
 import Checkboxes.Stories as Checkboxes
 import ContentPlaceholders
 import Dialog
+import Dropdown.Stories as Dropdowns
 import Html exposing (Html, div, img)
 import Html.Attributes exposing (src, style)
 import Icons
@@ -123,6 +124,7 @@ main =
             , Tabs.stories renderConfig
             , Layouts.stories renderConfig
             , ContentPlaceholders.stories renderConfig
+            , Dropdowns.stories renderConfig
             ]
         |> category
             "Complex components"
@@ -195,6 +197,10 @@ updateStories msg ({ customModel } as model) =
             Sidebar.update submsg customModel.sidebarStories
                 |> R.map (\t -> { customModel | sidebarStories = t })
                 |> finishCustomUpdate model
+
+        DropdownStoriesMsg submsg ->
+            Dropdowns.update renderConfig submsg customModel.dropdownStories
+                |> R.map (\t -> { model | customModel = { customModel | dropdownStories = t } })
 
         NoOp ->
             ( model, Cmd.none )

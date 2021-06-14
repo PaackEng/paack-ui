@@ -27,8 +27,8 @@ they fit in real applications.
 
 -}
 
-import Task
 import Browser.Dom as Dom
+import Task
 import UI.Analytics exposing (Analytics)
 
 
@@ -75,8 +75,6 @@ map =
 
                 DomFocus msg id ->
                     DomFocus (msg >> f) id
-
-
     in
     mapSideEffect >> List.map
 

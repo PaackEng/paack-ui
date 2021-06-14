@@ -51,6 +51,13 @@ checkbox =
     }
 
 
+dropdown : Dropdown
+dropdown =
+    { show = "Expandir"
+    , collapse = "Colapsar"
+    }
+
+
 listView : ListView
 listView =
     { search = "Buscar"
@@ -126,6 +133,7 @@ root =
     { filters = filters
     , paginator = paginator
     , checkbox = checkbox
+    , dropdown = dropdown
     , listView = listView
     , radio = radio
     , tables = tables
