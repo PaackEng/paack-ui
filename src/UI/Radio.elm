@@ -4,8 +4,8 @@ module UI.Radio exposing
     , withButtons, withSelected
     , RadioWidth, withWidth, widthFull, widthRelative
     , Direction, horizontal, vertical, withDirection
+    , RadioSize, sizeSM, sizeMD, withSize
     , renderElement
-    , RadioSize, sizeMD, sizeSM, withSize
     )
 
 {-| Accessible and uniform-styled implementation of a radio buttons.
@@ -45,6 +45,11 @@ module UI.Radio exposing
 # Direction
 
 @docs Direction, horizontal, vertical, withDirection
+
+
+# Size
+
+@docs RadioSize, sizeSM, sizeMD, withSize
 
 
 # Rendering
