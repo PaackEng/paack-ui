@@ -88,7 +88,7 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
 -}
 
-import Element exposing (Element, fill, px, shrink)
+import Element exposing (Element, fill, px)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
