@@ -4,6 +4,7 @@ module UI.Radio exposing
     , withButtons, withSelected
     , RadioWidth, withWidth, widthFull, widthRelative
     , Direction, horizontal, vertical, withDirection
+    , RadioSize, sizeSM, sizeMD, withSize
     , renderElement
     )
 
@@ -46,6 +47,11 @@ module UI.Radio exposing
 @docs Direction, horizontal, vertical, withDirection
 
 
+# Size
+
+@docs RadioSize, sizeSM, sizeMD, withSize
+
+
 # Rendering
 
 @docs renderElement
@@ -55,14 +61,11 @@ module UI.Radio exposing
 import Element exposing (Attribute, Element, fill, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
-import Element.Events as Events
-import UI.Icon as Icon
+import Element.Input as Input
+import Html.Attributes as HtmlAttrs
 import UI.Internal.Colors as Colors
-import UI.Internal.RenderConfig exposing (localeTerms)
-import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
-import UI.Utils.ARIA as ARIA
 
 
 {-| The `RadioGroup id msg` type is used for describing the component for later rendering.
@@ -91,6 +94,13 @@ type Direction
     | Horizontal
 
 
+{-| Describes the size of the radio buttons
+-}
+type RadioSize
+    = SizeSM
+    | SizeMD
+
+
 type alias Properties id msg =
     { label : String
     , message : id -> msg
@@ -102,6 +112,7 @@ type alias Options id =
     , buttons : List (RadioButton id)
     , width : RadioWidth
     , direction : Direction
+    , size : RadioSize
     }
 
 
@@ -116,7 +127,12 @@ The second is the message triggered when there is a selection.
 group : String -> (id -> msg) -> RadioGroup id msg
 group label message =
     RadioGroup { label = label, message = message }
-        { selected = Nothing, buttons = [], width = WidthRelative, direction = Vertical }
+        { selected = Nothing
+        , buttons = []
+        , width = WidthRelative
+        , direction = Vertical
+        , size = SizeSM
+        }
 
 
 {-| A radio button and an element of a radio group.
@@ -174,6 +190,16 @@ withDirection direction (RadioGroup prop opt) =
     RadioGroup prop { opt | direction = direction }
 
 
+{-| `Radio.withSize` changes the size of the radio buttons
+
+    Radio.withSize Radio.sizeMD someRadioGroup
+
+-}
+withSize : RadioSize -> RadioGroup id msg -> RadioGroup id msg
+withSize size (RadioGroup prop opt) =
+    RadioGroup prop { opt | size = size }
+
+
 {-| When displaying, arrange the buttons in horizontal lines.
 -}
 horizontal : Direction
@@ -205,93 +231,142 @@ widthRelative =
     WidthRelative
 
 
+{-| Small radio buttons (default value)
+-}
+sizeSM : RadioSize
+sizeSM =
+    SizeSM
+
+
+{-| Medium radio buttons
+-}
+sizeMD : RadioSize
+sizeMD =
+    SizeMD
+
+
 {-| End of the builder's life.
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
 renderElement : RenderConfig -> RadioGroup id msg -> Element msg
-renderElement renderConfig (RadioGroup { label, message } { selected, buttons, width, direction }) =
+renderElement renderConfig (RadioGroup { label, message } { size, selected, buttons, width, direction }) =
     let
-        layoutFunc =
+        radio =
             case direction of
                 Vertical ->
-                    Element.column
+                    Input.radio
 
                 Horizontal ->
-                    Element.row
+                    Input.radioRow
     in
-    buttons
-        |> List.map
-            (\(RadioButton id buttonLabel) ->
-                renderButton renderConfig
-                    (message id)
-                    buttonLabel
-                    (selected == Just id)
-            )
-        |> layoutFunc
-            (widthToEl width
-                :: (ARIA.toElementAttributes <| ARIA.roleRadioGroup label)
-            )
+    radio [ widthToEl width ]
+        { onChange = message
+        , selected = selected
+        , label =
+            Text.body2 label
+                |> Text.renderElement renderConfig
+                |> Input.labelAbove
+                    [ Element.paddingEach
+                        { top = 0
+                        , right = 0
+                        , bottom = 8
+                        , left = 0
+                        }
+                    ]
+        , options =
+            List.map
+                (\(RadioButton id buttonLabel) ->
+                    Input.optionWith
+                        id
+                        (renderButton renderConfig size buttonLabel)
+                )
+                buttons
+        }
 
 
-renderButton : RenderConfig -> msg -> String -> Bool -> Element msg
-renderButton renderConfig message label state =
+optionStateToBool : Input.OptionState -> Bool
+optionStateToBool state =
+    case state of
+        Input.Selected ->
+            True
+
+        _ ->
+            False
+
+
+renderButton : RenderConfig -> RadioSize -> String -> Input.OptionState -> Element msg
+renderButton renderConfig size label state =
     let
-        radioAttrs =
-            Element.width (px 20)
-                :: Element.height (px 20)
-                :: Border.color Colors.primary.middle
-                :: Border.width 2
-                :: Border.rounded 8
-                :: (ARIA.toElementAttributes <| ARIA.rolePresentation)
+        isSelected =
+            optionStateToBool state
 
-        radioIcon =
-            if state then
-                Element.el
-                    (radioSelected :: radioAttrs)
-                    (radioCheck renderConfig)
+        color =
+            if isSelected then
+                Colors.primary.middle
 
             else
+                Colors.gray.light1
+
+        ( bulletSize, padding, borderWidth ) =
+            case size of
+                SizeSM ->
+                    ( 20, 8, 2 )
+
+                SizeMD ->
+                    ( 28, 10, 3 )
+
+        radioAttrs =
+            [ Element.width (px bulletSize)
+            , Element.height (px bulletSize)
+            , Border.color color
+            , Border.width borderWidth
+            , Border.rounded 999
+            ]
+
+        radioBulletContent =
+            if isSelected then
                 Element.el
-                    radioAttrs
+                    [ Background.color color
+                    , Element.width fill
+                    , Element.height fill
+                    , Element.centerY
+                    , Element.centerX
+                    , Border.color Colors.white
+                    , Border.width 2
+                    , Border.rounded 999
+                    ]
                     Element.none
 
+            else
+                Element.none
+
         rowAttrs =
-            Element.spacing 8
-                :: Element.width fill
-                :: Element.paddingXY 12 4
-                :: Events.onClick message
-                :: Element.pointer
-                :: Element.mouseOver [ Background.color <| Colors.gray.light3 ]
-                :: (ARIA.toElementAttributes <| ARIA.roleRadio state)
+            [ Element.spacing 10
+            , Element.width fill
+            , Element.padding padding
+            , Element.pointer
+            , Border.rounded 6
+            , Element.mouseOver [ Background.color <| Colors.gray.light3 ]
+            , Element.htmlAttribute <| HtmlAttrs.tabindex 0
+            , Element.focused <|
+                if isSelected then
+                    [ Border.innerShadow
+                        { offset = ( 0, 0 )
+                        , size = 2
+                        , blur = 0
+                        , color = Colors.primary.middle
+                        }
+                    ]
+
+                else
+                    []
+            ]
     in
     Element.row rowAttrs
-        [ radioIcon
-        , Text.caption label
+        [ Element.el radioAttrs radioBulletContent
+        , Text.body1 label
             |> Text.renderElement renderConfig
         ]
-
-
-radioSelected : Attribute msg
-radioSelected =
-    Background.color Colors.primary.middle
-
-
-radioCheck : RenderConfig -> Element msg
-radioCheck renderConfig =
-    (renderConfig |> localeTerms >> .radio >> .select)
-        |> Icon.check
-        |> Icon.withCustomSize 14
-        |> Icon.withColor
-            (Palette.color
-                Palette.tonePrimary
-                Palette.brightnessMiddle
-                |> Palette.setContrasting True
-            )
-        |> Icon.renderElement renderConfig
-        |> Element.el
-            [ Element.centerY
-            , Element.centerX
-            ]
 
 
 widthToEl : RadioWidth -> Attribute msg
