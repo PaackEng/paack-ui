@@ -37,9 +37,6 @@ jobs:
           elm-working-directory: 'showcase'
           elm-review-extra-options: --ignore-dirs '../src'
 
-      - name: Don't forget to bump
-        run: bash -c "! echo 'n' | yarn exec elm bump | grep update"
-
   tests:
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
