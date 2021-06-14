@@ -28,6 +28,7 @@ they fit in real applications.
 -}
 
 import Task
+import Browser.Dom as Dom
 import UI.Analytics exposing (Analytics)
 
 
@@ -41,6 +42,7 @@ type alias Effect msg =
 -}
 type SideEffect msg
     = MsgToCmd msg
+    | DomFocus (Result Dom.Error () -> msg) String
     | Analytics Analytics
 
 
@@ -70,6 +72,11 @@ map =
 
                 Analytics data ->
                     Analytics data
+
+                DomFocus msg id ->
+                    DomFocus (msg >> f) id
+
+
     in
     mapSideEffect >> List.map
 
@@ -106,3 +113,6 @@ performSideEffect effect =
 
         Analytics _ ->
             Cmd.none
+
+        DomFocus msg id ->
+            Task.attempt msg (Dom.focus id)
