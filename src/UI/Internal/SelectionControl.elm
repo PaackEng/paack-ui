@@ -1,10 +1,12 @@
 module UI.Internal.SelectionControl exposing (..)
 
-import Element exposing (Attribute, fill, px)
+import Element exposing (Attribute, Element, fill, px)
 import Element.Background as Background
 import Element.Border as Border
 import Html.Attributes as HtmlAttrs
 import UI.Internal.Colors as Colors
+import UI.RenderConfig exposing (RenderConfig)
+import UI.Text as Text
 
 
 type SelectionControlSize
@@ -44,18 +46,14 @@ buttonAttributes size active =
     , Border.rounded 6
     , Element.mouseOver [ Background.color <| Colors.gray.light3 ]
     , Element.htmlAttribute <| HtmlAttrs.tabindex 0
-    , Element.focused <|
-        if active then
-            [ Border.innerShadow
-                { offset = ( 0, 0 )
-                , size = 2
-                , blur = 0
-                , color = Colors.primary.middle
-                }
-            ]
-
-        else
-            []
+    , Element.focused
+        [ Border.innerShadow
+            { offset = ( 0, 0 )
+            , size = 2
+            , blur = 0
+            , color = Colors.primary.middle
+            }
+        ]
     ]
 
 
@@ -70,3 +68,8 @@ iconAttributes size active =
     , Border.color <| iconColor active
     , Border.width border
     ]
+
+
+label : RenderConfig -> String -> Element msg
+label renderConfig =
+    Text.body1 >> Text.renderElement renderConfig

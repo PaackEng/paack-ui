@@ -32,9 +32,12 @@ module UI.Checkbox exposing
 import Element exposing (Attribute, Element, px)
 import Element.Background as Background
 import Element.Border as Border
+import Element.Input as Input
+import Html.Attributes as HtmlAttrs
 import UI.Icon as Icon
 import UI.Internal.Colors as Colors
 import UI.Internal.RenderConfig exposing (localeTerms)
+import UI.Internal.SelectionControl as SelectionControl
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
@@ -57,7 +60,12 @@ type alias Properties msg =
 
 type alias Options =
     { labelVisible : Bool
+    , size : CheckboxSize
     }
+
+
+type alias CheckboxSize =
+    SelectionControl.SelectionControlSize
 
 
 {-| Defines all the required properties for creating a checkbox.
@@ -70,7 +78,7 @@ type alias Options =
 checkbox : String -> (Bool -> msg) -> Bool -> Checkbox msg
 checkbox label message state =
     Checkbox { message = message, label = label, state = state }
-        { labelVisible = True }
+        { labelVisible = True, size = SelectionControl.SizeSM }
 
 
 {-| Show or hide the checkbox's label.
@@ -83,11 +91,16 @@ withLabelVisible bool (Checkbox prop opt) =
     Checkbox prop { opt | labelVisible = bool }
 
 
+withSize : CheckboxSize -> Checkbox msg -> Checkbox msg
+withSize size (Checkbox prop opt) =
+    Checkbox prop { opt | size = size }
+
+
 {-| End of the builder's life.
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
-renderElement : RenderConfig -> Checkbox msg -> Element msg
-renderElement renderConfig (Checkbox { message, label, state } { labelVisible }) =
+renderElement_ : RenderConfig -> Checkbox msg -> Element msg
+renderElement_ renderConfig (Checkbox { message, label, state } { labelVisible }) =
     let
         boxAttrs =
             Element.width (px 20)
@@ -107,7 +120,7 @@ renderElement renderConfig (Checkbox { message, label, state } { labelVisible })
         boxIcon =
             if state then
                 Element.el
-                    (boxSelected :: boxAttrs)
+                    (Background.color Colors.primary.middle :: boxAttrs)
                     (boxCheck renderConfig)
 
             else
@@ -126,9 +139,43 @@ renderElement renderConfig (Checkbox { message, label, state } { labelVisible })
         boxIcon
 
 
-boxSelected : Attribute msg
-boxSelected =
-    Background.color Colors.primary.middle
+{-| End of the builder's life.
+The result of this function is a ready-to-insert Elm UI's Element.
+-}
+renderElement : RenderConfig -> Checkbox msg -> Element msg
+renderElement renderConfig (Checkbox { message, label, state } { size }) =
+    let
+        { icon, border } =
+            SelectionControl.sizes size
+
+        boxAttrs =
+            [ Element.width (px icon)
+            , Element.height (px icon)
+            , Border.color <| SelectionControl.iconColor state
+            , Border.width border
+            , Border.rounded 6
+            , Element.onIndividualClick (message (not state))
+            , Element.pointer
+            ]
+
+        boxIcon _ =
+            if state then
+                Element.el
+                    (Background.color Colors.primary.middle :: boxAttrs)
+                    (boxCheck renderConfig)
+
+            else
+                Element.el
+                    boxAttrs
+                    Element.none
+    in
+    Input.checkbox
+        (SelectionControl.buttonAttributes size state)
+        { onChange = message
+        , icon = boxIcon
+        , checked = state
+        , label = Input.labelRight [ Element.width Element.fill ] (SelectionControl.label renderConfig label)
+        }
 
 
 boxCheck : RenderConfig -> Element msg
