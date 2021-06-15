@@ -41,9 +41,10 @@ import Element.Input as Input
 import UI.Icon as Icon
 import UI.Internal.Colors as Colors
 import UI.Internal.RenderConfig exposing (localeTerms)
-import UI.Internal.SelectionControl as SelectionControl
+import UI.Internal.SelectionControl as SelectionControl exposing (SelectionControlSize(..))
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
+import UI.Text as Text
 import UI.Utils.Element as Element
 
 
@@ -149,11 +150,26 @@ renderElement renderConfig (Checkbox { message, label, state } { labelVisible, s
                     boxAttrs
                     Element.none
 
+        text =
+            case size of
+                SizeSM ->
+                    Text.body2
+
+                SizeMD ->
+                    Text.body1
+
         labelElement =
             if labelVisible then
                 Input.labelRight
-                    [ Element.width Element.fill ]
-                    (SelectionControl.label renderConfig label)
+                    [ Element.width Element.fill
+                    , Element.paddingEach
+                        { top = 4
+                        , bottom = 0
+                        , right = 0
+                        , left = 0
+                        }
+                    ]
+                    (text label |> Text.renderElement renderConfig)
 
             else
                 Input.labelHidden label

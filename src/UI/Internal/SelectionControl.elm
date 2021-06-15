@@ -1,6 +1,6 @@
 module UI.Internal.SelectionControl exposing (..)
 
-import Element exposing (Attribute, Element, fill, px)
+import Element exposing (Attribute, Element, fill, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
 import Html.Attributes as HtmlAttrs
@@ -40,7 +40,7 @@ sizes size =
 buttonAttributes : SelectionControlSize -> Bool -> List (Element.Attribute msg)
 buttonAttributes size active =
     [ Element.spacing 10
-    , Element.width fill
+    , Element.width shrink
     , Element.padding <| .padding <| sizes size
     , Element.pointer
     , Border.rounded 6

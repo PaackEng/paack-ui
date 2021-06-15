@@ -96,6 +96,7 @@ import Element.Font as Font
 import Element.Keyed as Keyed
 import UI.Badge as Badge exposing (Badge)
 import UI.Button as Button
+import UI.Checkbox as Checkbox
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (maybeAnd, prependMaybe)
 import UI.Internal.Clickable as Clickable
@@ -596,62 +597,8 @@ selectAllButtonView : RenderConfig -> Maybe (SelectAll msg) -> Element msg
 selectAllButtonView cfg selectAll =
     case selectAll of
         Just { state, message } ->
-            let
-                color =
-                    if state then
-                        Palette.primaryDark1
-
-                    else
-                        Palette.primary
-
-                checkAttrs =
-                    Element.width (px 12)
-                        :: Element.height (px 12)
-                        :: Border.color (Palette.toElementColor color)
-                        :: Border.width 1
-                        :: Border.rounded 4
-                        :: (ARIA.toElementAttributes <| ARIA.rolePresentation)
-
-                checkIcon =
-                    if state then
-                        Element.el
-                            (Background.color (Palette.toElementColor color) :: checkAttrs)
-                            (selectAllCheck cfg)
-
-                    else
-                        Element.el
-                            checkAttrs
-                            Element.none
-
-                rowAttrs =
-                    Element.spacing 6
-                        :: Element.paddingXY 8 6
-                        :: Utils.onIndividualClick (message (not state))
-                        :: Element.pointer
-                        :: Background.color
-                            (Palette.toElementColor <|
-                                if state then
-                                    Palette.grayLight2
-
-                                else
-                                    Palette.grayLight3
-                            )
-                        :: Element.mouseOver
-                            [ Background.color <| Palette.toElementColor Palette.grayLight2 ]
-                        :: Border.rounded 4
-                        :: (ARIA.toElementAttributes <| ARIA.roleRadio state)
-                        ++ Utils.colorTransition 100
-            in
-            Element.row rowAttrs
-                [ Text.caption (cfg |> localeTerms >> .listView >> .selectAll)
-                    |> Text.withColor color
-                    |> Text.renderElement cfg
-                , checkIcon
-                ]
-                |> Element.el
-                    [ Element.paddingEach
-                        { top = 0, bottom = 12, left = 12, right = 12 }
-                    ]
+            Checkbox.checkbox (cfg |> localeTerms >> .listView >> .selectAll) message state
+                |> Checkbox.renderElement cfg
 
         Nothing ->
             Element.none
