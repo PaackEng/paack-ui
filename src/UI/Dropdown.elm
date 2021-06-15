@@ -44,7 +44,6 @@ import Dropdown
 import Element exposing (Attribute, Element)
 import Element.Background as Background
 import Element.Border as Border
-import Element.Font as Font
 import UI.Effect as Effect exposing (Effect)
 import UI.Icon as Icon
 import UI.Internal.Colors as Colors
@@ -261,21 +260,17 @@ getConfig cfg ((Dropdown prop opt) as dropdown) =
                 , selectionFromModel = always opt.selected
                 , dropdownMsg = Msg >> prop.dropdownMsg
                 , onSelectMsg = prop.onSelectMsg
-                , itemToPrompt = itemToPrompt dropdown
+                , itemToPrompt = itemToPrompt cfg dropdown
                 , itemToElement = itemToElement cfg dropdown
                 }
                 |> customDropdown cfg dropdown
 
 
-itemToPrompt : Dropdown item msg -> item -> Element msg
-itemToPrompt (Dropdown _ opts) item =
-    Element.text (opts.itemToText item)
-        |> List.singleton
-        |> Element.paragraph
-            [ Font.size 14
-            , Font.medium
-            , Font.color <| Palette.toElementColor Palette.primary
-            ]
+itemToPrompt : RenderConfig -> Dropdown item msg -> item -> Element msg
+itemToPrompt cfg (Dropdown _ opts) item =
+    Text.subtitle2 (opts.itemToText item)
+        |> Text.withColor Palette.primary
+        |> Text.renderElement cfg
 
 
 itemToElement : RenderConfig -> Dropdown item msg -> Bool -> Bool -> item -> Element msg
