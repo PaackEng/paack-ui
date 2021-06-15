@@ -54,6 +54,8 @@ import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 
 
+{-| The `Dropdown item msg` type is used for describing the component for later rendering.
+-}
 type Dropdown item msg
     = Dropdown (Properties item msg) (Options item)
 
@@ -74,6 +76,8 @@ type alias Options item =
     }
 
 
+{-| Keep this one in your Model, it holds the dropdown's current state.
+-}
 type State item
     = State (InternalState item)
 
@@ -327,7 +331,7 @@ selectAttrs (Dropdown prop _) =
         :: Border.width 1
         :: Border.color (Palette.toElementColor Palette.grayLight2)
         :: Border.rounded 6
-        :: Background.color (Palette.toElementColor Palette.grayLight3)
+        :: Background.color (Palette.toElementColor Palette.grayLight4)
         :: (case prop.dropdownType of
                 Basic ->
                     [ Element.pointer ]

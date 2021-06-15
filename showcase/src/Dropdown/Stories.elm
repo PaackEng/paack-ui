@@ -3,9 +3,8 @@ module Dropdown.Stories exposing (stories, update)
 import Dropdown.Model as Dropdown
 import Dropdown.Msg exposing (Msg(..))
 import Element exposing (Element)
-import Model exposing (Model)
 import Msg as RootMsg
-import PluginOptions exposing (PluginOptions, defaultWithMenu, defaultWithoutMenu)
+import PluginOptions exposing (defaultWithoutMenu)
 import Return exposing (Return)
 import Tables.Book exposing (Book, books)
 import UI.Dropdown as Dropdown exposing (Dropdown)
@@ -19,7 +18,6 @@ import Utils
         , goToDocsCallToAction
         , iconsSvgSprite
         , prettifyElmCode
-        , story
         , storyWithModel
         )
 
@@ -32,7 +30,7 @@ update cfg msg model =
                 ( state, effect ) =
                     Dropdown.update cfg
                         subMsg
-                        (defaultDropdownView cfg model)
+                        (defaultDropdownView model)
             in
             ( { model | dropdownState = state }
             , Effect.perform effect
@@ -62,7 +60,7 @@ basicDropdownStory cfg =
     storyWithModel
         ( "Default"
         , \{ dropdownStories } ->
-            defaultDropdownView cfg dropdownStories
+            defaultDropdownView dropdownStories
                 |> Dropdown.renderElement cfg
                 |> withIconSpreadsheet
         , { defaultWithoutMenu
@@ -72,8 +70,8 @@ basicDropdownStory cfg =
         )
 
 
-defaultDropdownView : RenderConfig -> Dropdown.Model -> Dropdown Book RootMsg.Msg
-defaultDropdownView renderConfig model =
+defaultDropdownView : Dropdown.Model -> Dropdown Book RootMsg.Msg
+defaultDropdownView model =
     Dropdown.basic
         { dropdownMsg = ForDropdownMsg >> RootMsg.DropdownStoriesMsg
         , onSelectMsg = SelectMsg >> RootMsg.DropdownStoriesMsg

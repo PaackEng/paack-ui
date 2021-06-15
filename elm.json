@@ -11,6 +11,7 @@
         "UI.Button",
         "UI.Checkbox",
         "UI.ContentPlaceholder",
+        "UI.Dropdown",
         "UI.Effect",
         "UI.Icon",
         "UI.Link",
