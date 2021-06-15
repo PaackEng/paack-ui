@@ -26,6 +26,10 @@
     "checkbox": {
         "toggle": "Basculer"
     },
+    "dropdown": {
+        "show": "Elargir",
+        "collapse": "Crash"
+    },
     "listView": {
         "search": "Rechercher",
         "selectAll": "Select All"

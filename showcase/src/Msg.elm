@@ -2,6 +2,7 @@ module Msg exposing (Msg(..))
 
 import Buttons.Msg as Buttons
 import Checkboxes.Msg as Checkboxes
+import Dropdown.Msg as Dropdown
 import Layouts.Msg as Layouts
 import Paginators.Msg as Paginators
 import Radio.Msg as Radio
@@ -23,4 +24,5 @@ type Msg
     | SidebarStoriesMsg Sidebar.Msg
     | TabsStoriesMsg Tabs.Msg
     | TabMsg TabsPlugin.Msg
+    | DropdownStoriesMsg Dropdown.Msg
     | NoOp

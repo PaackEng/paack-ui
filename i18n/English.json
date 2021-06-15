@@ -26,6 +26,10 @@
     "checkbox": {
         "toggle": "Toggle"
     },
+    "dropdown": {
+        "show": "Expand",
+        "collapse": "Collapse"
+    },
     "listView": {
         "search": "Search",
         "selectAll": "Select All"

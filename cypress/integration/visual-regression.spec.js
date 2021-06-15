@@ -156,4 +156,16 @@ describe('Percy Snapshots', () => {
       cy.percySnapshot('Non-persistent Sidebar')
     })
   })
+
+  describe('Dropdown', () => {
+    it('Creates the Basic Dropdown page snapshot', () => {
+      cy.visit('/#Basics/Dropdown/Basic')
+      cy.percySnapshot('Basic dropdown')
+    })
+
+    it('Creates the Filterable Dropdown page snapshot', () => {
+      cy.visit('/#Basics/Dropdown/Filterable')
+      cy.percySnapshot('Filterable dropdown')
+    })
+  })
 })
