@@ -67,6 +67,7 @@ iconAttributes size active =
     , Element.height (px icon)
     , Border.color <| iconColor active
     , Border.width border
+    , Element.alignTop
     ]
 
 

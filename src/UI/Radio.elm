@@ -308,8 +308,6 @@ renderButton renderConfig size label state =
                     [ Background.color <| SelectionControl.iconColor isSelected
                     , Element.width fill
                     , Element.height fill
-                    , Element.centerY
-                    , Element.centerX
                     , Border.color Colors.white
                     , Border.width 2
                     , Border.rounded 999
