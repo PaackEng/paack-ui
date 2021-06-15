@@ -1,6 +1,6 @@
 module UI.Internal.SelectionControl exposing (..)
 
-import Element exposing (Attribute, Element, fill, px, shrink)
+import Element exposing (Attribute, Element, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
 import Html.Attributes as HtmlAttrs
@@ -37,8 +37,8 @@ sizes size =
             Sizes 28 10 3
 
 
-buttonAttributes : SelectionControlSize -> Bool -> List (Element.Attribute msg)
-buttonAttributes size active =
+buttonAttributes : SelectionControlSize -> List (Element.Attribute msg)
+buttonAttributes size =
     [ Element.spacing 10
     , Element.width shrink
     , Element.padding <| .padding <| sizes size
@@ -69,8 +69,3 @@ iconAttributes size active =
     , Border.width border
     , Element.alignTop
     ]
-
-
-label : RenderConfig -> String -> Element msg
-label renderConfig =
-    Text.body1 >> Text.renderElement renderConfig

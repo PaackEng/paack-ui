@@ -163,7 +163,7 @@ renderElement renderConfig (Checkbox { message, label, state } { labelVisible, s
                 Input.labelRight
                     [ Element.width Element.fill
                     , Element.paddingEach
-                        { top = 4
+                        { top = 3
                         , bottom = 0
                         , right = 0
                         , left = 0
@@ -175,7 +175,7 @@ renderElement renderConfig (Checkbox { message, label, state } { labelVisible, s
                 Input.labelHidden label
     in
     Input.checkbox
-        (SelectionControl.buttonAttributes size state)
+        (SelectionControl.buttonAttributes size)
         { onChange = message
         , icon = boxIcon
         , checked = state

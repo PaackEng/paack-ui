@@ -317,9 +317,9 @@ renderButton renderConfig size label state =
             else
                 Element.none
     in
-    Element.row (SelectionControl.buttonAttributes size isSelected)
+    Element.row (SelectionControl.buttonAttributes size)
         [ Element.el radioAttrs radioBulletContent
-        , SelectionControl.label renderConfig label
+        , Text.body1 label |> Text.renderElement renderConfig
         ]
 
 
