@@ -211,7 +211,7 @@ defaultOptions =
     }
 
 
-{-| Replaces the component's placeholder text.
+{-| Changes the component's placeholder text.
 
     Dropdown.withPlaceholder "Choose a book"
         someDropdown
@@ -222,7 +222,7 @@ withPlaceholder placeholder (Dropdown prop opt) =
     Dropdown prop { opt | placeholder = Just placeholder }
 
 
-{-| Replaces the filterable component's placeholder text.
+{-| Changes the filterable component's placeholder text.
 
     Dropdown.withPlaceholder "Choose a book"
         someDropdown
@@ -233,7 +233,7 @@ withFilterPlaceholder placeholder (Dropdown prop opt) =
     Dropdown prop { opt | filterPlaceholder = Just placeholder }
 
 
-{-| Replaces the component's list of elements.
+{-| Changes the component's list of elements.
 
     Dropdown.withItems
         [ { id = 0, name = "Entry A" }
@@ -258,7 +258,7 @@ withSelected selected (Dropdown prop opt) =
     Dropdown prop { opt | selected = selected }
 
 
-{-| Replaces the way elements are formatted.
+{-| Changes the way elements are formatted.
 
     Dropdown.withItemToText .name
         someDropdown
