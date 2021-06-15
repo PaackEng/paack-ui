@@ -162,5 +162,10 @@ describe('Percy Snapshots', () => {
       cy.visit('/#Basics/Dropdown/Basic')
       cy.percySnapshot('Basic dropdown')
     })
+
+    it('Creates the Filterable Dropdown page snapshot', () => {
+      cy.visit('/#Basics/Dropdown/Filterable')
+      cy.percySnapshot('Filterable dropdown')
+    })
   })
 })
