@@ -1,8 +1,8 @@
 module UI.Checkbox exposing
     ( Checkbox, checkbox
     , withLabelVisible
+    , CheckboxSize, withSize, sizeSM, sizeMD
     , renderElement
-    , withSize
     )
 
 {-| Accessible and uniform-styled implementation of a checkbox.
@@ -22,6 +22,11 @@ module UI.Checkbox exposing
 # Label
 
 @docs withLabelVisible
+
+
+# Size
+
+@docs CheckboxSize, withSize, sizeSM, sizeMD
 
 
 # Rendering
@@ -62,8 +67,24 @@ type alias Options =
     }
 
 
+{-| The different sizes the Checkbox can take
+-}
 type alias CheckboxSize =
     SelectionControl.SelectionControlSize
+
+
+{-| Small-sized Checkbox
+-}
+sizeSM : CheckboxSize
+sizeSM =
+    SelectionControl.SizeSM
+
+
+{-| Medium-sized Checkbox
+-}
+sizeMD : CheckboxSize
+sizeMD =
+    SelectionControl.SizeMD
 
 
 {-| Defines all the required properties for creating a checkbox.
@@ -89,6 +110,11 @@ withLabelVisible bool (Checkbox prop opt) =
     Checkbox prop { opt | labelVisible = bool }
 
 
+{-| `Checkbox.withSize` changes the size of the Checkbox
+
+    Checkbox.withSize Checkbox.sizeMD someCheckbox
+
+-}
 withSize : CheckboxSize -> Checkbox msg -> Checkbox msg
 withSize size (Checkbox prop opt) =
     Checkbox prop { opt | size = size }
