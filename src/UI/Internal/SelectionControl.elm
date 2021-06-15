@@ -1,12 +1,10 @@
 module UI.Internal.SelectionControl exposing (..)
 
-import Element exposing (Attribute, Element, px, shrink)
+import Element exposing (Attribute, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
 import Html.Attributes as HtmlAttrs
 import UI.Internal.Colors as Colors
-import UI.RenderConfig exposing (RenderConfig)
-import UI.Text as Text
 
 
 type SelectionControlSize

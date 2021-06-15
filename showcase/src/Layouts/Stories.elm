@@ -36,7 +36,7 @@ update msg model =
             ( { model | showExtraMenu = not <| model.showExtraMenu }, Cmd.none )
 
         LayoutsMsg.SelectAll selected ->
-            ( model, Cmd.none )
+            ( { model | selectAll = selected }, Cmd.none )
 
 
 stories : RenderConfig -> ExplorerUI
@@ -118,7 +118,7 @@ listView renderConfig model =
         |> ListView.withSearchField (searchField model)
         |> ListView.withBadgedHeader "Books"
             (Badge.primaryLight "NEW")
-        |> ListView.withSelectAllButton (Msg.LayoutsStoriesMsg << LayoutsMsg.SelectAll) True
+        |> ListView.withSelectAllButton (Msg.LayoutsStoriesMsg << LayoutsMsg.SelectAll) model.selectAll
         |> ListView.withCustomExtraMenu (Msg.LayoutsStoriesMsg LayoutsMsg.ToggleExtraMenu)
             model.showExtraMenu
             ("Hello" |> Badge.grayLight |> Badge.renderElement renderConfig)

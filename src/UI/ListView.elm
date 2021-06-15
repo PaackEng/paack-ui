@@ -88,7 +88,7 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
 -}
 
-import Element exposing (Element, fill, px)
+import Element exposing (Element, fill)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
@@ -110,9 +110,8 @@ import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
 import UI.TextField as TextField
-import UI.Utils.ARIA as ARIA
 import UI.Utils.Action as Action
-import UI.Utils.Element as Utils exposing (zeroPadding)
+import UI.Utils.Element exposing (zeroPadding)
 
 
 type alias Options object msg =
@@ -602,24 +601,6 @@ selectAllButtonView cfg selectAll =
 
         Nothing ->
             Element.none
-
-
-selectAllCheck : RenderConfig -> Element msg
-selectAllCheck cfg =
-    (cfg |> localeTerms >> .listView >> .selectAll)
-        |> Icon.check
-        |> Icon.withCustomSize 10
-        |> Icon.withColor
-            (Palette.color
-                Palette.tonePrimary
-                Palette.brightnessMiddle
-                |> Palette.setContrasting True
-            )
-        |> Icon.renderElement cfg
-        |> Element.el
-            [ Element.centerY
-            , Element.centerX
-            ]
 
 
 headerView : RenderConfig -> Options object msg -> Element msg
