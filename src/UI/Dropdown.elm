@@ -1,9 +1,8 @@
 module UI.Dropdown exposing
-    ( Dropdown, BasicConfig, basic
+    ( Dropdown, BasicConfig, basic, filterable
     , State, Msg, init, update
     , withPlaceholder, withFilterPlaceholder, withItems, withSelected, withItemToText
     , renderElement
-    , filterable
     )
 
 {-| Accessible and uniform-styled implementation of a dropdown menu.
@@ -22,7 +21,7 @@ module UI.Dropdown exposing
 
 # Dropdown
 
-@docs Dropdown, BasicConfig, basic
+@docs Dropdown, BasicConfig, basic, filterable
 
 
 ## State
