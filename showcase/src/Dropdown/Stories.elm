@@ -30,7 +30,7 @@ update cfg msg model =
                 ( state, effect ) =
                     Dropdown.update cfg
                         subMsg
-                        (defaultDropdownView model)
+                        (basicDropdownView model)
             in
             ( { model | dropdownState = state }
             , Effect.perform effect
@@ -58,9 +58,9 @@ withIconSpreadsheet element =
 basicDropdownStory : RenderConfig -> ExplorerStory
 basicDropdownStory cfg =
     storyWithModel
-        ( "Default"
+        ( "Basic"
         , \{ dropdownStories } ->
-            defaultDropdownView dropdownStories
+            basicDropdownView dropdownStories
                 |> Dropdown.renderElement cfg
                 |> withIconSpreadsheet
         , { defaultWithoutMenu
@@ -70,8 +70,8 @@ basicDropdownStory cfg =
         )
 
 
-defaultDropdownView : Dropdown.Model -> Dropdown Book RootMsg.Msg
-defaultDropdownView model =
+basicDropdownView : Dropdown.Model -> Dropdown Book RootMsg.Msg
+basicDropdownView model =
     Dropdown.basic
         { dropdownMsg = ForDropdownMsg >> RootMsg.DropdownStoriesMsg
         , onSelectMsg = SelectMsg >> RootMsg.DropdownStoriesMsg
