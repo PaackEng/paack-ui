@@ -4,7 +4,7 @@ import Dropdown.Model as Dropdown
 import Dropdown.Msg exposing (Msg(..))
 import Element exposing (Element)
 import Msg as RootMsg
-import PluginOptions exposing (defaultWithoutMenu)
+import PluginOptions exposing (defaultWithMenu)
 import Return exposing (Return)
 import Tables.Book exposing (Book, books)
 import UI.Dropdown as Dropdown exposing (Dropdown)
@@ -44,6 +44,7 @@ stories : RenderConfig -> ExplorerUI
 stories cfg =
     storiesOf "Dropdown"
         [ basicDropdownStory cfg
+        , filterableDropdownStory cfg
         ]
 
 
@@ -63,8 +64,8 @@ basicDropdownStory cfg =
             basicDropdownView dropdownStories
                 |> Dropdown.renderElement cfg
                 |> withIconSpreadsheet
-        , { defaultWithoutMenu
-            | code = prettifyElmCode defaultDropdownCode
+        , { defaultWithMenu
+            | code = prettifyElmCode basicDropdownCode
             , note = goToDocsCallToAction "Dropdown"
           }
         )
@@ -83,10 +84,54 @@ basicDropdownView model =
         |> Dropdown.withItemToText .title
 
 
-defaultDropdownCode : String
-defaultDropdownCode =
+basicDropdownCode : String
+basicDropdownCode =
     """
 Dropdown.basic
+    { dropdownMsg = ForDropdownMsg >> RootMsg.DropdownStoriesMsg
+    , onSelectMsg = SelectMsg >> RootMsg.DropdownStoriesMsg
+    , state = model.dropdownState
+    }
+    |> Dropdown.withPlaceholder "Choose a book"
+    |> Dropdown.withItems books
+    |> Dropdown.withSelected model.selectedBook
+    |> Dropdown.withItemToText .title
+    |> Dropdown.renderElement renderConfig
+    """
+
+
+filterableDropdownStory : RenderConfig -> ExplorerStory
+filterableDropdownStory cfg =
+    storyWithModel
+        ( "Filterable"
+        , \{ dropdownStories } ->
+            filterableDropdownView dropdownStories
+                |> Dropdown.renderElement cfg
+                |> withIconSpreadsheet
+        , { defaultWithMenu
+            | code = prettifyElmCode filterableDropdownCode
+            , note = goToDocsCallToAction "Dropdown"
+          }
+        )
+
+
+filterableDropdownView : Dropdown.Model -> Dropdown Book RootMsg.Msg
+filterableDropdownView model =
+    Dropdown.filterable
+        { dropdownMsg = ForDropdownMsg >> RootMsg.DropdownStoriesMsg
+        , onSelectMsg = SelectMsg >> RootMsg.DropdownStoriesMsg
+        , state = model.dropdownState
+        }
+        |> Dropdown.withPlaceholder "Choose a book"
+        |> Dropdown.withItems books
+        |> Dropdown.withSelected model.selectedBook
+        |> Dropdown.withItemToText .title
+
+
+filterableDropdownCode : String
+filterableDropdownCode =
+    """
+Dropdown.filterable
     { dropdownMsg = ForDropdownMsg >> RootMsg.DropdownStoriesMsg
     , onSelectMsg = SelectMsg >> RootMsg.DropdownStoriesMsg
     , state = model.dropdownState

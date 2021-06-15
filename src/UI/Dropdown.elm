@@ -1,8 +1,9 @@
 module UI.Dropdown exposing
     ( Dropdown, BasicConfig, basic
     , State, Msg, init, update
-    , withPlaceholder, withItems, withSelected, withItemToText
+    , withPlaceholder, withFilterPlaceholder, withItems, withSelected, withItemToText
     , renderElement
+    , filterable
     )
 
 {-| Accessible and uniform-styled implementation of a dropdown menu.
@@ -31,7 +32,7 @@ module UI.Dropdown exposing
 
 # Options
 
-@docs withPlaceholder, withItems, withSelected, withItemToText
+@docs withPlaceholder, withFilterPlaceholder, withItems, withSelected, withItemToText
 
 
 # Rendering
@@ -70,6 +71,7 @@ type alias Properties item msg =
 
 type alias Options item =
     { placeholder : Maybe String
+    , filterPlaceholder : Maybe String
     , selected : Maybe item
     , itemToText : item -> String
     }
@@ -93,6 +95,7 @@ type Msg item
 
 type DropdownType
     = Basic
+    | Filterable
 
 
 {-| `BasicConfig` assembles the required configuration for having a simple dropdown.
@@ -177,9 +180,32 @@ basic prop =
         defaultOptions
 
 
+{-| Constructs a filterable dropdown.
+Also defines the handling function for messages, and the current dropdown's state.
+
+    filterable
+        { dropdownMsg = ForDropdownMsg
+        , onSelectMsg = GotSelectItemMsg
+        , state = model.dropdownState
+        }
+
+-}
+filterable : BasicConfig item msg -> Dropdown item msg
+filterable prop =
+    Dropdown
+        { dropdownType = Filterable
+        , items = []
+        , dropdownMsg = prop.dropdownMsg
+        , onSelectMsg = prop.onSelectMsg
+        , state = prop.state
+        }
+        defaultOptions
+
+
 defaultOptions : Options item
 defaultOptions =
     { placeholder = Nothing
+    , filterPlaceholder = Nothing
     , selected = Nothing
     , itemToText = always ""
     }
@@ -194,6 +220,17 @@ defaultOptions =
 withPlaceholder : String -> Dropdown item msg -> Dropdown item msg
 withPlaceholder placeholder (Dropdown prop opt) =
     Dropdown prop { opt | placeholder = Just placeholder }
+
+
+{-| Replaces the filterable component's placeholder text.
+
+    Dropdown.withPlaceholder "Choose a book"
+        someDropdown
+
+-}
+withFilterPlaceholder : String -> Dropdown item msg -> Dropdown item msg
+withFilterPlaceholder placeholder (Dropdown prop opt) =
+    Dropdown prop { opt | filterPlaceholder = Just placeholder }
 
 
 {-| Replaces the component's list of elements.
@@ -265,6 +302,22 @@ getConfig cfg ((Dropdown prop opt) as dropdown) =
                 }
                 |> customDropdown cfg dropdown
 
+        Filterable ->
+            Dropdown.filterable
+                { itemsFromModel = always prop.items
+                , selectionFromModel = always opt.selected
+                , dropdownMsg = Msg >> prop.dropdownMsg
+                , onSelectMsg = prop.onSelectMsg
+                , itemToPrompt = itemToPrompt cfg dropdown
+                , itemToElement = itemToElement cfg dropdown
+                , itemToText = opt.itemToText
+                }
+                |> Dropdown.withFilterPlaceholder
+                    (Maybe.withDefault (Maybe.withDefault "" opt.placeholder)
+                        opt.filterPlaceholder
+                    )
+                |> customDropdown cfg dropdown
+
 
 itemToPrompt : RenderConfig -> Dropdown item msg -> item -> Element msg
 itemToPrompt cfg (Dropdown _ opts) item =
@@ -330,6 +383,9 @@ selectAttrs (Dropdown prop _) =
         :: (case prop.dropdownType of
                 Basic ->
                     [ Element.pointer ]
+
+                Filterable ->
+                    []
            )
 
 
