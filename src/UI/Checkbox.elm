@@ -1,6 +1,6 @@
 module UI.Checkbox exposing
     ( Checkbox, checkbox
-    , withLabelVisible
+    , withHiddenLabel
     , CheckboxSize, withSize, sizeSM, sizeMD
     , renderElement
     )
@@ -10,7 +10,6 @@ module UI.Checkbox exposing
     Checkbox.checkbox "I agree with terms of service."
         Msg.ToggleThis
         True
-        |> Checkbox.withLabelVisible False
         |> Checkbox.renderElement renderConfig
 
 
@@ -21,7 +20,7 @@ module UI.Checkbox exposing
 
 # Label
 
-@docs withLabelVisible
+@docs withHiddenLabel
 
 
 # Size
@@ -100,14 +99,14 @@ checkbox label message state =
         { labelVisible = True, size = SelectionControl.SizeSM }
 
 
-{-| Show or hide the checkbox's label.
+{-| Hide the checkbox's label.
 
-    TextField.setLabelVisible True someTextField
+    Checkbox.withHiddenLabel someCheckbox
 
 -}
-withLabelVisible : Bool -> Checkbox msg -> Checkbox msg
-withLabelVisible bool (Checkbox prop opt) =
-    Checkbox prop { opt | labelVisible = bool }
+withHiddenLabel : Checkbox msg -> Checkbox msg
+withHiddenLabel (Checkbox prop opt) =
+    Checkbox prop { opt | labelVisible = False }
 
 
 {-| `Checkbox.withSize` changes the size of the Checkbox
@@ -124,7 +123,7 @@ withSize size (Checkbox prop opt) =
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
 renderElement : RenderConfig -> Checkbox msg -> Element msg
-renderElement renderConfig (Checkbox { message, label, state } { size }) =
+renderElement renderConfig (Checkbox { message, label, state } { labelVisible, size }) =
     let
         { icon, border } =
             SelectionControl.sizes size
@@ -149,16 +148,22 @@ renderElement renderConfig (Checkbox { message, label, state } { size }) =
                 Element.el
                     boxAttrs
                     Element.none
+
+        labelElement =
+            if labelVisible then
+                Input.labelRight
+                    [ Element.width Element.fill ]
+                    (SelectionControl.label renderConfig label)
+
+            else
+                Input.labelHidden label
     in
     Input.checkbox
         (SelectionControl.buttonAttributes size state)
         { onChange = message
         , icon = boxIcon
         , checked = state
-        , label =
-            Input.labelRight
-                [ Element.width Element.fill ]
-                (SelectionControl.label renderConfig label)
+        , label = labelElement
         }
 
 

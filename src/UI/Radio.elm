@@ -58,7 +58,7 @@ module UI.Radio exposing
 
 -}
 
-import Element exposing (Attribute, Element, fill, px, shrink)
+import Element exposing (Attribute, Element, fill, shrink)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Input as Input

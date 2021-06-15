@@ -1375,7 +1375,7 @@ selectionCell renderConfig selection item =
     item
         |> internalIsSelected selection
         |> checkbox (localeTerms renderConfig |> .tables |> .selectRow) (SelectionSet item)
-        |> Checkbox.withLabelVisible False
+        |> Checkbox.withHiddenLabel
         |> Checkbox.renderElement renderConfig
         |> Element.el
             [ Element.centerX, Element.centerY ]
