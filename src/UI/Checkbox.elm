@@ -176,9 +176,16 @@ renderElement renderConfig (Checkbox { message, label, state } options) =
 
             else
                 Input.labelHidden label
+
+        checkboxAttrs =
+            if options.labelVisible then
+                SelectionControl.buttonAttributes size
+
+            else
+                []
     in
     Input.checkbox
-        (SelectionControl.buttonAttributes size)
+        checkboxAttrs
         { onChange = message
         , icon = boxIcon
         , checked = state
