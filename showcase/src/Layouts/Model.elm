@@ -7,6 +7,7 @@ type alias Model =
     { selected : Maybe Book
     , filter : Maybe String
     , showExtraMenu : Bool
+    , selectAll : Bool
     }
 
 
@@ -15,4 +16,5 @@ initModel =
     { selected = Nothing
     , filter = Nothing
     , showExtraMenu = False
+    , selectAll = False
     }

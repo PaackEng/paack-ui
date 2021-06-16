@@ -58,12 +58,13 @@ module UI.Radio exposing
 
 -}
 
-import Element exposing (Attribute, Element, fill, px, shrink)
+import Element exposing (Attribute, Element, fill, shrink)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Input as Input
 import Html.Attributes as HtmlAttrs
 import UI.Internal.Colors as Colors
+import UI.Internal.SelectionControl as SelectionControl exposing (SelectionControlSize(..))
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 
@@ -97,8 +98,7 @@ type Direction
 {-| Describes the size of the radio buttons
 -}
 type RadioSize
-    = SizeSM
-    | SizeMD
+    = RadioSize SelectionControl.SelectionControlSize
 
 
 type alias Properties id msg =
@@ -131,7 +131,7 @@ group label message =
         , buttons = []
         , width = WidthRelative
         , direction = Vertical
-        , size = SizeSM
+        , size = RadioSize SizeSM
         }
 
 
@@ -235,14 +235,14 @@ widthRelative =
 -}
 sizeSM : RadioSize
 sizeSM =
-    SizeSM
+    RadioSize SizeSM
 
 
 {-| Medium radio buttons
 -}
 sizeMD : RadioSize
 sizeMD =
-    SizeMD
+    RadioSize SizeMD
 
 
 {-| End of the builder's life.
@@ -272,13 +272,12 @@ renderElement renderConfig (RadioGroup { label, message } { size, selected, butt
                         , bottom = 8
                         , left = 0
                         }
+                    , Element.htmlAttribute <| HtmlAttrs.tabindex -1
                     ]
         , options =
             List.map
                 (\(RadioButton id buttonLabel) ->
-                    Input.optionWith
-                        id
-                        (renderButton renderConfig size buttonLabel)
+                    Input.optionWith id (renderButton renderConfig size buttonLabel)
                 )
                 buttons
         }
@@ -295,42 +294,22 @@ optionStateToBool state =
 
 
 renderButton : RenderConfig -> RadioSize -> String -> Input.OptionState -> Element msg
-renderButton renderConfig size label state =
+renderButton renderConfig (RadioSize size) label state =
     let
         isSelected =
             optionStateToBool state
 
-        color =
-            if isSelected then
-                Colors.primary.middle
-
-            else
-                Colors.gray.light1
-
-        ( bulletSize, padding, borderWidth ) =
-            case size of
-                SizeSM ->
-                    ( 20, 8, 2 )
-
-                SizeMD ->
-                    ( 28, 10, 3 )
-
         radioAttrs =
-            [ Element.width (px bulletSize)
-            , Element.height (px bulletSize)
-            , Border.color color
-            , Border.width borderWidth
-            , Border.rounded 999
-            ]
+            Border.rounded 999
+                :: SelectionControl.iconAttributes size
+                    isSelected
 
         radioBulletContent =
             if isSelected then
                 Element.el
-                    [ Background.color color
+                    [ Background.color <| SelectionControl.iconColor isSelected
                     , Element.width fill
                     , Element.height fill
-                    , Element.centerY
-                    , Element.centerX
                     , Border.color Colors.white
                     , Border.width 2
                     , Border.rounded 999
@@ -339,33 +318,10 @@ renderButton renderConfig size label state =
 
             else
                 Element.none
-
-        rowAttrs =
-            [ Element.spacing 10
-            , Element.width fill
-            , Element.padding padding
-            , Element.pointer
-            , Border.rounded 6
-            , Element.mouseOver [ Background.color <| Colors.gray.light3 ]
-            , Element.htmlAttribute <| HtmlAttrs.tabindex 0
-            , Element.focused <|
-                if isSelected then
-                    [ Border.innerShadow
-                        { offset = ( 0, 0 )
-                        , size = 2
-                        , blur = 0
-                        , color = Colors.primary.middle
-                        }
-                    ]
-
-                else
-                    []
-            ]
     in
-    Element.row rowAttrs
+    Element.row (SelectionControl.buttonAttributes size)
         [ Element.el radioAttrs radioBulletContent
-        , Text.body1 label
-            |> Text.renderElement renderConfig
+        , Text.body1 label |> Text.renderElement renderConfig
         ]
 
 

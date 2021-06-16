@@ -7,3 +7,4 @@ type Msg
     = Select Book
     | Filter String
     | ToggleExtraMenu
+    | SelectAll Bool
