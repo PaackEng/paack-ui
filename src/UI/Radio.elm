@@ -97,8 +97,8 @@ type Direction
 
 {-| Describes the size of the radio buttons
 -}
-type alias RadioSize =
-    SelectionControl.SelectionControlSize
+type RadioSize
+    = RadioSize SelectionControl.SelectionControlSize
 
 
 type alias Properties id msg =
@@ -131,7 +131,7 @@ group label message =
         , buttons = []
         , width = WidthRelative
         , direction = Vertical
-        , size = SizeSM
+        , size = RadioSize SizeSM
         }
 
 
@@ -235,14 +235,14 @@ widthRelative =
 -}
 sizeSM : RadioSize
 sizeSM =
-    SizeSM
+    RadioSize SizeSM
 
 
 {-| Medium radio buttons
 -}
 sizeMD : RadioSize
 sizeMD =
-    SizeMD
+    RadioSize SizeMD
 
 
 {-| End of the builder's life.
@@ -294,7 +294,7 @@ optionStateToBool state =
 
 
 renderButton : RenderConfig -> RadioSize -> String -> Input.OptionState -> Element msg
-renderButton renderConfig size label state =
+renderButton renderConfig (RadioSize size) label state =
     let
         isSelected =
             optionStateToBool state

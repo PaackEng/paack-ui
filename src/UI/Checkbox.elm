@@ -69,22 +69,22 @@ type alias Options =
 
 {-| The different sizes the Checkbox can take
 -}
-type alias CheckboxSize =
-    SelectionControl.SelectionControlSize
+type CheckboxSize
+    = CheckboxSize SelectionControl.SelectionControlSize
 
 
 {-| Small-sized Checkbox
 -}
 sizeSM : CheckboxSize
 sizeSM =
-    SelectionControl.SizeSM
+    CheckboxSize SelectionControl.SizeSM
 
 
 {-| Medium-sized Checkbox
 -}
 sizeMD : CheckboxSize
 sizeMD =
-    SelectionControl.SizeMD
+    CheckboxSize SelectionControl.SizeMD
 
 
 {-| Defines all the required properties for creating a checkbox.
@@ -97,7 +97,7 @@ sizeMD =
 checkbox : String -> (Bool -> msg) -> Bool -> Checkbox msg
 checkbox label message state =
     Checkbox { message = message, label = label, state = state }
-        { labelVisible = True, size = SelectionControl.SizeSM }
+        { labelVisible = True, size = CheckboxSize SelectionControl.SizeSM }
 
 
 {-| Hide the checkbox's label.
@@ -124,8 +124,11 @@ withSize size (Checkbox prop opt) =
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
 renderElement : RenderConfig -> Checkbox msg -> Element msg
-renderElement renderConfig (Checkbox { message, label, state } { labelVisible, size }) =
+renderElement renderConfig (Checkbox { message, label, state } options) =
     let
+        (CheckboxSize size) =
+            options.size
+
         { icon, border } =
             SelectionControl.sizes size
 
@@ -159,7 +162,7 @@ renderElement renderConfig (Checkbox { message, label, state } { labelVisible, s
                     Text.body1
 
         labelElement =
-            if labelVisible then
+            if options.labelVisible then
                 Input.labelRight
                     [ Element.width Element.fill
                     , Element.paddingEach
