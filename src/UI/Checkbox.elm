@@ -179,7 +179,7 @@ renderElement renderConfig (Checkbox { message, label, state } options) =
 
         checkboxAttrs =
             if options.labelVisible then
-                SelectionControl.buttonAttributes size
+                SelectionControl.buttonAttributes size state
 
             else
                 []
