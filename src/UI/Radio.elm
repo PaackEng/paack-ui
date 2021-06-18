@@ -65,6 +65,7 @@ import Element.Input as Input
 import Html.Attributes as HtmlAttrs
 import UI.Internal.Colors as Colors
 import UI.Internal.SelectionControl as SelectionControl exposing (SelectionControlSize(..))
+import UI.Internal.Utils.Element as Utils
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 
@@ -103,7 +104,7 @@ type RadioSize
 
 type alias Properties id msg =
     { label : String
-    , message : id -> msg
+    , message : String -> id -> msg
     }
 
 
@@ -124,7 +125,7 @@ The second is the message triggered when there is a selection.
         Radio.group "Pick a card" Msg.CardPicking
 
 -}
-group : String -> (id -> msg) -> RadioGroup id msg
+group : String -> (String -> id -> msg) -> RadioGroup id msg
 group label message =
     RadioGroup { label = label, message = message }
         { selected = Nothing
@@ -260,7 +261,7 @@ renderElement renderConfig (RadioGroup { label, message } { size, selected, butt
                     Input.radioRow
     in
     radio [ widthToEl width ]
-        { onChange = message
+        { onChange = \value -> message (findId value buttons) value
         , selected = selected
         , label =
             Text.body2 label
@@ -275,12 +276,34 @@ renderElement renderConfig (RadioGroup { label, message } { size, selected, butt
                     , Element.htmlAttribute <| HtmlAttrs.tabindex -1
                     ]
         , options =
-            List.map
-                (\(RadioButton id buttonLabel) ->
-                    Input.optionWith id (renderButton renderConfig size buttonLabel)
+            List.indexedMap
+                (\index ((RadioButton id _) as btn) ->
+                    Input.optionWith id (renderButton renderConfig size index btn)
                 )
                 buttons
         }
+
+
+makeId : Int -> String -> String
+makeId index =
+    String.toLower
+        >> String.replace " " "-"
+        >> (++) ("radio-" ++ String.fromInt index ++ "-")
+
+
+findId : id -> List (RadioButton id) -> String
+findId id =
+    List.indexedMap Tuple.pair
+        >> List.foldl
+            (\( index, RadioButton id_ label ) acc ->
+                if id == id_ then
+                    Just <| makeId index label
+
+                else
+                    acc
+            )
+            Nothing
+        >> Maybe.withDefault ""
 
 
 optionStateToBool : Input.OptionState -> Bool
@@ -293,8 +316,8 @@ optionStateToBool state =
             False
 
 
-renderButton : RenderConfig -> RadioSize -> String -> Input.OptionState -> Element msg
-renderButton renderConfig (RadioSize size) label state =
+renderButton : RenderConfig -> RadioSize -> Int -> RadioButton id -> Input.OptionState -> Element msg
+renderButton renderConfig (RadioSize size) index (RadioButton _ label) state =
     let
         isSelected =
             optionStateToBool state
@@ -319,7 +342,8 @@ renderButton renderConfig (RadioSize size) label state =
             else
                 Element.none
     in
-    Element.row (SelectionControl.buttonAttributes size isSelected)
+    Element.row
+        (Utils.id (makeId index label) :: SelectionControl.buttonAttributes size isSelected)
         [ Element.el radioAttrs radioBulletContent
         , Text.body1 label |> Text.renderElement renderConfig
         ]

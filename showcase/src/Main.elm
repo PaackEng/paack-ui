@@ -175,8 +175,7 @@ updateStories msg ({ customModel } as model) =
 
         RadioStoriesMsg subMsg ->
             Radio.update subMsg customModel.radioStories
-                |> R.map (\t -> { customModel | radioStories = t })
-                |> finishCustomUpdate model
+                |> R.map (\t -> { model | customModel = { customModel | radioStories = t } })
 
         TabsStoriesMsg subMsg ->
             Tabs.update subMsg customModel.tabsStories

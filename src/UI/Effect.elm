@@ -1,6 +1,7 @@
 module UI.Effect exposing
     ( Effect, SideEffect(..), none, batch, msgToCmd, analytics
     , map, perform
+    , domFocus
     )
 
 {-| `UI.Effect` is a combination of every command required for `paack-ui` to work correctly.
@@ -91,6 +92,13 @@ msgToCmd msg =
 analytics : Analytics -> Effect msg
 analytics analytics_ =
     [ Analytics analytics_ ]
+
+
+{-| The dom focus effect constructor.
+-}
+domFocus : (Result Dom.Error () -> msg) -> String -> Effect msg
+domFocus msg id =
+    [ DomFocus msg id ]
 
 
 {-| Perform a minimal interpretation of side-effects into commands.

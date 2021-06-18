@@ -479,7 +479,7 @@ selectFilterRender :
 selectFilterRender renderConfig { fromFiltersMsg, index } list { current, applied } =
     Radio.group
         (renderConfig |> localeTerms >> .filters >> .select >> .description)
-        (\subIndex -> fromFiltersMsg <| Filters.EditSelect { column = index, value = subIndex })
+        (\_ subIndex -> fromFiltersMsg <| Filters.EditSelect { column = index, value = subIndex })
         |> Radio.withSelected (maybeNotThen applied current)
         |> Radio.withButtons (List.indexedMap Radio.button list)
         |> Radio.withWidth Radio.widthFull
@@ -560,7 +560,7 @@ periodDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
         editDateMsg str =
             fromFiltersMsg <| Filters.EditPeriodDate { column = index, value = str }
 
-        editComparisonMsg value =
+        editComparisonMsg _ value =
             fromFiltersMsg <| Filters.EditPeriodComparison { column = index, value = value }
 
         current =
