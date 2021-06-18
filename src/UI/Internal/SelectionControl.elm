@@ -55,7 +55,7 @@ buttonAttributes size state =
             { offset = ( 0, 0 )
             , size = 2
             , blur = 0
-            , color = Colors.primary.middle
+            , color = Colors.primary.light1
             }
         ]
     ]
