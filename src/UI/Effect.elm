@@ -1,7 +1,6 @@
 module UI.Effect exposing
-    ( Effect, SideEffect(..), none, batch, msgToCmd, analytics
+    ( Effect, SideEffect(..), none, batch, msgToCmd, analytics, domFocus
     , map, perform
-    , domFocus
     )
 
 {-| `UI.Effect` is a combination of every command required for `paack-ui` to work correctly.
@@ -19,7 +18,7 @@ they fit in real applications.
 
 # Create
 
-@docs Effect, SideEffect, none, batch, msgToCmd, analytics
+@docs Effect, SideEffect, none, batch, msgToCmd, analytics, domFocus
 
 
 # Transform
