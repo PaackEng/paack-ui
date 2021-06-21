@@ -3,7 +3,6 @@ module UI.Internal.SelectionControl exposing (..)
 import Element exposing (Attribute, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
-import Html.Attributes as HtmlAttrs
 import UI.Internal.Colors as Colors
 
 
