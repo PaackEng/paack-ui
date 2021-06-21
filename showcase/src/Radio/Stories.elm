@@ -111,8 +111,10 @@ radioGroupView direction size renderConfig msg { selected } =
         [ Element.spacing 8 ]
         [ iconsSvgSprite
         , Radio.group
-            label
-            msg
+            { label = label
+            , onSelectMsg = msg
+            , idPrefix = "band-radio"
+            }
             |> Radio.withSelected selected
             |> Radio.withDirection direction
             |> Radio.withSize size
@@ -141,8 +143,10 @@ codeForVerticalRadioGroup : String
 codeForVerticalRadioGroup =
     prettifyElmCode """
 Radio.group
-    "Pick one classic rock band"
-    Msg.RadioSet
+    { label = "Pick one classic rock band"
+    , onSelectMsg = Msg.RadioSet
+    , idPrefix = "band-radio"
+    }
     |> Radio.withSelected model.selected
     |> Radio.withButtons
         [ Radio.button Model.Queen "Queen"
@@ -159,8 +163,10 @@ codeForHorizontalRadioGroup : String
 codeForHorizontalRadioGroup =
     prettifyElmCode """
 Radio.group
-    "Pick one classic rock band"
-    Msg.RadioSet
+    { label = "Pick one classic rock band"
+    , onSelectMsg = Msg.RadioSet
+    , idPrefix = "band-radio"
+    }
     |> Radio.withSelected model.selected
     |> Radio.withDirection model.direction
     |> Radio.withButtons

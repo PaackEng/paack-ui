@@ -70,16 +70,16 @@ import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 
 
-{-| The `RadioGroup id msg` type is used for describing the component for later rendering.
+{-| The `RadioGroup option msg` type is used for describing the component for later rendering.
 -}
-type RadioGroup id msg
-    = RadioGroup (Properties id msg) (Options id)
+type RadioGroup option msg
+    = RadioGroup (Properties option msg) (Options option)
 
 
-{-| The `RadioButton id` describes an individual radiobutton
+{-| The `RadioButton option` describes an individual radiobutton
 -}
-type RadioButton id
-    = RadioButton id String
+type RadioButton option
+    = RadioButton option String
 
 
 {-| Describes a compatible width.
@@ -102,15 +102,16 @@ type RadioSize
     = RadioSize SelectionControl.SelectionControlSize
 
 
-type alias Properties id msg =
+type alias Properties option msg =
     { label : String
-    , message : String -> id -> msg
+    , onSelectMsg : String -> option -> msg
+    , idPrefix : String
     }
 
 
-type alias Options id =
-    { selected : Maybe id
-    , buttons : List (RadioButton id)
+type alias Options option =
+    { selected : Maybe option
+    , buttons : List (RadioButton option)
     , width : RadioWidth
     , direction : Direction
     , size : RadioSize
@@ -125,9 +126,9 @@ The second is the message triggered when there is a selection.
         Radio.group "Pick a card" Msg.CardPicking
 
 -}
-group : String -> (String -> id -> msg) -> RadioGroup id msg
-group label message =
-    RadioGroup { label = label, message = message }
+group : Properties option msg -> RadioGroup option msg
+group props =
+    RadioGroup props
         { selected = Nothing
         , buttons = []
         , width = WidthRelative
@@ -141,9 +142,9 @@ group label message =
     Radio.button Model.OrangeJuice "Orange Juice"
 
 -}
-button : id -> String -> RadioButton id
-button id label =
-    RadioButton id label
+button : option -> String -> RadioButton option
+button option label =
+    RadioButton option label
 
 
 {-| Replaces a group's list of radio buttons.
@@ -156,7 +157,7 @@ button id label =
         someRadioGroup
 
 -}
-withButtons : List (RadioButton id) -> RadioGroup id msg -> RadioGroup id msg
+withButtons : List (RadioButton option) -> RadioGroup option msg -> RadioGroup option msg
 withButtons buttons (RadioGroup prop opt) =
     RadioGroup prop { opt | buttons = buttons }
 
@@ -166,7 +167,7 @@ withButtons buttons (RadioGroup prop opt) =
     Radio.withSelected (Just Model.DoubleCheddar)
 
 -}
-withSelected : Maybe id -> RadioGroup id msg -> RadioGroup id msg
+withSelected : Maybe option -> RadioGroup option msg -> RadioGroup option msg
 withSelected maybeSelected (RadioGroup prop opt) =
     RadioGroup prop { opt | selected = maybeSelected }
 
@@ -176,7 +177,7 @@ withSelected maybeSelected (RadioGroup prop opt) =
     Radio.withWidth Radio.widthFull someRadioGroup
 
 -}
-withWidth : RadioWidth -> RadioGroup id msg -> RadioGroup id msg
+withWidth : RadioWidth -> RadioGroup option msg -> RadioGroup option msg
 withWidth width (RadioGroup prop opt) =
     RadioGroup prop { opt | width = width }
 
@@ -186,7 +187,7 @@ withWidth width (RadioGroup prop opt) =
     Radio.withDirection Radio.horizontal someRadioGroup
 
 -}
-withDirection : Direction -> RadioGroup id msg -> RadioGroup id msg
+withDirection : Direction -> RadioGroup option msg -> RadioGroup option msg
 withDirection direction (RadioGroup prop opt) =
     RadioGroup prop { opt | direction = direction }
 
@@ -196,7 +197,7 @@ withDirection direction (RadioGroup prop opt) =
     Radio.withSize Radio.sizeMD someRadioGroup
 
 -}
-withSize : RadioSize -> RadioGroup id msg -> RadioGroup id msg
+withSize : RadioSize -> RadioGroup option msg -> RadioGroup option msg
 withSize size (RadioGroup prop opt) =
     RadioGroup prop { opt | size = size }
 
@@ -249,8 +250,8 @@ sizeMD =
 {-| End of the builder's life.
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
-renderElement : RenderConfig -> RadioGroup id msg -> Element msg
-renderElement renderConfig (RadioGroup { label, message } { size, selected, buttons, width, direction }) =
+renderElement : RenderConfig -> RadioGroup option msg -> Element msg
+renderElement renderConfig (RadioGroup { label, onSelectMsg, idPrefix } { size, selected, buttons, width, direction }) =
     let
         radio =
             case direction of
@@ -261,7 +262,7 @@ renderElement renderConfig (RadioGroup { label, message } { size, selected, butt
                     Input.radioRow
     in
     radio [ widthToEl width ]
-        { onChange = \value -> message (findId value buttons) value
+        { onChange = \value -> onSelectMsg (findId idPrefix value buttons) value
         , selected = selected
         , label =
             Text.body2 label
@@ -277,27 +278,27 @@ renderElement renderConfig (RadioGroup { label, message } { size, selected, butt
                     ]
         , options =
             List.indexedMap
-                (\index ((RadioButton id _) as btn) ->
-                    Input.optionWith id (renderButton renderConfig size index btn)
+                (\index ((RadioButton option _) as btn) ->
+                    Input.optionWith
+                        option
+                        (renderButton renderConfig size (makeId idPrefix index) btn)
                 )
                 buttons
         }
 
 
-makeId : Int -> String -> String
-makeId index =
-    String.toLower
-        >> String.replace " " "-"
-        >> (++) ("radio-" ++ String.fromInt index ++ "-")
+makeId : String -> Int -> String
+makeId idPrefix index =
+    idPrefix ++ "-" ++ String.fromInt index
 
 
-findId : id -> List (RadioButton id) -> String
-findId id =
+findId : String -> option -> List (RadioButton option) -> String
+findId idPrefix value =
     List.indexedMap Tuple.pair
         >> List.foldl
-            (\( index, RadioButton id_ label ) acc ->
-                if id == id_ then
-                    Just <| makeId index label
+            (\( index, RadioButton option _ ) acc ->
+                if value == option then
+                    Just <| makeId idPrefix index
 
                 else
                     acc
@@ -316,8 +317,8 @@ optionStateToBool state =
             False
 
 
-renderButton : RenderConfig -> RadioSize -> Int -> RadioButton id -> Input.OptionState -> Element msg
-renderButton renderConfig (RadioSize size) index (RadioButton _ label) state =
+renderButton : RenderConfig -> RadioSize -> String -> RadioButton option -> Input.OptionState -> Element msg
+renderButton renderConfig (RadioSize size) id (RadioButton _ label) state =
     let
         isSelected =
             optionStateToBool state
@@ -351,7 +352,7 @@ renderButton renderConfig (RadioSize size) index (RadioButton _ label) state =
                     else
                         -1
             )
-                :: Utils.id (makeId index label)
+                :: Utils.id id
                 :: SelectionControl.buttonAttributes size
     in
     Element.row

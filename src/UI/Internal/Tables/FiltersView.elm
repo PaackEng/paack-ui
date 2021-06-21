@@ -478,8 +478,10 @@ selectFilterRender :
     -> Element msg
 selectFilterRender renderConfig { fromFiltersMsg, index } list { current, applied } =
     Radio.group
-        (renderConfig |> localeTerms >> .filters >> .select >> .description)
-        (\_ subIndex -> fromFiltersMsg <| Filters.EditSelect { column = index, value = subIndex })
+        { label = renderConfig |> localeTerms >> .filters >> .select >> .description
+        , onSelectMsg = \_ subIndex -> fromFiltersMsg <| Filters.EditSelect { column = index, value = subIndex }
+        , idPrefix = "table-select-filter"
+        }
         |> Radio.withSelected (maybeNotThen applied current)
         |> Radio.withButtons (List.indexedMap Radio.button list)
         |> Radio.withWidth Radio.widthFull
@@ -584,8 +586,10 @@ periodDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
             |> TextField.renderElement renderConfig
             |> internalPaddingBox
         , Radio.group
-            filtersTerms.period.description
-            editComparisonMsg
+            { label = filtersTerms.period.description
+            , onSelectMsg = editComparisonMsg
+            , idPrefix = "table-date-period-filter"
+            }
             |> Radio.withSelected (Just current.comparison)
             |> Radio.withButtons options
             |> Radio.withWidth Radio.widthFull
