@@ -35,21 +35,14 @@ sizes size =
             Sizes 28 10 3
 
 
-buttonAttributes : SelectionControlSize -> Bool -> List (Element.Attribute msg)
-buttonAttributes size state =
+buttonAttributes : SelectionControlSize -> List (Element.Attribute msg)
+buttonAttributes size =
     [ Element.spacing 10
     , Element.width shrink
     , Element.padding <| .padding <| sizes size
     , Element.pointer
     , Border.rounded 6
     , Element.mouseOver [ Background.color <| Colors.gray.light3 ]
-    , Element.htmlAttribute <|
-        HtmlAttrs.tabindex <|
-            if state then
-                0
-
-            else
-                -1
     , Element.focused
         [ Border.innerShadow
             { offset = ( 0, 0 )

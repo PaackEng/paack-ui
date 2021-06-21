@@ -341,9 +341,21 @@ renderButton renderConfig (RadioSize size) index (RadioButton _ label) state =
 
             else
                 Element.none
+
+        buttonAttributes =
+            (Element.htmlAttribute <|
+                HtmlAttrs.tabindex <|
+                    if isSelected then
+                        0
+
+                    else
+                        -1
+            )
+                :: Utils.id (makeId index label)
+                :: SelectionControl.buttonAttributes size
     in
     Element.row
-        (Utils.id (makeId index label) :: SelectionControl.buttonAttributes size isSelected)
+        buttonAttributes
         [ Element.el radioAttrs radioBulletContent
         , Text.body1 label |> Text.renderElement renderConfig
         ]
