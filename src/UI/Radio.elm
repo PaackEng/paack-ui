@@ -11,8 +11,10 @@ module UI.Radio exposing
 {-| Accessible and uniform-styled implementation of a radio buttons.
 
     Radio.group
-        "Pick a favorite animal:"
-        Msg.SelectRadio
+        { label = "Pick a favorite animal:"
+        , onSelectMsg = Msg.SelectRadio
+        , idPrefix = "radio-animal"
+        }
         |> Radio.withSelected (Just Model.Felines)
         |> Radio.withButtons
             [ Radio.button Model.Felines "Felines"
