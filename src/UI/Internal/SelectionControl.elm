@@ -3,7 +3,6 @@ module UI.Internal.SelectionControl exposing (..)
 import Element exposing (Attribute, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
-import Html.Attributes as HtmlAttrs
 import UI.Internal.Colors as Colors
 
 
@@ -43,13 +42,12 @@ buttonAttributes size =
     , Element.pointer
     , Border.rounded 6
     , Element.mouseOver [ Background.color <| Colors.gray.light3 ]
-    , Element.htmlAttribute <| HtmlAttrs.tabindex 0
     , Element.focused
         [ Border.innerShadow
             { offset = ( 0, 0 )
             , size = 2
             , blur = 0
-            , color = Colors.primary.middle
+            , color = Colors.primary.light1
             }
         ]
     ]

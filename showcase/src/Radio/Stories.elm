@@ -7,6 +7,7 @@ import PluginOptions exposing (defaultWithMenu)
 import Radio.Model as RadioModel exposing (Options)
 import Radio.Msg as RadioMsg
 import Return exposing (Return)
+import UI.Effect as Effect
 import UI.Radio as Radio
 import UI.RenderConfig exposing (RenderConfig)
 import UIExplorer exposing (storiesOf)
@@ -22,13 +23,19 @@ import Utils
         )
 
 
-update : RadioMsg.Msg -> RadioModel.Model -> Return RadioMsg.Msg RadioModel.Model
+update : RadioMsg.Msg -> RadioModel.Model -> Return Msg.Msg RadioModel.Model
 update msg model =
     case msg of
-        RadioMsg.Set newValue ->
-            ( { model | selected = Just newValue }, Cmd.none )
+        RadioMsg.Set id newValue ->
+            ( { model | selected = Just newValue }
+            , Effect.domFocus (RadioMsg.FocusResult >> Msg.RadioStoriesMsg) id
+                |> Effect.perform
+            )
 
-        RadioMsg.NoOp _ ->
+        RadioMsg.FocusResult _ ->
+            ( model, Cmd.none )
+
+        RadioMsg.NoOp ->
             ( model, Cmd.none )
 
 
@@ -95,17 +102,19 @@ label =
 
 view : Radio.Direction -> Radio.RadioSize -> RenderConfig -> Model -> Element Msg
 view direction size renderConfig { radioStories } =
-    radioGroupView direction size renderConfig (RadioMsg.Set >> Msg.RadioStoriesMsg) radioStories
+    radioGroupView direction size renderConfig (\id value -> Msg.RadioStoriesMsg <| RadioMsg.Set id value) radioStories
 
 
-radioGroupView : Radio.Direction -> Radio.RadioSize -> RenderConfig -> (Options -> msg) -> RadioModel.Model -> Element msg
+radioGroupView : Radio.Direction -> Radio.RadioSize -> RenderConfig -> (String -> Options -> msg) -> RadioModel.Model -> Element msg
 radioGroupView direction size renderConfig msg { selected } =
     Element.column
         [ Element.spacing 8 ]
         [ iconsSvgSprite
         , Radio.group
-            label
-            msg
+            { label = label
+            , onSelectMsg = msg
+            , idPrefix = "band-radio"
+            }
             |> Radio.withSelected selected
             |> Radio.withDirection direction
             |> Radio.withSize size
@@ -124,9 +133,9 @@ unitedView : RenderConfig -> Element Msg
 unitedView renderConfig =
     Element.column
         [ Element.spacing 8 ]
-        [ radioGroupView Radio.vertical Radio.sizeSM renderConfig (RadioMsg.NoOp >> Msg.RadioStoriesMsg) { selected = Nothing }
-        , radioGroupView Radio.horizontal Radio.sizeSM renderConfig (RadioMsg.NoOp >> Msg.RadioStoriesMsg) { selected = Nothing }
-        , radioGroupView Radio.vertical Radio.sizeMD renderConfig (RadioMsg.NoOp >> Msg.RadioStoriesMsg) { selected = Nothing }
+        [ radioGroupView Radio.vertical Radio.sizeSM renderConfig (\_ _ -> Msg.RadioStoriesMsg RadioMsg.NoOp) { selected = Nothing }
+        , radioGroupView Radio.horizontal Radio.sizeSM renderConfig (\_ _ -> Msg.RadioStoriesMsg RadioMsg.NoOp) { selected = Nothing }
+        , radioGroupView Radio.vertical Radio.sizeMD renderConfig (\_ _ -> Msg.RadioStoriesMsg RadioMsg.NoOp) { selected = Nothing }
         ]
 
 
@@ -134,8 +143,10 @@ codeForVerticalRadioGroup : String
 codeForVerticalRadioGroup =
     prettifyElmCode """
 Radio.group
-    "Pick one classic rock band"
-    Msg.RadioSet
+    { label = "Pick one classic rock band"
+    , onSelectMsg = Msg.RadioSet
+    , idPrefix = "band-radio"
+    }
     |> Radio.withSelected model.selected
     |> Radio.withButtons
         [ Radio.button Model.Queen "Queen"
@@ -152,8 +163,10 @@ codeForHorizontalRadioGroup : String
 codeForHorizontalRadioGroup =
     prettifyElmCode """
 Radio.group
-    "Pick one classic rock band"
-    Msg.RadioSet
+    { label = "Pick one classic rock band"
+    , onSelectMsg = Msg.RadioSet
+    , idPrefix = "band-radio"
+    }
     |> Radio.withSelected model.selected
     |> Radio.withDirection model.direction
     |> Radio.withButtons

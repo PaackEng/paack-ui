@@ -1,5 +1,5 @@
 module UI.Effect exposing
-    ( Effect, SideEffect(..), none, batch, msgToCmd, analytics
+    ( Effect, SideEffect(..), none, batch, msgToCmd, analytics, domFocus
     , map, perform
     )
 
@@ -18,7 +18,7 @@ they fit in real applications.
 
 # Create
 
-@docs Effect, SideEffect, none, batch, msgToCmd, analytics
+@docs Effect, SideEffect, none, batch, msgToCmd, analytics, domFocus
 
 
 # Transform
@@ -91,6 +91,13 @@ msgToCmd msg =
 analytics : Analytics -> Effect msg
 analytics analytics_ =
     [ Analytics analytics_ ]
+
+
+{-| The dom focus effect constructor.
+-}
+domFocus : (Result Dom.Error () -> msg) -> String -> Effect msg
+domFocus msg id =
+    [ DomFocus msg id ]
 
 
 {-| Perform a minimal interpretation of side-effects into commands.
