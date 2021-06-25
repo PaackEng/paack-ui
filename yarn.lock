@@ -3100,10 +3100,10 @@ elm-hot@^1.1.6:
   resolved "https://registry.yarnpkg.com/elm-hot/-/elm-hot-1.1.6.tgz#93e3962b40670e65f0a3640951b3add2702bfd0e"
   integrity sha512-zYZJlfs7Gt4BdjA+D+857K+XAWzwwySJmXCgFpHW1dIEfaHSZCIPYPf7/jinZBLfKRkOAlKzI32AA84DY50g7Q==
 
-elm-review@^2.5.2:
-  version "2.5.2"
-  resolved "https://registry.yarnpkg.com/elm-review/-/elm-review-2.5.2.tgz#e24ec5aa3204d046410605092fc77e94f1bf90ef"
-  integrity sha512-AfDzGCgnP9Qm/bR0E8Tc/RXeDfCCwhtTu7Jn2i9kld2FAZh8Xwhws31Qb31VuFZSRj5LYPyGAk5GrH/VXew90g==
+elm-review@^2.5.3:
+  version "2.5.3"
+  resolved "https://registry.yarnpkg.com/elm-review/-/elm-review-2.5.3.tgz#9b3bcb35c94defc6c1d018c157f6a36bf6a1c7c4"
+  integrity sha512-IshEsmfS/3Ho3c6f5VEyulHY7Hzs4Fz1yXX2Rgl6Y0pWX/61vxybWG8UIs3KOo4RsEcHzHAWmUYShpJzH1utNQ==
   dependencies:
     chalk "^4.0.0"
     chokidar "^3.4.0"
@@ -3117,6 +3117,7 @@ elm-review@^2.5.2:
     got "^10.7.0"
     minimist "^1.2.0"
     ora "^5.4.0"
+    path-key "^3.1.1"
     prompts "^2.2.1"
     strip-ansi "^6.0.0"
     temp "^0.9.1"
@@ -5676,7 +5677,7 @@ path-key@^2.0.1:
   resolved "https://registry.yarnpkg.com/path-key/-/path-key-2.0.1.tgz#411cadb574c5a140d3a4b1910d40d80cc9f40b40"
   integrity sha1-QRyttXTFoUDTpLGRDUDYDMn0C0A=
 
-path-key@^3.0.0, path-key@^3.1.0:
+path-key@^3.0.0, path-key@^3.1.0, path-key@^3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/path-key/-/path-key-3.1.1.tgz#581f6ade658cbba65a0d3380de7753295054f375"
   integrity sha512-ojmeN0qd+y0jszEtoY48r0Peq5dwMEkIlCOu6Q5f41lfkswXuKtYrhgoTpLnyIcHm24Uhqx+5Tqm2InSwLhE6Q==
