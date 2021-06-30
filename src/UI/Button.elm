@@ -481,7 +481,7 @@ toggleView cfg size hint toggleMsg current =
         attrs =
             Primitives.roundedBorders size
                 :: (Element.onIndividualClick <| toggleMsg (not current))
-                :: ARIA.toElementAttributes ARIA.roleButton
+                :: (ARIA.toElementAttributes <| ARIA.roleToggleButton current)
                 ++ toggleTheme current
                 ++ iconLayout hint size
     in
