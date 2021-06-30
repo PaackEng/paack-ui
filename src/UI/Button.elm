@@ -478,16 +478,12 @@ toggleView :
     -> Element msg
 toggleView cfg size hint toggleMsg current =
     let
-        ( paddings, borders ) =
-            iconLayout size
-
         attrs =
             Primitives.roundedBorders size
-                :: paddings
-                :: borders
                 :: (Element.onIndividualClick <| toggleMsg (not current))
-                :: ARIA.toElementAttributes ARIA.roleButton
+                :: (ARIA.toElementAttributes <| ARIA.roleToggleButton current)
                 ++ toggleTheme current
+                ++ iconLayout hint size
     in
     Icon.toggle hint
         |> fromIcon
@@ -537,18 +533,14 @@ workingView :
     -> Element msg
 workingView cfg size width tone body action =
     let
-        ( paddings, borders ) =
-            bodyLayout body size
-
         attrs =
             Primitives.roundedBorders size
                 :: buttonWidth width
-                :: paddings
-                :: borders
                 :: Font.semiBold
                 :: Element.pointer
                 :: (ARIA.toElementAttributes <| ARIA.roleButton)
                 ++ workingTheme tone
+                ++ bodyAttrs body size
     in
     case action of
         ActionRedirect link ->
@@ -571,17 +563,12 @@ staticView :
     -> Element msg
 staticView cfg size width body theme =
     let
-        ( paddings, borders ) =
-            bodyLayout body size
-
         attrs =
-            Primitives.roundedBorders
-                size
+            Primitives.roundedBorders size
                 :: buttonWidth width
-                :: paddings
-                :: borders
                 :: Font.semiBold
                 :: Element.disabled
+                ++ bodyAttrs body size
                 ++ theme body
     in
     body
@@ -603,18 +590,18 @@ buttonWidth width =
             Element.width Element.shrink
 
 
-bodyLayout : ButtonBody -> Size -> ( Attribute msg, Attribute msg )
-bodyLayout body size =
+bodyAttrs : ButtonBody -> Size -> List (Attribute msg)
+bodyAttrs body size =
     case body of
         BodyText _ ->
             textLayout size
 
-        BodyIcon _ ->
-            iconLayout size
+        BodyIcon icon ->
+            iconLayout (Icon.getHint icon) size
 
 
-iconLayout : Size -> ( Attribute msg, Attribute msg )
-iconLayout size =
+iconLayout : String -> Size -> List (Attribute msg)
+iconLayout hint size =
     let
         border =
             borderWidth size
@@ -633,12 +620,13 @@ iconLayout size =
                 Size.ExtraSmall ->
                     ( 4 - border, 4 - border )
     in
-    ( pairUncurry Element.paddingXY paddingXY
+    [ pairUncurry Element.paddingXY paddingXY
     , Border.width border
-    )
+    , Element.title hint
+    ]
 
 
-textLayout : Size -> ( Attribute msg, Attribute msg )
+textLayout : Size -> List (Attribute msg)
 textLayout size =
     let
         border =
@@ -658,9 +646,9 @@ textLayout size =
                 Size.ExtraSmall ->
                     ( 12 - border, ((24 - 10) // 2) - border )
     in
-    ( pairUncurry Element.paddingXY paddingXY
+    [ pairUncurry Element.paddingXY paddingXY
     , Border.width border
-    )
+    ]
 
 
 borderWidth : Size -> Int

@@ -1,6 +1,6 @@
 module UI.Utils.ARIA exposing
     ( ElementSemantics
-    , roleButton, roleImage, rolePresentation, roleCheckbox, roleTab, roleSwitch
+    , roleButton, roleImage, rolePresentation, roleCheckbox, roleTab, roleSwitch, roleToggleButton
     , roleRadioGroup, roleRadio
     , withLabel
     , toElementAttributes
@@ -13,7 +13,7 @@ module UI.Utils.ARIA exposing
 
 # Building
 
-@docs roleButton, roleImage, rolePresentation, roleCheckbox, roleTab, roleSwitch
+@docs roleButton, roleImage, rolePresentation, roleCheckbox, roleTab, roleSwitch, roleToggleButton
 
 
 ## Radio buttons
@@ -56,6 +56,7 @@ type Role
     | RoleRadio Bool
     | RoleRadioGroup
     | RoleTab Bool
+    | RoleToggleButton Bool
 
 
 {-| "The button role should be used for clickable elements that trigger a response when activated by the user." - MDN
@@ -68,6 +69,20 @@ type Role
 roleButton : ElementSemantics
 roleButton =
     fromRole RoleButton
+
+
+{-| A toggle button has the button role along with its pressed state
+
+    Element.el
+        (Events.onClick Msg.SomeEvent
+            :: ARIA.toElementAttributes ARIA.roleToggleButton isToggled
+        )
+        someChildElement
+
+-}
+roleToggleButton : Bool -> ElementSemantics
+roleToggleButton pressed =
+    fromRole (RoleToggleButton pressed)
 
 
 {-| "The checkbox role is used for checkable interactive controls." -MDN
@@ -204,8 +219,11 @@ toElementAttributes { role, label } =
         case role of
             RoleButton ->
                 [ roleAttr "button"
-                , pressedAttr "false"
-                , expandedAttr "undefined"
+                ]
+
+            RoleToggleButton pressed ->
+                [ roleAttr "button"
+                , pressedAttr pressed
                 ]
 
             RoleCheckbox checked ->
@@ -255,17 +273,10 @@ labelAttr value =
         |> Element.htmlAttribute
 
 
-pressedAttr : String -> Attribute msg
+pressedAttr : Bool -> Attribute msg
 pressedAttr value =
-    value
+    ifThenElse value "true" "false"
         |> HtmlAttrs.attribute "aria-pressed"
-        |> Element.htmlAttribute
-
-
-expandedAttr : String -> Attribute msg
-expandedAttr value =
-    value
-        |> HtmlAttrs.attribute "aria-expanded"
         |> Element.htmlAttribute
 
 
