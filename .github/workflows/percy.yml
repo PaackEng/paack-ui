@@ -9,23 +9,24 @@ on:
 
 jobs:
   percy:
-     runs-on: ubuntu-latest
-     if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
 
-     steps:
-       - uses: actions/checkout@v2
+    steps:
+      - uses: actions/checkout@v2
 
-       - name: Setup Node
-         uses: actions/setup-node@v2.1.5
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        # NOTE: percy has its own cache
 
-       - name: Percy test
-         uses: cypress-io/github-action@v2
-         with:
+      - name: Percy test
+        uses: cypress-io/github-action@v2
+        with:
           install-command: yarn --frozen-lockfile --silent
           cache-key: percy-${{ hashFiles('yarn.lock') }}
           start: yarn showcase
           wait-on: 'http://localhost:1234'
           command-prefix: 'percy exec --'
-         env:
+        env:
           PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
           NODE_ENV: 'production'
