@@ -176,6 +176,7 @@ import UI.Checkbox as Checkbox exposing (checkbox)
 import UI.Effect as Effect exposing (Effect)
 import UI.Internal.Basics exposing (ifThenElse, maybeThen, prependMaybe)
 import UI.Internal.DateInput as DateInput exposing (DateInput, PeriodDate, RangeDate)
+import UI.Internal.Filter.Model as Filter
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.Tables.Common exposing (..)
@@ -743,8 +744,10 @@ localSingleTextFilter :
     -> (item -> String)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-localSingleTextFilter =
-    Filters.singleTextLocal
+localSingleTextFilter initValue getData accu =
+    Filters.push
+        (Filter.singleTextLocal initValue getData)
+        accu
 
 
 {-| A filter with one single text field.
@@ -762,8 +765,10 @@ remoteSingleTextFilter :
     -> (Maybe String -> msg)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-remoteSingleTextFilter =
-    Filters.singleTextRemote
+remoteSingleTextFilter initValue applyMsg accu =
+    Filters.push
+        (Filter.singleTextRemote initValue applyMsg)
+        accu
 
 
 {-| A filter with multiple text field.
@@ -787,8 +792,10 @@ localMultiTextFilter :
     -> (item -> String)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-localMultiTextFilter =
-    Filters.multiTextLocal
+localMultiTextFilter initValue getData accu =
+    Filters.push
+        (Filter.multiTextLocal initValue getData)
+        accu
 
 
 {-| A filter with multiple text field.
@@ -808,8 +815,10 @@ remoteMultiTextFilter :
     -> (List String -> msg)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-remoteMultiTextFilter =
-    Filters.multiTextRemote
+remoteMultiTextFilter initValue applyMsg accu =
+    Filters.push
+        (Filter.multiTextRemote initValue applyMsg)
+        accu
 
 
 {-| A filter for dates with one single field.
@@ -826,8 +835,10 @@ localSingleDateFilter :
     -> (item -> Time.Posix)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-localSingleDateFilter =
-    Filters.singleDateLocal
+localSingleDateFilter timeZone initValue getData accu =
+    Filters.push
+        (Filter.singleDateLocal timeZone initValue getData)
+        accu
 
 
 {-| A filter for dates with one single field.
@@ -845,8 +856,10 @@ remoteSingleDateFilter :
     -> (Maybe DateInput -> msg)
     -> Filters.Filters msg item columns
     -> Filters.Filters msg item (T.Increase columns)
-remoteSingleDateFilter =
-    Filters.singleDateRemote
+remoteSingleDateFilter timeZone initValue applyMsg accu =
+    Filters.push
+        (Filter.singleDateRemote timeZone initValue applyMsg)
+        accu
 
 
 {-| A filter for dates in an expected range.
@@ -868,8 +881,10 @@ localRangeDateFilter :
     -> (item -> Time.Posix)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-localRangeDateFilter =
-    Filters.rangeDateLocal
+localRangeDateFilter timeZone fromTime toTime getData accu =
+    Filters.push
+        (Filter.rangeDateLocal timeZone fromTime toTime getData)
+        accu
 
 
 {-| A filter for dates in an expected range.
@@ -893,8 +908,10 @@ remoteRangeDateFilter :
     -> (Maybe RangeDate -> msg)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-remoteRangeDateFilter =
-    Filters.rangeDateRemote
+remoteRangeDateFilter timeZone fromTime toTime applyMsg accu =
+    Filters.push
+        (Filter.rangeDateRemote timeZone fromTime toTime applyMsg)
+        accu
 
 
 {-| A filter for a single date, dates before specified date, or dates after specified date.
@@ -916,8 +933,10 @@ localPeriodDateFilter :
     -> (item -> Time.Posix)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-localPeriodDateFilter =
-    Filters.periodDateLocal
+localPeriodDateFilter timeZone initValue initComparison getData accu =
+    Filters.push
+        (Filter.periodDateLocal timeZone initValue initComparison getData)
+        accu
 
 
 {-| A filter for a single date, dates before specified date, or dates after specified date.
@@ -941,8 +960,10 @@ remotePeriodDateFilter :
     -> (Maybe PeriodDate -> msg)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-remotePeriodDateFilter =
-    Filters.periodDateRemote
+remotePeriodDateFilter timeZone initValue initComparison applyMsg accu =
+    Filters.push
+        (Filter.periodDateRemote timeZone initValue initComparison applyMsg)
+        accu
 
 
 {-| A filter for custom radio buttons.
@@ -962,8 +983,10 @@ localSelectFilter :
     -> (item -> Int -> Bool)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-localSelectFilter =
-    Filters.selectLocal
+localSelectFilter initList initSelection getData accu =
+    Filters.push
+        (Filter.selectLocal initList initSelection getData)
+        accu
 
 
 {-| A filter for custom radio buttons.
@@ -985,8 +1008,10 @@ remoteSelectFilter :
     -> (Maybe Int -> msg)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-remoteSelectFilter =
-    Filters.selectRemote
+remoteSelectFilter initList initSelection applyMsg accu =
+    Filters.push
+        (Filter.selectRemote initList initSelection applyMsg)
+        accu
 
 
 
@@ -1332,7 +1357,7 @@ filterHeader :
     -> (Msg item -> msg)
     -> Maybe Int
     -> Column
-    -> Filters.Filter msg item
+    -> Filter.Filter msg item
     -> Sorters.ColumnStatus
     -> Int
     -> Element msg

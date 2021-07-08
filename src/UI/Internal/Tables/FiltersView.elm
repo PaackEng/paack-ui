@@ -13,6 +13,7 @@ import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Basics exposing (maybeNotThen, prependIf)
 import UI.Internal.Colors as Colors
 import UI.Internal.DateInput as DateInput exposing (DateInput(..), PeriodComparison(..), PeriodDate, RangeDate)
+import UI.Internal.Filter.Model as Filter exposing (Filter)
 import UI.Internal.Primitives as Primitives
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.Size as Size exposing (Size)
@@ -43,7 +44,7 @@ type alias Config msg =
 
 header :
     RenderConfig
-    -> Filters.Filter msg item
+    -> Filter msg item
     -> Sorters.ColumnStatus
     -> Config msg
     -> Element msg
@@ -61,26 +62,26 @@ header renderConfig filter sorting config =
     in
     if config.isOpen then
         case filter of
-            Filters.SingleTextFilter { editable } ->
+            Filter.SingleTextFilter { editable } ->
                 filterRender singleTextFilterRender editable
 
-            Filters.MultiTextFilter { editable } ->
+            Filter.MultiTextFilter { editable } ->
                 filterRender multiTextFilterRender editable
 
-            Filters.SingleDateFilter { editable } ->
+            Filter.SingleDateFilter { editable } ->
                 filterRender singleDateFilterRender editable
 
-            Filters.RangeDateFilter { editable } ->
+            Filter.RangeDateFilter { editable } ->
                 filterRender rangeDateFilterRender editable
 
-            Filters.PeriodDateFilter { editable } ->
+            Filter.PeriodDateFilter { editable } ->
                 filterRender periodDateFilterRender editable
 
-            Filters.SelectFilter list { editable } ->
+            Filter.SelectFilter list { editable } ->
                 selectFilterRender renderConfig config list editable
                     |> dialog renderConfig config filter sorting clearMsg applyMsg
 
-    else if Filters.isApplied filter then
+    else if Filter.isApplied filter then
         headerApplied renderConfig
             config.openMsg
             clearMsg
@@ -323,7 +324,7 @@ dialogClose renderConfig message =
 dialog :
     RenderConfig
     -> Config msg
-    -> Filters.Filter msg item
+    -> Filter msg item
     -> Sorters.ColumnStatus
     -> msg
     -> msg
@@ -332,10 +333,10 @@ dialog :
 dialog renderConfig config filter sorter clearMsg applyMsg content =
     let
         applied =
-            Filters.isApplied filter
+            Filter.isApplied filter
 
         current =
-            Filters.isEdited filter
+            Filter.isEdited filter
     in
     overlay config.discardMsg <|
         Element.column
@@ -426,7 +427,7 @@ singleTextFilterRender :
     RenderConfig
     -> msg
     -> Config msg
-    -> Filters.Editable String
+    -> Filter.Editable String
     -> Element msg
 singleTextFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } editable =
     let
@@ -434,7 +435,7 @@ singleTextFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
             fromFiltersMsg <| Filters.EditSingleText { column = index, value = str }
     in
     editable
-        |> Filters.editableWithDefault ""
+        |> Filter.editableWithDefault ""
         |> TextField.singlelineText editMsg label
         |> TextField.withSize contextSize
         |> TextField.withWidth TextField.widthFull
@@ -447,7 +448,7 @@ multiTextFilterRender :
     RenderConfig
     -> msg
     -> Config msg
-    -> Filters.Editable (Array String)
+    -> Filter.Editable (Array String)
     -> Element msg
 multiTextFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } editableArr =
     let
@@ -463,7 +464,7 @@ multiTextFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } edi
                 |> TextField.renderElement renderConfig
     in
     editableArr
-        |> Filters.editableWithDefault Array.empty
+        |> Filter.editableWithDefault Array.empty
         |> Array.push ""
         |> Array.indexedMap rowField
         |> Array.toList
@@ -474,7 +475,7 @@ selectFilterRender :
     RenderConfig
     -> Config msg
     -> List String
-    -> Filters.Editable Int
+    -> Filter.Editable Int
     -> Element msg
 selectFilterRender renderConfig { fromFiltersMsg, index } list { current, applied } =
     Radio.group
@@ -492,7 +493,7 @@ singleDateFilterRender :
     RenderConfig
     -> msg
     -> Config msg
-    -> Filters.Editable DateInput
+    -> Filter.Editable DateInput
     -> Element msg
 singleDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } editable =
     let
@@ -503,7 +504,7 @@ singleDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
             renderConfig |> localeTerms >> .filters >> .dateFormat
     in
     editable
-        |> Filters.editableWithDefault (DateInvalid "")
+        |> Filter.editableWithDefault (DateInvalid "")
         |> dateInput renderConfig applyMsg editMsg datePlaceholder label
         |> TextField.renderElement renderConfig
         |> internalPaddingBox
@@ -513,7 +514,7 @@ rangeDateFilterRender :
     RenderConfig
     -> msg
     -> Config msg
-    -> Filters.Editable RangeDate
+    -> Filter.Editable RangeDate
     -> Element msg
 rangeDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } editable =
     let
@@ -528,7 +529,7 @@ rangeDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } edi
 
         current =
             editable
-                |> Filters.editableWithDefault
+                |> Filter.editableWithDefault
                     { from = DateInvalid "", to = DateInvalid "" }
 
         fromPlaceholder =
@@ -555,7 +556,7 @@ periodDateFilterRender :
     RenderConfig
     -> msg
     -> Config msg
-    -> Filters.Editable PeriodDate
+    -> Filter.Editable PeriodDate
     -> Element msg
 periodDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } editable =
     let
@@ -567,7 +568,7 @@ periodDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
 
         current =
             editable
-                |> Filters.editableWithDefault { date = DateInvalid "", comparison = On }
+                |> Filter.editableWithDefault { date = DateInvalid "", comparison = On }
 
         filtersTerms =
             renderConfig |> localeTerms >> .filters
@@ -604,7 +605,7 @@ periodDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } ed
 dateInput : RenderConfig -> msg -> (String -> msg) -> String -> String -> DateInput -> TextField msg
 dateInput cfg applyMsg editMsg placeholder label current =
     current
-        |> DateInput.toTextField cfg Filters.dateSeparator editMsg label
+        |> DateInput.toTextField cfg Filter.dateSeparator editMsg label
         |> TextField.withPlaceholder placeholder
         |> TextField.withSize contextSize
         |> TextField.withWidth TextField.widthFull
