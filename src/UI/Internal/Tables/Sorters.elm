@@ -1,9 +1,7 @@
 module UI.Internal.Tables.Sorters exposing
     ( ColumnStatus
     , Msg(..)
-    , Sorter(..)
     , Sorters
-    , SortingDirection(..)
     , get
     , itemsApplySorting
     , sortBy
@@ -16,6 +14,7 @@ module UI.Internal.Tables.Sorters exposing
 
 import UI.Effect as Effect exposing (Effect)
 import UI.Internal.Analytics as Analytics
+import UI.Internal.Filter.Sorter as Sorter exposing (Sorter(..), SortingDirection(..))
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Utils.TypeNumbers as T
 
@@ -25,23 +24,13 @@ type Msg
     | ClearSorting
 
 
-type Sorter item
-    = Sortable (item -> String)
-    | Unsortable
-
-
-type SortingDirection
-    = SortIncreasing
-    | SortDecreasing
-
-
 type alias SortingStatus item =
-    { column : Int, by : item -> String, direction : SortingDirection }
+    { column : Int, by : Sorter item, direction : SortingDirection }
 
 
 type Sorters item columns
     = Sorters
-        { columns : NArray (Sorter item) columns
+        { columns : NArray (Maybe (Sorter item)) columns
         , status : Maybe (SortingStatus item)
         }
 
@@ -86,7 +75,7 @@ itemsApplySorting (Sorters sorters) items =
         Just status ->
             let
                 sortedItems =
-                    List.sortBy status.by items
+                    Sorter.sort status.by items
             in
             case status.direction of
                 SortIncreasing ->
@@ -110,7 +99,16 @@ sortBy :
     -> Sorters item (T.Increase columns)
 sortBy fn (Sorters accu) =
     Sorters
-        { columns = NArray.push (Sortable fn) accu.columns
+        { columns =
+            NArray.push
+                ({ retrieve = fn
+                 , smallerFirst = True
+                 , emptyOnTail = True
+                 }
+                    |> AlphanumericSortable
+                    |> Just
+                )
+                accu.columns
         , status = accu.status
         }
 
@@ -118,7 +116,7 @@ sortBy fn (Sorters accu) =
 unsortable : Sorters item columns -> Sorters item (T.Increase columns)
 unsortable (Sorters accu) =
     Sorters
-        { columns = NArray.push Unsortable accu.columns
+        { columns = NArray.push Nothing accu.columns
         , status = accu.status
         }
 
@@ -135,8 +133,8 @@ sortDecreasing =
 
 sort : SortingDirection -> Int -> Sorters item columns -> Sorters item columns
 sort direction column ((Sorters accu) as sorters) =
-    case NArray.get column accu.columns of
-        Just (Sortable by) ->
+    case Maybe.andThen identity <| NArray.get column accu.columns of
+        Just by ->
             Sorters
                 { accu
                     | status =
@@ -146,9 +144,6 @@ sort direction column ((Sorters accu) as sorters) =
                             , direction = direction
                             }
                 }
-
-        Just Unsortable ->
-            sorters
 
         Nothing ->
             sorters
@@ -166,10 +161,10 @@ get index (Sorters { columns, status }) =
 
         isSortableThen sortable =
             case sortable of
-                Sortable _ ->
+                Just _ ->
                     Just (Maybe.andThen getDirection status)
 
-                Unsortable ->
+                Nothing ->
                     Nothing
     in
     Maybe.andThen

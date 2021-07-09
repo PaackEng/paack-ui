@@ -14,11 +14,12 @@ import UI.Internal.Basics exposing (maybeNotThen, prependIf)
 import UI.Internal.Colors as Colors
 import UI.Internal.DateInput as DateInput exposing (DateInput(..), PeriodComparison(..), PeriodDate, RangeDate)
 import UI.Internal.Filter.Model as Filter exposing (Filter)
+import UI.Internal.Filter.Sorter exposing (SortingDirection(..))
 import UI.Internal.Primitives as Primitives
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.Size as Size exposing (Size)
 import UI.Internal.Tables.Filters as Filters
-import UI.Internal.Tables.Sorters as Sorters exposing (SortingDirection(..))
+import UI.Internal.Tables.Sorters as Sorters
 import UI.Internal.Text as Text
 import UI.Internal.Utils.Element exposing (overlay, shrinkButClip, tuplesToStyles, zIndex)
 import UI.Palette as Palette exposing (brightnessDarkest, brightnessMiddle, tonePrimary)
