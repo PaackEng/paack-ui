@@ -2,11 +2,12 @@ module UI.Internal.Filter.Sorter exposing (..)
 
 
 type Sorter item
-    = AlphanumericSortable (AlphanumericSortConfig item)
-    | IntegerSortable (item -> Int)
-    | FloatingSortable (item -> Float)
+    = AlphabeticalSortable (item -> String)
+    | AlphanumericSortable (AlphanumericSortConfig item)
     | CharSortable (item -> Float)
     | CustomSortable (item -> item -> Order)
+    | FloatingSortable (item -> Float)
+    | IntegerSortable (item -> Int)
 
 
 type SortingDirection
@@ -18,11 +19,12 @@ type alias AlphanumericSortConfig item =
     { retrieve : item -> String
     , smallerFirst : Bool
     , emptyOnTail : Bool
+    , numbersFirst : Bool
     }
 
 
 alphanumericSort : AlphanumericSortConfig item -> List item -> List item
-alphanumericSort { retrieve, smallerFirst, emptyOnTail } list =
+alphanumericSort { retrieve, smallerFirst, emptyOnTail, numbersFirst } list =
     let
         nonEmptySort nonEmptyList =
             if smallerFirst then
@@ -32,8 +34,31 @@ alphanumericSort { retrieve, smallerFirst, emptyOnTail } list =
 
             else
                 List.sortBy retrieve nonEmptyList
+
+        alphanumericMerge ( numbers, alphanums, empties ) =
+            let
+                sortedNumbers =
+                    numbers
+                        |> List.sortBy Tuple.first
+                        |> List.map Tuple.second
+
+                sortedAlphanums =
+                    nonEmptySort alphanums
+            in
+            if emptyOnTail then
+                sortedNumbers ++ sortedAlphanums ++ empties
+
+            else
+                empties ++ sortedNumbers ++ sortedAlphanums
     in
-    if emptyOnTail then
+    if numbersFirst then
+        List.foldr
+            (alphanumericPartition retrieve)
+            ( [], [], [] )
+            list
+            |> alphanumericMerge
+
+    else if emptyOnTail then
         List.partition (retrieve >> String.isEmpty)
             list
             |> Tuple.mapSecond nonEmptySort
@@ -53,20 +78,45 @@ compareSmallerFirst a b =
             another
 
 
+alphanumericPartition :
+    (item -> String)
+    -> item
+    -> ( List ( Float, item ), List item, List item )
+    -> ( List ( Float, item ), List item, List item )
+alphanumericPartition retrieve elem ( numbers, alphanums, empties ) =
+    let
+        string =
+            retrieve elem
+    in
+    if String.isEmpty string then
+        ( numbers, alphanums, elem :: empties )
+
+    else
+        case String.toFloat string of
+            Just float ->
+                ( ( float, elem ) :: numbers, alphanums, empties )
+
+            Nothing ->
+                ( numbers, elem :: alphanums, empties )
+
+
 sort : Sorter item -> List item -> List item
 sort sorter list =
     case sorter of
+        AlphabeticalSortable retrieve ->
+            List.sortBy retrieve list
+
         AlphanumericSortable config ->
             alphanumericSort config list
-
-        IntegerSortable retrieve ->
-            List.sortBy retrieve list
-
-        FloatingSortable retrieve ->
-            List.sortBy retrieve list
 
         CharSortable retrieve ->
             List.sortBy retrieve list
 
         CustomSortable fn ->
             List.sortWith fn list
+
+        FloatingSortable retrieve ->
+            List.sortBy retrieve list
+
+        IntegerSortable retrieve ->
+            List.sortBy retrieve list

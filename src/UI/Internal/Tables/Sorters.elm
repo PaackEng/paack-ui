@@ -99,16 +99,7 @@ sortBy :
     -> Sorters item (T.Increase columns)
 sortBy fn (Sorters accu) =
     Sorters
-        { columns =
-            NArray.push
-                ({ retrieve = fn
-                 , smallerFirst = True
-                 , emptyOnTail = True
-                 }
-                    |> AlphanumericSortable
-                    |> Just
-                )
-                accu.columns
+        { columns = NArray.push (Just <| AlphabeticalSortable fn) accu.columns
         , status = accu.status
         }
 
