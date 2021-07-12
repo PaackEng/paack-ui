@@ -18,10 +18,10 @@ type alias Sizes =
 iconColor : Bool -> Element.Color
 iconColor active =
     if active then
-        Colors.primary.middle
+        Colors.navyBlue700
 
     else
-        Colors.gray.light1
+        Colors.gray600
 
 
 sizes : SelectionControlSize -> Sizes
@@ -41,13 +41,13 @@ buttonAttributes size =
     , Element.padding <| .padding <| sizes size
     , Element.pointer
     , Border.rounded 6
-    , Element.mouseOver [ Background.color <| Colors.gray.light3 ]
+    , Element.mouseOver [ Background.color <| Colors.gray200 ]
     , Element.focused
         [ Border.innerShadow
             { offset = ( 0, 0 )
             , size = 2
             , blur = 0
-            , color = Colors.primary.light1
+            , color = Colors.navyBlue600
             }
         ]
     ]

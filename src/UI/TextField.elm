@@ -717,14 +717,14 @@ textAttrs cfg size =
 
 genericAttr : String -> Bool -> Bool -> TextFieldWidth -> Size -> List (Attribute msg)
 genericAttr label isPlaceholder hasError width size =
-    [ Background.color Colors.gray.light3
+    [ Background.color Colors.gray200
     , Primitives.roundedBorders size
     , Border.color <|
         if hasError then
-            Colors.danger.light1
+            Colors.red500
 
         else
-            Colors.gray.light2
+            Colors.gray300
     , Border.width <|
         if hasError then
             2
@@ -733,7 +733,7 @@ genericAttr label isPlaceholder hasError width size =
             1
     , textFieldPadding size
     , Element.focused
-        [ Border.color Colors.primary.light2
+        [ Border.color Colors.navyBlue300
         ]
     , Element.width <|
         case width of
@@ -745,10 +745,10 @@ genericAttr label isPlaceholder hasError width size =
     , Font.color <|
         -- TODO: Use CSS pre-processor
         if isPlaceholder then
-            Colors.gray.dark1
+            Colors.gray800
 
         else
-            Colors.gray.light1
+            Colors.gray600
     , Element.title label
     ]
 

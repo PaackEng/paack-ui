@@ -126,10 +126,10 @@ renderElement _ (Switch { message, label, state } { color }) =
                     Colors.overlayBackground
 
                 ColorSuccess ->
-                    Background.color Colors.success.middle
+                    Background.color Colors.green500
 
                 ColorDanger ->
-                    Background.color Colors.danger.middle
+                    Background.color Colors.red600
     in
     if state then
         Element.none
@@ -146,7 +146,7 @@ renderElement _ (Switch { message, label, state } { color }) =
                     :: knobAttrs
                 )
             |> Element.el thinBorder
-            |> Element.el (Background.color Colors.gray.light2 :: boxAttrs)
+            |> Element.el (Background.color Colors.gray300 :: boxAttrs)
 
 
 knobAttrs : List (Attribute msg)
