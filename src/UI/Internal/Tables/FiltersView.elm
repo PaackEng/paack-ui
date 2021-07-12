@@ -15,6 +15,7 @@ import UI.Internal.Colors as Colors
 import UI.Internal.DateInput as DateInput exposing (DateInput(..), PeriodComparison(..), PeriodDate, RangeDate)
 import UI.Internal.Filter.Model as Filter exposing (Filter)
 import UI.Internal.Filter.Sorter exposing (SortingDirection(..))
+import UI.Internal.Filter.View as FilterV2
 import UI.Internal.Primitives as Primitives
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.Size as Size exposing (Size)
@@ -82,19 +83,21 @@ header renderConfig filter sorting config =
                 selectFilterRender renderConfig config list editable
                     |> dialog renderConfig config filter sorting clearMsg applyMsg
 
-    else if Filter.isApplied filter then
-        headerApplied renderConfig
-            config.openMsg
-            clearMsg
-            (renderConfig |> localeTerms >> .filters >> .clear)
-            config.label
-            sorting
-
     else
-        headerNormal renderConfig
-            config.openMsg
+        FilterV2.header
             config.label
-            sorting
+            config.openMsg
+            |> FilterV2.headerWithSize FilterV2.extraSmall
+            |> FilterV2.headerWithSorting
+                (Maybe.andThen identity sorting)
+            |> FilterV2.headerWithApplied
+                (if Filter.isApplied filter then
+                    Just { preview = "1", discardMsg = clearMsg }
+
+                 else
+                    Nothing
+                )
+            |> FilterV2.headerToElement renderConfig
 
 
 

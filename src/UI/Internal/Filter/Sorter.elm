@@ -4,7 +4,7 @@ module UI.Internal.Filter.Sorter exposing (..)
 type Sorter item
     = AlphabeticalSortable (item -> String)
     | AlphanumericSortable (AlphanumericSortConfig item)
-    | CharSortable (item -> Float)
+    | CharSortable (item -> Char)
     | CustomSortable (item -> item -> Order)
     | FloatingSortable (item -> Float)
     | IntegerSortable (item -> Int)
