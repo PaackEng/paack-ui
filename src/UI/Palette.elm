@@ -59,7 +59,6 @@ module UI.Palette exposing
 -}
 
 import Element
-import UI.Internal.Basics exposing (ifThenElse)
 import UI.Internal.Colors as Internal exposing (..)
 import UI.Utils.Element exposing (colorSetOpacity)
 
@@ -350,9 +349,7 @@ color tone brightness =
 -}
 toElementColor : Color -> Element.Color
 toElementColor (Color { tone, brightness } { alpha, contrast }) =
-    tone
-        |> ifThenElse contrast contrastColors toColors
-        |> getBrightness brightness
+    backportColorV2 tone brightness contrast
         |> colorSetOpacity alpha
 
 
@@ -487,68 +484,111 @@ toneWarning =
 -- Internals
 
 
-getBrightness : Brightness -> ToneColors -> Element.Color
-getBrightness brightness =
-    case brightness of
-        BrightnessDark1 ->
-            .dark1
-
-        BrightnessMiddle ->
-            .middle
-
-        BrightnessLight1 ->
-            .light1
-
-        BrightnessLight2 ->
-            .light2
-
-        BrightnessLight3 ->
-            .light3
-
-        BrightnessLight4 ->
-            .light4
-
-
-toColors : Tone -> ToneColors
-toColors tone =
-    case tone of
-        ToneGray ->
-            Internal.gray
-
-        TonePrimary ->
-            Internal.primary
-
-        ToneSuccess ->
-            Internal.success
-
-        ToneDanger ->
-            Internal.danger
-
-        ToneWarning ->
-            Internal.warning
-
-
-contrastColors : Tone -> ToneColors
-contrastColors tone =
-    case tone of
-        ToneGray ->
-            darkConstrast
-
-        TonePrimary ->
-            contrastPrimary
-
-        ToneSuccess ->
-            contrastSuccess
-
-        ToneDanger ->
-            contrastDanger
-
-        ToneWarning ->
-            contrastWarning
-
-
 defaultOptions : Options
 defaultOptions =
     { alpha = 1
     , contrast = False
     }
+
+
+backportColorV2 : Tone -> Brightness -> Bool -> Element.Color
+backportColorV2 tone brightness contrast =
+    let
+        mimicContrast { text, background } =
+            if contrast then
+                Maybe.withDefault Internal.white text
+
+            else
+                background
+    in
+    mimicContrast <|
+        case ( tone, brightness ) of
+            ( ToneGray, BrightnessDark1 ) ->
+                Internal.gray.shade800
+
+            ( ToneGray, BrightnessMiddle ) ->
+                Internal.gray.shade700
+
+            ( ToneGray, BrightnessLight1 ) ->
+                Internal.gray.shade600
+
+            ( ToneGray, BrightnessLight2 ) ->
+                Internal.gray.shade300
+
+            ( ToneGray, BrightnessLight3 ) ->
+                Internal.gray.shade200
+
+            ( ToneGray, BrightnessLight4 ) ->
+                Internal.gray.shade100
+
+            ( TonePrimary, BrightnessDark1 ) ->
+                Internal.navyBlue.shade800
+
+            ( TonePrimary, BrightnessMiddle ) ->
+                Internal.navyBlue.shade700
+
+            ( TonePrimary, BrightnessLight1 ) ->
+                Internal.navyBlue.shade600
+
+            ( TonePrimary, BrightnessLight2 ) ->
+                Internal.navyBlue.shade400
+
+            ( TonePrimary, BrightnessLight3 ) ->
+                Internal.navyBlue.shade200
+
+            ( TonePrimary, BrightnessLight4 ) ->
+                Internal.navyBlue.shade100
+
+            ( ToneSuccess, BrightnessDark1 ) ->
+                Internal.green.shade700
+
+            ( ToneSuccess, BrightnessMiddle ) ->
+                Internal.green.shade500
+
+            ( ToneSuccess, BrightnessLight1 ) ->
+                Internal.green.shade400
+
+            ( ToneSuccess, BrightnessLight2 ) ->
+                Internal.green.shade300
+
+            ( ToneSuccess, BrightnessLight3 ) ->
+                Internal.green.shade200
+
+            ( ToneSuccess, BrightnessLight4 ) ->
+                Internal.green.shade100
+
+            ( ToneWarning, BrightnessDark1 ) ->
+                Internal.yellow.shade800
+
+            ( ToneWarning, BrightnessMiddle ) ->
+                Internal.yellow.shade500
+
+            ( ToneWarning, BrightnessLight1 ) ->
+                Internal.yellow.shade400
+
+            ( ToneWarning, BrightnessLight2 ) ->
+                Internal.yellow.shade300
+
+            ( ToneWarning, BrightnessLight3 ) ->
+                Internal.yellow.shade200
+
+            ( ToneWarning, BrightnessLight4 ) ->
+                Internal.yellow.shade100
+
+            ( ToneDanger, BrightnessDark1 ) ->
+                Internal.red.shade700
+
+            ( ToneDanger, BrightnessMiddle ) ->
+                Internal.red.shade600
+
+            ( ToneDanger, BrightnessLight1 ) ->
+                Internal.red.shade500
+
+            ( ToneDanger, BrightnessLight2 ) ->
+                Internal.red.shade400
+
+            ( ToneDanger, BrightnessLight3 ) ->
+                Internal.red.shade200
+
+            ( ToneDanger, BrightnessLight4 ) ->
+                Internal.red.shade100

@@ -145,7 +145,7 @@ renderElement renderConfig (Checkbox { message, label, state } options) =
         boxIcon _ =
             if state then
                 Element.el
-                    (Background.color Colors.primary.middle :: boxAttrs)
+                    (Background.color Colors.navyBlue700 :: boxAttrs)
                     (boxCheck renderConfig)
 
             else

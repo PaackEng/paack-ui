@@ -520,7 +520,7 @@ renderElement cfg (SelectList prop opt) =
                 )
             |> Keyed.column
                 ([ Border.widthEach { bottom = 0, left = 0, right = 0, top = 1 }
-                 , Border.color Colors.gray.light3
+                 , Border.color Colors.gray200
                  , Element.width fill
                  , Element.height fill
                  , Element.scrollbarY
@@ -547,8 +547,8 @@ actionBarView cfg actionBar =
                     , right = 12
                     , top = 12
                     }
-                , Background.color Colors.primary.light3
-                , Font.color Colors.primary.middle
+                , Background.color Colors.navyBlue200
+                , Font.color Colors.navyBlue700
                 ]
                 [ Text.body2 label
                     |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
@@ -690,7 +690,7 @@ itemView cfg { renderItem, toKey } { select, containerId } background selected o
             [ Element.pointer
             , Element.width fill
             , Border.widthEach { zeroPadding | bottom = 1 }
-            , Border.color Colors.gray.light3
+            , Border.color Colors.gray200
             ]
                 |> prependMaybe (Maybe.map ((|>) obj >> Events.onClick) select)
                 |> prependMaybe

@@ -162,14 +162,14 @@ normalBorder =
 
 textNormalColor : Element.Color
 textNormalColor =
-    Colors.gray.light1
+    Colors.gray600
 
 
 borderNormalColor : Element.Color
 borderNormalColor =
-    Colors.gray.light2
+    Colors.gray300
 
 
 currentColor : Element.Color
 currentColor =
-    Colors.primary.middle
+    Colors.navyBlue700

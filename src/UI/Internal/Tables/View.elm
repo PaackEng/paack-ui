@@ -110,7 +110,7 @@ rowBox ( key, cells ) =
         [ Element.spacing 8
         , Primitives.defaultRoundedBorders
         , Element.width fill
-        , Element.mouseOver [ Background.color Colors.gray.light3 ]
+        , Element.mouseOver [ Background.color Colors.gray200 ]
         ]
         cells
     )
@@ -159,5 +159,5 @@ headersAttr =
     , Element.width fill
     , Element.paddingEach { bottom = 7, top = 0, left = 0, right = 0 }
     , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
-    , Border.color Colors.gray.light3
+    , Border.color Colors.gray200
     ]
