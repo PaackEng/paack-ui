@@ -72,8 +72,8 @@ icons =
 iconView : RenderConfig -> Size -> ( String -> Icon, String ) -> Element msg
 iconView cfg size ( iconFn, label ) =
     Element.column
-        [ Background.color Colors.gray.dark1
-        , Font.color Colors.darkConstrast.dark1
+        [ Background.color Colors.gray800
+        , Font.color Colors.white
         , Element.spacing 10
         , Element.padding 10
         ]
@@ -83,7 +83,7 @@ iconView cfg size ( iconFn, label ) =
             |> Element.el
                 [ Font.size 25
                 , Element.centerX
-                , Background.color <| Colors.primary.middle
+                , Background.color <| Colors.navyBlue700
                 ]
         , Element.el [ Font.size 14 ] <| Element.text label
         ]

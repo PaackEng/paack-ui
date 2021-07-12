@@ -497,7 +497,7 @@ backportColorV2 tone brightness contrast =
     let
         mimicContrast { text, background } =
             if contrast then
-                Maybe.withDefault Internal.black text
+                Maybe.withDefault Internal.white text
 
             else
                 background
