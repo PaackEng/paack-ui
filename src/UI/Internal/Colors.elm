@@ -24,6 +24,20 @@ skyBlue =
 
 
 
+-- Developers common
+
+
+overlayBackground : Attribute msg
+overlayBackground =
+    Background.color (Element.rgba255 0 0 0 0.5)
+
+
+mainBackground : Attribute msg
+mainBackground =
+    Background.color white
+
+
+
 -- Shades baremetal
 
 
