@@ -3,11 +3,6 @@ module UI.Internal.Filter.Sorter exposing (..)
 
 type Sorter item
     = AlphabeticalSortable (item -> String)
-    | AlphanumericSortable (AlphanumericSortConfig item)
-    | CharSortable (item -> Char)
-    | CustomSortable (item -> item -> Order)
-    | FloatingSortable (item -> Float)
-    | IntegerSortable (item -> Int)
 
 
 type SortingDirection
@@ -104,19 +99,4 @@ sort : Sorter item -> List item -> List item
 sort sorter list =
     case sorter of
         AlphabeticalSortable retrieve ->
-            List.sortBy retrieve list
-
-        AlphanumericSortable config ->
-            alphanumericSort config list
-
-        CharSortable retrieve ->
-            List.sortBy retrieve list
-
-        CustomSortable fn ->
-            List.sortWith fn list
-
-        FloatingSortable retrieve ->
-            List.sortBy retrieve list
-
-        IntegerSortable retrieve ->
             List.sortBy retrieve list

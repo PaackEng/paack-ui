@@ -3,17 +3,15 @@ module UI.Internal.Filter.View exposing (..)
 import Element exposing (Element, fill, shrink)
 import Element.Background as Background
 import Element.Border as Border
-import Element.Events as Events
 import Element.Font as Font
-import Html.Attributes as HtmlAttrs
 import UI.Button exposing (Button)
 import UI.Icon as Icon
 import UI.Internal.Colors as Colors
 import UI.Internal.Filter.Sorter exposing (SortingDirection(..))
 import UI.Internal.RenderConfig as RenderConfig
 import UI.RenderConfig exposing (RenderConfig)
-import UI.Text as Text
 import UI.Utils.ARIA as ARIA
+import UI.Utils.Element as Element
 import UI.Utils.Focus as Focus
 
 
@@ -24,7 +22,6 @@ type FilterSize
 
 type FilterWidth
     = WidthFull
-    | WidthShrink
 
 
 type Header msg
@@ -144,7 +141,7 @@ headerToElement renderConfig (Header { label, openMsg } common { sorting, applie
                         , Border.color Colors.gray300
                         ]
                    , Element.pointer
-                   , Events.onClick openMsg
+                   , Element.onIndividualClick openMsg
                    ]
 
         body =
@@ -168,6 +165,7 @@ headerToElement renderConfig (Header { label, openMsg } common { sorting, applie
                         |> Icon.sortDecreasing
                         |> Icon.withCustomSize iconSize
                         |> Icon.renderElement renderConfig
+                        |> Element.el [ Element.width shrink ]
 
                 Nothing ->
                     Element.none
@@ -183,11 +181,9 @@ headerToElement renderConfig (Header { label, openMsg } common { sorting, applie
                             |> Element.el
                                 -- REVIEW: Add ARIA + Focus
                                 [ Element.alignRight
-                                , Element.focused
-                                    [ Border.color Colors.navyBlue600
-                                    ]
+                                , Border.width 2
                                 , Element.pointer
-                                , Events.onClick appliedData.discardMsg
+                                , Element.onIndividualClick appliedData.discardMsg
                                 ]
                     , baseColor = Colors.navyBlue200
                     }

@@ -9,7 +9,7 @@ import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
 import UI.Button as Button
-import UI.Icon as Icon exposing (Icon)
+import UI.Icon as Icon
 import UI.Internal.Basics exposing (maybeNotThen, prependIf)
 import UI.Internal.Colors as Colors
 import UI.Internal.DateInput as DateInput exposing (DateInput(..), PeriodComparison(..), PeriodDate, RangeDate)
@@ -21,9 +21,8 @@ import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.Size as Size exposing (Size)
 import UI.Internal.Tables.Filters as Filters
 import UI.Internal.Tables.Sorters as Sorters
-import UI.Internal.Text as Text
-import UI.Internal.Utils.Element exposing (overlay, shrinkButClip, tuplesToStyles, zIndex)
-import UI.Palette as Palette exposing (brightnessDarkest, brightnessMiddle, tonePrimary)
+import UI.Internal.Utils.Element exposing (overlay, tuplesToStyles, zIndex)
+import UI.Palette as Palette exposing (brightnessMiddle, tonePrimary)
 import UI.Radio as Radio
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
@@ -122,66 +121,6 @@ headerSelectToggle renderConfig toggleMsg =
 -- Mostly ripped from Button with Size.Small and WidthFull
 
 
-headerNormal : RenderConfig -> msg -> String -> Sorters.ColumnStatus -> Element msg
-headerNormal renderConfig openMsg label sorting =
-    -- Button.light
-    Icon.filter label
-        |> Icon.withSize contextSize
-        |> Icon.withColor (headerColor False)
-        |> Icon.renderElement renderConfig
-        |> Element.el [ Element.alignRight ]
-        |> headerBox renderConfig openMsg label sorting False
-
-
-headerApplied : RenderConfig -> msg -> msg -> String -> String -> Sorters.ColumnStatus -> Element msg
-headerApplied renderConfig openMsg clearMsg clearHint label sorting =
-    -- Button.primary
-    Button.fromIcon (Icon.close clearHint)
-        |> Button.cmd clearMsg Button.primary
-        |> Button.withSize contextSize
-        |> Button.renderElement renderConfig
-        |> Element.el [ Element.alignRight ]
-        |> headerBox renderConfig openMsg label sorting True
-
-
-headerText : RenderConfig -> Bool -> String -> Element msg
-headerText renderConfig isApplied label =
-    label
-        |> Text.ellipsizedText renderConfig Text.SizeCaption
-        |> Element.el
-            [ Font.size textSize
-            , Font.semiBold
-            , Font.color (Palette.toElementColor <| headerColor isApplied)
-            , Element.centerY
-            ]
-
-
-headerBox : RenderConfig -> msg -> String -> Sorters.ColumnStatus -> Bool -> Element msg -> Element msg
-headerBox renderConfig openMsg label sorting isFilterApplied rightIcon =
-    Element.row (Element.onIndividualClick openMsg :: headerAttrs isFilterApplied)
-        [ Element.row shrinkButClip
-            [ headerText renderConfig isFilterApplied label
-            , headerSorting renderConfig isFilterApplied sorting
-            ]
-            |> Element.el [ Element.width fill, Element.clip ]
-        , rightIcon
-        ]
-
-
-headerColor : Bool -> Palette.Color
-headerColor isApplied =
-    if isApplied then
-        Palette.color
-            tonePrimary
-            brightnessMiddle
-            |> Palette.setContrasting True
-
-    else
-        Palette.color
-            tonePrimary
-            brightnessDarkest
-
-
 headerPadX : Int
 headerPadX =
     (36 - 16) // 2
@@ -221,20 +160,6 @@ headerAttrs isApplied =
         :: (ARIA.toElementAttributes ARIA.roleButton
                 ++ workingTheme
            )
-
-
-headerSorting : RenderConfig -> Bool -> Sorters.ColumnStatus -> Element msg
-headerSorting renderConfig isFilterApplied status =
-    case Maybe.andThen identity status of
-        Just direction ->
-            sortingDirectionToIcon renderConfig direction
-                |> Icon.withCustomSize 12
-                |> Icon.withColor (headerColor isFilterApplied)
-                |> Icon.renderElement renderConfig
-                |> Element.el [ Element.centerY ]
-
-        Nothing ->
-            Element.none
 
 
 
@@ -624,13 +549,3 @@ internalPadding =
 internalPaddingBox : Element msg -> Element msg
 internalPaddingBox child =
     Element.el [ internalPadding ] child
-
-
-sortingDirectionToIcon : RenderConfig -> SortingDirection -> Icon
-sortingDirectionToIcon _ direction =
-    case direction of
-        SortIncreasing ->
-            Icon.sortIncreasing ""
-
-        SortDecreasing ->
-            Icon.sortDecreasing ""
