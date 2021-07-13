@@ -179,12 +179,18 @@ headerToElement renderConfig (Header { label, openMsg } common { sorting, applie
                             |> Icon.withCustomSize iconSize
                             |> Icon.renderElement renderConfig
                             |> Element.el
-                                -- REVIEW: Add ARIA + Focus
-                                [ Element.alignRight
-                                , Border.width 2
-                                , Element.pointer
-                                , Element.onIndividualClick appliedData.discardMsg
-                                ]
+                                (ARIA.toElementAttributes ARIA.roleButton
+                                    ++ Focus.toElementAttributes
+                                        { onEnter = appliedData.discardMsg
+                                        , tabIndex = 0
+                                        , hasFocus = False
+                                        }
+                                    ++ [ Element.alignRight
+                                       , Border.width 2
+                                       , Element.pointer
+                                       , Element.onIndividualClick appliedData.discardMsg
+                                       ]
+                                )
                     , baseColor = Colors.navyBlue200
                     }
 
