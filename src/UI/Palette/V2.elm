@@ -68,7 +68,7 @@ import UI.Internal.Colors as Internal exposing (..)
 import UI.Utils.Element exposing (colorSetOpacity)
 
 
-{-| `Palette.Color` upholds data about some desired color.
+{-| `Palette.Color` holds data about some desired color.
 -}
 type Color
     = Color Properties Options
@@ -86,9 +86,7 @@ type alias Options =
 
 {-| The design system describes four main entries that here are called Hues.
 
-A tone is a color with five brightness variations and a specific purpose.
-
-The four tones are Gray, Primary, Success, Warning, and Danger.
+A hue is one of the five pure colors of the palette.
 
 -}
 type Hue
@@ -99,9 +97,9 @@ type Hue
     | HueRed
 
 
-{-| Each [tone](UI-Palette#Hue) is later split in five brightness variations.
+{-| Each [hue](UI-Palette#Hue) can be paired with eight different shades.
 
-The five variations are Darkest, Middle, Light, Lighter, Lightest.
+The shades are 800, 700, 600, 500, 400, 300, 200 and 100.
 
 -}
 type Shade
@@ -115,9 +113,9 @@ type Shade
     | Shade100
 
 
-{-| Given a tone and shade, initiates the building of a color.
+{-| Given a hue and shade it constructs a color.
 
-    Palette.color tonePrimary brightnessMiddle
+    Palette.color hueBlue shade600
 
 -}
 color : Hue -> Shade -> Color
@@ -168,7 +166,7 @@ toBorderColor =
     toElementColor >> Border.color
 
 
-{-| Transforms a [`Palette.Color`](UI-Palette#Color) into an Elm-UI-compatible color.
+{-| Manually transforms a [`Palette.Color`](UI-Palette#Color) into an Elm-UI-compatible color.
 
     let
         backgroundColor =
@@ -193,7 +191,7 @@ toElementColor (Color { hue, shade } { alpha, contrast }) =
         |> colorSetOpacity alpha
 
 
-{-| Given some color, inverts it to contrast. Useful for contrasting text with the background.
+{-| Inverts a color for contrast. Useful for contrasting text with the background.
 
     backgroundColor
         |> Palette.setContrasting True
@@ -206,7 +204,7 @@ setContrasting enabled (Color prop opt) =
     Color prop { opt | contrast = enabled }
 
 
-{-| Applies an alpha value to the color, making it transparent.
+{-| Applies an alpha value to the color adding transparency.
 
     backgroundColor
         |> Palette.withAlpha 0.5
@@ -221,7 +219,7 @@ withAlpha alpha (Color prop opt) =
 
 {-| Transforms a [`Palette.Color`](UI-Palette#Color) into a CSS-compatible parameter.
 
-    Palette.color tonePrimary brightnessMiddle
+    Palette.blue700
         |> Palette.toCssColor
         |> Html.Attributes.style "font-color"
 
