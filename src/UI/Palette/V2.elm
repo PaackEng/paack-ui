@@ -1,12 +1,14 @@
 module UI.Palette.V2 exposing
-    ( blue100, blue200, blue300, blue400, blue500, blue600, blue700, blue800, gray100, gray200, gray300, gray400, gray500, gray600, gray700, gray800, green800, hueBlue, hueGray, hueGreen, hueRed, hueYellow, red100, red200, red300, red400, red500, red600, red700, shade100, shade200, shade300, shade400, shade500, shade600, shade700
-    , Hue
+    ( blue100, blue200, blue300, blue400, blue500, blue600, blue700, blue800
+    , gray100, gray200, gray300, gray400, gray500, gray600, gray700, gray800
+    , green800, red100, red200, red300, red400, red500, red600, red700, green100, green200, green300, green400, green500, green600, green700, red800, yellow100, yellow200, yellow300, yellow400, yellow500, yellow600, yellow700, yellow800
+    , Hue, hueBlue, hueGray, hueGreen, hueRed, hueYellow
+    , Shade, shade100, shade200, shade300, shade400, shade500, shade600, shade700, shade800
     , Color, color
     , setContrasting
     , withAlpha
     , toElementColor, toCssColor
     , toBackgroundColor, toFontColor, toBorderColor
-    , green100, green200, green300, green400, green500, green600, green700, red800, shade80, yellow100, yellow200, yellow300, yellow400, yellow500, yellow600, yellow700, yellow800
     )
 
 {-| `UI.Palette` is an interface offering all colors variations proposed in the design system.
@@ -17,7 +19,9 @@ module UI.Palette.V2 exposing
 
 # Which color
 
-@docs blue100, blue200, blue300, blue400, blue500, blue600, blue700, blue800, gray100, gray200, gray300, gray400, gray500, gray600, gray700, gray800, green800, hueBlue, hueGray, hueGreen, hueRed, hueYellow, red100, red200, red300, red400, red500, red600, red700, shade100, shade200, shade300, shade400, shade500, shade600, shade700, shade800
+@docs blue100, blue200, blue300, blue400, blue500, blue600, blue700, blue800
+@docs gray100, gray200, gray300, gray400, gray500, gray600, gray700, gray800
+@docs green800, red100, red200, red300, red400, red500, red600, red700, green100, green200, green300, green400, green500, green600, green700, red800, yellow100, yellow200, yellow300, yellow400, yellow500, yellow600, yellow700, yellow800
 
 
 # Which hue
@@ -27,7 +31,7 @@ module UI.Palette.V2 exposing
 
 # Which shade
 
-@docs shade100, shade200, shade300, shade400, shade500, shade600, shade700, shade800
+@docs Shade, shade100, shade200, shade300, shade400, shade500, shade600, shade700, shade800
 
 
 # Building
