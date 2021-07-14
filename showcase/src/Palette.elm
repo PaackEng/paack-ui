@@ -2,11 +2,19 @@ module Palette exposing (stories)
 
 import Element exposing (Element, px)
 import Element.Background as Background
+import Element.Border as Border
 import Element.Font as Font
 import PluginOptions exposing (defaultWithoutMenu)
 import UI.Palette.V2 as Palette exposing (Hue, Shade)
+import UI.RenderConfig as RenderConfig exposing (RenderConfig)
+import UI.Text as Text
 import UIExplorer exposing (storiesOf)
 import Utils exposing (ExplorerUI, goToDocsCallToAction, prettifyElmCode)
+
+
+renderConfig : RenderConfig
+renderConfig =
+    RenderConfig.init { width = 1920, height = 1080 } RenderConfig.localeEnglish
 
 
 stories : ExplorerUI
@@ -97,30 +105,33 @@ hues =
     ]
 
 
-shades : List Palette.Shade
+shades : List ( String, Palette.Shade )
 shades =
-    [ Palette.shade800
-    , Palette.shade700
-    , Palette.shade600
-    , Palette.shade500
-    , Palette.shade400
-    , Palette.shade300
-    , Palette.shade200
-    , Palette.shade100
+    [ ( "800", Palette.shade800 )
+    , ( "700", Palette.shade700 )
+    , ( "600", Palette.shade600 )
+    , ( "500", Palette.shade500 )
+    , ( "400", Palette.shade400 )
+    , ( "300", Palette.shade300 )
+    , ( "200", Palette.shade200 )
+    , ( "100", Palette.shade100 )
     ]
 
 
-colorView : Hue -> Palette.Shade -> Element msg
-colorView hue shade =
-    Element.el
-        [ Palette.toBackgroundColor <| Palette.color hue shade
-        , Element.width (px 100)
-        , Element.height (px 100)
-        , Element.spacing 10
-        , Element.padding 10
-        , Font.size 14
+colorView : Hue -> ( String, Palette.Shade ) -> Element msg
+colorView hue ( shadeLabel, shade ) =
+    Element.column [ Element.spacing 8 ]
+        [ Element.el
+            [ Palette.toBackgroundColor <| Palette.color hue shade
+            , Element.width (px 80)
+            , Element.height (px 60)
+            , Border.rounded 8
+            ]
+            Element.none
+        , Text.subtitle2 shadeLabel
+            |> Text.renderElement renderConfig
+            |> Element.el [ Element.width (Element.px 70) ]
         ]
-        Element.none
 
 
 colorsView : Element msg
@@ -128,7 +139,7 @@ colorsView =
     hues
         |> List.map colorVarianceView
         |> Element.column
-            [ Element.spacing 10
+            [ Element.spacing 24
             ]
 
 
@@ -136,8 +147,10 @@ colorVarianceView : ( String, Hue ) -> Element msg
 colorVarianceView ( label, hue ) =
     Element.row
         [ Element.spacing 20 ]
-        [ shades
+        [ Text.heading6 label
+            |> Text.renderElement renderConfig
+            |> Element.el [ Element.width (Element.px 70) ]
+        , shades
             |> List.map (colorView hue)
-            |> Element.row []
-        , Element.text label
+            |> Element.row [ Element.spacing 8 ]
         ]
