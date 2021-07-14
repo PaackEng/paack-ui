@@ -4,7 +4,7 @@ import Element exposing (Element, px)
 import Element.Background as Background
 import Element.Font as Font
 import PluginOptions exposing (defaultWithoutMenu)
-import UI.Palette as Palette exposing (Tone)
+import UI.Palette.V2 as Palette exposing (Hue, Shade)
 import UIExplorer exposing (storiesOf)
 import Utils exposing (ExplorerUI, goToDocsCallToAction, prettifyElmCode)
 
@@ -32,8 +32,7 @@ import UI.Palette as Palette
 
 myRedSquare =
     Element.el
-        [ Palette.toElementColor Palette.danger
-            |> Background.color
+        [ Palette.toBackgroundColor Palette.red
         , Element.width (px 100)
         , Element.height (px 100)
         , Element.spacing 10
@@ -88,30 +87,33 @@ This is quite a specific use case and we try as much is possible avoid having to
         ++ goToDocsCallToAction "Palette"
 
 
-tones : List ( String, Palette.Tone )
-tones =
-    [ ( "Gray", Palette.toneGray )
-    , ( "Primary", Palette.tonePrimary )
-    , ( "Success", Palette.toneSuccess )
-    , ( "Danger", Palette.toneDanger )
-    , ( "Warning", Palette.toneWarning )
+hues : List ( String, Palette.Hue )
+hues =
+    [ ( "Gray", Palette.hueGray )
+    , ( "Blue", Palette.hueBlue )
+    , ( "Green", Palette.hueGreen )
+    , ( "Yellow", Palette.hueYellow )
+    , ( "Red", Palette.hueRed )
     ]
 
 
-brightnesses : List Palette.Brightness
-brightnesses =
-    [ Palette.brightnessDarkest
-    , Palette.brightnessMiddle
-    , Palette.brightnessLight
-    , Palette.brightnessLighter
-    , Palette.brightnessLightest
+shades : List Palette.Shade
+shades =
+    [ Palette.shade800
+    , Palette.shade700
+    , Palette.shade600
+    , Palette.shade500
+    , Palette.shade400
+    , Palette.shade300
+    , Palette.shade200
+    , Palette.shade100
     ]
 
 
-colorView : Tone -> Palette.Brightness -> Element msg
-colorView tone brightness =
+colorView : Hue -> Palette.Shade -> Element msg
+colorView hue shade =
     Element.el
-        [ Background.color <| Palette.toElementColor <| Palette.color tone brightness
+        [ Palette.toBackgroundColor <| Palette.color hue shade
         , Element.width (px 100)
         , Element.height (px 100)
         , Element.spacing 10
@@ -123,19 +125,19 @@ colorView tone brightness =
 
 colorsView : Element msg
 colorsView =
-    tones
+    hues
         |> List.map colorVarianceView
         |> Element.column
             [ Element.spacing 10
             ]
 
 
-colorVarianceView : ( String, Tone ) -> Element msg
-colorVarianceView ( label, tone ) =
+colorVarianceView : ( String, Hue ) -> Element msg
+colorVarianceView ( label, hue ) =
     Element.row
         [ Element.spacing 20 ]
-        [ brightnesses
-            |> List.map (colorView tone)
+        [ shades
+            |> List.map (colorView hue)
             |> Element.row []
         , Element.text label
         ]

@@ -237,34 +237,32 @@ toCssColor data =
            )
 
 
-getShade : Shade -> Shades -> Element.Color
+getShade : Shade -> Internal.Shades -> Internal.ColorPair
 getShade shade =
-    .background
-        << (case shade of
-                Shade800 ->
-                    .shade800
+    case shade of
+        Shade800 ->
+            .shade800
 
-                Shade700 ->
-                    .shade700
+        Shade700 ->
+            .shade700
 
-                Shade600 ->
-                    .shade600
+        Shade600 ->
+            .shade600
 
-                Shade500 ->
-                    .shade500
+        Shade500 ->
+            .shade500
 
-                Shade400 ->
-                    .shade400
+        Shade400 ->
+            .shade400
 
-                Shade300 ->
-                    .shade300
+        Shade300 ->
+            .shade300
 
-                Shade200 ->
-                    .shade200
+        Shade200 ->
+            .shade200
 
-                Shade100 ->
-                    .shade100
-           )
+        Shade100 ->
+            .shade100
 
 
 toColor : Bool -> Shade -> Hue -> Element.Color
