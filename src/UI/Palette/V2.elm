@@ -1,14 +1,14 @@
 module UI.Palette.V2 exposing
-    ( blue100, blue200, blue300, blue400, blue500, blue600, blue700, blue800
+    ( blue, gray, green, red, yellow
+    , blue100, blue200, blue300, blue400, blue500, blue600, blue700, blue800
     , gray100, gray200, gray300, gray400, gray500, gray600, gray700, gray800
     , green800, red100, red200, red300, red400, red500, red600, red700, green100, green200, green300, green400, green500, green600, green700, red800, yellow100, yellow200, yellow300, yellow400, yellow500, yellow600, yellow700, yellow800
     , Hue, hueBlue, hueGray, hueGreen, hueRed, hueYellow
     , Shade, shade100, shade200, shade300, shade400, shade500, shade600, shade700, shade800
-    , Color, color
+    , Color, color, toBackgroundColor, toFontColor, toBorderColor
     , setContrasting
     , withAlpha
     , toElementColor, toCssColor
-    , toBackgroundColor, toFontColor, toBorderColor
     )
 
 {-| `UI.Palette` is an interface offering all colors variations proposed in the design system.
@@ -19,6 +19,7 @@ module UI.Palette.V2 exposing
 
 # Which color
 
+@docs blue, gray, green, red, yellow
 @docs blue100, blue200, blue300, blue400, blue500, blue600, blue700, blue800
 @docs gray100, gray200, gray300, gray400, gray500, gray600, gray700, gray800
 @docs green800, red100, red200, red300, red400, red500, red600, red700, green100, green200, green300, green400, green500, green600, green700, red800, yellow100, yellow200, yellow300, yellow400, yellow500, yellow600, yellow700, yellow800
@@ -36,7 +37,7 @@ module UI.Palette.V2 exposing
 
 # Building
 
-@docs Color, color
+@docs Color, color, toBackgroundColor, toFontColor, toBorderColor
 
 
 # Inverting
@@ -52,11 +53,6 @@ module UI.Palette.V2 exposing
 # Obtaining a usable variation
 
 @docs toElementColor, toCssColor
-
-
-# Shorthands
-
-@docs toBackgroundColor, toFontColor, toBorderColor
 
 -}
 
@@ -228,15 +224,15 @@ toCssColor : Color -> String
 toCssColor data =
     toElementColor data
         |> Element.toRgb
-        |> (\{ red, green, blue, alpha } ->
+        |> (\rgb ->
                 "rgba("
-                    ++ String.fromInt (ceiling (red * 255))
+                    ++ String.fromInt (ceiling (rgb.red * 255))
                     ++ ","
-                    ++ String.fromInt (ceiling (green * 255))
+                    ++ String.fromInt (ceiling (rgb.green * 255))
                     ++ ","
-                    ++ String.fromInt (ceiling (blue * 255))
+                    ++ String.fromInt (ceiling (rgb.blue * 255))
                     ++ ","
-                    ++ String.fromFloat alpha
+                    ++ String.fromFloat rgb.alpha
                     ++ ")"
            )
 
@@ -304,6 +300,41 @@ defaultOptions =
     { alpha = 1
     , contrast = False
     }
+
+
+{-| Shorthand for the most common occurrence of blue. Equivalent to blue700
+-}
+blue : Color
+blue =
+    blue700
+
+
+{-| Shorthand for the most common occurrence of red. Equivalent to red600
+-}
+red : Color
+red =
+    red600
+
+
+{-| Shorthand for the most common occurrence of gray. Equivalent to gray700
+-}
+gray : Color
+gray =
+    gray700
+
+
+{-| Shorthand for the most common occurrence of yellow. Equivalent to yellow500
+-}
+yellow : Color
+yellow =
+    yellow500
+
+
+{-| Shorthand for the most common occurrence of green. Equivalent to green500
+-}
+green : Color
+green =
+    green500
 
 
 {-| -}
