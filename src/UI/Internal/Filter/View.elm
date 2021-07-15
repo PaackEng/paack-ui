@@ -186,7 +186,6 @@ headerToElement renderConfig (Header { label, openMsg } common { sorting, applie
                                         , hasFocus = False
                                         }
                                     ++ [ Element.alignRight
-                                       , Border.width 2
                                        , Element.pointer
                                        , Element.onIndividualClick appliedData.discardMsg
                                        ]
