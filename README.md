@@ -89,6 +89,8 @@ For including these assets, we recommend using parcel.
 First, add `paack-ui-assets` using `npm install`.
 Secondly, add `import 'paack-ui-assets/js/paackSvgIconSprite.js';` to `index.js`
 
+You also have to import/provide "Fira Sans" font family, with the following weights: 400, 500, 600 and 700.
+
 ## Where to begin?
 
 See [the `UI.NavigationContainer` module documentation](http://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-NavigationContainer) for the top-level component.

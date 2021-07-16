@@ -356,11 +356,19 @@ renderButton renderConfig (RadioSize size) id (RadioButton _ label) state =
             )
                 :: Utils.id id
                 :: SelectionControl.buttonAttributes size
+
+        text =
+            case size of
+                SizeMD ->
+                    Text.subtitle1
+
+                SizeSM ->
+                    Text.body2
     in
     Element.row
         buttonAttributes
         [ Element.el radioAttrs radioBulletContent
-        , Text.body1 label |> Text.renderElement renderConfig
+        , text label |> Text.renderElement renderConfig
         ]
 
 

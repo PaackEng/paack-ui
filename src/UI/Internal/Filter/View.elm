@@ -3,10 +3,10 @@ module UI.Internal.Filter.View exposing
     , BodySorting
     , CommonOptions
     , FilterSize(..)
-    , FilterWidth(..)
     , Header
     , body
     , bodyToElement
+    , bodyWithButtons
     , bodyWithRows
     , bodyWithSize
     , bodyWithSorting
@@ -26,7 +26,6 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
-import Html.Attributes as HtmlAttrs
 import UI.Button as Button exposing (Button)
 import UI.Icon as Icon
 import UI.Internal.Colors as Colors
@@ -34,6 +33,7 @@ import UI.Internal.Filter.Sorter exposing (SortingDirection(..))
 import UI.Internal.RenderConfig as RenderConfig
 import UI.Internal.Utils.Element as Element
 import UI.RenderConfig exposing (RenderConfig)
+import UI.Size as Size
 import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element exposing (RectangleSides, zeroPadding)
 
@@ -43,12 +43,8 @@ type FilterSize
     | Medium
 
 
-type FilterWidth
-    = WidthFull
-
-
 type alias CommonOptions =
-    { width : FilterWidth
+    { width : Element.Length
     , size : FilterSize
     }
 
@@ -78,11 +74,11 @@ header : String -> msg -> Header msg
 header label openMsg =
     Header
         { label = label, openMsg = openMsg }
-        { width = WidthFull, size = Medium }
+        { width = fill, size = Medium }
         { sorting = Nothing, applied = Nothing }
 
 
-headerWithWidth : FilterWidth -> Header msg -> Header msg
+headerWithWidth : Element.Length -> Header msg -> Header msg
 headerWithWidth width (Header prop common options) =
     Header prop { common | width = width } options
 
@@ -108,20 +104,12 @@ headerWithApplied applied (Header prop common options) =
 headerToElement : RenderConfig -> Header msg -> Element msg
 headerToElement renderConfig (Header { label, openMsg } common { sorting, applied }) =
     let
-        terms =
-            RenderConfig.localeTerms renderConfig
-
         { padding, fontSize, iconSize } =
             headerProportions common.size
 
         attrs =
             ARIA.toElementAttributes ARIA.roleButton
-                ++ [ Element.width <|
-                        if common.width == WidthFull then
-                            fill
-
-                        else
-                            shrink
+                ++ [ Element.width common.width
                    , Element.paddingEach padding
                    , Element.spacing 8
                    , Background.color baseColor
@@ -130,7 +118,7 @@ headerToElement renderConfig (Header { label, openMsg } common { sorting, applie
                    , Border.color baseColor
                    , Font.color Colors.navyBlue700
                    , Font.size fontSize
-                   , Font.bold
+                   , Font.semiBold
                    , Element.focused
                         [ Border.color Colors.navyBlue600
                         ]
@@ -144,8 +132,8 @@ headerToElement renderConfig (Header { label, openMsg } common { sorting, applie
                    , Element.tabIndex 0
                    ]
 
-        sortingIcon =
-            headerSortingIcon renderConfig iconSize sorting
+        headerSortingIcon =
+            sortingIcon renderConfig [ Element.width shrink ] iconSize sorting
 
         { preview, rightIcon, baseColor } =
             case applied of
@@ -166,39 +154,18 @@ headerToElement renderConfig (Header { label, openMsg } common { sorting, applie
                     }
     in
     Element.row attrs
-        [ sortingIcon
+        [ headerSortingIcon
         , Element.text label
         , preview
         , rightIcon
         ]
 
 
-headerSortingIcon : RenderConfig -> Int -> Maybe SortingDirection -> Element msg
-headerSortingIcon renderConfig iconSize sorting =
-    case sorting of
-        Just SortAscending ->
-            RenderConfig.localeTerms renderConfig
-                |> (.tables >> .sorting >> .ascending)
-                |> Icon.sortIncreasing
-                |> Icon.withCustomSize iconSize
-                |> Icon.renderElement renderConfig
-                |> Element.el [ Element.width shrink ]
-
-        Just SortDescending ->
-            RenderConfig.localeTerms renderConfig
-                |> (.tables >> .sorting >> .descending)
-                |> Icon.sortDecreasing
-                |> Icon.withCustomSize iconSize
-                |> Icon.renderElement renderConfig
-                |> Element.el [ Element.width shrink ]
-
-        Nothing ->
-            Element.none
-
-
 headerClearIcon : RenderConfig -> msg -> Int -> Element msg
 headerClearIcon renderConfig clearMsg iconSize =
-    Icon.close "Discard"
+    RenderConfig.localeTerms renderConfig
+        |> (.filters >> .clear)
+        |> Icon.close
         |> Icon.withCustomSize iconSize
         |> Icon.renderElement renderConfig
         |> Element.el
@@ -264,11 +231,11 @@ body : String -> msg -> Body msg
 body label closeMsg =
     Body
         { label = label, closeMsg = closeMsg }
-        { width = WidthFull, size = Medium }
+        { width = fill, size = Medium }
         { sorting = Nothing, rows = [], buttons = [] }
 
 
-bodyWithWidth : FilterWidth -> Body msg -> Body msg
+bodyWithWidth : Element.Length -> Body msg -> Body msg
 bodyWithWidth width (Body prop common options) =
     Body prop { common | width = width } options
 
@@ -288,14 +255,24 @@ bodyWithRows rows (Body prop common options) =
     Body prop common { options | rows = rows }
 
 
+bodyWithButtons : List (Button msg) -> Body msg -> Body msg
+bodyWithButtons buttons (Body prop common options) =
+    Body prop common { options | buttons = buttons }
+
+
 bodyToElement : RenderConfig -> Body msg -> Element msg
 bodyToElement renderConfig (Body { label, closeMsg } common { sorting, rows, buttons }) =
     let
+        width =
+            if common.width == shrink then
+                Element.tuplesToStyles ( "min-width", "100%" )
+
+            else
+                Element.width common.width
+
         attrs =
             [ Element.zIndex 9
             , Element.alignTop
-            , Element.tuplesToStyles ( "min-width", "100%" )
-            , Element.tuplesToStyles ( "width", "min-content" )
             , Colors.mainBackground
             , Border.shadow
                 { offset = ( 0, 6 )
@@ -304,34 +281,47 @@ bodyToElement renderConfig (Body { label, closeMsg } common { sorting, rows, but
                 , color = Element.rgba 0 0 0 0.5
                 }
             , roundedBorders
+            , width
             ]
 
         bodyRows =
-            [ bodyHeader renderConfig closeMsg label common.size
-            , bodySorting renderConfig sorting
+            [ bodyHeader renderConfig common.size closeMsg label
+            , bodySorting renderConfig common.size sorting
+            , Element.column
+                [ Element.width fill
+                , Element.spacing 8
+                , Element.padding 10
+                ]
+                rows
+            , bodyButtons renderConfig common.size buttons
             ]
-                ++ rows
-                ++ bodyButtons renderConfig buttons
     in
     Element.column attrs
         bodyRows
         |> Element.clickElsewhereToLeave closeMsg []
 
 
-bodyHeader : RenderConfig -> msg -> String -> FilterSize -> Element msg
-bodyHeader renderConfig closeMsg label size =
+bodyHeader : RenderConfig -> FilterSize -> msg -> String -> Element msg
+bodyHeader renderConfig size closeMsg label =
     let
         { padding, fontSize, iconSize } =
             headerProportions size
+
+        paddingWithBorders =
+            { left = padding.left + 2
+            , top = padding.top + 1
+            , bottom = padding.bottom + 1
+            , right = padding.right
+            }
     in
     Element.row
-        [ Element.paddingEach padding
+        [ Element.paddingEach paddingWithBorders
         , Element.width fill
         , Border.color Colors.gray300
         , Border.widthEach { zeroPadding | bottom = 1 }
         , Font.color Colors.navyBlue700
         , Font.size fontSize
-        , Font.bold
+        , Font.semiBold
         ]
         [ Element.text label
         , bodyCloseIcon renderConfig closeMsg iconSize
@@ -340,7 +330,9 @@ bodyHeader renderConfig closeMsg label size =
 
 bodyCloseIcon : RenderConfig -> msg -> Int -> Element msg
 bodyCloseIcon renderConfig closeMsg iconSize =
-    Icon.close "Discard"
+    RenderConfig.localeTerms renderConfig
+        |> (.filters >> .close)
+        |> Icon.close
         |> Icon.withCustomSize iconSize
         |> Icon.renderElement renderConfig
         |> Element.el
@@ -354,22 +346,140 @@ bodyCloseIcon renderConfig closeMsg iconSize =
             )
 
 
-bodyButtons : RenderConfig -> List (Button msg) -> List (Element msg)
-bodyButtons renderConfig =
+bodySorting : RenderConfig -> FilterSize -> Maybe (BodySorting msg) -> Element msg
+bodySorting renderConfig size sorting =
+    case sorting of
+        Just { smaller, larger, ascendingSortMsg, descendingSortMsg, clearSortMsg, applied } ->
+            let
+                { fontSize, iconSize } =
+                    bodySortingProportions size
+
+                terms =
+                    RenderConfig.localeTerms renderConfig
+
+                backgroundColor direction =
+                    if applied == Just direction then
+                        Background.color Colors.navyBlue200
+
+                    else
+                        Colors.mainBackground
+
+                sortAs direction label msg =
+                    Element.row
+                        [ Element.width fill
+                        , Font.color Colors.navyBlue700
+                        , Font.size fontSize
+                        , Font.medium
+                        , Element.paddingEach
+                            { top = 6, left = 12, right = 6, bottom = 6 }
+                        , Element.spacing 6
+                        , Border.color Colors.gray300
+                        , Border.widthEach { zeroPadding | bottom = 1 }
+                        , Events.onClick msg
+                        , Element.onEnterPressed msg
+                        , Element.tabIndex 0
+                        , backgroundColor direction
+                        , Element.mouseOver
+                            [ Background.color Colors.gray300
+                            ]
+                        ]
+                        [ Element.paragraph [ Events.onClick msg ]
+                            [ Element.text label
+                            , Element.text " ("
+                            , Element.text smaller
+                            , Element.text " - "
+                            , Element.text larger
+                            , Element.text ")"
+                            ]
+                        , sortingIcon renderConfig
+                            [ Element.alignRight
+                            ]
+                            iconSize
+                            (Just direction)
+                        ]
+            in
+            Element.column [ Element.width fill ]
+                [ sortAs SortAscending terms.tables.sorting.ascending ascendingSortMsg
+                , sortAs SortDescending terms.tables.sorting.descending descendingSortMsg
+                ]
+
+        Nothing ->
+            Element.none
+
+
+bodySortingProportions :
+    FilterSize
+    ->
+        { padding : RectangleSides
+        , fontSize : Int
+        , iconSize : Int
+        }
+bodySortingProportions size =
+    case size of
+        Medium ->
+            { padding = { left = 10, bottom = 7, top = 9, right = 12 }
+            , fontSize = 10
+            , iconSize = 10
+            }
+
+        ExtraSmall ->
+            { padding = { left = 8, bottom = 7, top = 7, right = 12 }
+            , fontSize = 10
+            , iconSize = 10
+            }
+
+
+bodyButtons : RenderConfig -> FilterSize -> List (Button msg) -> Element msg
+bodyButtons renderConfig size buttons =
     let
+        buttonSize =
+            case size of
+                ExtraSmall ->
+                    Size.extraSmall
+
+                Medium ->
+                    Size.small
+
         applier =
             Button.withWidth Button.widthFull
+                >> Button.withSize buttonSize
                 >> Button.renderElement renderConfig
     in
-    List.map applier
+    Element.column
+        [ Element.width fill
+        , Element.spacing 8
+        , Element.padding 12
+        ]
+        (List.map applier buttons)
 
 
-bodySorting : RenderConfig -> Maybe (BodySorting msg) -> Element msg
-bodySorting renderConfig sorting =
+
+{- Common -}
+
+
+sortingIcon :
+    RenderConfig
+    -> List (Attribute msg)
+    -> Int
+    -> Maybe SortingDirection
+    -> Element msg
+sortingIcon renderConfig attrs iconSize sorting =
     case sorting of
-        Just {} ->
-            Element.column [ Element.width fill ]
-                []
+        Just SortAscending ->
+            RenderConfig.localeTerms renderConfig
+                |> (.tables >> .sorting >> .ascending)
+                |> Icon.sortIncreasing
+                |> Icon.withCustomSize iconSize
+                |> Icon.renderElement renderConfig
+                |> Element.el attrs
+
+        Just SortDescending ->
+            RenderConfig.localeTerms renderConfig
+                |> (.tables >> .sorting >> .descending)
+                |> Icon.sortDecreasing
+                |> Icon.withCustomSize iconSize
+                |> Icon.renderElement renderConfig
+                |> Element.el attrs
 
         Nothing ->
             Element.none

@@ -3,8 +3,9 @@ module UI.Internal.Tables.FiltersView exposing (Config, header, headerSelectTogg
 -- WARNING: Don't use any other Size.* beyond "contextSize"
 
 import Array exposing (Array)
-import Element exposing (Attribute, Element, px)
+import Element exposing (Attribute, Element, fill, minimum, px)
 import Element.Background as Background
+import UI.Button as Button
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (maybeNotThen)
 import UI.Internal.Colors as Colors
@@ -13,7 +14,7 @@ import UI.Internal.Filter.Model as Filter exposing (Filter)
 import UI.Internal.Filter.Sorter exposing (SortingDirection(..))
 import UI.Internal.Filter.View as FilterV2
 import UI.Internal.Primitives as Primitives
-import UI.Internal.RenderConfig exposing (localeTerms)
+import UI.Internal.RenderConfig as RenderConfig exposing (localeTerms)
 import UI.Internal.Size as Size exposing (Size)
 import UI.Internal.Tables.Filters as Filters
 import UI.Internal.Tables.Sorters as Sorters
@@ -54,6 +55,9 @@ header renderConfig filter sorting config =
             sortMsg =
                 Sorters.SetSorting config.index >> config.fromSortersMsg
 
+            terms =
+                RenderConfig.localeTerms renderConfig
+
             filterRender renderer editable =
                 FilterV2.body
                     config.label
@@ -69,6 +73,15 @@ header renderConfig filter sorting config =
                         , clearSortMsg = config.fromSortersMsg Sorters.ClearSorting
                         , applied = Maybe.andThen identity sorting
                         }
+                    |> FilterV2.bodyWithButtons
+                        [ terms.filters.apply
+                            |> Button.fromLabel
+                            |> Button.cmd applyMsg Button.primary
+                        , terms.filters.clear
+                            |> Button.fromLabel
+                            |> Button.cmd applyMsg Button.danger
+                        ]
+                    |> FilterV2.bodyWithWidth (fill |> minimum 180)
                     |> FilterV2.bodyToElement renderConfig
         in
         case filter of

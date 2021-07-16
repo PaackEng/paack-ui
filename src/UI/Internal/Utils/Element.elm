@@ -62,15 +62,22 @@ clickElsewhereToLeave : msg -> List (Attribute msg) -> Element msg -> Element ms
 clickElsewhereToLeave onClickMsg backgroundStyleAttributes foregroundContent =
     let
         backgroundAttributes =
-            [ positionFixed -- Needs for starting at the top-left corner
-            , zIndex 8
-            , Element.htmlAttribute <| HtmlAttrs.style "top" "0"
-            , Element.htmlAttribute <| HtmlAttrs.style "left" "0"
-            , Element.htmlAttribute <| HtmlAttrs.style "width" "100vw"
-            , Element.htmlAttribute <| HtmlAttrs.style "height" "100vh"
-            , Events.onClick onClickMsg
-            ]
-                ++ backgroundStyleAttributes
+            positionFixed
+                :: zIndex 8
+                :: Element.htmlAttribute
+            <|
+                HtmlAttrs.style "top" "0"
+                    :: Element.htmlAttribute
+                <|
+                    HtmlAttrs.style "left" "0"
+                        :: Element.htmlAttribute
+                    <|
+                        HtmlAttrs.style "width" "100vw"
+                            :: Element.htmlAttribute
+                        <|
+                            HtmlAttrs.style "height" "100vh"
+                                :: Events.onClick onClickMsg
+                                :: backgroundStyleAttributes
     in
     Element.el
         [ Element.width fill

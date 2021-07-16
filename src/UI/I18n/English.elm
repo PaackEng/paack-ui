@@ -29,7 +29,7 @@ filters : Filters
 filters =
     { dateFormat = "DD/MM/YYYY"
     , close = "Close"
-    , clear = "Clear"
+    , clear = "Clear All"
     , apply = "Apply"
     , period = filtersPeriod
     , range = filtersRange
