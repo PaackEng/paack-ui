@@ -1,11 +1,9 @@
 module Palette exposing (stories)
 
 import Element exposing (Element, px)
-import Element.Background as Background
 import Element.Border as Border
-import Element.Font as Font
 import PluginOptions exposing (defaultWithoutMenu)
-import UI.Palette.V2 as Palette exposing (Hue, Shade)
+import UI.Palette.V2 as Palette exposing (Hue)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UIExplorer exposing (storiesOf)
