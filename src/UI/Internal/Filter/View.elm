@@ -184,11 +184,7 @@ headerClearIcon renderConfig clearMsg iconSize =
 
 headerProportions :
     FilterSize
-    ->
-        { padding : RectangleSides
-        , fontSize : Int
-        , iconSize : Int
-        }
+    -> { fontSize : Int, iconSize : Int, padding : RectangleSides }
 headerProportions size =
     case size of
         Medium ->
@@ -349,79 +345,90 @@ bodyCloseIcon renderConfig closeMsg iconSize =
 bodySorting : RenderConfig -> FilterSize -> Maybe (BodySorting msg) -> Element msg
 bodySorting renderConfig size sorting =
     case sorting of
-        Just { smaller, larger, ascendingSortMsg, descendingSortMsg, clearSortMsg, applied } ->
+        Just sortingData ->
             let
-                { fontSize, iconSize } =
+                proportions =
                     bodySortingProportions size
 
                 terms =
                     RenderConfig.localeTerms renderConfig
-
-                backgroundColor direction =
-                    if applied == Just direction then
-                        Background.color Colors.navyBlue200
-
-                    else
-                        Colors.mainBackground
-
-                allowClearingMsg direction msg =
-                    if applied == Just direction then
-                        clearSortMsg
-
-                    else
-                        msg
-
-                sortAs direction label msg =
-                    Element.row
-                        [ Element.width fill
-                        , Font.color Colors.navyBlue700
-                        , Font.size fontSize
-                        , Font.medium
-                        , Element.paddingEach
-                            { top = 6, left = 12, right = 6, bottom = 6 }
-                        , Element.spacing 6
-                        , Border.color Colors.gray300
-                        , Border.widthEach { zeroPadding | bottom = 1 }
-                        , Events.onClick <| allowClearingMsg direction msg
-                        , Element.onEnterPressed <| allowClearingMsg direction msg
-                        , Element.tabIndex 0
-                        , backgroundColor direction
-                        , Element.pointer
-                        , Element.mouseOver
-                            [ Background.color Colors.gray300
-                            ]
-                        ]
-                        [ Element.paragraph []
-                            [ Element.text label
-                            , Element.text " ("
-                            , Element.text smaller
-                            , Element.text " - "
-                            , Element.text larger
-                            , Element.text ")"
-                            ]
-                        , sortingIcon renderConfig
-                            [ Element.alignRight
-                            ]
-                            iconSize
-                            (Just direction)
-                        ]
             in
             Element.column [ Element.width fill ]
-                [ sortAs SortAscending terms.tables.sorting.ascending ascendingSortMsg
-                , sortAs SortDescending terms.tables.sorting.descending descendingSortMsg
+                [ sortAs renderConfig
+                    SortAscending
+                    proportions
+                    sortingData
+                    terms.tables.sorting.ascending
+                    sortingData.ascendingSortMsg
+                , sortAs renderConfig
+                    SortDescending
+                    proportions
+                    sortingData
+                    terms.tables.sorting.descending
+                    sortingData.descendingSortMsg
                 ]
 
         Nothing ->
             Element.none
 
 
+sortAs :
+    RenderConfig
+    -> SortingDirection
+    -> { fontSize : Int, iconSize : Int, padding : RectangleSides }
+    -> BodySorting msg
+    -> String
+    -> msg
+    -> Element msg
+sortAs renderConfig direction { fontSize, iconSize } sortingData label msg =
+    let
+        ( backgroundColor, allowClearingMsg ) =
+            if sortingData.applied == Just direction then
+                ( Background.color Colors.navyBlue200
+                , sortingData.clearSortMsg
+                )
+
+            else
+                ( Colors.mainBackground, msg )
+    in
+    Element.row
+        [ Element.width fill
+        , Font.color Colors.navyBlue700
+        , Font.size fontSize
+        , Font.medium
+        , Element.paddingEach
+            { top = 6, left = 12, right = 6, bottom = 6 }
+        , Element.spacing 6
+        , Border.color Colors.gray300
+        , Border.widthEach { zeroPadding | bottom = 1 }
+        , Events.onClick <| allowClearingMsg
+        , Element.onEnterPressed <| allowClearingMsg
+        , Element.tabIndex 0
+        , backgroundColor
+        , Element.pointer
+        , Element.mouseOver
+            [ Background.color Colors.gray300
+            ]
+        ]
+        [ Element.paragraph []
+            [ Element.text label
+            , Element.text " ("
+            , Element.text sortingData.smaller
+            , Element.text " - "
+            , Element.text sortingData.larger
+            , Element.text ")"
+            ]
+        , sortingIcon renderConfig
+            [ Element.alignRight
+            ]
+            iconSize
+            (Just direction)
+        ]
+
+
 bodySortingProportions :
     FilterSize
-    ->
-        { padding : RectangleSides
-        , fontSize : Int
-        , iconSize : Int
-        }
+    -> { fontSize : Int, iconSize : Int, padding : RectangleSides }
 bodySortingProportions size =
     case size of
         Medium ->
