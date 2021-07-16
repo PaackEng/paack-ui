@@ -364,6 +364,13 @@ bodySorting renderConfig size sorting =
                     else
                         Colors.mainBackground
 
+                allowClearingMsg direction msg =
+                    if applied == Just direction then
+                        clearSortMsg
+
+                    else
+                        msg
+
                 sortAs direction label msg =
                     Element.row
                         [ Element.width fill
@@ -375,15 +382,16 @@ bodySorting renderConfig size sorting =
                         , Element.spacing 6
                         , Border.color Colors.gray300
                         , Border.widthEach { zeroPadding | bottom = 1 }
-                        , Events.onClick msg
-                        , Element.onEnterPressed msg
+                        , Events.onClick <| allowClearingMsg direction msg
+                        , Element.onEnterPressed <| allowClearingMsg direction msg
                         , Element.tabIndex 0
                         , backgroundColor direction
+                        , Element.pointer
                         , Element.mouseOver
                             [ Background.color Colors.gray300
                             ]
                         ]
-                        [ Element.paragraph [ Events.onClick msg ]
+                        [ Element.paragraph []
                             [ Element.text label
                             , Element.text " ("
                             , Element.text smaller
