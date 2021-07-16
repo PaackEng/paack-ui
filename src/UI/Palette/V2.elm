@@ -6,7 +6,6 @@ module UI.Palette.V2 exposing
     , Hue, hueBlue, hueGray, hueGreen, hueRed, hueYellow
     , Shade, shade100, shade200, shade300, shade400, shade500, shade600, shade700, shade800
     , Color, color, toBackgroundColor, toFontColor, toBorderColor
-    , setContrasting
     , withAlpha
     , toElementColor, toCssColor
     )
@@ -40,11 +39,6 @@ module UI.Palette.V2 exposing
 @docs Color, color, toBackgroundColor, toFontColor, toBorderColor
 
 
-# Inverting
-
-@docs setContrasting
-
-
 # Making it transparent
 
 @docs withAlpha
@@ -75,8 +69,7 @@ type alias Properties =
 
 
 type alias Options =
-    { contrast : Bool
-    , alpha : Float
+    { alpha : Float
     }
 
 
@@ -170,7 +163,6 @@ toBorderColor =
     in
     Element.el
         [ backgroundColor
-            |> Palette.setContrasting True
             |> Palette.toElementColor
             |> Element.Font.color
         , backgroundColor
@@ -182,22 +174,9 @@ toBorderColor =
 
 -}
 toElementColor : Color -> Element.Color
-toElementColor (Color { hue, shade } { alpha, contrast }) =
-    toColor contrast shade hue
+toElementColor (Color { hue, shade } { alpha }) =
+    toColor shade hue
         |> colorSetOpacity alpha
-
-
-{-| Inverts a color for contrast. Useful for contrasting text with the background.
-
-    backgroundColor
-        |> Palette.setContrasting True
-        |> Palette.toElementColor
-        |> Element.Font.color
-
--}
-setContrasting : Bool -> Color -> Color
-setContrasting enabled (Color prop opt) =
-    Color prop { opt | contrast = enabled }
 
 
 {-| Applies an alpha value to the color adding transparency.
@@ -237,66 +216,58 @@ toCssColor data =
            )
 
 
-getShade : Shade -> Internal.Shades -> Internal.ColorPair
+getShade : Shade -> Internal.Shades -> Element.Color
 getShade shade =
-    case shade of
-        Shade800 ->
-            .shade800
+    .background
+        << (case shade of
+                Shade800 ->
+                    .shade800
 
-        Shade700 ->
-            .shade700
+                Shade700 ->
+                    .shade700
 
-        Shade600 ->
-            .shade600
+                Shade600 ->
+                    .shade600
 
-        Shade500 ->
-            .shade500
+                Shade500 ->
+                    .shade500
 
-        Shade400 ->
-            .shade400
+                Shade400 ->
+                    .shade400
 
-        Shade300 ->
-            .shade300
+                Shade300 ->
+                    .shade300
 
-        Shade200 ->
-            .shade200
+                Shade200 ->
+                    .shade200
 
-        Shade100 ->
-            .shade100
+                Shade100 ->
+                    .shade100
+           )
 
 
-toColor : Bool -> Shade -> Hue -> Element.Color
-toColor contrast shade hue =
-    let
-        mimicContrast { text, background } =
-            if contrast then
-                Maybe.withDefault Internal.white text
+toColor : Shade -> Hue -> Element.Color
+toColor shade hue =
+    case hue of
+        HueBlue ->
+            getShade shade Internal.navyBlue
 
-            else
-                background
-    in
-    mimicContrast <|
-        case hue of
-            HueBlue ->
-                getShade shade Internal.navyBlue
+        HueRed ->
+            getShade shade Internal.red
 
-            HueRed ->
-                getShade shade Internal.red
+        HueGray ->
+            getShade shade Internal.gray
 
-            HueGray ->
-                getShade shade Internal.gray
+        HueYellow ->
+            getShade shade Internal.yellow
 
-            HueYellow ->
-                getShade shade Internal.yellow
-
-            HueGreen ->
-                getShade shade Internal.green
+        HueGreen ->
+            getShade shade Internal.green
 
 
 defaultOptions : Options
 defaultOptions =
     { alpha = 1
-    , contrast = False
     }
 
 
