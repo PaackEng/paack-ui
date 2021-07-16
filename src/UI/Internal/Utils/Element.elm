@@ -1,11 +1,13 @@
 module UI.Internal.Utils.Element exposing
-    ( css
+    ( clickElsewhereToLeave
+    , css
     , id
     , overflowAttrs
     , overflowVisible
     , overlay
     , shrinkButClip
     , style
+    , tabIndex
     , title
     , tuplesToStyles
     , zIndex
@@ -56,29 +58,31 @@ id value =
         |> Element.htmlAttribute
 
 
-overlayBackground : msg -> Element msg
-overlayBackground onClickMsg =
+clickElsewhereToLeave : msg -> List (Attribute msg) -> Element msg -> Element msg
+clickElsewhereToLeave onClickMsg backgroundStyleAttributes foregroundContent =
+    let
+        backgroundAttributes =
+            [ positionFixed -- Needs for starting at the top-left corner
+            , zIndex 8
+            , Element.htmlAttribute <| HtmlAttrs.style "top" "0"
+            , Element.htmlAttribute <| HtmlAttrs.style "left" "0"
+            , Element.htmlAttribute <| HtmlAttrs.style "width" "100vw"
+            , Element.htmlAttribute <| HtmlAttrs.style "height" "100vh"
+            , Events.onClick onClickMsg
+            ]
+                ++ backgroundStyleAttributes
+    in
     Element.el
-        [ positionFixed -- Needs for starting at the top-left corner
-        , zIndex 8
-        , Colors.overlayBackground
-        , Element.htmlAttribute <| HtmlAttrs.style "top" "0"
-        , Element.htmlAttribute <| HtmlAttrs.style "left" "0"
-        , Element.htmlAttribute <| HtmlAttrs.style "width" "100vw"
-        , Element.htmlAttribute <| HtmlAttrs.style "height" "100vh"
-        , Events.onClick onClickMsg
+        [ Element.width fill
+        , Element.height (shrink |> minimum 1)
+        , Element.inFront foregroundContent
         ]
-        Element.none
+        (Element.el backgroundAttributes Element.none)
 
 
 overlay : msg -> Element msg -> Element msg
 overlay closeMsg content =
-    Element.el
-        [ Element.width fill
-        , Element.height (shrink |> minimum 1)
-        , Element.inFront content
-        ]
-        (overlayBackground closeMsg)
+    clickElsewhereToLeave closeMsg [ Colors.overlayBackground ] content
 
 
 shrinkButClip : List (Attribute msg)
@@ -107,3 +111,10 @@ overflowVisible =
 zIndex : Int -> Attribute msg
 zIndex val =
     Element.htmlAttribute <| HtmlAttrs.style "z-index" (String.fromInt val)
+
+
+{-| Give preference to UI.Util.Focus
+-}
+tabIndex : Int -> Attribute msg
+tabIndex val =
+    Element.htmlAttribute <| HtmlAttrs.style "tabIndex" (String.fromInt val)
