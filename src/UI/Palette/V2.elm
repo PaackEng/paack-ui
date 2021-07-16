@@ -60,7 +60,7 @@ import Element
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
-import UI.Internal.Colors as Internal exposing (..)
+import UI.Internal.Colors as Internal
 import UI.Utils.Element exposing (colorSetOpacity)
 
 
