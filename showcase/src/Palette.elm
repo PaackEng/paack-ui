@@ -1,12 +1,18 @@
 module Palette exposing (stories)
 
 import Element exposing (Element, px)
-import Element.Background as Background
-import Element.Font as Font
+import Element.Border as Border
 import PluginOptions exposing (defaultWithoutMenu)
-import UI.Palette as Palette exposing (Tone)
+import UI.Palette.V2 as Palette exposing (Hue)
+import UI.RenderConfig as RenderConfig exposing (RenderConfig)
+import UI.Text as Text
 import UIExplorer exposing (storiesOf)
 import Utils exposing (ExplorerUI, goToDocsCallToAction, prettifyElmCode)
+
+
+renderConfig : RenderConfig
+renderConfig =
+    RenderConfig.init { width = 1920, height = 1080 } RenderConfig.localeEnglish
 
 
 stories : ExplorerUI
@@ -32,8 +38,7 @@ import UI.Palette as Palette
 
 myRedSquare =
     Element.el
-        [ Palette.toElementColor Palette.danger
-            |> Background.color
+        [ Palette.toBackgroundColor Palette.red
         , Element.width (px 100)
         , Element.height (px 100)
         , Element.spacing 10
@@ -88,54 +93,62 @@ This is quite a specific use case and we try as much is possible avoid having to
         ++ goToDocsCallToAction "Palette"
 
 
-tones : List ( String, Palette.Tone )
-tones =
-    [ ( "Gray", Palette.toneGray )
-    , ( "Primary", Palette.tonePrimary )
-    , ( "Success", Palette.toneSuccess )
-    , ( "Danger", Palette.toneDanger )
-    , ( "Warning", Palette.toneWarning )
+hues : List ( String, Palette.Hue )
+hues =
+    [ ( "Gray", Palette.hueGray )
+    , ( "Blue", Palette.hueBlue )
+    , ( "Green", Palette.hueGreen )
+    , ( "Yellow", Palette.hueYellow )
+    , ( "Red", Palette.hueRed )
     ]
 
 
-brightnesses : List Palette.Brightness
-brightnesses =
-    [ Palette.brightnessDarkest
-    , Palette.brightnessMiddle
-    , Palette.brightnessLight
-    , Palette.brightnessLighter
-    , Palette.brightnessLightest
+shades : List ( String, Palette.Shade )
+shades =
+    [ ( "800", Palette.shade800 )
+    , ( "700", Palette.shade700 )
+    , ( "600", Palette.shade600 )
+    , ( "500", Palette.shade500 )
+    , ( "400", Palette.shade400 )
+    , ( "300", Palette.shade300 )
+    , ( "200", Palette.shade200 )
+    , ( "100", Palette.shade100 )
     ]
 
 
-colorView : Tone -> Palette.Brightness -> Element msg
-colorView tone brightness =
-    Element.el
-        [ Background.color <| Palette.toElementColor <| Palette.color tone brightness
-        , Element.width (px 100)
-        , Element.height (px 100)
-        , Element.spacing 10
-        , Element.padding 10
-        , Font.size 14
+colorView : Hue -> ( String, Palette.Shade ) -> Element msg
+colorView hue ( shadeLabel, shade ) =
+    Element.column [ Element.spacing 8 ]
+        [ Element.el
+            [ Palette.toBackgroundColor <| Palette.color hue shade
+            , Element.width (px 80)
+            , Element.height (px 60)
+            , Border.rounded 8
+            ]
+            Element.none
+        , Text.subtitle2 shadeLabel
+            |> Text.renderElement renderConfig
+            |> Element.el [ Element.width (Element.px 70) ]
         ]
-        Element.none
 
 
 colorsView : Element msg
 colorsView =
-    tones
+    hues
         |> List.map colorVarianceView
         |> Element.column
-            [ Element.spacing 10
+            [ Element.spacing 24
             ]
 
 
-colorVarianceView : ( String, Tone ) -> Element msg
-colorVarianceView ( label, tone ) =
+colorVarianceView : ( String, Hue ) -> Element msg
+colorVarianceView ( label, hue ) =
     Element.row
         [ Element.spacing 20 ]
-        [ brightnesses
-            |> List.map (colorView tone)
-            |> Element.row []
-        , Element.text label
+        [ Text.heading6 label
+            |> Text.renderElement renderConfig
+            |> Element.el [ Element.width (Element.px 70) ]
+        , shades
+            |> List.map (colorView hue)
+            |> Element.row [ Element.spacing 8 ]
         ]

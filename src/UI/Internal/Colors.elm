@@ -348,7 +348,7 @@ allShades =
     [ Shade800, Shade700, Shade600, Shade500, Shade400, Shade300, Shade200, Shade100 ]
 
 
-type Tone
+type Hue
     = Gray
     | NavyBlue
     | Green
@@ -356,7 +356,7 @@ type Tone
     | Red
 
 
-allTones : List Tone
+allTones : List Hue
 allTones =
     [ Gray, NavyBlue, Green, Yellow, Red ]
 
@@ -389,7 +389,7 @@ colorFromShades shade shades =
             shades.shade100
 
 
-shadesFromTone : Tone -> Shades
+shadesFromTone : Hue -> Shades
 shadesFromTone tone =
     case tone of
         Gray ->
@@ -408,15 +408,15 @@ shadesFromTone tone =
             red
 
 
-getBackgroundColor : Tone -> Shade -> Element.Color
-getBackgroundColor tone shade =
-    shadesFromTone tone
+getBackgroundColor : Hue -> Shade -> Element.Color
+getBackgroundColor hue shade =
+    shadesFromTone hue
         |> colorFromShades shade
         |> .background
 
 
-getTextColor : Tone -> Shade -> Maybe Element.Color
-getTextColor tone shade =
-    shadesFromTone tone
+getTextColor : Hue -> Shade -> Maybe Element.Color
+getTextColor hue shade =
+    shadesFromTone hue
         |> colorFromShades shade
         |> .text
