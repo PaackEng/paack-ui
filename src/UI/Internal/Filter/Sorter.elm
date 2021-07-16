@@ -6,8 +6,8 @@ type Sorter item
 
 
 type SortingDirection
-    = SortIncreasing
-    | SortDecreasing
+    = SortAscending
+    | SortDescending
 
 
 type alias AlphanumericSortConfig item =

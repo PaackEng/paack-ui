@@ -64,8 +64,8 @@ header renderConfig filter sorting config =
                     |> FilterV2.bodyWithSorting
                         { smaller = "A"
                         , larger = "Z"
-                        , ascendingSortMsg = sortMsg SortIncreasing
-                        , descendingSortMsg = sortMsg SortDecreasing
+                        , ascendingSortMsg = sortMsg SortAscending
+                        , descendingSortMsg = sortMsg SortDescending
                         , clearSortMsg = config.fromSortersMsg Sorters.ClearSorting
                         , applied = Maybe.andThen identity sorting
                         }

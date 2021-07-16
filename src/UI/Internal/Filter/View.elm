@@ -176,17 +176,17 @@ headerToElement renderConfig (Header { label, openMsg } common { sorting, applie
 headerSortingIcon : RenderConfig -> Int -> Maybe SortingDirection -> Element msg
 headerSortingIcon renderConfig iconSize sorting =
     case sorting of
-        Just SortIncreasing ->
+        Just SortAscending ->
             RenderConfig.localeTerms renderConfig
-                |> (.tables >> .sorting >> .increase)
+                |> (.tables >> .sorting >> .ascending)
                 |> Icon.sortIncreasing
                 |> Icon.withCustomSize iconSize
                 |> Icon.renderElement renderConfig
                 |> Element.el [ Element.width shrink ]
 
-        Just SortDecreasing ->
+        Just SortDescending ->
             RenderConfig.localeTerms renderConfig
-                |> (.tables >> .sorting >> .decrease)
+                |> (.tables >> .sorting >> .descending)
                 |> Icon.sortDecreasing
                 |> Icon.withCustomSize iconSize
                 |> Icon.renderElement renderConfig

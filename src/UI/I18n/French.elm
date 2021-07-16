@@ -80,8 +80,8 @@ tablesDetails =
 
 tablesSorting : TablesSorting
 tablesSorting =
-    { increase = "Trier de A à Z"
-    , decrease = "Trier de Z à A"
+    { ascending = "Sort Ascending"
+    , descending = "Sort Descending"
     }
 
 

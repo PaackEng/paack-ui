@@ -4,9 +4,9 @@ module UI.Internal.Tables.Sorters exposing
     , Sorters
     , get
     , itemsApplySorting
+    , sortAscending
     , sortBy
-    , sortDecreasing
-    , sortIncreasing
+    , sortDescending
     , sortersEmpty
     , unsortable
     , update
@@ -45,7 +45,7 @@ update msg sorters =
         SetSorting index direction ->
             let
                 reverse =
-                    direction == SortDecreasing
+                    direction == SortDescending
             in
             ( sort direction index sorters
             , Analytics.SetSorting index reverse
@@ -78,10 +78,10 @@ itemsApplySorting (Sorters sorters) items =
                     Sorter.sort status.by items
             in
             case status.direction of
-                SortIncreasing ->
+                SortAscending ->
                     sortedItems
 
-                SortDecreasing ->
+                SortDescending ->
                     List.reverse sortedItems
 
 
@@ -112,14 +112,14 @@ unsortable (Sorters accu) =
         }
 
 
-sortIncreasing : Int -> Sorters item columns -> Sorters item columns
-sortIncreasing =
-    sort SortIncreasing
+sortAscending : Int -> Sorters item columns -> Sorters item columns
+sortAscending =
+    sort SortAscending
 
 
-sortDecreasing : Int -> Sorters item columns -> Sorters item columns
-sortDecreasing =
-    sort SortDecreasing
+sortDescending : Int -> Sorters item columns -> Sorters item columns
+sortDescending =
+    sort SortDescending
 
 
 sort : SortingDirection -> Int -> Sorters item columns -> Sorters item columns

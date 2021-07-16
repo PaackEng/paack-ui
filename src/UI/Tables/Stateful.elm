@@ -1114,7 +1114,7 @@ sortBy =
 -}
 sortDecreasing : Int -> Sorters item columns -> Sorters item columns
 sortDecreasing =
-    Sorters.sortDecreasing
+    Sorters.sortDescending
 
 
 {-| Changes the initial sorting to some columns as increasing.
@@ -1127,7 +1127,7 @@ sortDecreasing =
 -}
 sortIncreasing : Int -> Sorters item columns -> Sorters item columns
 sortIncreasing =
-    Sorters.sortIncreasing
+    Sorters.sortAscending
 
 
 {-| An empty [`Sorters`](#Sorters) set.

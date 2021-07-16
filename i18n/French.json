@@ -43,8 +43,8 @@
             "collapse": "Crash"
         },
         "sorting": {
-            "increase": "Trier de A à Z",
-            "decrease": "Trier de Z à A"
+            "ascending": "Sort Ascending",
+            "descending": "Sort Descending"
         },
         "selectRow": "Sélectionner la ligne",
         "selectAll": "Sélectionner toutes les lignes"
