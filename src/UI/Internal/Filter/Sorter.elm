@@ -1,4 +1,4 @@
-module UI.Internal.Filter.Sorter exposing (..)
+module UI.Internal.Filter.Sorter exposing (Sorter(..), SortingDirection(..), preview, sort)
 
 
 type Sorter item
@@ -31,3 +31,22 @@ sort sorter list =
 
         IntegerSortable retrieve ->
             List.sortBy retrieve list
+
+
+preview : Sorter item -> Maybe ( String, String )
+preview sorter =
+    case sorter of
+        AlphabeticalSortable _ ->
+            Just ( "A", "Z" )
+
+        CharSortable _ ->
+            Just ( "A", "Z" )
+
+        CustomSortable _ ->
+            Nothing
+
+        FloatSortable _ ->
+            Just ( "0", "9" )
+
+        IntegerSortable _ ->
+            Just ( "0", "9" )

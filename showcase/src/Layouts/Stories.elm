@@ -95,7 +95,7 @@ selectedView renderConfig model =
                 , Element.column
                     [ Element.spacing 8 ]
                     [ "Year: "
-                        ++ book.year
+                        ++ String.fromInt book.year
                         |> Text.body1
                         |> Text.renderElement renderConfig
                     , "ISBN: "

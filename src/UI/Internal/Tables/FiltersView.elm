@@ -11,7 +11,7 @@ import UI.Internal.Basics exposing (maybeNotThen)
 import UI.Internal.Colors as Colors
 import UI.Internal.DateInput as DateInput exposing (DateInput(..), PeriodComparison(..), PeriodDate, RangeDate)
 import UI.Internal.Filter.Model as Filter exposing (Filter)
-import UI.Internal.Filter.Sorter exposing (SortingDirection(..))
+import UI.Internal.Filter.Sorter as Sorter exposing (SortingDirection(..))
 import UI.Internal.Filter.View as FilterV2
 import UI.Internal.Primitives as Primitives
 import UI.Internal.RenderConfig as RenderConfig exposing (localeTerms)
@@ -39,7 +39,7 @@ type alias Config msg =
 header :
     RenderConfig
     -> Filter msg item
-    -> Sorters.ColumnStatus
+    -> Sorters.ColumnStatus item
     -> Config msg
     -> Element msg
 header renderConfig filter sorting config =
@@ -66,12 +66,17 @@ header renderConfig filter sorting config =
                     |> FilterV2.bodyWithRows
                         (renderer renderConfig applyMsg config editable)
                     |> FilterV2.bodyWithSorting
-                        { smaller = "A"
-                        , larger = "Z"
+                        { preview =
+                            Maybe.andThen
+                                (Tuple.second
+                                    >> Sorter.preview
+                                    >> Maybe.map (\( s, l ) -> { smaller = s, larger = l })
+                                )
+                                sorting
                         , ascendingSortMsg = sortMsg SortAscending
                         , descendingSortMsg = sortMsg SortDescending
                         , clearSortMsg = config.fromSortersMsg Sorters.ClearSorting
-                        , applied = Maybe.andThen identity sorting
+                        , applied = Maybe.andThen Tuple.first sorting
                         }
                     |> FilterV2.bodyWithButtons
                         [ terms.filters.apply
@@ -109,7 +114,7 @@ header renderConfig filter sorting config =
             config.openMsg
             |> FilterV2.headerWithSize FilterV2.sizeExtraSmall
             |> FilterV2.headerWithSorting
-                (Maybe.andThen identity sorting)
+                (Maybe.andThen Tuple.first sorting)
             |> FilterV2.headerWithApplied
                 (Maybe.map
                     (\i -> { preview = String.fromInt i, clearMsg = clearMsg })

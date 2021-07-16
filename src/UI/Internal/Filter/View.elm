@@ -214,8 +214,7 @@ type Body msg
 
 
 type alias BodySorting msg =
-    { smaller : String
-    , larger : String
+    { preview : Maybe { smaller : String, larger : String }
     , ascendingSortMsg : msg
     , descendingSortMsg : msg
     , clearSortMsg : msg
@@ -390,6 +389,29 @@ sortAs renderConfig direction { fontSize, iconSize } sortingData label msg =
 
             else
                 ( Colors.mainBackground, msg )
+
+        labelParagraph =
+            case ( sortingData.preview, direction ) of
+                ( Just { smaller, larger }, SortAscending ) ->
+                    [ Element.text label
+                    , Element.text " ("
+                    , Element.text smaller
+                    , Element.text " - "
+                    , Element.text larger
+                    , Element.text ")"
+                    ]
+
+                ( Just { smaller, larger }, SortDescending ) ->
+                    [ Element.text label
+                    , Element.text " ("
+                    , Element.text larger
+                    , Element.text " - "
+                    , Element.text smaller
+                    , Element.text ")"
+                    ]
+
+                _ ->
+                    [ Element.text label ]
     in
     Element.row
         [ Element.width fill
@@ -410,14 +432,7 @@ sortAs renderConfig direction { fontSize, iconSize } sortingData label msg =
             [ Background.color Colors.gray300
             ]
         ]
-        [ Element.paragraph []
-            [ Element.text label
-            , Element.text " ("
-            , Element.text sortingData.smaller
-            , Element.text " - "
-            , Element.text sortingData.larger
-            , Element.text ")"
-            ]
+        [ Element.paragraph [] labelParagraph
         , sortingIcon renderConfig
             [ Element.alignRight
             ]

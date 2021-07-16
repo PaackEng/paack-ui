@@ -10,7 +10,7 @@ module UI.Tables.Stateful exposing
     , periodSingle, pariodAfter, periodBefore, localPeriodDateFilter, remotePeriodDateFilter
     , localSelectFilter, remoteSelectFilter
     , Sorters, stateWithSorters
-    , sortersEmpty, sortBy, sortByFloat, sortByInteger, sortByChar, sortWith, unsortable
+    , sortersEmpty, sortBy, sortByFloat, sortByInt, sortByChar, sortWith, unsortable
     , sortDecreasing, sortIncreasing
     , withWidth
     , stateWithSelection, stateIsSelected
@@ -140,7 +140,7 @@ And on model:
 # Sorting
 
 @docs Sorters, stateWithSorters
-@docs sortersEmpty, sortBy, sortByFloat, sortByInteger, sortByChar, sortWith, unsortable
+@docs sortersEmpty, sortBy, sortByFloat, sortByInt, sortByChar, sortWith, unsortable
 @docs sortDecreasing, sortIncreasing
 
 
@@ -1128,16 +1128,16 @@ sortByFloat fn =
     sortersInit =
         sortersEmpty
             |> unsortable
-            |> sortByInteger .count
-            |> sortByInteger .areaCode
-            |> sortByInteger .hour
+            |> sortByInt .count
+            |> sortByInt .areaCode
+            |> sortByInt .hour
 
 -}
-sortByInteger :
+sortByInt :
     (item -> Int)
     -> Sorters item columns
     -> Sorters item (T.Increase columns)
-sortByInteger fn =
+sortByInt fn =
     Sorters.sortWith (IntegerSortable fn)
 
 
@@ -1427,7 +1427,7 @@ filterHeader :
     -> Maybe Int
     -> Column
     -> Filter.Filter msg item
-    -> Sorters.ColumnStatus
+    -> Sorters.ColumnStatus item
     -> Int
     -> Element msg
 filterHeader renderConfig toExternalMsg selected (Column header { width }) filter sorter index =

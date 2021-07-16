@@ -35,8 +35,8 @@ type Sorters item columns
         }
 
 
-type alias ColumnStatus =
-    Maybe (Maybe SortingDirection)
+type alias ColumnStatus item =
+    Maybe ( Maybe SortingDirection, Sorter item )
 
 
 update : Msg -> Sorters item columns -> ( Sorters item columns, Effect msg )
@@ -140,7 +140,7 @@ sort direction column ((Sorters accu) as sorters) =
             sorters
 
 
-get : Int -> Sorters item columns -> ColumnStatus
+get : Int -> Sorters item columns -> ColumnStatus item
 get index (Sorters { columns, status }) =
     let
         getDirection currentSorting =
@@ -152,8 +152,8 @@ get index (Sorters { columns, status }) =
 
         isSortableThen sortable =
             case sortable of
-                Just _ ->
-                    Just (Maybe.andThen getDirection status)
+                Just by ->
+                    Just ( Maybe.andThen getDirection status, by )
 
                 Nothing ->
                     Nothing
