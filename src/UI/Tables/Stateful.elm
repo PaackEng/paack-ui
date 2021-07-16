@@ -10,7 +10,7 @@ module UI.Tables.Stateful exposing
     , periodSingle, pariodAfter, periodBefore, localPeriodDateFilter, remotePeriodDateFilter
     , localSelectFilter, remoteSelectFilter
     , Sorters, stateWithSorters
-    , sortersEmpty, sortBy, unsortable
+    , sortersEmpty, sortBy, sortByFloat, sortByInteger, sortByChar, sortWith, unsortable
     , sortDecreasing, sortIncreasing
     , withWidth
     , stateWithSelection, stateIsSelected
@@ -140,7 +140,7 @@ And on model:
 # Sorting
 
 @docs Sorters, stateWithSorters
-@docs sortersEmpty, sortBy, unsortable
+@docs sortersEmpty, sortBy, sortByFloat, sortByInteger, sortByChar, sortWith, unsortable
 @docs sortDecreasing, sortIncreasing
 
 
@@ -177,6 +177,7 @@ import UI.Effect as Effect exposing (Effect)
 import UI.Internal.Basics exposing (ifThenElse, maybeThen, prependMaybe)
 import UI.Internal.DateInput as DateInput exposing (DateInput, PeriodDate, RangeDate)
 import UI.Internal.Filter.Model as Filter
+import UI.Internal.Filter.Sorter exposing (Sorter(..))
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.Tables.Common exposing (..)
@@ -1087,7 +1088,7 @@ stateWithSorters sorters (State state) =
         }
 
 
-{-| Describes how to convert a column's value to a sortable `List String`.
+{-| Allow sorting a column alphabetically.
 
     sortersInit =
         sortersEmpty
@@ -1100,8 +1101,76 @@ sortBy :
     (item -> String)
     -> Sorters item columns
     -> Sorters item (T.Increase columns)
-sortBy =
-    Sorters.sortBy
+sortBy fn =
+    Sorters.sortWith (AlphabeticalSortable fn)
+
+
+{-| Allow sorting a column using a Float value.
+
+    sortersInit =
+        sortersEmpty
+            |> unsortable
+            |> sortByFloat .value
+            |> sortByFloat .timestamp
+            |> sortByFloat .average
+
+-}
+sortByFloat :
+    (item -> Float)
+    -> Sorters item columns
+    -> Sorters item (T.Increase columns)
+sortByFloat fn =
+    Sorters.sortWith (FloatSortable fn)
+
+
+{-| Allow sorting a column using an Integer value.
+
+    sortersInit =
+        sortersEmpty
+            |> unsortable
+            |> sortByInteger .count
+            |> sortByInteger .areaCode
+            |> sortByInteger .hour
+
+-}
+sortByInteger :
+    (item -> Int)
+    -> Sorters item columns
+    -> Sorters item (T.Increase columns)
+sortByInteger fn =
+    Sorters.sortWith (IntegerSortable fn)
+
+
+{-| Allow sorting a column using a Char value.
+
+    sortersInit =
+        sortersEmpty
+            |> unsortable
+            |> sortByChar .firstLetter
+
+-}
+sortByChar :
+    (item -> Char)
+    -> Sorters item columns
+    -> Sorters item (T.Increase columns)
+sortByChar fn =
+    Sorters.sortWith (CharSortable fn)
+
+
+{-| Allow sorting a column with a custom function.
+
+    sortersInit =
+        sortersEmpty
+            |> unsortable
+            |> sortWith (List.sortWith flippedComparison)
+
+-}
+sortWith :
+    (List item -> List item)
+    -> Sorters item columns
+    -> Sorters item (T.Increase columns)
+sortWith fn =
+    Sorters.sortWith (CustomSortable fn)
 
 
 {-| Changes the initial sorting to some columns as descreasing.

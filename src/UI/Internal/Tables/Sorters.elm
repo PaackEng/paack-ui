@@ -5,8 +5,8 @@ module UI.Internal.Tables.Sorters exposing
     , get
     , itemsApplySorting
     , sortAscending
-    , sortBy
     , sortDescending
+    , sortWith
     , sortersEmpty
     , unsortable
     , update
@@ -14,7 +14,7 @@ module UI.Internal.Tables.Sorters exposing
 
 import UI.Effect as Effect exposing (Effect)
 import UI.Internal.Analytics as Analytics
-import UI.Internal.Filter.Sorter as Sorter exposing (Sorter(..), SortingDirection(..))
+import UI.Internal.Filter.Sorter as Sorter exposing (Sorter, SortingDirection(..))
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Utils.TypeNumbers as T
 
@@ -93,13 +93,13 @@ sortersEmpty =
         }
 
 
-sortBy :
-    (item -> String)
+sortWith :
+    Sorter item
     -> Sorters item columns
     -> Sorters item (T.Increase columns)
-sortBy fn (Sorters accu) =
+sortWith customSorter (Sorters accu) =
     Sorters
-        { columns = NArray.push (Just <| AlphabeticalSortable fn) accu.columns
+        { columns = NArray.push (Just customSorter) accu.columns
         , status = accu.status
         }
 
