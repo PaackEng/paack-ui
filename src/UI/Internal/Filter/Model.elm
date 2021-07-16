@@ -147,6 +147,28 @@ isApplied filter =
             editable.applied /= Nothing
 
 
+appliedLength : Filter msg item -> Maybe Int
+appliedLength filter =
+    case filter of
+        SingleTextFilter { editable } ->
+            Maybe.map (always 1) editable.applied
+
+        MultiTextFilter { editable } ->
+            Maybe.map Array.length editable.applied
+
+        SingleDateFilter { editable } ->
+            Maybe.map (always 1) editable.applied
+
+        RangeDateFilter { editable } ->
+            Maybe.map (always 1) editable.applied
+
+        PeriodDateFilter { editable } ->
+            Maybe.map (always 1) editable.applied
+
+        SelectFilter _ { editable } ->
+            Maybe.map (always 1) editable.applied
+
+
 localAppliedMap : FilterConfig msg value item -> Maybe (item -> Bool)
 localAppliedMap { editable, strategy } =
     case strategy of

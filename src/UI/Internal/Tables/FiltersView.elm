@@ -111,11 +111,9 @@ header renderConfig filter sorting config =
             |> FilterV2.headerWithSorting
                 (Maybe.andThen identity sorting)
             |> FilterV2.headerWithApplied
-                (if Filter.isApplied filter then
-                    Just { preview = "1", clearMsg = clearMsg }
-
-                 else
-                    Nothing
+                (Maybe.map
+                    (\i -> { preview = String.fromInt i, clearMsg = clearMsg })
+                    (Filter.appliedLength filter)
                 )
             |> FilterV2.headerToElement renderConfig
 
