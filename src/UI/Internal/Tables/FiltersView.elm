@@ -84,7 +84,7 @@ header renderConfig filter sorting config =
                             |> Button.cmd applyMsg Button.primary
                         , terms.filters.clear
                             |> Button.fromLabel
-                            |> Button.cmd applyMsg Button.danger
+                            |> Button.cmd clearMsg Button.danger
                         ]
                     |> FilterV2.bodyWithWidth (fill |> minimum 180)
                     |> FilterV2.bodyToElement renderConfig
