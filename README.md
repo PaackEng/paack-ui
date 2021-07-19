@@ -89,7 +89,14 @@ For including these assets, we recommend using parcel.
 First, add `paack-ui-assets` using `npm install`.
 Secondly, add `import 'paack-ui-assets/js/paackSvgIconSprite.js';` to `index.js`
 
-You also have to import/provide "Fira Sans" font family, with the following weights: 400, 500, 600 and 700.
+Also, you have to import or provide the "Fira Sans" font family, with the following weights: 400, 500, 600 and 700. Here's an example for you:
+
+```html
+<link
+  href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+```
 
 ## Where to begin?
 
