@@ -5,6 +5,7 @@ module UI.Internal.Utils.Element exposing
     , overflowAttrs
     , overflowVisible
     , overlay
+    , overlayZIndex
     , shrinkButClip
     , style
     , tabIndex
@@ -64,7 +65,7 @@ clickElsewhereToLeave onClickMsg backgroundStyleAttributes foregroundContent =
         backgroundAttributes =
             positionFixed
                 -- Needs for starting at the top-left corner
-                :: zIndex 8
+                :: zIndex overlayZIndex
                 :: (Element.htmlAttribute <| HtmlAttrs.style "top" "0")
                 :: (Element.htmlAttribute <| HtmlAttrs.style "left" "0")
                 :: (Element.htmlAttribute <| HtmlAttrs.style "width" "100vw")
@@ -92,6 +93,11 @@ shrinkButClip =
         , ( "max-width", "100%" )
         , ( "overflow", "clip" )
         ]
+
+
+overlayZIndex : Int
+overlayZIndex =
+    8
 
 
 

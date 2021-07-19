@@ -31,7 +31,7 @@ import UI.Icon as Icon
 import UI.Internal.Colors as Colors
 import UI.Internal.Filter.Sorter exposing (SortingDirection(..))
 import UI.Internal.RenderConfig as RenderConfig
-import UI.Internal.Utils.Element as Element
+import UI.Internal.Utils.Element as Element exposing (overlayZIndex)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Utils.ARIA as ARIA
@@ -266,7 +266,7 @@ bodyToElement renderConfig (Body { label, closeMsg } common { sorting, rows, but
                 Element.width common.width
 
         attrs =
-            [ Element.zIndex 9
+            [ Element.zIndex (overlayZIndex + 1)
             , Element.alignTop
             , Colors.mainBackground
             , Border.shadow
