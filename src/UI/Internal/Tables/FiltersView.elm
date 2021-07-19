@@ -129,61 +129,26 @@ header renderConfig filter sorting config =
 
 headerSelectToggle : RenderConfig -> msg -> Element msg
 headerSelectToggle renderConfig toggleMsg =
+    let
+        headerAttrs =
+            Element.onIndividualClick toggleMsg
+                :: Primitives.roundedBorders contextSize
+                :: Element.width Element.fill
+                :: Element.padding ((34 - 16) // 2)
+                :: Element.spacing 8
+                :: Element.pointer
+                :: Background.color Colors.gray200
+                :: Element.mouseOver [ Background.color Colors.navyBlue200 ]
+                :: Element.colorTransition 100
+                ++ ARIA.toElementAttributes ARIA.roleButton
+    in
     (localeTerms renderConfig |> .tables |> .selectAll)
         |> Icon.check
         |> Icon.withSize contextSize
         |> Icon.renderElement renderConfig
-        |> Element.el
-            (Element.onIndividualClick toggleMsg
-                :: headerAttrs False
-            )
+        |> Element.el headerAttrs
         |> Element.el
             [ Element.width (px 32) ]
-
-
-
--- Mostly ripped from Button with Size.Small and WidthFull
-
-
-headerPadX : Int
-headerPadX =
-    (36 - 16) // 2
-
-
-headerAttrs : Bool -> List (Attribute msg)
-headerAttrs isApplied =
-    let
-        baseHeight =
-            if isApplied then
-                24
-
-            else
-                16
-
-        paddingXY =
-            Element.paddingXY
-                headerPadX
-                ((36 - baseHeight) // 2)
-
-        workingTheme =
-            if isApplied then
-                [ Background.color Colors.navyBlue700 ]
-
-            else
-                Background.color
-                    Colors.gray200
-                    :: Element.mouseOver [ Background.color Colors.navyBlue200 ]
-                    :: Element.colorTransition 100
-    in
-    Primitives.roundedBorders
-        contextSize
-        :: Element.width Element.fill
-        :: paddingXY
-        :: Element.spacing 8
-        :: Element.pointer
-        :: (ARIA.toElementAttributes ARIA.roleButton
-                ++ workingTheme
-           )
 
 
 
@@ -196,7 +161,6 @@ contextSize =
 
 
 
--- Editing
 -- Specifics
 
 
