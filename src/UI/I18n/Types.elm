@@ -67,8 +67,8 @@ type alias TablesDetails =
 
 
 type alias TablesSorting =
-    { increase : String
-    , decrease : String
+    { ascending : String
+    , descending : String
     }
 
 

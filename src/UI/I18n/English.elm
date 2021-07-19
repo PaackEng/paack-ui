@@ -29,7 +29,7 @@ filters : Filters
 filters =
     { dateFormat = "DD/MM/YYYY"
     , close = "Close"
-    , clear = "Clear"
+    , clear = "Clear All"
     , apply = "Apply"
     , period = filtersPeriod
     , range = filtersRange
@@ -80,8 +80,8 @@ tablesDetails =
 
 tablesSorting : TablesSorting
 tablesSorting =
-    { increase = "Sort from A - Z"
-    , decrease = "Sort from Z - A"
+    { ascending = "Sort Ascending"
+    , descending = "Sort Descending"
     }
 
 

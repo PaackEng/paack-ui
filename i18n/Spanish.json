@@ -43,8 +43,8 @@
             "collapse": "Colapsar"
         },
         "sorting": {
-            "increase": "Ordenar A-Z",
-            "decrease": "Ordenar Z-A"
+            "ascending": "Sort Ascending",
+            "descending": "Sort Descending"
         },
         "selectRow": "Select this row.",
         "selectAll": "Select all rows"

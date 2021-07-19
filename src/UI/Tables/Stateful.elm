@@ -10,7 +10,7 @@ module UI.Tables.Stateful exposing
     , periodSingle, pariodAfter, periodBefore, localPeriodDateFilter, remotePeriodDateFilter
     , localSelectFilter, remoteSelectFilter
     , Sorters, stateWithSorters
-    , sortersEmpty, sortBy, unsortable
+    , sortersEmpty, sortBy, sortByFloat, sortByInt, sortByChar, sortWith, unsortable
     , sortDecreasing, sortIncreasing
     , withWidth
     , stateWithSelection, stateIsSelected
@@ -140,7 +140,7 @@ And on model:
 # Sorting
 
 @docs Sorters, stateWithSorters
-@docs sortersEmpty, sortBy, unsortable
+@docs sortersEmpty, sortBy, sortByFloat, sortByInt, sortByChar, sortWith, unsortable
 @docs sortDecreasing, sortIncreasing
 
 
@@ -176,6 +176,8 @@ import UI.Checkbox as Checkbox exposing (checkbox)
 import UI.Effect as Effect exposing (Effect)
 import UI.Internal.Basics exposing (ifThenElse, maybeThen, prependMaybe)
 import UI.Internal.DateInput as DateInput exposing (DateInput, PeriodDate, RangeDate)
+import UI.Internal.Filter.Model as Filter
+import UI.Internal.Filter.Sorter exposing (Sorter(..))
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.Tables.Common exposing (..)
@@ -409,16 +411,22 @@ updateMobileToggle state index =
 
 updateFilters : StateModel msg item columns -> Filters.Msg -> ( State msg item columns, Effect msg )
 updateFilters state subMsg =
+    let
+        map ( newFilters, { effects, closeDialog } ) =
+            ( applyFilters newFilters <|
+                if closeDialog then
+                    { state | filterDialog = Nothing }
+
+                else
+                    state
+            , effects
+            )
+    in
     case state.filters of
         Just filters ->
             filters
                 |> Filters.update subMsg
-                |> (\( newFilters, subCmd ) ->
-                        ( state
-                            |> applyFilters newFilters
-                        , subCmd
-                        )
-                   )
+                |> map
 
         Nothing ->
             ( State state, Effect.none )
@@ -743,8 +751,10 @@ localSingleTextFilter :
     -> (item -> String)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-localSingleTextFilter =
-    Filters.singleTextLocal
+localSingleTextFilter initValue getData accu =
+    Filters.push
+        (Filter.singleTextLocal initValue getData)
+        accu
 
 
 {-| A filter with one single text field.
@@ -762,8 +772,10 @@ remoteSingleTextFilter :
     -> (Maybe String -> msg)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-remoteSingleTextFilter =
-    Filters.singleTextRemote
+remoteSingleTextFilter initValue applyMsg accu =
+    Filters.push
+        (Filter.singleTextRemote initValue applyMsg)
+        accu
 
 
 {-| A filter with multiple text field.
@@ -787,8 +799,10 @@ localMultiTextFilter :
     -> (item -> String)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-localMultiTextFilter =
-    Filters.multiTextLocal
+localMultiTextFilter initValue getData accu =
+    Filters.push
+        (Filter.multiTextLocal initValue getData)
+        accu
 
 
 {-| A filter with multiple text field.
@@ -808,8 +822,10 @@ remoteMultiTextFilter :
     -> (List String -> msg)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-remoteMultiTextFilter =
-    Filters.multiTextRemote
+remoteMultiTextFilter initValue applyMsg accu =
+    Filters.push
+        (Filter.multiTextRemote initValue applyMsg)
+        accu
 
 
 {-| A filter for dates with one single field.
@@ -826,8 +842,10 @@ localSingleDateFilter :
     -> (item -> Time.Posix)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-localSingleDateFilter =
-    Filters.singleDateLocal
+localSingleDateFilter timeZone initValue getData accu =
+    Filters.push
+        (Filter.singleDateLocal timeZone initValue getData)
+        accu
 
 
 {-| A filter for dates with one single field.
@@ -845,8 +863,10 @@ remoteSingleDateFilter :
     -> (Maybe DateInput -> msg)
     -> Filters.Filters msg item columns
     -> Filters.Filters msg item (T.Increase columns)
-remoteSingleDateFilter =
-    Filters.singleDateRemote
+remoteSingleDateFilter timeZone initValue applyMsg accu =
+    Filters.push
+        (Filter.singleDateRemote timeZone initValue applyMsg)
+        accu
 
 
 {-| A filter for dates in an expected range.
@@ -868,8 +888,10 @@ localRangeDateFilter :
     -> (item -> Time.Posix)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-localRangeDateFilter =
-    Filters.rangeDateLocal
+localRangeDateFilter timeZone fromTime toTime getData accu =
+    Filters.push
+        (Filter.rangeDateLocal timeZone fromTime toTime getData)
+        accu
 
 
 {-| A filter for dates in an expected range.
@@ -893,8 +915,10 @@ remoteRangeDateFilter :
     -> (Maybe RangeDate -> msg)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-remoteRangeDateFilter =
-    Filters.rangeDateRemote
+remoteRangeDateFilter timeZone fromTime toTime applyMsg accu =
+    Filters.push
+        (Filter.rangeDateRemote timeZone fromTime toTime applyMsg)
+        accu
 
 
 {-| A filter for a single date, dates before specified date, or dates after specified date.
@@ -916,8 +940,10 @@ localPeriodDateFilter :
     -> (item -> Time.Posix)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-localPeriodDateFilter =
-    Filters.periodDateLocal
+localPeriodDateFilter timeZone initValue initComparison getData accu =
+    Filters.push
+        (Filter.periodDateLocal timeZone initValue initComparison getData)
+        accu
 
 
 {-| A filter for a single date, dates before specified date, or dates after specified date.
@@ -941,8 +967,10 @@ remotePeriodDateFilter :
     -> (Maybe PeriodDate -> msg)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-remotePeriodDateFilter =
-    Filters.periodDateRemote
+remotePeriodDateFilter timeZone initValue initComparison applyMsg accu =
+    Filters.push
+        (Filter.periodDateRemote timeZone initValue initComparison applyMsg)
+        accu
 
 
 {-| A filter for custom radio buttons.
@@ -962,8 +990,10 @@ localSelectFilter :
     -> (item -> Int -> Bool)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-localSelectFilter =
-    Filters.selectLocal
+localSelectFilter initList initSelection getData accu =
+    Filters.push
+        (Filter.selectLocal initList initSelection getData)
+        accu
 
 
 {-| A filter for custom radio buttons.
@@ -985,8 +1015,10 @@ remoteSelectFilter :
     -> (Maybe Int -> msg)
     -> Filters msg item columns
     -> Filters msg item (T.Increase columns)
-remoteSelectFilter =
-    Filters.selectRemote
+remoteSelectFilter initList initSelection applyMsg accu =
+    Filters.push
+        (Filter.selectRemote initList initSelection applyMsg)
+        accu
 
 
 
@@ -1062,7 +1094,7 @@ stateWithSorters sorters (State state) =
         }
 
 
-{-| Describes how to convert a column's value to a sortable `List String`.
+{-| Allow sorting a column alphabetically.
 
     sortersInit =
         sortersEmpty
@@ -1075,8 +1107,76 @@ sortBy :
     (item -> String)
     -> Sorters item columns
     -> Sorters item (T.Increase columns)
-sortBy =
-    Sorters.sortBy
+sortBy fn =
+    Sorters.sortWith (AlphabeticalSortable fn)
+
+
+{-| Allow sorting a column using a Float value.
+
+    sortersInit =
+        sortersEmpty
+            |> unsortable
+            |> sortByFloat .value
+            |> sortByFloat .timestamp
+            |> sortByFloat .average
+
+-}
+sortByFloat :
+    (item -> Float)
+    -> Sorters item columns
+    -> Sorters item (T.Increase columns)
+sortByFloat fn =
+    Sorters.sortWith (FloatSortable fn)
+
+
+{-| Allow sorting a column using an Integer value.
+
+    sortersInit =
+        sortersEmpty
+            |> unsortable
+            |> sortByInt .count
+            |> sortByInt .areaCode
+            |> sortByInt .hour
+
+-}
+sortByInt :
+    (item -> Int)
+    -> Sorters item columns
+    -> Sorters item (T.Increase columns)
+sortByInt fn =
+    Sorters.sortWith (IntegerSortable fn)
+
+
+{-| Allow sorting a column using a Char value.
+
+    sortersInit =
+        sortersEmpty
+            |> unsortable
+            |> sortByChar .firstLetter
+
+-}
+sortByChar :
+    (item -> Char)
+    -> Sorters item columns
+    -> Sorters item (T.Increase columns)
+sortByChar fn =
+    Sorters.sortWith (CharSortable fn)
+
+
+{-| Allow sorting a column with a custom function.
+
+    sortersInit =
+        sortersEmpty
+            |> unsortable
+            |> sortWith (List.sortWith flippedComparison)
+
+-}
+sortWith :
+    (List item -> List item)
+    -> Sorters item columns
+    -> Sorters item (T.Increase columns)
+sortWith fn =
+    Sorters.sortWith (CustomSortable fn)
 
 
 {-| Changes the initial sorting to some columns as descreasing.
@@ -1089,7 +1189,7 @@ sortBy =
 -}
 sortDecreasing : Int -> Sorters item columns -> Sorters item columns
 sortDecreasing =
-    Sorters.sortDecreasing
+    Sorters.sortDescending
 
 
 {-| Changes the initial sorting to some columns as increasing.
@@ -1102,7 +1202,7 @@ sortDecreasing =
 -}
 sortIncreasing : Int -> Sorters item columns -> Sorters item columns
 sortIncreasing =
-    Sorters.sortIncreasing
+    Sorters.sortAscending
 
 
 {-| An empty [`Sorters`](#Sorters) set.
@@ -1332,8 +1432,8 @@ filterHeader :
     -> (Msg item -> msg)
     -> Maybe Int
     -> Column
-    -> Filters.Filter msg item
-    -> Sorters.ColumnStatus
+    -> Filter.Filter msg item
+    -> Sorters.ColumnStatus item
     -> Int
     -> Element msg
 filterHeader renderConfig toExternalMsg selected (Column header { width }) filter sorter index =

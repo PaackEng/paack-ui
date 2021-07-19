@@ -24,6 +24,8 @@ A text can be created and rendered as in the following pipeline:
         |> Text.renderElement renderConfig
         |> Element.el [ Element.width (px 200) ]
 
+**Note**: Don't forget to import "Fira Sans" family, with the weights: 400, 500, 600 and 700.
+
 
 # Building
 

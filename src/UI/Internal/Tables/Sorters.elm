@@ -1,14 +1,12 @@
 module UI.Internal.Tables.Sorters exposing
     ( ColumnStatus
     , Msg(..)
-    , Sorter(..)
     , Sorters
-    , SortingDirection(..)
     , get
     , itemsApplySorting
-    , sortBy
-    , sortDecreasing
-    , sortIncreasing
+    , sortAscending
+    , sortDescending
+    , sortWith
     , sortersEmpty
     , unsortable
     , update
@@ -16,6 +14,7 @@ module UI.Internal.Tables.Sorters exposing
 
 import UI.Effect as Effect exposing (Effect)
 import UI.Internal.Analytics as Analytics
+import UI.Internal.Filter.Sorter as Sorter exposing (Sorter, SortingDirection(..))
 import UI.Internal.NArray as NArray exposing (NArray)
 import UI.Utils.TypeNumbers as T
 
@@ -25,29 +24,19 @@ type Msg
     | ClearSorting
 
 
-type Sorter item
-    = Sortable (item -> String)
-    | Unsortable
-
-
-type SortingDirection
-    = SortIncreasing
-    | SortDecreasing
-
-
 type alias SortingStatus item =
-    { column : Int, by : item -> String, direction : SortingDirection }
+    { column : Int, by : Sorter item, direction : SortingDirection }
 
 
 type Sorters item columns
     = Sorters
-        { columns : NArray (Sorter item) columns
+        { columns : NArray (Maybe (Sorter item)) columns
         , status : Maybe (SortingStatus item)
         }
 
 
-type alias ColumnStatus =
-    Maybe (Maybe SortingDirection)
+type alias ColumnStatus item =
+    Maybe ( Maybe SortingDirection, Sorter item )
 
 
 update : Msg -> Sorters item columns -> ( Sorters item columns, Effect msg )
@@ -56,7 +45,7 @@ update msg sorters =
         SetSorting index direction ->
             let
                 reverse =
-                    direction == SortDecreasing
+                    direction == SortDescending
             in
             ( sort direction index sorters
             , Analytics.SetSorting index reverse
@@ -86,13 +75,13 @@ itemsApplySorting (Sorters sorters) items =
         Just status ->
             let
                 sortedItems =
-                    List.sortBy status.by items
+                    Sorter.sort status.by items
             in
             case status.direction of
-                SortIncreasing ->
+                SortAscending ->
                     sortedItems
 
-                SortDecreasing ->
+                SortDescending ->
                     List.reverse sortedItems
 
 
@@ -104,13 +93,13 @@ sortersEmpty =
         }
 
 
-sortBy :
-    (item -> String)
+sortWith :
+    Sorter item
     -> Sorters item columns
     -> Sorters item (T.Increase columns)
-sortBy fn (Sorters accu) =
+sortWith customSorter (Sorters accu) =
     Sorters
-        { columns = NArray.push (Sortable fn) accu.columns
+        { columns = NArray.push (Just customSorter) accu.columns
         , status = accu.status
         }
 
@@ -118,25 +107,25 @@ sortBy fn (Sorters accu) =
 unsortable : Sorters item columns -> Sorters item (T.Increase columns)
 unsortable (Sorters accu) =
     Sorters
-        { columns = NArray.push Unsortable accu.columns
+        { columns = NArray.push Nothing accu.columns
         , status = accu.status
         }
 
 
-sortIncreasing : Int -> Sorters item columns -> Sorters item columns
-sortIncreasing =
-    sort SortIncreasing
+sortAscending : Int -> Sorters item columns -> Sorters item columns
+sortAscending =
+    sort SortAscending
 
 
-sortDecreasing : Int -> Sorters item columns -> Sorters item columns
-sortDecreasing =
-    sort SortDecreasing
+sortDescending : Int -> Sorters item columns -> Sorters item columns
+sortDescending =
+    sort SortDescending
 
 
 sort : SortingDirection -> Int -> Sorters item columns -> Sorters item columns
 sort direction column ((Sorters accu) as sorters) =
-    case NArray.get column accu.columns of
-        Just (Sortable by) ->
+    case Maybe.andThen identity <| NArray.get column accu.columns of
+        Just by ->
             Sorters
                 { accu
                     | status =
@@ -147,14 +136,11 @@ sort direction column ((Sorters accu) as sorters) =
                             }
                 }
 
-        Just Unsortable ->
-            sorters
-
         Nothing ->
             sorters
 
 
-get : Int -> Sorters item columns -> ColumnStatus
+get : Int -> Sorters item columns -> ColumnStatus item
 get index (Sorters { columns, status }) =
     let
         getDirection currentSorting =
@@ -166,10 +152,10 @@ get index (Sorters { columns, status }) =
 
         isSortableThen sortable =
             case sortable of
-                Sortable _ ->
-                    Just (Maybe.andThen getDirection status)
+                Just by ->
+                    Just ( Maybe.andThen getDirection status, by )
 
-                Unsortable ->
+                Nothing ->
                     Nothing
     in
     Maybe.andThen
