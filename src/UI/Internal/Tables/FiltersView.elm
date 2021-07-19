@@ -3,7 +3,7 @@ module UI.Internal.Tables.FiltersView exposing (Config, header, headerSelectTogg
 -- WARNING: Don't use any other Size.* beyond "contextSize"
 
 import Array exposing (Array)
-import Element exposing (Attribute, Element, fill, minimum, px)
+import Element exposing (Element, fill, minimum, px)
 import Element.Background as Background
 import UI.Button as Button
 import UI.Icon as Icon
