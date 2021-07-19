@@ -411,16 +411,22 @@ updateMobileToggle state index =
 
 updateFilters : StateModel msg item columns -> Filters.Msg -> ( State msg item columns, Effect msg )
 updateFilters state subMsg =
+    let
+        map ( newFilters, { effects, closeDialog } ) =
+            ( applyFilters newFilters <|
+                if closeDialog then
+                    { state | filterDialog = Nothing }
+
+                else
+                    state
+            , effects
+            )
+    in
     case state.filters of
         Just filters ->
             filters
                 |> Filters.update subMsg
-                |> (\( newFilters, subCmd ) ->
-                        ( state
-                            |> applyFilters newFilters
-                        , subCmd
-                        )
-                   )
+                |> map
 
         Nothing ->
             ( State state, Effect.none )

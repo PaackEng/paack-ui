@@ -273,8 +273,10 @@ bodyToElement renderConfig (Body { label, closeMsg } common { sorting, rows, but
                 { offset = ( 0, 6 )
                 , size = 0
                 , blur = 20
-                , color = Element.rgba 0 0 0 0.5
+                , color = Element.rgba 0 0 0 0.09
                 }
+            , Border.width 1
+            , Border.color Colors.gray300
             , roundedBorders
             , width
             ]
@@ -291,9 +293,7 @@ bodyToElement renderConfig (Body { label, closeMsg } common { sorting, rows, but
             , bodyButtons renderConfig common.size buttons
             ]
     in
-    Element.column attrs
-        bodyRows
-        |> Element.clickElsewhereToLeave closeMsg []
+    Element.customOverlay closeMsg [] <| Element.column attrs bodyRows
 
 
 bodyHeader : RenderConfig -> FilterSize -> msg -> String -> Element msg
@@ -303,7 +303,7 @@ bodyHeader renderConfig size closeMsg label =
             headerProportions size
 
         paddingWithBorders =
-            { left = padding.left + 2
+            { left = padding.left + 1
             , top = padding.top + 1
             , bottom = padding.bottom + 1
             , right = padding.right
@@ -393,25 +393,13 @@ sortAs renderConfig direction { fontSize, iconSize } sortingData label msg =
         labelParagraph =
             case ( sortingData.preview, direction ) of
                 ( Just { smaller, larger }, SortAscending ) ->
-                    [ Element.text label
-                    , Element.text " ("
-                    , Element.text smaller
-                    , Element.text " - "
-                    , Element.text larger
-                    , Element.text ")"
-                    ]
+                    [ label, " (", smaller, " - ", larger, ")" ]
 
                 ( Just { smaller, larger }, SortDescending ) ->
-                    [ Element.text label
-                    , Element.text " ("
-                    , Element.text larger
-                    , Element.text " - "
-                    , Element.text smaller
-                    , Element.text ")"
-                    ]
+                    [ label, " (", larger, " - ", smaller, ")" ]
 
                 _ ->
-                    [ Element.text label ]
+                    [ label ]
     in
     Element.row
         [ Element.width fill
@@ -432,7 +420,9 @@ sortAs renderConfig direction { fontSize, iconSize } sortingData label msg =
             [ Background.color Colors.gray300
             ]
         ]
-        [ Element.paragraph [] labelParagraph
+        [ labelParagraph
+            |> List.map Element.text
+            |> Element.paragraph []
         , sortingIcon renderConfig
             [ Element.alignRight
             ]

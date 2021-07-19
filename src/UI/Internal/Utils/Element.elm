@@ -1,6 +1,6 @@
 module UI.Internal.Utils.Element exposing
-    ( clickElsewhereToLeave
-    , css
+    ( css
+    , customOverlay
     , id
     , overflowAttrs
     , overflowVisible
@@ -59,8 +59,8 @@ id value =
         |> Element.htmlAttribute
 
 
-clickElsewhereToLeave : msg -> List (Attribute msg) -> Element msg -> Element msg
-clickElsewhereToLeave onClickMsg backgroundStyleAttributes foregroundContent =
+customOverlay : msg -> List (Attribute msg) -> Element msg -> Element msg
+customOverlay onClickMsg backgroundStyleAttributes foregroundContent =
     let
         backgroundAttributes =
             positionFixed
@@ -83,7 +83,7 @@ clickElsewhereToLeave onClickMsg backgroundStyleAttributes foregroundContent =
 
 overlay : msg -> Element msg -> Element msg
 overlay closeMsg content =
-    clickElsewhereToLeave closeMsg [ Colors.overlayBackground ] content
+    customOverlay closeMsg [ Colors.overlayBackground ] content
 
 
 shrinkButClip : List (Attribute msg)

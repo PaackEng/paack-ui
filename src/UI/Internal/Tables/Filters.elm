@@ -63,32 +63,36 @@ push newValue model =
 -- Update
 
 
-update : Msg -> Filters msg item columns -> ( Filters msg item columns, Effect msg )
+type alias OutMsg msg =
+    { effects : Effect msg, closeDialog : Bool }
+
+
+update : Msg -> Filters msg item columns -> ( Filters msg item columns, OutMsg msg )
 update msg model =
     case msg of
         EditSingleText { column, value } ->
-            ( columnEdit singleTextEdit column value model, Effect.none )
+            ( columnEdit singleTextEdit column value model, emptyOutMsg )
 
         EditMultiText { column, field, value } ->
-            ( columnEdit (multiTextEdit field) column value model, Effect.none )
+            ( columnEdit (multiTextEdit field) column value model, emptyOutMsg )
 
         EditSingleDate { column, value } ->
-            ( columnEdit singleDateEdit column value model, Effect.none )
+            ( columnEdit singleDateEdit column value model, emptyOutMsg )
 
         EditRangeFromDate { column, value } ->
-            ( columnEdit rangeDateFromEdit column value model, Effect.none )
+            ( columnEdit rangeDateFromEdit column value model, emptyOutMsg )
 
         EditRangeToDate { column, value } ->
-            ( columnEdit rangeDateToEdit column value model, Effect.none )
+            ( columnEdit rangeDateToEdit column value model, emptyOutMsg )
 
         EditPeriodDate { column, value } ->
-            ( columnEdit periodDateEdit column value model, Effect.none )
+            ( columnEdit periodDateEdit column value model, emptyOutMsg )
 
         EditPeriodComparison { column, value } ->
-            ( columnEdit periodDateComparisonEdit column value model, Effect.none )
+            ( columnEdit periodDateComparisonEdit column value model, emptyOutMsg )
 
         EditSelect { column, value } ->
-            ( columnEdit selectEdit column value model, Effect.none )
+            ( columnEdit selectEdit column value model, emptyOutMsg )
 
         Apply column ->
             applyFilter column model
@@ -97,6 +101,16 @@ update msg model =
         Clear column ->
             filterClear column model
                 |> withClearAnalytics column
+
+
+emptyOutMsg : OutMsg msg
+emptyOutMsg =
+    { effects = Effect.none, closeDialog = False }
+
+
+closeDialogMsg : Effect msg -> OutMsg msg
+closeDialogMsg effects =
+    { effects = effects, closeDialog = True }
 
 
 columnEdit :
@@ -115,54 +129,56 @@ columnEdit applier column value model =
             model
 
 
-dispatchApply : Strategy msg value item -> value -> Filters msg item columns -> ( Filters msg item columns, Effect msg )
+dispatchApply : Strategy msg value item -> value -> Filters msg item columns -> ( Filters msg item columns, OutMsg msg )
 dispatchApply strategy value newModel =
     case strategy of
         Local _ ->
             ( newModel
-            , Effect.none
+            , closeDialogMsg Effect.none
             )
 
         Remote { applyMsg } ->
             ( newModel
-            , Effect.msgToCmd <| applyMsg value
+            , applyMsg value
+                |> Effect.msgToCmd
+                |> closeDialogMsg
             )
 
 
-withApplyAnalytics : Int -> ( Filters msg item columns, Effect msg ) -> ( Filters msg item columns, Effect msg )
-withApplyAnalytics column ( model, effects ) =
+withApplyAnalytics : Int -> ( Filters msg item columns, OutMsg msg ) -> ( Filters msg item columns, OutMsg msg )
+withApplyAnalytics column ( model, { effects, closeDialog } ) =
     let
         analytics =
             Analytics.ApplyFilter column
                 |> Analytics.TableAnalytics
                 |> Effect.analytics
     in
-    ( model, Effect.batch [ effects, analytics ] )
+    ( model, { effects = Effect.batch [ effects, analytics ], closeDialog = closeDialog } )
 
 
-dispatchClear : Strategy msg value item -> Filters msg item columns -> ( Filters msg item columns, Effect msg )
+dispatchClear : Strategy msg value item -> Filters msg item columns -> ( Filters msg item columns, OutMsg msg )
 dispatchClear strategy newModel =
     case strategy of
         Local _ ->
             ( newModel
-            , Effect.none
+            , closeDialogMsg Effect.none
             )
 
         Remote { clearMsg } ->
             ( newModel
-            , Effect.msgToCmd clearMsg
+            , closeDialogMsg <| Effect.msgToCmd clearMsg
             )
 
 
-withClearAnalytics : Int -> ( Filters msg item columns, Effect msg ) -> ( Filters msg item columns, Effect msg )
-withClearAnalytics column ( model, effects ) =
+withClearAnalytics : Int -> ( Filters msg item columns, OutMsg msg ) -> ( Filters msg item columns, OutMsg msg )
+withClearAnalytics column ( model, { effects, closeDialog } ) =
     let
         analytics =
             Analytics.ClearFilter column
                 |> Analytics.TableAnalytics
                 |> Effect.analytics
     in
-    ( model, Effect.batch [ effects, analytics ] )
+    ( model, { effects = Effect.batch [ effects, analytics ], closeDialog = closeDialog } )
 
 
 applyShortcut :
@@ -170,7 +186,7 @@ applyShortcut :
     -> Int
     -> FilterConfig msg value item
     -> (FilterConfig msg value item -> Filter msg item)
-    -> ( Filters msg item columns, Effect msg )
+    -> ( Filters msg item columns, OutMsg msg )
 applyShortcut model column config constructor =
     case config.editable.current of
         Just newValue ->
@@ -181,10 +197,10 @@ applyShortcut model column config constructor =
                 |> dispatchApply config.strategy newValue
 
         Nothing ->
-            ( model, Effect.none )
+            ( model, emptyOutMsg )
 
 
-applyFilter : Int -> Filters msg item columns -> ( Filters msg item columns, Effect msg )
+applyFilter : Int -> Filters msg item columns -> ( Filters msg item columns, OutMsg msg )
 applyFilter column model =
     case NArray.get column model of
         Just (SingleTextFilter config) ->
@@ -206,10 +222,10 @@ applyFilter column model =
             applyShortcut model column config (SelectFilter list)
 
         Nothing ->
-            ( model, Effect.none )
+            ( model, emptyOutMsg )
 
 
-filterClear : Int -> Filters msg item columns -> ( Filters msg item columns, Effect msg )
+filterClear : Int -> Filters msg item columns -> ( Filters msg item columns, OutMsg msg )
 filterClear column model =
     case NArray.get column model of
         Just (SingleTextFilter config) ->
@@ -255,7 +271,7 @@ filterClear column model =
                 |> dispatchClear config.strategy
 
         Nothing ->
-            ( model, Effect.none )
+            ( model, emptyOutMsg )
 
 
 

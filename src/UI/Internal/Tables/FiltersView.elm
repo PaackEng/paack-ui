@@ -58,6 +58,35 @@ header renderConfig filter sorting config =
             terms =
                 RenderConfig.localeTerms renderConfig
 
+            applyButton =
+                terms.filters.apply
+                    |> Button.fromLabel
+                    |> Button.cmd applyMsg Button.primary
+
+            disabledApplyButton =
+                terms.filters.apply
+                    |> Button.fromLabel
+                    |> Button.disabled
+
+            clearButton =
+                terms.filters.clear
+                    |> Button.fromLabel
+                    |> Button.cmd clearMsg Button.danger
+
+            buttons =
+                case ( Filter.isApplied filter, Filter.isEdited filter ) of
+                    ( False, False ) ->
+                        [ disabledApplyButton ]
+
+                    ( False, True ) ->
+                        [ applyButton ]
+
+                    ( True, False ) ->
+                        [ clearButton ]
+
+                    ( True, True ) ->
+                        [ applyButton, clearButton ]
+
             filterRender renderer editable =
                 FilterV2.body
                     config.label
@@ -78,14 +107,7 @@ header renderConfig filter sorting config =
                         , clearSortMsg = config.fromSortersMsg Sorters.ClearSorting
                         , applied = Maybe.andThen Tuple.first sorting
                         }
-                    |> FilterV2.bodyWithButtons
-                        [ terms.filters.apply
-                            |> Button.fromLabel
-                            |> Button.cmd applyMsg Button.primary
-                        , terms.filters.clear
-                            |> Button.fromLabel
-                            |> Button.cmd clearMsg Button.danger
-                        ]
+                    |> FilterV2.bodyWithButtons buttons
                     |> FilterV2.bodyWithWidth (fill |> minimum 180)
                     |> FilterV2.bodyToElement renderConfig
         in
