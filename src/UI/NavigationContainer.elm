@@ -87,6 +87,7 @@ Example of usage:
 
 import Element exposing (Element, fill)
 import Html exposing (Html)
+import UI.Effect as Effect exposing (Effect)
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Dialog as Dialog1
 import UI.Internal.DialogV2 exposing (dialogViewV2)
@@ -365,10 +366,18 @@ contentMap applier data =
 {-| Given a message, apply an update to the [`Nav.State`](#State).
 -}
 stateUpdate : Msg -> State -> ( State, Cmd Msg )
-stateUpdate msg (State state) =
+stateUpdate msg state =
+    stateUpdateWithoutPerform msg state
+        |> Tuple.mapSecond Effect.perform
+
+
+{-| Similar to [`stateUpdate`], but using Effects.
+-}
+stateUpdateWithoutPerform : Msg -> State -> ( State, Effect Msg )
+stateUpdateWithoutPerform msg (State state) =
     case msg of
         ToggleMenu newVal ->
-            ( State { state | menuExpanded = newVal }, Cmd.none )
+            ( State { state | menuExpanded = newVal }, Effect.none )
 
 
 
