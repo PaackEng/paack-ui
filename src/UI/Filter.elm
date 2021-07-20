@@ -2,8 +2,10 @@ module UI.Filter exposing
     ( singleTextFilter, multiTextFilter, singleDateFilter, rangeDateFilter, periodDateFilter, radioFilter
     , EditDataMsg, filterUpdate
     , fromModel
-    , withSorting, withBody, withButtons
-    , customSorting
+    , withBody, withButtons
+    , FilterSorting, withSorting, customSorting
+    , Filter
+    , FilterSize, withSize, sizeMedium, sizeExtraSmall
     , renderElement
     )
 
@@ -57,17 +59,20 @@ There is also the possibility to create a custom filter, where you set the sorti
     view renderConfig model =
         Filter.customFilter label
             { openMsg = openMsg, closeMsg = closeMsg }
-            |> Filter.withSorting
-                (Filter.customSorting
-                    { ascendingMsg = Sort True
-                    , descendingMsg = Sort False
-                    , clearMsg = ClearSorting
-                    , applied = model.sortingDirection
-                    }
-                )
+            |> Filter.withSorting (filterSorting model)
             |> Filter.withBody (filterBody renderConfig model)
             |> Filter.withButtons (filterButtons renderConfig model)
-            |> Filter.renderElement renderConfig model.isFilterOpen
+            |> Filter.withAppliedHeader clearMsg labelWhenApplied
+            |> Filter.renderElement renderConfig
+
+    filterSorting model =
+        Filter.customSorting
+            { ascendingMsg = Sort True
+            , descendingMsg = Sort False
+            , clearMsg = ClearSorting
+            , applied = model.sortingDirection
+            }
+            |> Filter.sortingWithPreview "A" "Z"
 
 
 ## Builder
@@ -77,16 +82,46 @@ There is also the possibility to create a custom filter, where you set the sorti
 
 ## Customizer
 
-@docs withSorting, withBody, withButtons
+@docs withBody, withButtons, withAppliedHeader
 
 
 ### Sorting
 
-@docs customSorting
+@docs FilterSorting, withSorting, customSorting
 
 
-# Rendering
+# Common
+
+@docs Filter
+
+
+## Size
+
+@docs FilterSize, withSize, sizeMedium, sizeExtraSmall
+
+
+## Rendering
 
 @docs renderElement
 
 -}
+
+
+{-| Describes a compatible size.
+-}
+type FilterSize
+    = FilterSize Internal.FilterSize
+
+
+{-| Smallest size.
+-}
+sizeExtraSmall : FilterSize
+sizeExtraSmall =
+    FilterSize Internal.ExtraSmall
+
+
+{-| Default size.
+-}
+sizeMedium : FilterSize
+sizeMedium =
+    FilterSize Internal.Medium

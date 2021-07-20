@@ -1,25 +1,4 @@
-module UI.Internal.Filter.View exposing
-    ( Body
-    , BodySorting
-    , CommonOptions
-    , FilterSize(..)
-    , Header
-    , body
-    , bodyToElement
-    , bodyWithButtons
-    , bodyWithRows
-    , bodyWithSize
-    , bodyWithSorting
-    , bodyWithWidth
-    , header
-    , headerToElement
-    , headerWithApplied
-    , headerWithSize
-    , headerWithSorting
-    , headerWithWidth
-    , sizeExtraSmall
-    , sizeMedium
-    )
+module UI.Internal.Filter.View exposing (..)
 
 import Element exposing (Attribute, Element, fill, shrink)
 import Element.Background as Background
@@ -29,11 +8,14 @@ import Element.Font as Font
 import UI.Button as Button exposing (Button)
 import UI.Icon as Icon
 import UI.Internal.Colors as Colors
+import UI.Internal.Filter.Model as Model
+import UI.Internal.Filter.Msg as Msg exposing (Msg)
 import UI.Internal.Filter.Sorter exposing (SortingDirection(..))
 import UI.Internal.RenderConfig as RenderConfig
 import UI.Internal.Utils.Element as Element exposing (overlayZIndex)
 import UI.RenderConfig exposing (RenderConfig)
-import UI.Size as Size
+import UI.Size as Size exposing (Size)
+import UI.TextField as TextField
 import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element exposing (RectangleSides, zeroPadding)
 
@@ -49,60 +31,36 @@ type alias CommonOptions =
     }
 
 
-sizeExtraSmall : FilterSize
-sizeExtraSmall =
-    ExtraSmall
+type alias Header msg =
+    { label : String
+    , openMsg : msg
+    , common : CommonOptions
+    , sorting : Maybe SortingDirection
+    , applied : Maybe { preview : String, clearMsg : msg }
+    }
 
 
-sizeMedium : FilterSize
-sizeMedium =
-    Medium
+type alias Body msg =
+    { label : String
+    , closeMsg : msg
+    , common : CommonOptions
+    , sorting : Maybe (BodySorting msg)
+    , rows : List (Element msg)
+    , buttons : List (Button msg)
+    }
 
 
-{-| The filter header-state button
--}
-type Header msg
-    = Header
-        { label : String, openMsg : msg }
-        CommonOptions
-        { sorting : Maybe SortingDirection
-        , applied : Maybe { preview : String, clearMsg : msg }
-        }
-
-
-header : String -> msg -> Header msg
-header label openMsg =
-    Header
-        { label = label, openMsg = openMsg }
-        { width = fill, size = Medium }
-        { sorting = Nothing, applied = Nothing }
-
-
-headerWithWidth : Element.Length -> Header msg -> Header msg
-headerWithWidth width (Header prop common options) =
-    Header prop { common | width = width } options
-
-
-headerWithSize : FilterSize -> Header msg -> Header msg
-headerWithSize size (Header prop common options) =
-    Header prop { common | size = size } options
-
-
-headerWithSorting : Maybe SortingDirection -> Header msg -> Header msg
-headerWithSorting sorting (Header prop common options) =
-    Header prop common { options | sorting = sorting }
-
-
-headerWithApplied :
-    Maybe { preview : String, clearMsg : msg }
-    -> Header msg
-    -> Header msg
-headerWithApplied applied (Header prop common options) =
-    Header prop common { options | applied = applied }
+type alias BodySorting msg =
+    { preview : Maybe { smaller : String, larger : String }
+    , ascendingSortMsg : msg
+    , descendingSortMsg : msg
+    , clearSortMsg : msg
+    , applied : Maybe SortingDirection
+    }
 
 
 headerToElement : RenderConfig -> Header msg -> Element msg
-headerToElement renderConfig (Header { label, openMsg } common { sorting, applied }) =
+headerToElement renderConfig { label, openMsg, common, sorting, applied } =
     let
         { padding, fontSize, iconSize } =
             headerProportions common.size
@@ -200,63 +158,8 @@ headerProportions size =
             }
 
 
-{-| The filter dialog-state body
--}
-type Body msg
-    = Body
-        { label : String, closeMsg : msg }
-        CommonOptions
-        { sorting :
-            Maybe (BodySorting msg)
-        , rows : List (Element msg)
-        , buttons : List (Button msg)
-        }
-
-
-type alias BodySorting msg =
-    { preview : Maybe { smaller : String, larger : String }
-    , ascendingSortMsg : msg
-    , descendingSortMsg : msg
-    , clearSortMsg : msg
-    , applied : Maybe SortingDirection
-    }
-
-
-body : String -> msg -> Body msg
-body label closeMsg =
-    Body
-        { label = label, closeMsg = closeMsg }
-        { width = fill, size = Medium }
-        { sorting = Nothing, rows = [], buttons = [] }
-
-
-bodyWithWidth : Element.Length -> Body msg -> Body msg
-bodyWithWidth width (Body prop common options) =
-    Body prop { common | width = width } options
-
-
-bodyWithSize : FilterSize -> Body msg -> Body msg
-bodyWithSize size (Body prop common options) =
-    Body prop { common | size = size } options
-
-
-bodyWithSorting : BodySorting msg -> Body msg -> Body msg
-bodyWithSorting sorting (Body prop common options) =
-    Body prop common { options | sorting = Just sorting }
-
-
-bodyWithRows : List (Element msg) -> Body msg -> Body msg
-bodyWithRows rows (Body prop common options) =
-    Body prop common { options | rows = rows }
-
-
-bodyWithButtons : List (Button msg) -> Body msg -> Body msg
-bodyWithButtons buttons (Body prop common options) =
-    Body prop common { options | buttons = buttons }
-
-
 bodyToElement : RenderConfig -> Body msg -> Element msg
-bodyToElement renderConfig (Body { label, closeMsg } common { sorting, rows, buttons }) =
+bodyToElement renderConfig { label, closeMsg, common, sorting, rows, buttons } =
     let
         width =
             if common.width == shrink then
@@ -452,17 +355,9 @@ bodySortingProportions size =
 bodyButtons : RenderConfig -> FilterSize -> List (Button msg) -> Element msg
 bodyButtons renderConfig size buttons =
     let
-        buttonSize =
-            case size of
-                ExtraSmall ->
-                    Size.extraSmall
-
-                Medium ->
-                    Size.small
-
         applier =
             Button.withWidth Button.widthFull
-                >> Button.withSize buttonSize
+                >> Button.withSize (sizeToElement size)
                 >> Button.renderElement renderConfig
     in
     Element.column
@@ -471,10 +366,6 @@ bodyButtons renderConfig size buttons =
         , Element.padding 12
         ]
         (List.map applier buttons)
-
-
-
-{- Common -}
 
 
 sortingIcon :
@@ -508,3 +399,73 @@ sortingIcon renderConfig attrs iconSize sorting =
 roundedBorders : Attribute msg
 roundedBorders =
     Border.rounded 6
+
+
+sizeToElement : FilterSize -> Size
+sizeToElement size =
+    case size of
+        ExtraSmall ->
+            Size.extraSmall
+
+        Medium ->
+            Size.small
+
+
+
+{------- Default Presets ----------}
+
+
+defaultButtons :
+    { applyMsg : msg
+    , clearMsg : msg
+    , applyLabel : String
+    , clearLabel : String
+    }
+    -> Model.Filter msg item
+    -> List (Button msg)
+defaultButtons { applyMsg, clearMsg, applyLabel, clearLabel } filter =
+    let
+        applyButton =
+            applyLabel
+                |> Button.fromLabel
+                |> Button.cmd applyMsg Button.primary
+
+        disabledApplyButton =
+            applyLabel
+                |> Button.fromLabel
+                |> Button.disabled
+
+        clearButton =
+            clearLabel
+                |> Button.fromLabel
+                |> Button.cmd clearMsg Button.danger
+    in
+    case ( Model.isApplied filter, Model.isEdited filter ) of
+        ( False, False ) ->
+            [ disabledApplyButton ]
+
+        ( False, True ) ->
+            [ applyButton ]
+
+        ( True, False ) ->
+            [ clearButton ]
+
+        ( True, True ) ->
+            [ applyButton, clearButton ]
+
+
+defaultSingleTextFilter :
+    RenderConfig
+    -> FilterSize
+    -> String
+    -> Model.Editable String
+    -> List (Element Msg)
+defaultSingleTextFilter renderConfig size label editable =
+    editable
+        |> Model.editableWithDefault ""
+        |> TextField.singlelineText Msg.EditSingleText label
+        |> TextField.withSize (sizeToElement size)
+        |> TextField.withWidth TextField.widthFull
+        |> TextField.withOnEnterPressed Msg.Apply
+        |> TextField.renderElement renderConfig
+        |> List.singleton

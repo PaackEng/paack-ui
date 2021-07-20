@@ -11,6 +11,7 @@ import UI.Internal.Basics exposing (maybeNotThen)
 import UI.Internal.Colors as Colors
 import UI.Internal.DateInput as DateInput exposing (DateInput(..), PeriodComparison(..), PeriodDate, RangeDate)
 import UI.Internal.Filter.Model as Filter exposing (Filter)
+import UI.Internal.Filter.Msg as Filter
 import UI.Internal.Filter.Sorter as Sorter exposing (SortingDirection(..))
 import UI.Internal.Filter.View as FilterV2
 import UI.Internal.Primitives as Primitives
@@ -45,12 +46,12 @@ header :
 header renderConfig filter sorting config =
     let
         clearMsg =
-            config.fromFiltersMsg <| Filters.Clear config.index
+            config.fromFiltersMsg <| Filters.FilterMsg config.index Filter.Clear
     in
     if config.isOpen then
         let
             applyMsg =
-                config.fromFiltersMsg <| Filters.Apply config.index
+                config.fromFiltersMsg <| Filters.FilterMsg config.index Filter.Apply
 
             sortMsg =
                 Sorters.SetSorting config.index >> config.fromSortersMsg
@@ -58,43 +59,13 @@ header renderConfig filter sorting config =
             terms =
                 RenderConfig.localeTerms renderConfig
 
-            applyButton =
-                terms.filters.apply
-                    |> Button.fromLabel
-                    |> Button.cmd applyMsg Button.primary
-
-            disabledApplyButton =
-                terms.filters.apply
-                    |> Button.fromLabel
-                    |> Button.disabled
-
-            clearButton =
-                terms.filters.clear
-                    |> Button.fromLabel
-                    |> Button.cmd clearMsg Button.danger
-
-            buttons =
-                case ( Filter.isApplied filter, Filter.isEdited filter ) of
-                    ( False, False ) ->
-                        [ disabledApplyButton ]
-
-                    ( False, True ) ->
-                        [ applyButton ]
-
-                    ( True, False ) ->
-                        [ clearButton ]
-
-                    ( True, True ) ->
-                        [ applyButton, clearButton ]
-
             filterRender renderer editable =
-                FilterV2.body
-                    config.label
-                    config.discardMsg
-                    |> FilterV2.bodyWithSize FilterV2.sizeExtraSmall
-                    |> FilterV2.bodyWithRows
-                        (renderer renderConfig applyMsg config editable)
-                    |> FilterV2.bodyWithSorting
+                FilterV2.bodyToElement renderConfig
+                    { label = config.label
+                    , closeMsg = config.discardMsg
+                    , rows = renderer renderConfig applyMsg config editable
+                    , common = { size = FilterV2.ExtraSmall, width = fill |> minimum 180 }
+                    , sorting =
                         { preview =
                             Maybe.andThen
                                 (Tuple.second
@@ -107,9 +78,16 @@ header renderConfig filter sorting config =
                         , clearSortMsg = config.fromSortersMsg Sorters.ClearSorting
                         , applied = Maybe.andThen Tuple.first sorting
                         }
-                    |> FilterV2.bodyWithButtons buttons
-                    |> FilterV2.bodyWithWidth (fill |> minimum 180)
-                    |> FilterV2.bodyToElement renderConfig
+                            |> Just
+                    , buttons =
+                        FilterV2.defaultButtons
+                            { applyMsg = applyMsg
+                            , clearMsg = clearMsg
+                            , applyLabel = terms.filters.apply
+                            , clearLabel = terms.filters.clear
+                            }
+                            filter
+                    }
         in
         case filter of
             Filter.SingleTextFilter { editable } ->
@@ -131,18 +109,17 @@ header renderConfig filter sorting config =
                 filterRender (selectFilterRender list) editable
 
     else
-        FilterV2.header
-            config.label
-            config.openMsg
-            |> FilterV2.headerWithSize FilterV2.sizeExtraSmall
-            |> FilterV2.headerWithSorting
-                (Maybe.andThen Tuple.first sorting)
-            |> FilterV2.headerWithApplied
-                (Maybe.map
+        FilterV2.headerToElement renderConfig
+            { label = config.label
+            , openMsg = config.openMsg
+            , common = { size = FilterV2.ExtraSmall, width = Element.fill }
+            , sorting =
+                Maybe.andThen Tuple.first sorting
+            , applied =
+                Maybe.map
                     (\i -> { preview = String.fromInt i, clearMsg = clearMsg })
                     (Filter.appliedLength filter)
-                )
-            |> FilterV2.headerToElement renderConfig
+            }
 
 
 
@@ -193,18 +170,11 @@ singleTextFilterRender :
     -> Filter.Editable String
     -> List (Element msg)
 singleTextFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } editable =
-    let
-        editMsg str =
-            fromFiltersMsg <| Filters.EditSingleText { column = index, value = str }
-    in
-    editable
-        |> Filter.editableWithDefault ""
-        |> TextField.singlelineText editMsg label
-        |> TextField.withSize contextSize
-        |> TextField.withWidth TextField.widthFull
-        |> TextField.withOnEnterPressed applyMsg
-        |> TextField.renderElement renderConfig
-        |> List.singleton
+    FilterV2.defaultSingleTextFilter renderConfig
+        FilterV2.ExtraSmall
+        label
+        editable
+        |> List.map (Element.map (Filters.FilterMsg index >> fromFiltersMsg))
 
 
 multiTextFilterRender :
@@ -216,7 +186,7 @@ multiTextFilterRender :
 multiTextFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } editableArr =
     let
         editMsg subIndex str =
-            fromFiltersMsg <| Filters.EditMultiText { column = index, field = subIndex, value = str }
+            fromFiltersMsg <| Filters.FilterMsg index <| Filter.EditMultiText subIndex str
 
         rowField subIndex line =
             line
@@ -243,7 +213,7 @@ selectFilterRender :
 selectFilterRender list renderConfig _ { fromFiltersMsg, index } { current, applied } =
     Radio.group
         { label = renderConfig |> localeTerms >> .filters >> .select >> .description
-        , onSelectMsg = \_ subIndex -> fromFiltersMsg <| Filters.EditSelect { column = index, value = subIndex }
+        , onSelectMsg = \_ optionIndex -> fromFiltersMsg <| Filters.FilterMsg index <| Filter.EditSelect optionIndex
         , idPrefix = "table-select-filter"
         }
         |> Radio.withSelected (maybeNotThen applied current)
@@ -263,7 +233,7 @@ singleDateFilterRender :
 singleDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } editable =
     let
         editMsg str =
-            fromFiltersMsg <| Filters.EditSingleDate { column = index, value = str }
+            fromFiltersMsg <| Filters.FilterMsg index <| Filter.EditSingleDate str
 
         datePlaceholder =
             renderConfig |> localeTerms >> .filters >> .dateFormat
@@ -284,10 +254,10 @@ rangeDateFilterRender :
 rangeDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } editable =
     let
         editFromMsg str =
-            fromFiltersMsg <| Filters.EditRangeFromDate { column = index, value = str }
+            fromFiltersMsg <| Filters.FilterMsg index <| Filter.EditRangeFromDate str
 
         editToMsg str =
-            fromFiltersMsg <| Filters.EditRangeToDate { column = index, value = str }
+            fromFiltersMsg <| Filters.FilterMsg index <| Filter.EditRangeToDate str
 
         filtersTerms =
             renderConfig |> localeTerms >> .filters
@@ -321,10 +291,10 @@ periodDateFilterRender :
 periodDateFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } editable =
     let
         editDateMsg str =
-            fromFiltersMsg <| Filters.EditPeriodDate { column = index, value = str }
+            fromFiltersMsg <| Filters.FilterMsg index <| Filter.EditPeriodDate str
 
         editComparisonMsg _ value =
-            fromFiltersMsg <| Filters.EditPeriodComparison { column = index, value = value }
+            fromFiltersMsg <| Filters.FilterMsg index <| Filter.EditPeriodComparison value
 
         current =
             editable
