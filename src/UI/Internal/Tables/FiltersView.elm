@@ -44,82 +44,16 @@ header :
     -> Config msg
     -> Element msg
 header renderConfig filter sorting config =
-    let
-        clearMsg =
-            config.fromFiltersMsg <| Filters.FilterMsg config.index Filter.Clear
-    in
-    if config.isOpen then
-        let
-            applyMsg =
-                config.fromFiltersMsg <| Filters.FilterMsg config.index Filter.Apply
-
-            sortMsg =
-                Sorters.SetSorting config.index >> config.fromSortersMsg
-
-            terms =
-                RenderConfig.localeTerms renderConfig
-
-            filterRender renderer editable =
-                FilterV2.bodyToElement renderConfig
-                    { label = config.label
-                    , closeMsg = config.discardMsg
-                    , rows = renderer renderConfig applyMsg config editable
-                    , common = { size = FilterV2.ExtraSmall, width = fill |> minimum 180 }
-                    , sorting =
-                        { preview =
-                            Maybe.andThen
-                                (Tuple.second
-                                    >> Sorter.preview
-                                    >> Maybe.map (\( s, l ) -> { smaller = s, larger = l })
-                                )
-                                sorting
-                        , ascendingSortMsg = sortMsg SortAscending
-                        , descendingSortMsg = sortMsg SortDescending
-                        , clearSortMsg = config.fromSortersMsg Sorters.ClearSorting
-                        , applied = Maybe.andThen Tuple.first sorting
-                        }
-                            |> Just
-                    , buttons =
-                        FilterV2.defaultButtons
-                            { applyMsg = applyMsg
-                            , clearMsg = clearMsg
-                            , applyLabel = terms.filters.apply
-                            , clearLabel = terms.filters.clear
-                            }
-                            filter
-                    }
-        in
-        case filter of
-            Filter.SingleTextFilter { editable } ->
-                filterRender singleTextFilterRender editable
-
-            Filter.MultiTextFilter { editable } ->
-                filterRender multiTextFilterRender editable
-
-            Filter.SingleDateFilter { editable } ->
-                filterRender singleDateFilterRender editable
-
-            Filter.RangeDateFilter { editable } ->
-                filterRender rangeDateFilterRender editable
-
-            Filter.PeriodDateFilter { editable } ->
-                filterRender periodDateFilterRender editable
-
-            Filter.SelectFilter list { editable } ->
-                filterRender (selectFilterRender list) editable
-
-    else
-        FilterV2.headerToElement renderConfig
-            { label = config.label
-            , openMsg = config.openMsg
-            , common = { size = FilterV2.ExtraSmall, width = Element.fill }
-            , sorting =
-                Maybe.andThen Tuple.first sorting
-            , applied =
-                Maybe.map
-                    (\i -> { preview = String.fromInt i, clearMsg = clearMsg })
-                    (Filter.appliedLength filter)
-            }
+    FilterV2.defaultFilter
+        { openMsg = config.openMsg
+        , closeMsg = config.discardMsg
+        , editMsg = config.fromFiltersMsg << Filters.FilterMsg config.index
+        , label = config.label
+        , isOpen = config.isOpen
+        }
+        filter
+        sorting
+        |> FilterV2.renderElement renderConfig
 
 
 
@@ -161,20 +95,6 @@ contextSize =
 
 
 -- Specifics
-
-
-singleTextFilterRender :
-    RenderConfig
-    -> msg
-    -> Config msg
-    -> Filter.Editable String
-    -> List (Element msg)
-singleTextFilterRender renderConfig applyMsg { fromFiltersMsg, index, label } editable =
-    FilterV2.defaultSingleTextFilter renderConfig
-        FilterV2.ExtraSmall
-        label
-        editable
-        |> List.map (Element.map (Filters.FilterMsg index >> fromFiltersMsg))
 
 
 multiTextFilterRender :
