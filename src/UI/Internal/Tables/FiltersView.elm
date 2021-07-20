@@ -49,6 +49,7 @@ header renderConfig filter sorting config =
         }
         filter
         sorting
+        |> FilterV2.withSize FilterV2.ExtraSmall
         |> FilterV2.renderElement renderConfig
 
 
