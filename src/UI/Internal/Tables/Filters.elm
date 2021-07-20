@@ -1,6 +1,5 @@
 module UI.Internal.Tables.Filters exposing (..)
 
-import UI.Effect as Effect exposing (Effect)
 import UI.Internal.Basics exposing (flip)
 import UI.Internal.Filter.Model exposing (Filter, filterGet)
 import UI.Internal.Filter.Msg as Filter
