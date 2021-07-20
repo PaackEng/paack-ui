@@ -123,4 +123,4 @@ zIndex val =
 -}
 tabIndex : Int -> Attribute msg
 tabIndex val =
-    Element.htmlAttribute <| HtmlAttrs.style "tabIndex" (String.fromInt val)
+    Element.htmlAttribute <| HtmlAttrs.tabindex val

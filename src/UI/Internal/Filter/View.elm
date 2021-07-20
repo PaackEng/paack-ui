@@ -58,6 +58,11 @@ type alias BodySorting msg =
     }
 
 
+withSize : FilterSize -> { a | size : FilterSize } -> { a | size : FilterSize }
+withSize newSize data =
+    { data | size = newSize }
+
+
 headerToElement :
     RenderConfig
     ->
@@ -144,10 +149,7 @@ headerClearIcon renderConfig clearMsg iconSize =
                    , Element.pointer
                    , Element.onIndividualClick clearMsg
                    , Element.onEnterPressed clearMsg
-                   , Element.tabIndex 0
                    , Border.color (Element.rgba 1 1 1 0)
-                   , Border.width 2
-                   , Element.focused [ Border.color Colors.navyBlue600 ]
                    ]
             )
 
@@ -206,6 +208,7 @@ bodyToElement renderConfig { label, closeMsg, width, size, sorting, rows, button
             , Border.color Colors.gray300
             , roundedBorders
             , widthAttr
+            , Element.tabIndex -1
             ]
 
         bodyRows =
@@ -215,6 +218,7 @@ bodyToElement renderConfig { label, closeMsg, width, size, sorting, rows, button
                 [ Element.width fill
                 , Element.spacing 8
                 , Element.padding 10
+                , Element.tabIndex -1
                 ]
                 (rows renderConfig size)
             , bodyButtons renderConfig size buttons
@@ -264,6 +268,10 @@ bodyCloseIcon renderConfig closeMsg iconSize =
                    , Events.onClick closeMsg
                    , Element.onEnterPressed closeMsg
                    , Element.tabIndex 0
+                   , Border.width 1
+                   , Border.color Colors.white
+                   , Element.focused [ Border.color Colors.navyBlue100 ]
+                   , roundedBorders
                    ]
             )
 
