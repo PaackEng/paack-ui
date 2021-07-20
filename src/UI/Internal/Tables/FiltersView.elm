@@ -7,7 +7,6 @@ import Element exposing (Element, fill, minimum, px)
 import Element.Background as Background
 import UI.Button as Button
 import UI.Icon as Icon
-import UI.Internal.Basics exposing (maybeNotThen)
 import UI.Internal.Colors as Colors
 import UI.Internal.Filter.Model as Filter exposing (Filter)
 import UI.Internal.Filter.Msg as Filter
@@ -18,9 +17,7 @@ import UI.Internal.RenderConfig as RenderConfig exposing (localeTerms)
 import UI.Internal.Size as Size exposing (Size)
 import UI.Internal.Tables.Filters as Filters
 import UI.Internal.Tables.Sorters as Sorters
-import UI.Radio as Radio
 import UI.RenderConfig exposing (RenderConfig)
-import UI.TextField as TextField exposing (TextField)
 import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element
 

@@ -43,7 +43,7 @@ type alias FullFilter msg =
     , width : Element.Length
     , size : FilterSize
     , sorting : Maybe (BodySorting msg)
-    , rows : RenderConfig -> List (Element msg)
+    , rows : RenderConfig -> FilterSize -> List (Element msg)
     , buttons : RenderConfig -> List (Button msg)
     , applied : Maybe { preview : String, clearMsg : msg }
     }
@@ -179,7 +179,7 @@ bodyToElement :
             , width : Element.Length
             , size : FilterSize
             , sorting : Maybe (BodySorting msg)
-            , rows : RenderConfig -> List (Element msg)
+            , rows : RenderConfig -> FilterSize -> List (Element msg)
             , buttons : RenderConfig -> List (Button msg)
         }
     -> Element msg
@@ -216,7 +216,7 @@ bodyToElement renderConfig { label, closeMsg, width, size, sorting, rows, button
                 , Element.spacing 8
                 , Element.padding 10
                 ]
-                (rows renderConfig)
+                (rows renderConfig size)
             , bodyButtons renderConfig size buttons
             ]
     in
@@ -514,23 +514,26 @@ defaultFilter config filter sorting =
             , applied = Maybe.andThen Tuple.first sorting
             }
 
-        rows renderConfig =
+        rows renderConfig size =
             List.map (Element.map config.editMsg) <|
                 case filter of
                     Model.SingleTextFilter { editable } ->
-                        defaultSingleTextFilter renderConfig
-                            ExtraSmall
-                            config.label
-                            editable
+                        defaultSingleTextFilter renderConfig size config.label editable
 
                     Model.MultiTextFilter { editable } ->
-                        defaultMultiTextFilter renderConfig
-                            ExtraSmall
-                            config.label
-                            editable
+                        defaultMultiTextFilter renderConfig size config.label editable
 
-                    _ ->
-                        []
+                    Model.SelectFilter list { editable } ->
+                        selectFilterRender renderConfig size config.label editable list
+
+                    Model.SingleDateFilter { editable } ->
+                        singleDateFilterRender renderConfig size config.label editable
+
+                    Model.RangeDateFilter { editable } ->
+                        rangeDateFilterRender renderConfig size config.label editable
+
+                    Model.PeriodDateFilter { editable } ->
+                        periodDateFilterRender renderConfig size config.label editable
     in
     { label = config.label
     , openMsg = config.openMsg
