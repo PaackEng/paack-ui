@@ -7,6 +7,7 @@ import Element.Background as Background
 import UI.Icon as Icon
 import UI.Internal.Colors as Colors
 import UI.Internal.Filter.Model exposing (Filter)
+import UI.Internal.Filter.Sorter exposing (SortingDirection(..))
 import UI.Internal.Filter.View as FilterV2
 import UI.Internal.Primitives as Primitives
 import UI.Internal.RenderConfig exposing (localeTerms)
@@ -36,12 +37,19 @@ header :
     -> Config msg
     -> Element msg
 header renderConfig filter sorting config =
+    let
+        sortMsg =
+            Sorters.SetSorting config.index >> config.fromSortersMsg
+    in
     FilterV2.defaultFilter
         { openMsg = config.openMsg
         , closeMsg = config.discardMsg
         , editMsg = config.fromFiltersMsg << Filters.FilterMsg config.index
         , label = config.label
         , isOpen = config.isOpen
+        , sortAscendingMsg = sortMsg SortAscending
+        , sortDescendingMsg = sortMsg SortDescending
+        , clearSortMsg = config.fromSortersMsg Sorters.ClearSorting
         }
         filter
         sorting
