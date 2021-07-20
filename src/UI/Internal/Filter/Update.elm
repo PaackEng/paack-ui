@@ -1,9 +1,6 @@
 module UI.Internal.Filter.Update exposing (Analytics(..), OutMsg, emptyOutMsg, update)
 
 import UI.Effect as Effect exposing (Effect)
-import UI.Internal.Analytics as Analytics
-import UI.Internal.Basics exposing (flip)
-import UI.Internal.DateInput exposing (PeriodComparison)
 import UI.Internal.Filter.Model exposing (..)
 import UI.Internal.Filter.Msg exposing (Msg(..))
 

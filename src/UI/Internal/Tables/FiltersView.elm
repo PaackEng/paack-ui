@@ -2,18 +2,14 @@ module UI.Internal.Tables.FiltersView exposing (Config, header, headerSelectTogg
 
 -- WARNING: Don't use any other Size.* beyond "contextSize"
 
-import Array exposing (Array)
-import Element exposing (Element, fill, minimum, px)
+import Element exposing (Element, px)
 import Element.Background as Background
-import UI.Button as Button
 import UI.Icon as Icon
 import UI.Internal.Colors as Colors
-import UI.Internal.Filter.Model as Filter exposing (Filter)
-import UI.Internal.Filter.Msg as Filter
-import UI.Internal.Filter.Sorter as Sorter exposing (SortingDirection(..))
+import UI.Internal.Filter.Model exposing (Filter)
 import UI.Internal.Filter.View as FilterV2
 import UI.Internal.Primitives as Primitives
-import UI.Internal.RenderConfig as RenderConfig exposing (localeTerms)
+import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.Size as Size exposing (Size)
 import UI.Internal.Tables.Filters as Filters
 import UI.Internal.Tables.Sorters as Sorters
