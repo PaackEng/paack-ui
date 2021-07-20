@@ -8,9 +8,9 @@ import Element.Font as Font
 import UI.Button as Button exposing (Button)
 import UI.Icon as Icon
 import UI.Internal.Colors as Colors
-import UI.Internal.Filter.Model as Model
+import UI.Internal.Filter.Model as Model exposing (Filter)
 import UI.Internal.Filter.Msg as Msg exposing (Msg)
-import UI.Internal.Filter.Sorter exposing (SortingDirection(..))
+import UI.Internal.Filter.Sorter as Sorter exposing (Sorter, SortingDirection(..))
 import UI.Internal.RenderConfig as RenderConfig
 import UI.Internal.Utils.Element as Element exposing (overlayZIndex)
 import UI.RenderConfig exposing (RenderConfig)
@@ -31,22 +31,17 @@ type alias CommonOptions =
     }
 
 
-type alias Header msg =
+type alias FullFilter msg =
     { label : String
     , openMsg : msg
-    , common : CommonOptions
-    , sorting : Maybe SortingDirection
-    , applied : Maybe { preview : String, clearMsg : msg }
-    }
-
-
-type alias Body msg =
-    { label : String
     , closeMsg : msg
-    , common : CommonOptions
+    , open : Bool
+    , width : Element.Length
+    , size : FilterSize
     , sorting : Maybe (BodySorting msg)
-    , rows : List (Element msg)
-    , buttons : List (Button msg)
+    , rows : RenderConfig -> List (Element msg)
+    , buttons : RenderConfig -> List (Button msg)
+    , applied : Maybe { preview : String, clearMsg : msg }
     }
 
 
@@ -59,15 +54,26 @@ type alias BodySorting msg =
     }
 
 
-headerToElement : RenderConfig -> Header msg -> Element msg
-headerToElement renderConfig { label, openMsg, common, sorting, applied } =
+headerToElement :
+    RenderConfig
+    ->
+        { h
+            | label : String
+            , openMsg : msg
+            , width : Element.Length
+            , size : FilterSize
+            , sorting : Maybe (BodySorting msg)
+            , applied : Maybe { preview : String, clearMsg : msg }
+        }
+    -> Element msg
+headerToElement renderConfig { label, openMsg, width, size, sorting, applied } =
     let
         { padding, fontSize, iconSize } =
-            headerProportions common.size
+            headerProportions size
 
         attrs =
             ARIA.toElementAttributes ARIA.roleButton
-                ++ [ Element.width common.width
+                ++ [ Element.width width
                    , Element.paddingEach padding
                    , Element.spacing 8
                    , Background.color baseColor
@@ -91,7 +97,9 @@ headerToElement renderConfig { label, openMsg, common, sorting, applied } =
                    ]
 
         headerSortingIcon =
-            sortingIcon renderConfig [ Element.width shrink ] iconSize sorting
+            sorting
+                |> Maybe.andThen .applied
+                |> sortingIcon renderConfig [ Element.width shrink ] iconSize
 
         { preview, rightIcon, baseColor } =
             case applied of
@@ -158,15 +166,27 @@ headerProportions size =
             }
 
 
-bodyToElement : RenderConfig -> Body msg -> Element msg
-bodyToElement renderConfig { label, closeMsg, common, sorting, rows, buttons } =
+bodyToElement :
+    RenderConfig
+    ->
+        { b
+            | label : String
+            , closeMsg : msg
+            , width : Element.Length
+            , size : FilterSize
+            , sorting : Maybe (BodySorting msg)
+            , rows : RenderConfig -> List (Element msg)
+            , buttons : RenderConfig -> List (Button msg)
+        }
+    -> Element msg
+bodyToElement renderConfig { label, closeMsg, width, size, sorting, rows, buttons } =
     let
-        width =
-            if common.width == shrink then
+        widthAttr =
+            if width == shrink then
                 Element.tuplesToStyles ( "min-width", "100%" )
 
             else
-                Element.width common.width
+                Element.width width
 
         attrs =
             [ Element.zIndex (overlayZIndex + 1)
@@ -181,19 +201,19 @@ bodyToElement renderConfig { label, closeMsg, common, sorting, rows, buttons } =
             , Border.width 1
             , Border.color Colors.gray300
             , roundedBorders
-            , width
+            , widthAttr
             ]
 
         bodyRows =
-            [ bodyHeader renderConfig common.size closeMsg label
-            , bodySorting renderConfig common.size sorting
+            [ bodyHeader renderConfig size closeMsg label
+            , bodySorting renderConfig size sorting
             , Element.column
                 [ Element.width fill
                 , Element.spacing 8
                 , Element.padding 10
                 ]
-                rows
-            , bodyButtons renderConfig common.size buttons
+                (rows renderConfig)
+            , bodyButtons renderConfig size buttons
             ]
     in
     Element.customOverlay closeMsg [] <| Element.column attrs bodyRows
@@ -352,7 +372,7 @@ bodySortingProportions size =
             }
 
 
-bodyButtons : RenderConfig -> FilterSize -> List (Button msg) -> Element msg
+bodyButtons : RenderConfig -> FilterSize -> (RenderConfig -> List (Button msg)) -> Element msg
 bodyButtons renderConfig size buttons =
     let
         applier =
@@ -365,7 +385,7 @@ bodyButtons renderConfig size buttons =
         , Element.spacing 8
         , Element.padding 12
         ]
-        (List.map applier buttons)
+        (List.map applier <| buttons renderConfig)
 
 
 sortingIcon :
@@ -416,29 +436,29 @@ sizeToElement size =
 
 
 defaultButtons :
-    { applyMsg : msg
-    , clearMsg : msg
-    , applyLabel : String
-    , clearLabel : String
-    }
+    (Msg -> msg)
     -> Model.Filter msg item
+    -> RenderConfig
     -> List (Button msg)
-defaultButtons { applyMsg, clearMsg, applyLabel, clearLabel } filter =
+defaultButtons editMsg filter renderConfig =
     let
+        terms =
+            RenderConfig.localeTerms renderConfig
+
         applyButton =
-            applyLabel
+            terms.filters.apply
                 |> Button.fromLabel
-                |> Button.cmd applyMsg Button.primary
+                |> Button.cmd (editMsg Msg.Apply) Button.primary
 
         disabledApplyButton =
-            applyLabel
+            terms.filters.apply
                 |> Button.fromLabel
                 |> Button.disabled
 
         clearButton =
-            clearLabel
+            terms.filters.clear
                 |> Button.fromLabel
-                |> Button.cmd clearMsg Button.danger
+                |> Button.cmd (editMsg Msg.Clear) Button.danger
     in
     case ( Model.isApplied filter, Model.isEdited filter ) of
         ( False, False ) ->
@@ -469,3 +489,63 @@ defaultSingleTextFilter renderConfig size label editable =
         |> TextField.withOnEnterPressed Msg.Apply
         |> TextField.renderElement renderConfig
         |> List.singleton
+
+
+defaultFilter :
+    { openMsg : msg
+    , closeMsg : msg
+    , editMsg : Msg -> msg
+    , label : String
+    , isOpen : Bool
+    }
+    -> Filter msg item
+    -> Maybe ( Maybe SortingDirection, Sorter item )
+    -> FullFilter msg
+defaultFilter config filter sorting =
+    { label = config.label
+    , openMsg = config.openMsg
+    , closeMsg = config.closeMsg
+    , open = config.isOpen
+    , width = Element.fill
+    , size = ExtraSmall
+    , sorting =
+        { preview =
+            Maybe.andThen
+                (Tuple.second
+                    >> Sorter.preview
+                    >> Maybe.map (\( s, l ) -> { smaller = s, larger = l })
+                )
+                sorting
+        , ascendingSortMsg = config.editMsg <| Msg.SetSorting <| Just SortAscending
+        , descendingSortMsg = config.editMsg <| Msg.SetSorting <| Just SortDescending
+        , clearSortMsg = config.editMsg <| Msg.SetSorting Nothing
+        , applied = Maybe.andThen Tuple.first sorting
+        }
+            |> Just
+    , buttons = defaultButtons config.editMsg filter
+    , applied =
+        Maybe.map
+            (\i -> { preview = String.fromInt i, clearMsg = config.editMsg Msg.Clear })
+            (Model.appliedLength filter)
+    , rows =
+        \renderConfig ->
+            List.map (Element.map config.editMsg) <|
+                case filter of
+                    Model.SingleTextFilter { editable } ->
+                        defaultSingleTextFilter renderConfig
+                            ExtraSmall
+                            config.label
+                            editable
+
+                    _ ->
+                        []
+    }
+
+
+renderElement : RenderConfig -> FullFilter msg -> Element msg
+renderElement renderConfig filter =
+    if filter.open then
+        headerToElement renderConfig filter
+
+    else
+        bodyToElement renderConfig filter

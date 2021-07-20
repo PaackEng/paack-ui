@@ -31,10 +31,11 @@ There are the predefined filters, which have states and updates, and includes so
         Filter.fromModel label
             { openMsg = openMsg
             , closeMsg = closeMsg
-            , editMsg = FilterEdit
+            , editMsg = Msg.FilterEdit
+            , isOpen = model.isFilterOpen
             }
             model.someFilter
-            |> Filter.renderElement renderConfig model.isFilterOpen
+            |> Filter.renderElement renderConfig
 
 
 ## Builders
