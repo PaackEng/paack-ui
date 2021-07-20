@@ -1,5 +1,6 @@
 module UI.Internal.Filter.View exposing (..)
 
+import Array exposing (Array)
 import Element exposing (Attribute, Element, fill, shrink)
 import Element.Background as Background
 import Element.Border as Border
@@ -7,15 +8,18 @@ import Element.Events as Events
 import Element.Font as Font
 import UI.Button as Button exposing (Button)
 import UI.Icon as Icon
+import UI.Internal.Basics exposing (maybeNotThen)
 import UI.Internal.Colors as Colors
+import UI.Internal.DateInput as DateInput exposing (DateInput(..), PeriodComparison(..), PeriodDate, RangeDate)
 import UI.Internal.Filter.Model as Model exposing (Filter)
 import UI.Internal.Filter.Msg as Msg exposing (Msg)
 import UI.Internal.Filter.Sorter as Sorter exposing (Sorter, SortingDirection(..))
 import UI.Internal.RenderConfig as RenderConfig
 import UI.Internal.Utils.Element as Element exposing (overlayZIndex)
+import UI.Radio as Radio
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size exposing (Size)
-import UI.TextField as TextField
+import UI.TextField as TextField exposing (TextField)
 import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element exposing (RectangleSides, zeroPadding)
 
@@ -431,6 +435,16 @@ sizeToElement size =
             Size.small
 
 
+sizeToRadio : FilterSize -> Radio.RadioSize
+sizeToRadio size =
+    case size of
+        ExtraSmall ->
+            Radio.sizeSM
+
+        Medium ->
+            Radio.sizeMD
+
+
 
 {------- Default Presets ----------}
 
@@ -474,6 +488,75 @@ defaultButtons editMsg filter renderConfig =
             [ applyButton, clearButton ]
 
 
+defaultFilter :
+    { openMsg : msg
+    , closeMsg : msg
+    , editMsg : Msg -> msg
+    , label : String
+    , isOpen : Bool
+    }
+    -> Filter msg item
+    -> Maybe ( Maybe SortingDirection, Sorter item )
+    -> FullFilter msg
+defaultFilter config filter sorting =
+    let
+        sortingData =
+            { preview =
+                Maybe.andThen
+                    (Tuple.second
+                        >> Sorter.preview
+                        >> Maybe.map (\( s, l ) -> { smaller = s, larger = l })
+                    )
+                    sorting
+            , ascendingSortMsg = config.editMsg <| Msg.SetSorting <| Just SortAscending
+            , descendingSortMsg = config.editMsg <| Msg.SetSorting <| Just SortDescending
+            , clearSortMsg = config.editMsg <| Msg.SetSorting Nothing
+            , applied = Maybe.andThen Tuple.first sorting
+            }
+
+        rows renderConfig =
+            List.map (Element.map config.editMsg) <|
+                case filter of
+                    Model.SingleTextFilter { editable } ->
+                        defaultSingleTextFilter renderConfig
+                            ExtraSmall
+                            config.label
+                            editable
+
+                    Model.MultiTextFilter { editable } ->
+                        defaultMultiTextFilter renderConfig
+                            ExtraSmall
+                            config.label
+                            editable
+
+                    _ ->
+                        []
+    in
+    { label = config.label
+    , openMsg = config.openMsg
+    , closeMsg = config.closeMsg
+    , open = config.isOpen
+    , width = Element.fill
+    , size = Medium
+    , sorting = Just sortingData
+    , buttons = defaultButtons config.editMsg filter
+    , applied =
+        Maybe.map
+            (\i -> { preview = String.fromInt i, clearMsg = config.editMsg Msg.Clear })
+            (Model.appliedLength filter)
+    , rows = rows
+    }
+
+
+renderElement : RenderConfig -> FullFilter msg -> Element msg
+renderElement renderConfig filter =
+    if filter.open then
+        bodyToElement renderConfig filter
+
+    else
+        headerToElement renderConfig filter
+
+
 defaultSingleTextFilter :
     RenderConfig
     -> FilterSize
@@ -491,61 +574,141 @@ defaultSingleTextFilter renderConfig size label editable =
         |> List.singleton
 
 
-defaultFilter :
-    { openMsg : msg
-    , closeMsg : msg
-    , editMsg : Msg -> msg
-    , label : String
-    , isOpen : Bool
-    }
-    -> Filter msg item
-    -> Maybe ( Maybe SortingDirection, Sorter item )
-    -> FullFilter msg
-defaultFilter config filter sorting =
-    { label = config.label
-    , openMsg = config.openMsg
-    , closeMsg = config.closeMsg
-    , open = config.isOpen
-    , width = Element.fill
-    , size = ExtraSmall
-    , sorting =
-        { preview =
-            Maybe.andThen
-                (Tuple.second
-                    >> Sorter.preview
-                    >> Maybe.map (\( s, l ) -> { smaller = s, larger = l })
-                )
-                sorting
-        , ascendingSortMsg = config.editMsg <| Msg.SetSorting <| Just SortAscending
-        , descendingSortMsg = config.editMsg <| Msg.SetSorting <| Just SortDescending
-        , clearSortMsg = config.editMsg <| Msg.SetSorting Nothing
-        , applied = Maybe.andThen Tuple.first sorting
+defaultMultiTextFilter :
+    RenderConfig
+    -> FilterSize
+    -> String
+    -> Model.Editable (Array String)
+    -> List (Element Msg)
+defaultMultiTextFilter renderConfig size label editableArr =
+    let
+        rowField subIndex line =
+            line
+                |> TextField.singlelineText (Msg.EditMultiText subIndex) label
+                |> TextField.withSize (sizeToElement size)
+                |> TextField.withWidth TextField.widthFull
+                |> TextField.withOnEnterPressed Msg.Apply
+                |> TextField.renderElement renderConfig
+    in
+    editableArr
+        |> Model.editableWithDefault Array.empty
+        |> Array.push ""
+        |> Array.indexedMap rowField
+        |> Array.toList
+
+
+selectFilterRender :
+    RenderConfig
+    -> FilterSize
+    -> String
+    -> Model.Editable Int
+    -> List String
+    -> List (Element Msg)
+selectFilterRender renderConfig size _ { current, applied } list =
+    Radio.group
+        { label = renderConfig |> RenderConfig.localeTerms >> .filters >> .select >> .description
+        , onSelectMsg = always Msg.EditSelect
+        , idPrefix = "table-select-filter"
         }
-            |> Just
-    , buttons = defaultButtons config.editMsg filter
-    , applied =
-        Maybe.map
-            (\i -> { preview = String.fromInt i, clearMsg = config.editMsg Msg.Clear })
-            (Model.appliedLength filter)
-    , rows =
-        \renderConfig ->
-            List.map (Element.map config.editMsg) <|
-                case filter of
-                    Model.SingleTextFilter { editable } ->
-                        defaultSingleTextFilter renderConfig
-                            ExtraSmall
-                            config.label
-                            editable
-
-                    _ ->
-                        []
-    }
+        |> Radio.withSelected (maybeNotThen applied current)
+        |> Radio.withButtons (List.indexedMap Radio.button list)
+        |> Radio.withWidth Radio.widthFull
+        |> Radio.withSize (sizeToRadio size)
+        |> Radio.renderElement renderConfig
+        |> List.singleton
 
 
-renderElement : RenderConfig -> FullFilter msg -> Element msg
-renderElement renderConfig filter =
-    if filter.open then
-        headerToElement renderConfig filter
+singleDateFilterRender :
+    RenderConfig
+    -> FilterSize
+    -> String
+    -> Model.Editable DateInput
+    -> List (Element Msg)
+singleDateFilterRender renderConfig size label editable =
+    let
+        datePlaceholder =
+            renderConfig |> RenderConfig.localeTerms >> .filters >> .dateFormat
+    in
+    editable
+        |> Model.editableWithDefault (DateInvalid "")
+        |> dateInput renderConfig Msg.Apply Msg.EditSingleDate size datePlaceholder label
+        |> TextField.renderElement renderConfig
+        |> List.singleton
 
-    else
-        bodyToElement renderConfig filter
+
+rangeDateFilterRender :
+    RenderConfig
+    -> FilterSize
+    -> String
+    -> Model.Editable RangeDate
+    -> List (Element Msg)
+rangeDateFilterRender renderConfig size label editable =
+    let
+        filtersTerms =
+            renderConfig |> RenderConfig.localeTerms >> .filters
+
+        current =
+            editable
+                |> Model.editableWithDefault
+                    { from = DateInvalid "", to = DateInvalid "" }
+
+        fromPlaceholder =
+            filtersTerms.range.from { date = filtersTerms.dateFormat }
+
+        toPlaceholder =
+            filtersTerms.range.to { date = filtersTerms.dateFormat }
+    in
+    [ current.from
+        |> dateInput renderConfig Msg.Apply Msg.EditRangeFromDate size fromPlaceholder label
+        |> TextField.renderElement renderConfig
+    , current.to
+        |> dateInput renderConfig Msg.Apply Msg.EditRangeToDate size toPlaceholder label
+        |> TextField.renderElement renderConfig
+    ]
+
+
+periodDateFilterRender :
+    RenderConfig
+    -> FilterSize
+    -> String
+    -> Model.Editable PeriodDate
+    -> List (Element Msg)
+periodDateFilterRender renderConfig size label editable =
+    let
+        current =
+            editable
+                |> Model.editableWithDefault { date = DateInvalid "", comparison = On }
+
+        filtersTerms =
+            renderConfig |> RenderConfig.localeTerms >> .filters
+
+        options =
+            [ Radio.button On filtersTerms.period.on
+            , Radio.button Before filtersTerms.period.before
+            , Radio.button After filtersTerms.period.after
+            ]
+    in
+    [ current.date
+        |> dateInput renderConfig Msg.Apply Msg.EditPeriodDate size filtersTerms.dateFormat label
+        |> TextField.renderElement renderConfig
+    , Radio.group
+        { label = filtersTerms.period.description
+        , onSelectMsg = always <| Msg.EditPeriodComparison
+        , idPrefix = "table-date-period-filter"
+        }
+        |> Radio.withSelected (Just current.comparison)
+        |> Radio.withButtons options
+        |> Radio.withWidth Radio.widthFull
+        |> Radio.withSize (sizeToRadio size)
+        |> Radio.renderElement renderConfig
+    ]
+
+
+dateInput : RenderConfig -> msg -> (String -> msg) -> FilterSize -> String -> String -> DateInput -> TextField msg
+dateInput cfg applyMsg editMsg size placeholder label current =
+    current
+        |> DateInput.toTextField cfg Model.dateSeparator editMsg label
+        |> TextField.withPlaceholder placeholder
+        |> TextField.withSize (sizeToElement size)
+        |> TextField.withWidth TextField.widthFull
+        |> TextField.withOnEnterPressed applyMsg
