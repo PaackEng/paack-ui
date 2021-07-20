@@ -366,10 +366,9 @@ contentMap applier data =
 {-| Given a message, apply an update to the [`Nav.State`](#State).
 -}
 stateUpdate : Msg -> State -> ( State, Cmd Msg )
-stateUpdate msg (State state) =
-    case msg of
-        ToggleMenu newVal ->
-            ( State { state | menuExpanded = newVal }, Cmd.none )
+stateUpdate msg state =
+    stateUpdateWithoutPerform msg state
+        |> Tuple.mapSecond Effect.perform
 
 
 {-| Similar to [`stateUpdate`], but using Effects.
