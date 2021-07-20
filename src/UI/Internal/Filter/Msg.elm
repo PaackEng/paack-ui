@@ -1,7 +1,6 @@
 module UI.Internal.Filter.Msg exposing (Msg(..))
 
 import UI.Internal.DateInput exposing (PeriodComparison)
-import UI.Internal.Filter.Sorter exposing (SortingDirection)
 
 
 type Msg
@@ -13,6 +12,5 @@ type Msg
     | EditPeriodDate String
     | EditPeriodComparison PeriodComparison
     | EditSelect Int
-    | SetSorting (Maybe SortingDirection)
     | Apply
     | Clear

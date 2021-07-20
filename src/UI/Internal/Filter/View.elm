@@ -500,6 +500,9 @@ defaultFilter :
     { openMsg : msg
     , closeMsg : msg
     , editMsg : Msg -> msg
+    , sortAscendingMsg : msg
+    , sortDescendingMsg : msg
+    , clearSortMsg : msg
     , label : String
     , isOpen : Bool
     }
@@ -516,9 +519,9 @@ defaultFilter config filter sorting =
                         >> Maybe.map (\( s, l ) -> { smaller = s, larger = l })
                     )
                     sorting
-            , ascendingSortMsg = config.editMsg <| Msg.SetSorting <| Just SortAscending
-            , descendingSortMsg = config.editMsg <| Msg.SetSorting <| Just SortDescending
-            , clearSortMsg = config.editMsg <| Msg.SetSorting Nothing
+            , ascendingSortMsg = config.sortAscendingMsg
+            , descendingSortMsg = config.sortDescendingMsg
+            , clearSortMsg = config.clearSortMsg
             , applied = Maybe.andThen Tuple.first sorting
             }
 

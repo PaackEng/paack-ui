@@ -44,10 +44,6 @@ update msg model =
         EditSelect value ->
             ( selectEdit value model, emptyOutMsg )
 
-        SetSorting _ ->
-            -- TODO
-            ( model, emptyOutMsg )
-
         Apply ->
             applyFilter model
 
