@@ -1,7 +1,7 @@
 module UI.Internal.Filter.Apply exposing (apply)
 
 import UI.Internal.Filter.Model as Filter exposing (Filter)
-import UI.Internal.Filter.Sorter as Sorter
+import UI.Internal.Filter.Sorter as Sorter exposing (SortingDirection)
 
 
 apply : Filter msg item -> Maybe (Sorter.Status item) -> List item -> List item
@@ -17,7 +17,7 @@ apply filter sorting items =
     in
     case sorting of
         Just ( Just direction, sorter ) ->
-            Sorter.sort sorter filteredResults
+            Sorter.sort sorter direction filteredResults
 
         _ ->
             filteredResults

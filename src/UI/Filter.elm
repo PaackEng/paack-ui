@@ -1,6 +1,6 @@
 module UI.Filter exposing
     ( Filter
-    , FilterSize, withSize, sizeMedium, sizeExtraSmall
+    , FilterSize, withSize, sizeMedium, sizeExtraSmall, withWidth
     , renderElement
     , FilterModel, fromModel
     , singleTextFilter, multiTextFilter, singleDateFilter, rangeDateFilter, periodDateFilter, radioFilter
@@ -23,7 +23,7 @@ module UI.Filter exposing
 
 ## Size
 
-@docs FilterSize, withSize, sizeMedium, sizeExtraSmall
+@docs FilterSize, withSize, sizeMedium, sizeExtraSmall, withWidth
 
 
 ## Rendering

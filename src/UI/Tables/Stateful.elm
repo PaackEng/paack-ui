@@ -1164,15 +1164,16 @@ sortByChar fn =
 
 
 {-| Allow sorting a column with a custom function.
+Check [`List.sortWith`](https://package.elm-lang.org/packages/elm/core/latest/List#sortWith)
 
     sortersInit =
         sortersEmpty
             |> unsortable
-            |> sortWith (List.sortWith flippedComparison)
+            |> sortWith flippedComparison
 
 -}
 sortWith :
-    (List item -> List item)
+    (item -> item -> Order)
     -> Sorters item columns
     -> Sorters item (T.Increase columns)
 sortWith fn =
