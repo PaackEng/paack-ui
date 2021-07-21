@@ -6,6 +6,7 @@ module Model exposing
 import Buttons.Model as Buttons
 import Checkboxes.Model as Checkboxes
 import Dropdown.Model as Dropdown
+import Filters.Model as Filters
 import Layouts.Model as Layouts
 import Paginators.Model as Paginators
 import Radio.Model as Radio
@@ -18,30 +19,32 @@ import UIExplorer.Plugins.Tabs as TabsPlugin
 
 type alias Model =
     { buttonsStories : Buttons.Model
-    , paginatorsStories : Paginators.Model
-    , tablesStories : Tables.Model
     , checkboxesStories : Checkboxes.Model
-    , switchesStories : Switches.Model
+    , dropdownStories : Dropdown.Model
+    , filtersStories : Filters.Model
+    , layoutsStories : Layouts.Model
+    , paginatorsStories : Paginators.Model
     , radioStories : Radio.Model
+    , sidebarStories : Sidebar.Model
+    , switchesStories : Switches.Model
+    , tablesStories : Tables.Model
     , tabsStories : Tabs.Model
     , tabs : TabsPlugin.Model
-    , layoutsStories : Layouts.Model
-    , sidebarStories : Sidebar.Model
-    , dropdownStories : Dropdown.Model
     }
 
 
 init : Model
 init =
     { buttonsStories = Buttons.initModel
-    , paginatorsStories = Paginators.initModel
-    , tablesStories = Tables.initModel
     , checkboxesStories = Checkboxes.initModel
-    , switchesStories = Switches.initModel
+    , dropdownStories = Dropdown.initModel
+    , filtersStories = Filters.initModel
+    , layoutsStories = Layouts.initModel
+    , paginatorsStories = Paginators.initModel
     , radioStories = Radio.initModel
+    , sidebarStories = Sidebar.initModel
+    , switchesStories = Switches.initModel
+    , tablesStories = Tables.initModel
     , tabsStories = Tabs.initModel
     , tabs = TabsPlugin.initialModel
-    , layoutsStories = Layouts.initModel
-    , sidebarStories = Sidebar.initModel
-    , dropdownStories = Dropdown.initModel
     }

@@ -7,6 +7,7 @@ import Checkboxes.Stories as Checkboxes
 import ContentPlaceholders
 import Dialog
 import Dropdown.Stories as Dropdowns
+import Filters.Stories as Filters
 import Html exposing (Html, div, img)
 import Html.Attributes exposing (src, style)
 import Icons
@@ -131,6 +132,7 @@ main =
             [ Tables.stories renderConfig
             , Paginators.stories renderConfig
             , Sidebar.stories renderConfig
+            , Filters.stories renderConfig
             ]
         |> exploreWithCategories config
 
@@ -200,6 +202,10 @@ updateStories msg ({ customModel } as model) =
         DropdownStoriesMsg submsg ->
             Dropdowns.update renderConfig submsg customModel.dropdownStories
                 |> R.map (\t -> { model | customModel = { customModel | dropdownStories = t } })
+
+        FiltersStoriesMsg subMsg ->
+            Filters.update subMsg customModel.filtersStories
+                |> R.map (\t -> { model | customModel = { customModel | filtersStories = t } })
 
         NoOp ->
             ( model, Cmd.none )
