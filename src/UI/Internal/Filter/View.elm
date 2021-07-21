@@ -42,18 +42,18 @@ type alias FullFilter msg =
     , open : Bool
     , width : Element.Length
     , size : FilterSize
-    , sorting : Maybe (BodySorting msg)
+    , sorting : Maybe (FilterSorting msg)
     , rows : RenderConfig -> FilterSize -> List (Element msg)
     , buttons : RenderConfig -> List (Button msg)
     , applied : Maybe { preview : String, clearMsg : msg }
     }
 
 
-type alias BodySorting msg =
+type alias FilterSorting msg =
     { preview : Maybe { smaller : String, larger : String }
-    , ascendingSortMsg : msg
-    , descendingSortMsg : msg
-    , clearSortMsg : msg
+    , sortAscendingMsg : msg
+    , sortDescendingMsg : msg
+    , clearSortingMsg : msg
     , applied : Maybe SortingDirection
     }
 
@@ -71,7 +71,7 @@ headerToElement :
             , openMsg : msg
             , width : Element.Length
             , size : FilterSize
-            , sorting : Maybe (BodySorting msg)
+            , sorting : Maybe (FilterSorting msg)
             , applied : Maybe { preview : String, clearMsg : msg }
         }
     -> Element msg
@@ -180,7 +180,7 @@ bodyToElement :
             , closeMsg : msg
             , width : Element.Length
             , size : FilterSize
-            , sorting : Maybe (BodySorting msg)
+            , sorting : Maybe (FilterSorting msg)
             , rows : RenderConfig -> FilterSize -> List (Element msg)
             , buttons : RenderConfig -> List (Button msg)
         }
@@ -276,7 +276,7 @@ bodyCloseIcon renderConfig closeMsg iconSize =
             )
 
 
-bodySorting : RenderConfig -> FilterSize -> Maybe (BodySorting msg) -> Element msg
+bodySorting : RenderConfig -> FilterSize -> Maybe (FilterSorting msg) -> Element msg
 bodySorting renderConfig size sorting =
     case sorting of
         Just sortingData ->
@@ -293,13 +293,13 @@ bodySorting renderConfig size sorting =
                     proportions
                     sortingData
                     terms.tables.sorting.ascending
-                    sortingData.ascendingSortMsg
+                    sortingData.sortAscendingMsg
                 , sortAs renderConfig
                     SortDescending
                     proportions
                     sortingData
                     terms.tables.sorting.descending
-                    sortingData.descendingSortMsg
+                    sortingData.sortDescendingMsg
                 ]
 
         Nothing ->
@@ -310,7 +310,7 @@ sortAs :
     RenderConfig
     -> SortingDirection
     -> { fontSize : Int, iconSize : Int, padding : RectangleSides }
-    -> BodySorting msg
+    -> FilterSorting msg
     -> String
     -> msg
     -> Element msg
@@ -319,7 +319,7 @@ sortAs renderConfig direction { fontSize, iconSize } sortingData label msg =
         ( backgroundColor, allowClearingMsg ) =
             if sortingData.applied == Just direction then
                 ( Background.color Colors.navyBlue200
-                , sortingData.clearSortMsg
+                , sortingData.clearSortingMsg
                 )
 
             else
@@ -453,6 +453,15 @@ sizeToRadio size =
             Radio.sizeMD
 
 
+renderElement : RenderConfig -> FullFilter msg -> Element msg
+renderElement renderConfig filter =
+    if filter.open then
+        bodyToElement renderConfig filter
+
+    else
+        headerToElement renderConfig filter
+
+
 
 {------- Default Presets ----------}
 
@@ -502,12 +511,12 @@ defaultFilter :
     , editMsg : Msg -> msg
     , sortAscendingMsg : msg
     , sortDescendingMsg : msg
-    , clearSortMsg : msg
+    , clearSortingMsg : msg
     , label : String
     , isOpen : Bool
     }
     -> Filter msg item
-    -> Maybe ( Maybe SortingDirection, Sorter item )
+    -> Maybe (Sorter.Status item)
     -> FullFilter msg
 defaultFilter config filter sorting =
     let
@@ -519,9 +528,9 @@ defaultFilter config filter sorting =
                         >> Maybe.map (\( s, l ) -> { smaller = s, larger = l })
                     )
                     sorting
-            , ascendingSortMsg = config.sortAscendingMsg
-            , descendingSortMsg = config.sortDescendingMsg
-            , clearSortMsg = config.clearSortMsg
+            , sortAscendingMsg = config.sortAscendingMsg
+            , sortDescendingMsg = config.sortDescendingMsg
+            , clearSortingMsg = config.clearSortingMsg
             , applied = Maybe.andThen Tuple.first sorting
             }
 
@@ -560,15 +569,6 @@ defaultFilter config filter sorting =
             (Model.appliedLength filter)
     , rows = rows
     }
-
-
-renderElement : RenderConfig -> FullFilter msg -> Element msg
-renderElement renderConfig filter =
-    if filter.open then
-        bodyToElement renderConfig filter
-
-    else
-        headerToElement renderConfig filter
 
 
 defaultSingleTextFilter :

@@ -49,7 +49,7 @@ header renderConfig filter sorting config =
         , isOpen = config.isOpen
         , sortAscendingMsg = sortMsg SortAscending
         , sortDescendingMsg = sortMsg SortDescending
-        , clearSortMsg = config.fromSortersMsg Sorters.ClearSorting
+        , clearSortingMsg = config.fromSortersMsg Sorters.ClearSorting
         }
         filter
         sorting

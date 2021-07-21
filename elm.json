@@ -13,6 +13,7 @@
         "UI.ContentPlaceholder",
         "UI.Dropdown",
         "UI.Effect",
+        "UI.Filter",
         "UI.Icon",
         "UI.Link",
         "UI.ListView",

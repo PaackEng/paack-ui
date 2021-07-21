@@ -549,6 +549,19 @@ periodDateLocal timeZone posixInit periodInit getPosix =
         }
 
 
+elmOrderToPeriodComparison : Order -> PeriodComparison
+elmOrderToPeriodComparison order =
+    case order of
+        LT ->
+            Before
+
+        EQ ->
+            On
+
+        GT ->
+            After
+
+
 periodDateRemote :
     Time.Zone
     -> Maybe Posix

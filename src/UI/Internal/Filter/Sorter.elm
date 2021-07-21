@@ -1,4 +1,4 @@
-module UI.Internal.Filter.Sorter exposing (Sorter(..), SortingDirection(..), preview, sort)
+module UI.Internal.Filter.Sorter exposing (Sorter(..), SortingDirection(..), Status, preview, sort)
 
 
 type Sorter item
@@ -12,6 +12,10 @@ type Sorter item
 type SortingDirection
     = SortAscending
     | SortDescending
+
+
+type alias Status item =
+    ( Maybe SortingDirection, Sorter item )
 
 
 sort : Sorter item -> List item -> List item
