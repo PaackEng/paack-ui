@@ -1,7 +1,7 @@
 module UI.Internal.Filter.View exposing (..)
 
 import Array exposing (Array)
-import Element exposing (Attribute, Element, fill, shrink)
+import Element exposing (Attribute, Element, fill, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
@@ -44,6 +44,7 @@ type alias FullFilter msg =
     , size : FilterSize
     , sorting : Maybe (FilterSorting msg)
     , rows : RenderConfig -> FilterSize -> List (Element msg)
+    , rowsHeight : Maybe Int
     , buttons : RenderConfig -> List (Button msg)
     , applied : Maybe { preview : String, clearMsg : msg }
     }
@@ -182,10 +183,11 @@ bodyToElement :
             , size : FilterSize
             , sorting : Maybe (FilterSorting msg)
             , rows : RenderConfig -> FilterSize -> List (Element msg)
+            , rowsHeight : Maybe Int
             , buttons : RenderConfig -> List (Button msg)
         }
     -> Element msg
-bodyToElement renderConfig { label, closeMsg, width, size, sorting, rows, buttons } =
+bodyToElement renderConfig { label, closeMsg, width, size, sorting, rows, buttons, rowsHeight } =
     let
         widthAttr =
             if width == shrink then
@@ -208,23 +210,42 @@ bodyToElement renderConfig { label, closeMsg, width, size, sorting, rows, button
             , Border.color Colors.gray300
             , roundedBorders
             , widthAttr
+            ]
+
+        bodyAttrs =
+            [ Element.width fill
+            , Element.spacing 8
+            , Element.padding 10
             , Element.tabIndex -1
             ]
+
+        bodyAttrsWithHeight =
+            case rowsHeight of
+                Just value ->
+                    Element.height (px value)
+                        :: Element.scrollbarY
+                        :: Element.clipX
+                        :: bodyAttrs
+
+                Nothing ->
+                    bodyAttrs
 
         bodyRows =
             [ bodyHeader renderConfig size closeMsg label
             , bodySorting renderConfig size sorting
             , Element.column
-                [ Element.width fill
-                , Element.spacing 8
-                , Element.padding 10
-                , Element.tabIndex -1
-                ]
+                bodyAttrsWithHeight
                 (rows renderConfig size)
             , bodyButtons renderConfig size buttons
             ]
     in
-    Element.customOverlay closeMsg [] <| Element.column attrs bodyRows
+    Element.column attrs bodyRows
+        |> Element.customOverlay closeMsg []
+        |> Element.el
+            [ Element.width width
+            , Element.height (px 1)
+            , Element.alignTop
+            ]
 
 
 bodyHeader : RenderConfig -> FilterSize -> msg -> String -> Element msg
@@ -560,6 +581,7 @@ defaultFilter config filter sorting =
     , closeMsg = config.closeMsg
     , open = config.isOpen
     , width = Element.fill
+    , rowsHeight = Just 160
     , size = Medium
     , sorting = Just sortingData
     , buttons = defaultButtons config.editMsg filter

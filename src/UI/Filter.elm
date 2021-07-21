@@ -9,7 +9,7 @@ module UI.Filter exposing
     , FilterSorting, withSorting, sorting, withSortingPreview
     , FilterAppliedSorting, withAppliedSorting, sortingAscending, sortingDescending, notSorting
     , customFilter
-    , withBody, withButtons
+    , withBody, withButtons, withBodyHeight
     , FilterAppliedHeader, withAppliedHeader, appliedHeader
     )
 
@@ -106,7 +106,7 @@ There is also the possibility to create a custom filter, where you set the sorti
 
 ## Customizer
 
-@docs withBody, withButtons
+@docs withBody, withButtons, withBodyHeight
 
 
 ## Header when filter applied
@@ -185,6 +185,7 @@ customFilter label { openMsg, closeMsg, isOpen } =
         , size = Internal.Medium
         , sorting = Nothing
         , rows = always <| always []
+        , rowsHeight = Nothing
         , buttons = always []
         , applied = Nothing
         }
@@ -244,6 +245,13 @@ withBody newBody (Filter filter) =
 withButtons : List (Button msg) -> Filter msg -> Filter msg
 withButtons newButtons (Filter filter) =
     Filter { filter | buttons = always newButtons }
+
+
+{-| Limits the vertical size of the filter's body
+-}
+withBodyHeight : Int -> Filter msg -> Filter msg
+withBodyHeight maxPx (Filter filter) =
+    Filter { filter | rowsHeight = Just maxPx }
 
 
 {-| Sets the closed filter visually different when with filtering applied.
