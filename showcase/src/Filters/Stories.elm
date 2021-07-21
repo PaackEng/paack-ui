@@ -1,6 +1,6 @@
 module Filters.Stories exposing (stories, update)
 
-import Element exposing (Element, fill, maximum, minimum, px)
+import Element exposing (Element, fill, maximum, minimum)
 import Filters.Model as Story
 import Filters.Msg as Story
 import Model exposing (Model)
@@ -8,7 +8,6 @@ import Msg exposing (Msg)
 import PluginOptions exposing (defaultWithMenu)
 import Return exposing (Return)
 import UI.Button as Button
-import UI.Effect as Effect
 import UI.Filter as Filter
 import UI.ListView as ListView
 import UI.RenderConfig exposing (RenderConfig)
@@ -23,7 +22,6 @@ import Utils
         , goToDocsCallToAction
         , iconsSvgSprite
         , prettifyElmCode
-        , story
         , storyWithModel
         )
 
@@ -172,7 +170,7 @@ united renderConfig =
 
 
 unitedView : RenderConfig -> Model -> Element Msg
-unitedView renderConfig { filtersStories } =
+unitedView renderConfig _ =
     Element.wrappedRow [ Element.width fill, Element.height (fill |> minimum 320), Element.spacing 16 ]
         [ iconsSvgSprite
         , Element.column [ Element.width (fill |> maximum 160), Element.spacing 16 ]
