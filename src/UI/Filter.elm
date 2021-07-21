@@ -128,18 +128,26 @@ import UI.Internal.Filter.View as Internal
 import UI.RenderConfig exposing (RenderConfig)
 
 
+{-| Holds the filter's visual element information.
+-}
 type Filter msg
     = Filter (Internal.FullFilter msg)
 
 
+{-| Describes the filter's sorting information.
+-}
 type FilterSorting msg
     = FilterSorting (Internal.FilterSorting msg)
 
 
+{-| Describes the applied sorting state.
+-}
 type FilterAppliedSorting
     = FilterAppliedSorting (Maybe Sorter.SortingDirection)
 
 
+{-| Holds a pre-defined filter's current state.
+-}
 type FilterModel msg item
     = FilterModel
         { sorting : Maybe (Sorter.Status item)
@@ -150,16 +158,22 @@ type FilterModel msg item
         }
 
 
+{-| Contains a pre-defined filter's change.
+-}
 type FilterMsg
     = FilterMsg Internal.Msg
     | SetSorting (Maybe Sorter.SortingDirection)
     | SetOpen Bool
 
 
+{-| Describes the applied filter state.
+-}
 type FilterAppliedHeader msg
     = FilterAppliedHeader { preview : String, clearMsg : msg }
 
 
+{-| Builds a custom filter, where you create the messages and treat the states.
+-}
 customFilter : String -> { openMsg : msg, closeMsg : msg, isOpen : Bool } -> Filter msg
 customFilter label { openMsg, closeMsg, isOpen } =
     Filter
@@ -176,6 +190,9 @@ customFilter label { openMsg, closeMsg, isOpen } =
         }
 
 
+{-| End of the builder's life.
+The result of this function is a ready-to-insert Elm UI's Element.
+-}
 renderElement : RenderConfig -> Filter msg -> Element msg
 renderElement renderConfig (Filter filter) =
     Internal.renderElement renderConfig filter
@@ -201,36 +218,50 @@ sizeMedium =
     FilterSize Internal.Medium
 
 
+{-| Scale the component between [the compatible sizes](#FilterSize).
+-}
 withSize : FilterSize -> Filter msg -> Filter msg
 withSize (FilterSize newSize) (Filter filter) =
     Filter { filter | size = newSize }
 
 
+{-| Sets the width with Element.
+-}
 withWidth : Element.Length -> Filter msg -> Filter msg
 withWidth newWidth (Filter filter) =
     Filter { filter | width = newWidth }
 
 
+{-| Sets the content of the filter's dialog when open.
+-}
 withBody : List (Element msg) -> Filter msg -> Filter msg
 withBody newBody (Filter filter) =
     Filter { filter | rows = always <| always newBody }
 
 
+{-| Sets the buttons at the bottom of the filter's dialog when open.
+-}
 withButtons : List (Button msg) -> Filter msg -> Filter msg
 withButtons newButtons (Filter filter) =
     Filter { filter | buttons = always newButtons }
 
 
+{-| Sets the closed filter visually different when with filtering applied.
+-}
 withAppliedHeader : Maybe (FilterAppliedHeader msg) -> Filter msg -> Filter msg
 withAppliedHeader maybeAppliedHeader (Filter filter) =
     Filter { filter | applied = Maybe.map (\(FilterAppliedHeader header) -> header) maybeAppliedHeader }
 
 
+{-| Sets a preview of how many items (or which ones) were selected for filtering, with a button to fastly clear the filtering.
+-}
 appliedHeader : String -> msg -> FilterAppliedHeader msg
 appliedHeader label clearMsg =
     FilterAppliedHeader { preview = label, clearMsg = clearMsg }
 
 
+{-| A classic update function.
+-}
 update : FilterMsg -> FilterModel msg item -> ( FilterModel msg item, Effect msg )
 update msg (FilterModel ({ filter, items } as model)) =
     case msg of
@@ -271,6 +302,8 @@ update msg (FilterModel ({ filter, items } as model)) =
             )
 
 
+{-| Builds a [`FilterSorting`](#FilterSorting) for custom sorting.
+-}
 sorting : { sortAscendingMsg : msg, sortDescendingMsg : msg, clearSortingMsg : msg } -> FilterSorting msg
 sorting { sortAscendingMsg, sortDescendingMsg, clearSortingMsg } =
     FilterSorting
@@ -282,36 +315,53 @@ sorting { sortAscendingMsg, sortDescendingMsg, clearSortingMsg } =
         }
 
 
+{-| For when the current sorting is ascending.
+-}
 sortingAscending : FilterAppliedSorting
 sortingAscending =
     FilterAppliedSorting <| Just Sorter.SortAscending
 
 
+{-| For when the current sorting is descending.
+-}
 sortingDescending : FilterAppliedSorting
 sortingDescending =
     FilterAppliedSorting <| Just Sorter.SortDescending
 
 
+{-| For when not sorting.
+-}
 notSorting : FilterAppliedSorting
 notSorting =
     FilterAppliedSorting <| Nothing
 
 
+{-| Adds sorting buttons to the filter.
+-}
 withSorting : FilterSorting msg -> Filter msg -> Filter msg
 withSorting (FilterSorting sortingData) (Filter filter) =
     Filter { filter | sorting = Just sortingData }
 
 
+{-| Sets the current sorting state.
+-}
 withAppliedSorting : FilterAppliedSorting -> FilterSorting msg -> FilterSorting msg
 withAppliedSorting (FilterAppliedSorting appliedSorting) (FilterSorting sortingData) =
     FilterSorting { sortingData | applied = appliedSorting }
 
 
+{-| Add example of the sorting order to the sorting buttons.
+-}
 withSortingPreview : { smaller : String, larger : String } -> FilterSorting msg -> FilterSorting msg
 withSortingPreview preview (FilterSorting sortingData) =
     FilterSorting { sortingData | preview = Just preview }
 
 
+{-| A pre-built, single text field filter.
+
+    singleTextField (Just "initial filtering value") .someStringField
+
+-}
 singleTextFilter : Maybe String -> (item -> String) -> FilterModel msg item
 singleTextFilter initialFilter getData =
     defaultFilterModel
@@ -320,6 +370,11 @@ singleTextFilter initialFilter getData =
         }
 
 
+{-| A pre-built filter, with multiple text fields.
+
+    multiTextField [] .someStringField
+
+-}
 multiTextFilter : List String -> (item -> String) -> FilterModel msg item
 multiTextFilter initialList getData =
     defaultFilterModel
@@ -328,6 +383,11 @@ multiTextFilter initialList getData =
         }
 
 
+{-| A pre-built filter, for a single date.
+
+    singleDateFilter timeZone (Just model.someInitialTime) .someTimeField
+
+-}
 singleDateFilter : Time.Zone -> Maybe Time.Posix -> (item -> Time.Posix) -> FilterModel msg item
 singleDateFilter timeZone initialTime getData =
     defaultFilterModel
@@ -336,6 +396,14 @@ singleDateFilter timeZone initialTime getData =
         }
 
 
+{-| A pre-built filter, for a range of date.
+
+    rangeDateFilter timeZone
+        (Just model.someInitialBeginningTime)
+        (Just model.someInitialEndingTime)
+        .someTimeField
+
+-}
 rangeDateFilter : Time.Zone -> Maybe Time.Posix -> Maybe Time.Posix -> (item -> Time.Posix) -> FilterModel msg item
 rangeDateFilter timeZone initialBegin initialEnd getData =
     defaultFilterModel
@@ -344,6 +412,14 @@ rangeDateFilter timeZone initialBegin initialEnd getData =
         }
 
 
+{-| A pre-built filter, for a period (before, on, or after) some date.
+
+    rangeDateFilter timeZone
+        (Just model.someInitialBeginningTime)
+        (Just model.someInitialEndingTime)
+        .someTimeField
+
+-}
 periodDateFilter : Time.Zone -> Maybe Time.Posix -> Maybe Order -> (item -> Time.Posix) -> FilterModel msg item
 periodDateFilter timeZone initialFilter initialComparer getData =
     defaultFilterModel
@@ -352,6 +428,13 @@ periodDateFilter timeZone initialFilter initialComparer getData =
         }
 
 
+{-| A pre-built filter, for a custom radio group.
+
+    radioFilter [ "Orange", "Strawberry", "Pineapple", "Watermelon" ]
+        (Just 0)
+        (\fruit selected -> fruitsIndex fruit == selected)
+
+-}
 radioFilter : List String -> Maybe Int -> (item -> Int -> Bool) -> FilterModel msg item
 radioFilter labelList initialSelection compare =
     defaultFilterModel
@@ -360,6 +443,8 @@ radioFilter labelList initialSelection compare =
         }
 
 
+{-| Feed the filter with items.
+-}
 setItems : List item -> FilterModel msg item -> FilterModel msg item
 setItems items (FilterModel model) =
     FilterModel
@@ -369,11 +454,21 @@ setItems items (FilterModel model) =
         }
 
 
+{-| Retrieve items, sorted and filtered.
+-}
 getItems : FilterModel msg item -> List item
 getItems (FilterModel { result }) =
     result
 
 
+{-| Creates the visual component from the model of a pre-built filter.
+
+    fromModel
+        label
+        Msg.ForFilter
+        model.someFilter
+
+-}
 fromModel :
     String
     -> (FilterMsg -> msg)
