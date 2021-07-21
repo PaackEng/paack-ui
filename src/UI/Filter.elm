@@ -5,8 +5,10 @@ module UI.Filter exposing
     , FilterModel, fromModel
     , singleTextFilter, multiTextFilter, singleDateFilter, rangeDateFilter, periodDateFilter, radioFilter
     , FilterMsg, filterUpdate
+    , setItems, getItems
     , FilterSorting, withSorting, sorting
     , FilterAppliedSorting, withAppliedSorting, sortingAscending, sortingDescending, notSorting
+    , customFilter
     , withBody, withButtons
     , FilterAppliedHeader, withAppliedHeader, appliedHeader
     )
@@ -61,6 +63,7 @@ There are the predefined filters, which have states and updates, and includes so
 @docs FilterModel, fromModel
 @docs singleTextFilter, multiTextFilter, singleDateFilter, rangeDateFilter, periodDateFilter, radioFilter
 @docs FilterMsg, filterUpdate
+@docs setItems, getItems
 
 
 ### Sorting
@@ -120,6 +123,7 @@ import Element exposing (Element)
 import Time
 import UI.Button exposing (Button)
 import UI.Effect as Effect exposing (Effect)
+import UI.Internal.Filter.Apply as Internal
 import UI.Internal.Filter.Model as Internal
 import UI.Internal.Filter.Msg as Internal
 import UI.Internal.Filter.Sorter as Sorter
@@ -141,7 +145,12 @@ type FilterAppliedSorting
 
 
 type FilterModel msg item
-    = FilterModel (Internal.Filter msg item)
+    = FilterModel
+        { sorting : Maybe (Sorter.Status item)
+        , filter : Internal.Filter msg item
+        , items : List item
+        , result : List item
+        }
 
 
 type FilterMsg
@@ -225,14 +234,34 @@ appliedHeader label clearMsg =
 
 
 filterUpdate : FilterMsg -> FilterModel msg item -> ( FilterModel msg item, Effect msg )
-filterUpdate msg ((FilterModel model) as untouchedModel) =
+filterUpdate msg (FilterModel ({ filter, items } as model)) =
     case msg of
         FilterMsg subMsg ->
-            Internal.update subMsg model
-                |> Tuple.mapBoth FilterModel .effects
+            let
+                ( newFilter, outMsg ) =
+                    Internal.update subMsg filter
 
-        SetSorting _ ->
-            ( untouchedModel, Effect.none )
+                newResult =
+                    if outMsg.closeDialog then
+                        Internal.apply newFilter model.sorting items
+
+                    else
+                        model.result
+            in
+            ( FilterModel { model | filter = newFilter, result = newResult }
+            , outMsg.effects
+            )
+
+        SetSorting newSortingDirection ->
+            let
+                newSorting =
+                    Maybe.map
+                        (Tuple.mapFirst (always newSortingDirection))
+                        model.sorting
+            in
+            ( FilterModel { model | sorting = newSorting, result = Internal.apply filter newSorting items }
+            , Effect.none
+            )
 
 
 sorting : { sortAscendingMsg : msg, sortDescendingMsg : msg, clearSortingMsg : msg } -> FilterSorting msg
@@ -273,32 +302,76 @@ withAppliedSorting (FilterAppliedSorting appliedSorting) (FilterSorting sortingD
 
 singleTextFilter : Maybe String -> (item -> String) -> FilterModel msg item
 singleTextFilter initialFilter getData =
-    FilterModel <| Internal.singleTextLocal initialFilter getData
+    FilterModel
+        { sorting = Just ( Nothing, Sorter.AlphabeticalSortable getData )
+        , filter = Internal.singleTextLocal initialFilter getData
+        , items = []
+        , result = []
+        }
 
 
 multiTextFilter : List String -> (item -> String) -> FilterModel msg item
 multiTextFilter initialList getData =
-    FilterModel <| Internal.multiTextLocal initialList getData
+    FilterModel
+        { sorting = Just ( Nothing, Sorter.AlphabeticalSortable getData )
+        , filter = Internal.multiTextLocal initialList getData
+        , items = []
+        , result = []
+        }
 
 
 singleDateFilter : Time.Zone -> Maybe Time.Posix -> (item -> Time.Posix) -> FilterModel msg item
 singleDateFilter timeZone initialTime getData =
-    FilterModel <| Internal.singleDateLocal timeZone initialTime getData
+    FilterModel
+        { sorting = Just ( Nothing, Sorter.IntegerSortable <| (getData >> Time.toMillis timeZone) )
+        , filter = Internal.singleDateLocal timeZone initialTime getData
+        , items = []
+        , result = []
+        }
 
 
 rangeDateFilter : Time.Zone -> Maybe Time.Posix -> Maybe Time.Posix -> (item -> Time.Posix) -> FilterModel msg item
 rangeDateFilter timeZone initialBegin initialEnd getData =
-    FilterModel <| Internal.rangeDateLocal timeZone initialBegin initialEnd getData
+    FilterModel
+        { sorting = Just ( Nothing, Sorter.IntegerSortable <| (getData >> Time.toMillis timeZone) )
+        , filter = Internal.rangeDateLocal timeZone initialBegin initialEnd getData
+        , items = []
+        , result = []
+        }
 
 
 periodDateFilter : Time.Zone -> Maybe Time.Posix -> Maybe Order -> (item -> Time.Posix) -> FilterModel msg item
 periodDateFilter timeZone initialFilter initialComparer getData =
-    FilterModel <| Internal.periodDateLocal timeZone initialFilter (Maybe.map Internal.elmOrderToPeriodComparison initialComparer) getData
+    FilterModel
+        { sorting = Just ( Nothing, Sorter.IntegerSortable <| (getData >> Time.toMillis timeZone) )
+        , filter = Internal.periodDateLocal timeZone initialFilter (Maybe.map Internal.elmOrderToPeriodComparison initialComparer) getData
+        , items = []
+        , result = []
+        }
 
 
 radioFilter : List String -> Maybe Int -> (item -> Int -> Bool) -> FilterModel msg item
 radioFilter labelList initialSelection compare =
-    FilterModel <| Internal.selectLocal labelList initialSelection compare
+    FilterModel
+        { sorting = Nothing
+        , filter = Internal.selectLocal labelList initialSelection compare
+        , items = []
+        , result = []
+        }
+
+
+setItems : List item -> FilterModel msg item -> FilterModel msg item
+setItems items (FilterModel model) =
+    FilterModel
+        { model
+            | items = items
+            , result = Internal.apply model.filter model.sorting items
+        }
+
+
+getItems : FilterModel msg item -> List item
+getItems (FilterModel { result }) =
+    result
 
 
 fromModel :
@@ -322,6 +395,6 @@ fromModel label { openMsg, closeMsg, toExternalMsg, isOpen } (FilterModel model)
         , label = label
         , isOpen = isOpen
         }
-        model
-        Nothing
+        model.filter
+        model.sorting
         |> Filter
