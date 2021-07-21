@@ -1,7 +1,7 @@
 module UI.Internal.Filter.Apply exposing (apply)
 
 import UI.Internal.Filter.Model as Filter exposing (Filter)
-import UI.Internal.Filter.Sorter as Sorter exposing (SortingDirection)
+import UI.Internal.Filter.Sorter as Sorter
 
 
 apply : Filter msg item -> Maybe (Sorter.Status item) -> List item -> List item

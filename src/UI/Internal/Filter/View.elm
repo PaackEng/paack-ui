@@ -13,7 +13,7 @@ import UI.Internal.Colors as Colors
 import UI.Internal.DateInput as DateInput exposing (DateInput(..), PeriodComparison(..), PeriodDate, RangeDate)
 import UI.Internal.Filter.Model as Model exposing (Filter)
 import UI.Internal.Filter.Msg as Msg exposing (Msg)
-import UI.Internal.Filter.Sorter as Sorter exposing (Sorter, SortingDirection(..))
+import UI.Internal.Filter.Sorter as Sorter exposing (SortingDirection(..))
 import UI.Internal.RenderConfig as RenderConfig
 import UI.Internal.Utils.Element as Element exposing (overlayZIndex)
 import UI.Radio as Radio
