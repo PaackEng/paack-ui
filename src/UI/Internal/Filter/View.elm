@@ -1,7 +1,7 @@
 module UI.Internal.Filter.View exposing (..)
 
 import Array exposing (Array)
-import Element exposing (Attribute, Element, fill, minimum, px, shrink)
+import Element exposing (Attribute, Element, fill, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
