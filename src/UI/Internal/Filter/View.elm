@@ -573,8 +573,8 @@ defaultFilter config filter sorting =
                     Model.RangeDateFilter { editable } ->
                         rangeDateFilterRender renderConfig size config.label editable
 
-                    Model.PeriodDateFilter { editable } ->
-                        periodDateFilterRender renderConfig size config.label editable
+                    Model.PeriodDateFilter radioDomId { editable } ->
+                        periodDateFilterRender renderConfig radioDomId size config.label editable
     in
     { label = config.label
     , openMsg = config.openMsg
@@ -638,16 +638,16 @@ selectFilterRender :
     -> FilterSize
     -> String
     -> Model.Editable Int
-    -> List String
+    -> { items : List String, domId : String }
     -> List (Element Msg)
-selectFilterRender renderConfig size _ { current, applied } list =
+selectFilterRender renderConfig size label { current, applied } { items, domId } =
     Radio.group
-        { label = renderConfig |> RenderConfig.localeTerms >> .filters >> .select >> .description
-        , onSelectMsg = always Msg.EditSelect
-        , idPrefix = "table-select-filter"
+        { label = label
+        , onSelectMsg = Msg.EditSelect
+        , idPrefix = domId
         }
         |> Radio.withSelected (maybeNotThen applied current)
-        |> Radio.withButtons (List.indexedMap Radio.button list)
+        |> Radio.withButtons (List.indexedMap Radio.button items)
         |> Radio.withWidth Radio.widthFull
         |> Radio.withSize (sizeToRadio size)
         |> Radio.renderElement renderConfig
@@ -705,11 +705,12 @@ rangeDateFilterRender renderConfig size label editable =
 
 periodDateFilterRender :
     RenderConfig
+    -> { domId : String }
     -> FilterSize
     -> String
     -> Model.Editable PeriodDate
     -> List (Element Msg)
-periodDateFilterRender renderConfig size label editable =
+periodDateFilterRender renderConfig { domId } size label editable =
     let
         current =
             editable
@@ -729,8 +730,8 @@ periodDateFilterRender renderConfig size label editable =
         |> TextField.renderElement renderConfig
     , Radio.group
         { label = filtersTerms.period.description
-        , onSelectMsg = always <| Msg.EditPeriodComparison
-        , idPrefix = "table-date-period-filter"
+        , onSelectMsg = Msg.EditPeriodComparison
+        , idPrefix = domId
         }
         |> Radio.withSelected (Just current.comparison)
         |> Radio.withButtons options

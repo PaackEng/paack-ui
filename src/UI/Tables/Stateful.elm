@@ -942,7 +942,7 @@ localPeriodDateFilter :
     -> Filters msg item (T.Increase columns)
 localPeriodDateFilter timeZone initValue initComparison getData accu =
     Filters.push
-        (Filter.periodDateLocal timeZone initValue initComparison getData)
+        (Filter.periodDateLocal "table-date-period-filter" timeZone initValue initComparison getData)
         accu
 
 
@@ -969,7 +969,7 @@ remotePeriodDateFilter :
     -> Filters msg item (T.Increase columns)
 remotePeriodDateFilter timeZone initValue initComparison applyMsg accu =
     Filters.push
-        (Filter.periodDateRemote timeZone initValue initComparison applyMsg)
+        (Filter.periodDateRemote "table-date-period-filter" timeZone initValue initComparison applyMsg)
         accu
 
 
@@ -992,7 +992,7 @@ localSelectFilter :
     -> Filters msg item (T.Increase columns)
 localSelectFilter initList initSelection getData accu =
     Filters.push
-        (Filter.selectLocal initList initSelection getData)
+        (Filter.selectLocal "table-select-filter" initList initSelection getData)
         accu
 
 
@@ -1017,7 +1017,7 @@ remoteSelectFilter :
     -> Filters msg item (T.Increase columns)
 remoteSelectFilter initList initSelection applyMsg accu =
     Filters.push
-        (Filter.selectRemote initList initSelection applyMsg)
+        (Filter.selectRemote "table-select-filter" initList initSelection applyMsg)
         accu
 
 

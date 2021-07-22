@@ -33,7 +33,7 @@ update msg model =
             Tuple.mapBoth
                 (\newFilter -> { model | demoFilter = newFilter })
                 (always Cmd.none)
-                (Filter.update subMsg model.demoFilter)
+                (Filter.update (Story.FilterMsg >> Msg.FiltersStoriesMsg) subMsg model.demoFilter)
 
 
 stories : RenderConfig -> ExplorerUI

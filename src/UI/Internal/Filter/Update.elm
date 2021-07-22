@@ -1,20 +1,41 @@
-module UI.Internal.Filter.Update exposing (Analytics(..), OutMsg, emptyOutMsg, update)
+module UI.Internal.Filter.Update exposing (Analytics(..), OutMsg, apply, emptyOutMsg, update)
 
 import UI.Effect as Effect exposing (Effect)
 import UI.Internal.Filter.Model exposing (..)
 import UI.Internal.Filter.Msg exposing (Msg(..))
+import UI.Internal.Filter.Sorter as Sorter
 
 
 type alias OutMsg msg =
     { effects : Effect msg
     , closeDialog : Bool
     , registerAnalytics : Maybe Analytics
+    , focusElement : Maybe String
     }
 
 
 type Analytics
     = Applied
     | Cleared
+
+
+apply : Filter msg item -> Maybe (Sorter.Status item) -> List item -> List item
+apply filter sorting items =
+    let
+        filteredResults =
+            case filterGet filter of
+                Just filterFunction ->
+                    List.filter filterFunction items
+
+                Nothing ->
+                    items
+    in
+    case sorting of
+        Just ( Just direction, sorter ) ->
+            Sorter.sort sorter direction filteredResults
+
+        _ ->
+            filteredResults
 
 
 update : Msg -> Filter msg item -> ( Filter msg item, OutMsg msg )
@@ -38,11 +59,14 @@ update msg model =
         EditPeriodDate value ->
             ( periodDateEdit value model, emptyOutMsg )
 
-        EditPeriodComparison value ->
-            ( periodDateComparisonEdit value model, emptyOutMsg )
+        EditPeriodComparison focusedElement value ->
+            ( periodDateComparisonEdit value model, focusElementOutMsg focusedElement )
 
-        EditSelect value ->
-            ( selectEdit value model, emptyOutMsg )
+        EditSelect focusedElement value ->
+            ( selectEdit value model, focusElementOutMsg focusedElement )
+
+        DomFocusResult _ ->
+            ( model, emptyOutMsg )
 
         Apply ->
             applyFilter model
@@ -53,7 +77,12 @@ update msg model =
 
 emptyOutMsg : OutMsg msg
 emptyOutMsg =
-    { effects = Effect.none, closeDialog = False, registerAnalytics = Nothing }
+    { effects = Effect.none, closeDialog = False, registerAnalytics = Nothing, focusElement = Nothing }
+
+
+focusElementOutMsg : String -> OutMsg msg
+focusElementOutMsg element =
+    { effects = Effect.none, closeDialog = False, registerAnalytics = Nothing, focusElement = Just element }
 
 
 dispatchApply : Strategy msg value item -> value -> Filter msg item -> ( Filter msg item, OutMsg msg )
@@ -61,7 +90,7 @@ dispatchApply strategy value newModel =
     case strategy of
         Local _ ->
             ( newModel
-            , { effects = Effect.none, closeDialog = True, registerAnalytics = Just Applied }
+            , { emptyOutMsg | closeDialog = True, registerAnalytics = Just Applied }
             )
 
         Remote { applyMsg } ->
@@ -69,6 +98,7 @@ dispatchApply strategy value newModel =
             , { effects = Effect.msgToCmd <| applyMsg value
               , closeDialog = True
               , registerAnalytics = Just Applied
+              , focusElement = Nothing
               }
             )
 
@@ -78,7 +108,7 @@ dispatchClear strategy newModel =
     case strategy of
         Local _ ->
             ( newModel
-            , { effects = Effect.none, closeDialog = True, registerAnalytics = Just Cleared }
+            , { emptyOutMsg | closeDialog = True, registerAnalytics = Just Cleared }
             )
 
         Remote { clearMsg } ->
@@ -86,6 +116,7 @@ dispatchClear strategy newModel =
             , { effects = Effect.msgToCmd clearMsg
               , closeDialog = True
               , registerAnalytics = Just Cleared
+              , focusElement = Nothing
               }
             )
 
@@ -121,11 +152,11 @@ applyFilter filter =
         RangeDateFilter config ->
             applyShortcut config RangeDateFilter
 
-        PeriodDateFilter config ->
-            applyShortcut config PeriodDateFilter
+        PeriodDateFilter data config ->
+            applyShortcut config (PeriodDateFilter data)
 
-        SelectFilter list config ->
-            applyShortcut config (SelectFilter list)
+        SelectFilter data config ->
+            applyShortcut config (SelectFilter data)
 
 
 filterClear : Filter msg item -> ( Filter msg item, OutMsg msg )
@@ -155,14 +186,14 @@ filterClear filter =
                 |> RangeDateFilter
                 |> dispatchClear config.strategy
 
-        PeriodDateFilter config ->
+        PeriodDateFilter data config ->
             editableEmpty
                 |> configSetEditable config
-                |> PeriodDateFilter
+                |> PeriodDateFilter data
                 |> dispatchClear config.strategy
 
-        SelectFilter list config ->
+        SelectFilter data config ->
             editableEmpty
                 |> configSetEditable config
-                |> SelectFilter list
+                |> SelectFilter data
                 |> dispatchClear config.strategy

@@ -119,7 +119,6 @@ import Element exposing (Element)
 import Time
 import UI.Button exposing (Button)
 import UI.Effect as Effect exposing (Effect)
-import UI.Internal.Filter.Apply as Internal
 import UI.Internal.Filter.Model as Internal
 import UI.Internal.Filter.Msg as Internal
 import UI.Internal.Filter.Sorter as Sorter
@@ -270,8 +269,8 @@ appliedHeader label clearMsg =
 
 {-| A classic update function.
 -}
-update : FilterMsg -> FilterModel msg item -> ( FilterModel msg item, Effect msg )
-update msg (FilterModel ({ filter, items } as model)) =
+update : (FilterMsg -> msg) -> FilterMsg -> FilterModel msg item -> ( FilterModel msg item, Effect msg )
+update toExternalMsg msg (FilterModel ({ filter, items } as model)) =
     case msg of
         FilterMsg subMsg ->
             let
@@ -288,9 +287,17 @@ update msg (FilterModel ({ filter, items } as model)) =
                         ( model.result
                         , model.isOpen
                         )
+
+                effects =
+                    case outMsg.focusElement of
+                        Just focusElement ->
+                            Effect.batch [ outMsg.effects, Effect.domFocus (Internal.DomFocusResult >> FilterMsg >> toExternalMsg) focusElement ]
+
+                        Nothing ->
+                            outMsg.effects
             in
             ( FilterModel { model | filter = newFilter, result = newResult, isOpen = newOpen }
-            , outMsg.effects
+            , effects
             )
 
         SetSorting newSortingDirection ->
@@ -422,32 +429,34 @@ rangeDateFilter timeZone initialBegin initialEnd getData =
 
 {-| A pre-built filter, for a period (before, on, or after) some date.
 
-    rangeDateFilter timeZone
+    periodDateFilter "some-dom-id"
+        timeZone
         (Just model.someInitialBeginningTime)
-        (Just model.someInitialEndingTime)
+        (Just GT)
         .someTimeField
 
 -}
-periodDateFilter : Time.Zone -> Maybe Time.Posix -> Maybe Order -> (item -> Time.Posix) -> FilterModel msg item
-periodDateFilter timeZone initialFilter initialComparer getData =
+periodDateFilter : String -> Time.Zone -> Maybe Time.Posix -> Maybe Order -> (item -> Time.Posix) -> FilterModel msg item
+periodDateFilter domId timeZone initialFilter initialComparer getData =
     defaultFilterModel
         { sorting = Just ( Nothing, Sorter.IntegerSortable <| (getData >> Time.toMillis timeZone) )
-        , filter = Internal.periodDateLocal timeZone initialFilter (Maybe.map Internal.elmOrderToPeriodComparison initialComparer) getData
+        , filter = Internal.periodDateLocal domId timeZone initialFilter (Maybe.map Internal.elmOrderToPeriodComparison initialComparer) getData
         }
 
 
 {-| A pre-built filter, for a custom radio group.
 
-    radioFilter [ "Orange", "Strawberry", "Pineapple", "Watermelon" ]
+    radioFilter "some-dom-id"
+        [ "Orange", "Strawberry", "Pineapple", "Watermelon" ]
         (Just 0)
         (\fruit selected -> fruitsIndex fruit == selected)
 
 -}
-radioFilter : List String -> Maybe Int -> (item -> Int -> Bool) -> FilterModel msg item
-radioFilter labelList initialSelection compare =
+radioFilter : String -> List String -> Maybe Int -> (item -> Int -> Bool) -> FilterModel msg item
+radioFilter domId labelList initialSelection compare =
     defaultFilterModel
         { sorting = Nothing
-        , filter = Internal.selectLocal labelList initialSelection compare
+        , filter = Internal.selectLocal domId labelList initialSelection compare
         }
 
 
