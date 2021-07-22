@@ -168,4 +168,11 @@ describe('Percy Snapshots', () => {
       cy.percySnapshot('Filterable dropdown')
     })
   })
+
+  describe('Filters', () => {
+    it('Creates a snapshot for all arrangement of filters', () => {
+      cy.visit('/#Complex%20components/Filter/United')
+      cy.percySnapshot('Filters')
+    })
+  })
 })

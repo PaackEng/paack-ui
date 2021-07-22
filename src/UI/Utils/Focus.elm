@@ -51,8 +51,8 @@ toElementAttributes { onEnter, tabIndex, hasFocus } =
     let
         any =
             [ Events.onFocus onEnter
-            , String.fromInt tabIndex
-                |> HtmlAttrs.attribute "tabindex"
+            , tabIndex
+                |> HtmlAttrs.tabindex
                 |> Element.htmlAttribute
             ]
     in

@@ -24,8 +24,8 @@ type Filter msg item
     | MultiTextFilter (MultiTextFilterConfig msg item)
     | SingleDateFilter (SingleDateFilterConfig msg item)
     | RangeDateFilter (RangeDateFilterConfig msg item)
-    | PeriodDateFilter (PeriodDateFilterConfig msg item)
-    | SelectFilter (List String) (SelectFilterConfig msg item)
+    | PeriodDateFilter { domId : String } (PeriodDateFilterConfig msg item)
+    | SelectFilter { domId : String, items : List String } (SelectFilterConfig msg item)
 
 
 type alias Editable value =
@@ -118,7 +118,7 @@ isEdited filter =
         RangeDateFilter { editable } ->
             editable.current /= Nothing
 
-        PeriodDateFilter { editable } ->
+        PeriodDateFilter _ { editable } ->
             editable.current /= Nothing
 
         SelectFilter _ { editable } ->
@@ -140,7 +140,7 @@ isApplied filter =
         RangeDateFilter { editable } ->
             editable.applied /= Nothing
 
-        PeriodDateFilter { editable } ->
+        PeriodDateFilter _ { editable } ->
             editable.applied /= Nothing
 
         SelectFilter _ { editable } ->
@@ -162,7 +162,7 @@ appliedLength filter =
         RangeDateFilter { editable } ->
             Maybe.map (always 1) editable.applied
 
-        PeriodDateFilter { editable } ->
+        PeriodDateFilter _ { editable } ->
             Maybe.map (always 1) editable.applied
 
         SelectFilter _ { editable } ->
@@ -194,7 +194,7 @@ filterGet filter =
         RangeDateFilter config ->
             localAppliedMap config
 
-        PeriodDateFilter config ->
+        PeriodDateFilter _ config ->
             localAppliedMap config
 
         SelectFilter _ config ->
@@ -522,12 +522,13 @@ periodDateInit timeZone posixInit periodInit =
 
 
 periodDateLocal :
-    Time.Zone
+    String
+    -> Time.Zone
     -> Maybe Posix
     -> Maybe PeriodComparison
     -> (item -> Posix)
     -> Filter msg item
-periodDateLocal timeZone posixInit periodInit getPosix =
+periodDateLocal domId timeZone posixInit periodInit getPosix =
     let
         compare posix { date, comparison } =
             case comparison of
@@ -544,19 +545,35 @@ periodDateLocal timeZone posixInit periodInit getPosix =
             compare (getPosix item) current
     in
     PeriodDateFilter
+        { domId = domId }
         { editable = { applied = periodDateInit timeZone posixInit periodInit, current = Nothing }
         , strategy = strategyLocal applier
         }
 
 
+elmOrderToPeriodComparison : Order -> PeriodComparison
+elmOrderToPeriodComparison order =
+    case order of
+        LT ->
+            Before
+
+        EQ ->
+            On
+
+        GT ->
+            After
+
+
 periodDateRemote :
-    Time.Zone
+    String
+    -> Time.Zone
     -> Maybe Posix
     -> Maybe PeriodComparison
     -> (Maybe PeriodDate -> msg)
     -> Filter msg item
-periodDateRemote timeZone posixInit periodInit applyMsg =
+periodDateRemote domId timeZone posixInit periodInit applyMsg =
     PeriodDateFilter
+        { domId = domId }
         { editable = { applied = periodDateInit timeZone posixInit periodInit, current = Nothing }
         , strategy =
             strategyRemote
@@ -569,7 +586,7 @@ periodDateRemote timeZone posixInit periodInit applyMsg =
 periodDateEdit : String -> Filter msg item -> Filter msg item
 periodDateEdit value filter =
     case filter of
-        PeriodDateFilter config ->
+        PeriodDateFilter radioConfig config ->
             config.editable
                 |> editableMapCurrent
                     (\maybeCurrent ->
@@ -581,7 +598,7 @@ periodDateEdit value filter =
                         }
                     )
                 |> configSetEditable config
-                |> PeriodDateFilter
+                |> PeriodDateFilter radioConfig
 
         _ ->
             filter
@@ -590,7 +607,7 @@ periodDateEdit value filter =
 periodDateComparisonEdit : PeriodComparison -> Filter msg item -> Filter msg item
 periodDateComparisonEdit value filter =
     case filter of
-        PeriodDateFilter config ->
+        PeriodDateFilter radioConfig config ->
             config.editable
                 |> editableMapCurrent
                     (\maybeCurrent ->
@@ -602,7 +619,7 @@ periodDateComparisonEdit value filter =
                         }
                     )
                 |> configSetEditable config
-                |> PeriodDateFilter
+                |> PeriodDateFilter radioConfig
 
         _ ->
             filter
@@ -617,24 +634,26 @@ type alias SelectFilterConfig msg item =
 
 
 selectLocal :
-    List String
+    String
+    -> List String
     -> Maybe Int
     -> (item -> Int -> Bool)
     -> Filter msg item
-selectLocal list initValue filter =
-    SelectFilter list
+selectLocal domId items initValue filter =
+    SelectFilter { domId = domId, items = items }
         { editable = { applied = initValue, current = Nothing }
         , strategy = strategyLocal filter
         }
 
 
 selectRemote :
-    List String
+    String
+    -> List String
     -> Maybe Int
     -> (Maybe Int -> msg)
     -> Filter msg item
-selectRemote list initValue applyMsg =
-    SelectFilter list
+selectRemote domId items initValue applyMsg =
+    SelectFilter { domId = domId, items = items }
         { editable = { applied = initValue, current = Nothing }
         , strategy =
             strategyRemote

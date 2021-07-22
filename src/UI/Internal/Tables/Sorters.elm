@@ -73,16 +73,7 @@ itemsApplySorting (Sorters sorters) items =
             items
 
         Just status ->
-            let
-                sortedItems =
-                    Sorter.sort status.by items
-            in
-            case status.direction of
-                SortAscending ->
-                    sortedItems
-
-                SortDescending ->
-                    List.reverse sortedItems
+            Sorter.sort status.by status.direction items
 
 
 sortersEmpty : Sorters item T.Zero
