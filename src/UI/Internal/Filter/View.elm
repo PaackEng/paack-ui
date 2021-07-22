@@ -1,7 +1,7 @@
 module UI.Internal.Filter.View exposing (..)
 
 import Array exposing (Array)
-import Element exposing (Attribute, Element, fill, px, shrink)
+import Element exposing (Attribute, Element, fill, minimum, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
@@ -189,14 +189,16 @@ bodyToElement :
     -> Element msg
 bodyToElement renderConfig { label, closeMsg, width, size, sorting, rows, buttons, rowsHeight } =
     let
-        widthAttr =
-            if width == shrink then
+        attrs =
+            if width == fill then
                 Element.tuplesToStyles ( "min-width", "100%" )
+                    :: Element.tuplesToStyles ( "width", "min-content" )
+                    :: basicAttrs
 
             else
-                Element.width width
+                Element.width width :: basicAttrs
 
-        attrs =
+        basicAttrs =
             [ Element.zIndex (overlayZIndex + 1)
             , Element.alignTop
             , Colors.mainBackground
@@ -209,7 +211,6 @@ bodyToElement renderConfig { label, closeMsg, width, size, sorting, rows, button
             , Border.width 1
             , Border.color Colors.gray300
             , roundedBorders
-            , widthAttr
             ]
 
         bodyAttrs =
@@ -580,8 +581,8 @@ defaultFilter config filter sorting =
     , openMsg = config.openMsg
     , closeMsg = config.closeMsg
     , open = config.isOpen
-    , width = Element.fill
-    , rowsHeight = Just 160
+    , width = fill
+    , rowsHeight = Nothing
     , size = Medium
     , sorting = Just sortingData
     , buttons = defaultButtons config.editMsg filter
