@@ -1,11 +1,12 @@
 module UI.Icon exposing
     ( svgSpriteImport
     , Icon
-    , add, check, close, collapse, configure, download, edit, fix, fixing, fixIssues, eventLog
-    , expand, filter, groups, logout, move, nextContent, notifications
-    , paackSpaces, packages, previousContent, print, remove, sandwichMenu
-    , search, searchSpace, seeMore, sortDecreasing, sortIncreasing, toggle
-    , toggleDown, toggleUp, delete, warning, moreActions
+    , add, assignPerson, check, close, collapse, configure, delete, done
+    , download, edit, eventLog, expand, filter, fix, fixIssues, fixing, groups
+    , location, logout, moreActions, move, nextContent, notifications
+    , paackSpaces, packages, pause, previousContent, print, remove
+    , sandwichMenu, search, searchSpace, seeMore, sortDecreasing
+    , sortIncreasing, toggle, toggleDown, toggleUp, wait, warning
     , getHint
     , withColor
     , withSize, withCustomSize
@@ -36,11 +37,12 @@ An icon can be created and rendered as in the following pipeline:
 # Building
 
 @docs Icon
-@docs add, check, close, collapse, configure, download, edit, fix, fixing, fixIssues, eventLog
-@docs expand, filter, groups, logout, move, nextContent, notifications
-@docs paackSpaces, packages, previousContent, print, remove, sandwichMenu
-@docs search, searchSpace, seeMore, sortDecreasing, sortIncreasing, toggle
-@docs toggleDown, toggleUp, delete, warning, moreActions
+@docs add, assignPerson, check, close, collapse, configure, delete, done
+@docs download, edit, eventLog, expand, filter, fix, fixIssues, fixing, groups
+@docs location, logout, moreActions, move, nextContent, notifications
+@docs paackSpaces, packages, pause, previousContent, print, remove
+@docs sandwichMenu, search, searchSpace, seeMore, sortDecreasing
+@docs sortIncreasing, toggle, toggleDown, toggleUp, wait, warning
 
 
 # Disassemble
@@ -103,11 +105,13 @@ For more information read this module's main documentation.
 -}
 type IconGlyph
     = Add
+    | AssignPerson
     | Check
     | Close
     | Collapse
     | Configure
     | Delete
+    | Done
     | DownArrow
     | Download
     | Edit
@@ -118,10 +122,12 @@ type IconGlyph
     | Fixing
     | FixIssues
     | Groups
+    | Location
     | Logout
     | Move
     | NextContent
     | Notifications
+    | Pause
     | PaackSpaces
     | Packages
     | PreviousContent
@@ -136,6 +142,7 @@ type IconGlyph
     | SortIncreasing
     | Toggle
     | ToggleUp
+    | Wait
     | Warning
 
 
@@ -547,6 +554,56 @@ fixIssues hint =
     Icon (Properties hint FixIssues) defaultOptions
 
 
+{-| A person with a plus sign on the bottom-right.
+
+    Icon.assingPerson "Select Manager"
+
+-}
+assignPerson : String -> Icon
+assignPerson hint =
+    Icon (Properties hint AssignPerson) defaultOptions
+
+
+{-| A notepad with a checkmark.
+
+    Icon.done "Mark all as done."
+
+-}
+done : String -> Icon
+done hint =
+    Icon (Properties hint Done) defaultOptions
+
+
+{-| A GPS-like arrow.
+
+    Icon.location "Track order."
+
+-}
+location : String -> Icon
+location hint =
+    Icon (Properties hint Location) defaultOptions
+
+
+{-| The hand from the stop sign.
+
+    Icon.pause "Paused orders"
+
+-}
+pause : String -> Icon
+pause hint =
+    Icon (Properties hint Pause) defaultOptions
+
+
+{-| An hourglass.
+
+    Icon.wait "On hold"
+
+-}
+wait : String -> Icon
+wait hint =
+    Icon (Properties hint Wait) defaultOptions
+
+
 
 -- Rendering
 
@@ -582,6 +639,9 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
             Add ->
                 svgIcon "Add"
 
+            AssignPerson ->
+                svgIcon "Person-Assign"
+
             Check ->
                 svgIcon "Checkmark"
 
@@ -596,6 +656,9 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
 
             Delete ->
                 svgIcon "Trash"
+
+            Done ->
+                svgIcon "Notepad"
 
             DownArrow ->
                 svgIcon "Chevron-Down"
@@ -627,6 +690,9 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
             Groups ->
                 svgIcon "Groups"
 
+            Location ->
+                svgIcon "Location"
+
             Logout ->
                 svgIcon "Logout"
 
@@ -647,6 +713,9 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
 
             PreviousContent ->
                 svgIcon "Chevron-Left"
+
+            Pause ->
+                svgIcon "Hand"
 
             Print ->
                 svgIcon "Printer"
@@ -680,6 +749,9 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
 
             ToggleUp ->
                 svgIcon "Chevron-Up"
+
+            Wait ->
+                svgIcon "Hourglass"
 
             Warning ->
                 svgIcon "Warning"
