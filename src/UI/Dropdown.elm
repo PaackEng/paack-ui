@@ -2,6 +2,7 @@ module UI.Dropdown exposing
     ( Dropdown, BasicConfig, basic, filterable
     , State, Msg, init, update
     , withPlaceholder, withFilterPlaceholder, withItems, withSelected, withItemToText
+    , withMaximumListHeight
     , renderElement
     )
 
@@ -32,6 +33,7 @@ module UI.Dropdown exposing
 # Options
 
 @docs withPlaceholder, withFilterPlaceholder, withItems, withSelected, withItemToText
+@docs withMaximumListHeight
 
 
 # Rendering
@@ -41,7 +43,7 @@ module UI.Dropdown exposing
 -}
 
 import Dropdown
-import Element exposing (Attribute, Element)
+import Element exposing (Attribute, Element, maximum, shrink)
 import Element.Background as Background
 import Element.Border as Border
 import UI.Effect as Effect exposing (Effect)
@@ -73,6 +75,7 @@ type alias Options item =
     , filterPlaceholder : Maybe String
     , selected : Maybe item
     , itemToText : item -> String
+    , listHeight : Maybe Int
     }
 
 
@@ -160,7 +163,7 @@ translateEffect effect =
 {-| Constructs a basic dropdown.
 Also defines the handling function for messages, and the current dropdown's state.
 
-    basic
+    Dropdown.basic
         { dropdownMsg = ForDropdownMsg
         , onSelectMsg = GotSelectItemMsg
         , state = model.dropdownState
@@ -182,7 +185,7 @@ basic prop =
 {-| Constructs a filterable dropdown.
 Also defines the handling function for messages, and the current dropdown's state.
 
-    filterable
+    Dropdown.filterable
         { dropdownMsg = ForDropdownMsg
         , onSelectMsg = GotSelectItemMsg
         , state = model.dropdownState
@@ -207,6 +210,7 @@ defaultOptions =
     , filterPlaceholder = Nothing
     , selected = Nothing
     , itemToText = always ""
+    , listHeight = Nothing
     }
 
 
@@ -266,6 +270,17 @@ withSelected selected (Dropdown prop opt) =
 withItemToText : (item -> String) -> Dropdown item msg -> Dropdown item msg
 withItemToText itemToText (Dropdown prop opt) =
     Dropdown prop { opt | itemToText = itemToText }
+
+
+{-| Changes the maximum height of the dropdown list.
+
+    Dropdown.withMaximumListHeight 200
+        someDropdown
+
+-}
+withMaximumListHeight : Int -> Dropdown item msg -> Dropdown item msg
+withMaximumListHeight height (Dropdown prop opt) =
+    Dropdown prop { opt | listHeight = Just height }
 
 
 {-| End of the builder's life.
@@ -358,7 +373,7 @@ customDropdown cfg dropdown =
     Dropdown.withContainerAttributes [ Element.width Element.fill ]
         >> Dropdown.withPromptElement (promptElement cfg dropdown)
         >> Dropdown.withSelectAttributes (selectAttrs dropdown)
-        >> Dropdown.withListAttributes listAttrs
+        >> Dropdown.withListAttributes (listAttrs dropdown)
         >> Dropdown.withSearchAttributes [ Border.width 0, Element.padding 0 ]
         >> Dropdown.withOpenCloseButtons (openCloseButtons cfg)
 
@@ -388,9 +403,16 @@ selectAttrs (Dropdown prop _) =
            )
 
 
-listAttrs : List (Attribute msg)
-listAttrs =
+listAttrs : Dropdown item msg -> List (Attribute msg)
+listAttrs (Dropdown _ opt) =
     [ Element.width Element.fill
+    , case opt.listHeight of
+        Just height ->
+            Element.height <| maximum height shrink
+
+        Nothing ->
+            Element.height Element.fill
+    , Element.scrollbarY
     , Element.padding 4
     , Border.width 1
     , Border.color <| Palette.toElementColor Palette.grayLight3

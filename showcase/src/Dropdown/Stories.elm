@@ -82,6 +82,7 @@ basicDropdownView model =
         |> Dropdown.withItems books
         |> Dropdown.withSelected model.selectedBook
         |> Dropdown.withItemToText .title
+        |> Dropdown.withMaximumListHeight 200
 
 
 basicDropdownCode : String
@@ -96,6 +97,7 @@ Dropdown.basic
     |> Dropdown.withItems books
     |> Dropdown.withSelected model.selectedBook
     |> Dropdown.withItemToText .title
+    |> Dropdown.withMaximumListHeight 200
     |> Dropdown.renderElement renderConfig
     """
 
