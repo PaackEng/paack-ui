@@ -1,10 +1,10 @@
 module UI.Icon exposing
     ( svgSpriteImport
     , Icon
-    , add, assignPerson, check, close, collapse, configure, delete, done
+    , add, assignPerson, boxes, check, close, collapse, configure, delete, done
     , download, edit, eventLog, expand, filter, fix, fixIssues, fixing, groups
     , location, logout, moreActions, move, nextContent, notifications
-    , paackSpaces, packages, pause, previousContent, print, remove
+    , paackSpaces, packages, person, persons, phone, pause, previousContent, print, remove
     , sandwichMenu, search, searchSpace, seeMore, sortDecreasing
     , sortIncreasing, toggle, toggleDown, toggleUp, wait, warning
     , getHint
@@ -37,10 +37,10 @@ An icon can be created and rendered as in the following pipeline:
 # Building
 
 @docs Icon
-@docs add, assignPerson, check, close, collapse, configure, delete, done
+@docs add, assignPerson, boxes, check, close, collapse, configure, delete, done
 @docs download, edit, eventLog, expand, filter, fix, fixIssues, fixing, groups
 @docs location, logout, moreActions, move, nextContent, notifications
-@docs paackSpaces, packages, pause, previousContent, print, remove
+@docs paackSpaces, packages, person, persons, phone, pause, previousContent, print, remove
 @docs sandwichMenu, search, searchSpace, seeMore, sortDecreasing
 @docs sortIncreasing, toggle, toggleDown, toggleUp, wait, warning
 
@@ -106,6 +106,7 @@ For more information read this module's main documentation.
 type IconGlyph
     = Add
     | AssignPerson
+    | Boxes
     | Check
     | Close
     | Collapse
@@ -130,6 +131,9 @@ type IconGlyph
     | Pause
     | PaackSpaces
     | Packages
+    | Person
+    | Persons
+    | Phone
     | PreviousContent
     | Print
     | Remove
@@ -259,6 +263,16 @@ add hint =
     Icon (Properties hint Add) defaultOptions
 
 
+{-| Piled up boxes.
+
+    Icon.packages "Boxes"
+
+-}
+boxes : String -> Icon
+boxes hint =
+    Icon (Properties hint Boxes) defaultOptions
+
+
 {-| A check mark, commonly used inside checkboxes and radio buttons.
 
     Icon.check "Done"
@@ -339,6 +353,36 @@ paackSpaces hint =
 packages : String -> Icon
 packages hint =
     Icon (Properties hint Packages) defaultOptions
+
+
+{-| A single person.
+
+    Icon.person "Account"
+
+-}
+person : String -> Icon
+person hint =
+    Icon (Properties hint Person) defaultOptions
+
+
+{-| Three persons.
+
+    Icon.persons "Contacts"
+
+-}
+persons : String -> Icon
+persons hint =
+    Icon (Properties hint Persons) defaultOptions
+
+
+{-| A phone.
+
+    Icon.phone "Call"
+
+-}
+phone : String -> Icon
+phone hint =
+    Icon (Properties hint Phone) defaultOptions
 
 
 {-| A chat-like baloon.
@@ -642,6 +686,9 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
             AssignPerson ->
                 svgIcon "Person-Assign"
 
+            Boxes ->
+                svgIcon "Boxes-Filled"
+
             Check ->
                 svgIcon "Checkmark"
 
@@ -710,6 +757,15 @@ renderElement _ (Icon { hint, glyph } { color, size }) =
 
             Packages ->
                 svgIcon "Box-Outlined"
+
+            Person ->
+                svgIcon "Person"
+
+            Persons ->
+                svgIcon "Persons"
+
+            Phone ->
+                svgIcon "Phone-StartCall"
 
             PreviousContent ->
                 svgIcon "Chevron-Left"
