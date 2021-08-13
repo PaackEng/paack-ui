@@ -8,7 +8,7 @@ import Element.Events as Events
 import Element.Font as Font
 import UI.Button as Button exposing (Button)
 import UI.Icon as Icon
-import UI.Internal.Basics exposing (maybeNotThen)
+import UI.Internal.Basics exposing (maybeNotThen, prependIf)
 import UI.Internal.Colors as Colors
 import UI.Internal.DateInput as DateInput exposing (DateInput(..), PeriodComparison(..), PeriodDate, RangeDate)
 import UI.Internal.Filter.Model as Model exposing (Filter)
@@ -22,7 +22,6 @@ import UI.Size as Size exposing (Size)
 import UI.TextField as TextField exposing (TextField)
 import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element exposing (RectangleSides, zeroPadding)
-import UI.Internal.Basics exposing (prependIf)
 
 
 type FilterSize
@@ -66,22 +65,21 @@ headerToElement :
         { h
             | label : String
             , openMsg : msg
-            , width : Element.Length
             , size : FilterSize
             , sorting : Maybe (FilterSorting msg)
             , applied : Maybe { preview : String, clearMsg : msg }
             , alignRight : Bool
         }
     -> Element msg
-headerToElement renderConfig { label, openMsg, width, size, sorting, applied, alignRight } =
+headerToElement renderConfig { label, openMsg, size, sorting, applied, alignRight } =
     let
         { padding, fontSize, iconSize } =
             headerProportions size
 
         attrs =
             ARIA.toElementAttributes ARIA.roleButton
-                ++ [ Element.width width
-                   , Element.paddingEach padding
+                ++ [ Element.paddingEach padding
+                   , Element.width fill
                    , Element.spacing 8
                    , Background.color baseColor
                    , Border.width 2
@@ -102,7 +100,7 @@ headerToElement renderConfig { label, openMsg, width, size, sorting, applied, al
                    , Element.onEnterPressed openMsg
                    , Element.tabIndex 0
                    ]
-                    |> prependIf alignRight Element.alignRight
+                |> prependIf alignRight Element.alignRight
 
         headerSortingIcon =
             sorting
@@ -211,7 +209,7 @@ bodyToElement renderConfig { label, closeMsg, width, size, sorting, rows, button
             , Border.color Colors.gray300
             , roundedBorders
             ]
-            |> prependIf alignRight Element.alignRight
+                |> prependIf alignRight Element.alignRight
 
         bodyAttrs =
             [ Element.width fill
@@ -243,7 +241,7 @@ bodyToElement renderConfig { label, closeMsg, width, size, sorting, rows, button
     Element.column attrs bodyRows
         |> Element.customOverlay closeMsg []
         |> Element.el
-            [ Element.width width
+            [ Element.width fill
             , Element.height (px 1)
             , Element.alignTop
             ]

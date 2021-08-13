@@ -88,7 +88,7 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
 -}
 
-import Element exposing (Element, fill)
+import Element exposing (Element, fill, shrink)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
@@ -635,6 +635,7 @@ selectAllButtonView : RenderConfig -> SelectAll msg -> Element msg
 selectAllButtonView cfg { state, message } =
     Checkbox.checkbox (cfg |> localeTerms >> .listView >> .selectAll) message state
         |> Checkbox.renderElement cfg
+        |> Element.el [ Element.width fill, Element.alignTop ]
 
 
 filterView : RenderConfig -> Filter msg -> Element msg
@@ -643,6 +644,7 @@ filterView cfg filter =
         |> Filter.withSize Filter.sizeExtraSmall
         |> Filter.withAlignRight
         |> Filter.renderElement cfg
+        |> Element.el [ Element.width shrink, Element.alignRight, Element.alignTop ]
 
 
 headerView : RenderConfig -> Options object msg -> Element msg
