@@ -1,6 +1,6 @@
 module UI.Filter exposing
     ( Filter
-    , FilterSize, withSize, sizeMedium, sizeExtraSmall, withWidth
+    , FilterSize, withSize, sizeMedium, sizeExtraSmall, withWidth, withAlignRight
     , renderElement
     , FilterModel, fromModel
     , singleTextFilter, multiTextFilter, singleDateFilter, rangeDateFilter, periodDateFilter, radioFilter
@@ -23,7 +23,7 @@ module UI.Filter exposing
 
 ## Size
 
-@docs FilterSize, withSize, sizeMedium, sizeExtraSmall, withWidth
+@docs FilterSize, withSize, sizeMedium, sizeExtraSmall, withWidth, withAlignRight
 
 
 ## Rendering
@@ -187,6 +187,7 @@ customFilter label { openMsg, closeMsg, isOpen } =
         , rowsHeight = Nothing
         , buttons = always []
         , applied = Nothing
+        , alignRight = False
         }
 
 
@@ -230,6 +231,13 @@ withSize (FilterSize newSize) (Filter filter) =
 withWidth : Element.Length -> Filter msg -> Filter msg
 withWidth newWidth (Filter filter) =
     Filter { filter | width = newWidth }
+
+
+{-| Aligns the filter to the right.
+-}
+withAlignRight : Filter msg -> Filter msg
+withAlignRight (Filter filter) =
+    Filter { filter | alignRight = True }
 
 
 {-| Sets the content of the filter's dialog when open.
@@ -501,6 +509,7 @@ fromModel label toExternalMsg (FilterModel model) =
         , clearSortingMsg = toExternalMsg <| SetSorting Nothing
         , label = label
         , isOpen = model.isOpen
+        , alignRight = False
         }
         model.filter
         model.sorting

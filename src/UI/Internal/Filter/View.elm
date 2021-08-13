@@ -22,17 +22,12 @@ import UI.Size as Size exposing (Size)
 import UI.TextField as TextField exposing (TextField)
 import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element exposing (RectangleSides, zeroPadding)
+import UI.Internal.Basics exposing (prependIf)
 
 
 type FilterSize
     = ExtraSmall
     | Medium
-
-
-type alias CommonOptions =
-    { width : Element.Length
-    , size : FilterSize
-    }
 
 
 type alias FullFilter msg =
@@ -47,6 +42,7 @@ type alias FullFilter msg =
     , rowsHeight : Maybe Int
     , buttons : RenderConfig -> List (Button msg)
     , applied : Maybe { preview : String, clearMsg : msg }
+    , alignRight : Bool
     }
 
 
@@ -74,9 +70,10 @@ headerToElement :
             , size : FilterSize
             , sorting : Maybe (FilterSorting msg)
             , applied : Maybe { preview : String, clearMsg : msg }
+            , alignRight : Bool
         }
     -> Element msg
-headerToElement renderConfig { label, openMsg, width, size, sorting, applied } =
+headerToElement renderConfig { label, openMsg, width, size, sorting, applied, alignRight } =
     let
         { padding, fontSize, iconSize } =
             headerProportions size
@@ -105,6 +102,7 @@ headerToElement renderConfig { label, openMsg, width, size, sorting, applied } =
                    , Element.onEnterPressed openMsg
                    , Element.tabIndex 0
                    ]
+                    |> prependIf alignRight Element.alignRight
 
         headerSortingIcon =
             sorting
@@ -185,9 +183,10 @@ bodyToElement :
             , rows : RenderConfig -> FilterSize -> List (Element msg)
             , rowsHeight : Maybe Int
             , buttons : RenderConfig -> List (Button msg)
+            , alignRight : Bool
         }
     -> Element msg
-bodyToElement renderConfig { label, closeMsg, width, size, sorting, rows, buttons, rowsHeight } =
+bodyToElement renderConfig { label, closeMsg, width, size, sorting, rows, buttons, rowsHeight, alignRight } =
     let
         attrs =
             if width == fill then
@@ -212,6 +211,7 @@ bodyToElement renderConfig { label, closeMsg, width, size, sorting, rows, button
             , Border.color Colors.gray300
             , roundedBorders
             ]
+            |> prependIf alignRight Element.alignRight
 
         bodyAttrs =
             [ Element.width fill
@@ -536,6 +536,7 @@ defaultFilter :
     , clearSortingMsg : msg
     , label : String
     , isOpen : Bool
+    , alignRight : Bool
     }
     -> Filter msg item
     -> Maybe (Sorter.Status item)
@@ -591,6 +592,7 @@ defaultFilter config filter sorting =
             (\i -> { preview = String.fromInt i, clearMsg = config.editMsg Msg.Clear })
             (Model.appliedLength filter)
     , rows = rows
+    , alignRight = config.alignRight
     }
 
 

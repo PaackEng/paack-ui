@@ -3,7 +3,7 @@ module UI.ListView exposing
     , ToggleableConfig, ToggleableCover, toggleableList
     , withItems, withSelect, withSelected, withDomId
     , SearchConfig, withSearchField, withActionBar, withSelectAllButton
-    , withCustomExtraMenu, withHeader, withBadgedHeader
+    , withFilter, withCustomExtraMenu, withHeader, withBadgedHeader
     , withWidth
     , SelectStyle, withSelectStyle
     , renderElement
@@ -69,7 +69,7 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 ## Extra elements
 
 @docs SearchConfig, withSearchField, withActionBar, withSelectAllButton
-@docs withCustomExtraMenu, withHeader, withBadgedHeader
+@docs withFilter, withCustomExtraMenu, withHeader, withBadgedHeader
 
 
 ## Width
@@ -97,6 +97,7 @@ import Element.Keyed as Keyed
 import UI.Badge as Badge exposing (Badge)
 import UI.Button as Button
 import UI.Checkbox as Checkbox
+import UI.Filter as Filter exposing (Filter)
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (maybeAnd, prependMaybe)
 import UI.Internal.Clickable as Clickable
@@ -127,6 +128,7 @@ type alias Options object msg =
     , headerBadge : Maybe Badge
     , dropdown : Maybe (Dropdown msg)
     , selectAll : Maybe (SelectAll msg)
+    , filter : Maybe (Filter msg)
     }
 
 
@@ -342,6 +344,17 @@ withSelectAllButton message state (SelectList prop opt) =
     SelectList prop { opt | selectAll = Just <| SelectAll state message }
 
 
+{-| Adds a button to apply additional filters.
+
+    ListView.withFilter additionalFilters
+        someListView
+
+-}
+withFilter : Filter msg -> ListView object msg -> ListView object msg
+withFilter filter (SelectList prop opt) =
+    SelectList prop { opt | filter = Just filter }
+
+
 {-| Replaces the component's list of elements.
 
     ListView.withItems
@@ -506,7 +519,7 @@ renderElement cfg (SelectList prop opt) =
         , Element.scrollbarY
         ]
         [ searchFieldView cfg opt
-        , selectAllButtonView cfg opt.selectAll
+        , toolbarView cfg opt
         , opt.items
             |> filterOptions opt.searchField
             |> List.map
@@ -592,15 +605,44 @@ searchFieldView cfg opt =
             Element.none
 
 
-selectAllButtonView : RenderConfig -> Maybe (SelectAll msg) -> Element msg
-selectAllButtonView cfg selectAll =
-    case selectAll of
-        Just { state, message } ->
-            Checkbox.checkbox (cfg |> localeTerms >> .listView >> .selectAll) message state
-                |> Checkbox.renderElement cfg
+toolbarView : RenderConfig -> Options object msg -> Element msg
+toolbarView cfg opt =
+    let
+        entries =
+            []
+                |> prependMaybe
+                    (Maybe.map (filterView cfg) opt.filter)
+                |> prependMaybe
+                    (Maybe.map (selectAllButtonView cfg) opt.selectAll)
+    in
+    if List.isEmpty entries then
+        Element.none
 
-        Nothing ->
-            Element.none
+    else
+        Element.row
+            [ Element.width Element.fill
+            , Element.paddingEach
+                { bottom = 12
+                , left = 15
+                , right = 15
+                , top = 0
+                }
+            ]
+            entries
+
+
+selectAllButtonView : RenderConfig -> SelectAll msg -> Element msg
+selectAllButtonView cfg { state, message } =
+    Checkbox.checkbox (cfg |> localeTerms >> .listView >> .selectAll) message state
+        |> Checkbox.renderElement cfg
+
+
+filterView : RenderConfig -> Filter msg -> Element msg
+filterView cfg filter =
+    filter
+        |> Filter.withSize Filter.sizeExtraSmall
+        |> Filter.withAlignRight
+        |> Filter.renderElement cfg
 
 
 headerView : RenderConfig -> Options object msg -> Element msg
@@ -722,6 +764,7 @@ defaultOptions =
     , headerBadge = Nothing
     , dropdown = Nothing
     , selectAll = Nothing
+    , filter = Nothing
     }
 
 
