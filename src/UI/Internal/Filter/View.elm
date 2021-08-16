@@ -8,7 +8,7 @@ import Element.Events as Events
 import Element.Font as Font
 import UI.Button as Button exposing (Button)
 import UI.Icon as Icon
-import UI.Internal.Basics exposing (maybeNotThen)
+import UI.Internal.Basics exposing (maybeNotThen, prependIf)
 import UI.Internal.Colors as Colors
 import UI.Internal.DateInput as DateInput exposing (DateInput(..), PeriodComparison(..), PeriodDate, RangeDate)
 import UI.Internal.Filter.Model as Model exposing (Filter)
@@ -29,12 +29,6 @@ type FilterSize
     | Medium
 
 
-type alias CommonOptions =
-    { width : Element.Length
-    , size : FilterSize
-    }
-
-
 type alias FullFilter msg =
     { label : String
     , openMsg : msg
@@ -47,6 +41,7 @@ type alias FullFilter msg =
     , rowsHeight : Maybe Int
     , buttons : RenderConfig -> List (Button msg)
     , applied : Maybe { preview : String, clearMsg : msg }
+    , alignRight : Bool
     }
 
 
@@ -70,21 +65,21 @@ headerToElement :
         { h
             | label : String
             , openMsg : msg
-            , width : Element.Length
             , size : FilterSize
             , sorting : Maybe (FilterSorting msg)
             , applied : Maybe { preview : String, clearMsg : msg }
+            , alignRight : Bool
         }
     -> Element msg
-headerToElement renderConfig { label, openMsg, width, size, sorting, applied } =
+headerToElement renderConfig { label, openMsg, size, sorting, applied, alignRight } =
     let
         { padding, fontSize, iconSize } =
             headerProportions size
 
         attrs =
             ARIA.toElementAttributes ARIA.roleButton
-                ++ [ Element.width width
-                   , Element.paddingEach padding
+                ++ [ Element.paddingEach padding
+                   , Element.width fill
                    , Element.spacing 8
                    , Background.color baseColor
                    , Border.width 2
@@ -105,6 +100,7 @@ headerToElement renderConfig { label, openMsg, width, size, sorting, applied } =
                    , Element.onEnterPressed openMsg
                    , Element.tabIndex 0
                    ]
+                |> prependIf alignRight Element.alignRight
 
         headerSortingIcon =
             sorting
@@ -185,9 +181,10 @@ bodyToElement :
             , rows : RenderConfig -> FilterSize -> List (Element msg)
             , rowsHeight : Maybe Int
             , buttons : RenderConfig -> List (Button msg)
+            , alignRight : Bool
         }
     -> Element msg
-bodyToElement renderConfig { label, closeMsg, width, size, sorting, rows, buttons, rowsHeight } =
+bodyToElement renderConfig { label, closeMsg, width, size, sorting, rows, buttons, rowsHeight, alignRight } =
     let
         attrs =
             if width == fill then
@@ -212,6 +209,7 @@ bodyToElement renderConfig { label, closeMsg, width, size, sorting, rows, button
             , Border.color Colors.gray300
             , roundedBorders
             ]
+                |> prependIf alignRight Element.alignRight
 
         bodyAttrs =
             [ Element.width fill
@@ -243,7 +241,7 @@ bodyToElement renderConfig { label, closeMsg, width, size, sorting, rows, button
     Element.column attrs bodyRows
         |> Element.customOverlay closeMsg []
         |> Element.el
-            [ Element.width width
+            [ Element.width fill
             , Element.height (px 1)
             , Element.alignTop
             ]
@@ -536,6 +534,7 @@ defaultFilter :
     , clearSortingMsg : msg
     , label : String
     , isOpen : Bool
+    , alignRight : Bool
     }
     -> Filter msg item
     -> Maybe (Sorter.Status item)
@@ -591,6 +590,7 @@ defaultFilter config filter sorting =
             (\i -> { preview = String.fromInt i, clearMsg = config.editMsg Msg.Clear })
             (Model.appliedLength filter)
     , rows = rows
+    , alignRight = config.alignRight
     }
 
 

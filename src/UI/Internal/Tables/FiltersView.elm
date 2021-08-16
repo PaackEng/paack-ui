@@ -50,6 +50,7 @@ header renderConfig filter sorting config =
         , sortAscendingMsg = sortMsg SortAscending
         , sortDescendingMsg = sortMsg SortDescending
         , clearSortingMsg = config.fromSortersMsg Sorters.ClearSorting
+        , alignRight = False
         }
         filter
         sorting
