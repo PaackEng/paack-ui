@@ -8,6 +8,10 @@ The purpose of using Elm UI is mostly to keep components accessible.
 
 The usage of this library is mostly internal, but we are open to suggestions and feedback.
 
+## Limitations
+
+- You can neither adjust the existing color palette nor create a new one. The only way to do that is to fork the entire library.
+
 ## Example
 
 Here's an example of this package in action:
