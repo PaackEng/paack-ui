@@ -1,5 +1,5 @@
 module UI.Dropdown exposing
-    ( Dropdown, BasicConfig, basic, filterable
+    ( Dropdown, BasicConfig, basic, filterable, autoCompleteHelper
     , State, Msg, init, update
     , withPlaceholder, withFilterPlaceholder, withItems, withSelected, withItemToText
     , withMaximumListHeight
@@ -22,7 +22,7 @@ module UI.Dropdown exposing
 
 # Dropdown
 
-@docs Dropdown, BasicConfig, basic, filterable
+@docs Dropdown, BasicConfig, basic, filterable, autoCompleteHelper
 
 
 ## State
@@ -66,6 +66,7 @@ type alias Properties item msg =
     , items : List item
     , dropdownMsg : Msg item -> msg
     , onSelectMsg : Maybe item -> msg
+    , onFilterChangeMsg : Maybe (String -> msg)
     , state : State item
     }
 
@@ -98,6 +99,7 @@ type Msg item
 type DropdownType
     = Basic
     | Filterable
+    | AutoCompleteHelper
 
 
 {-| `BasicConfig` assembles the required configuration for having a simple dropdown.
@@ -111,6 +113,25 @@ type DropdownType
 type alias BasicConfig item msg =
     { dropdownMsg : Msg item -> msg
     , onSelectMsg : Maybe item -> msg
+    , state : State item
+    }
+
+
+{-| `AutoCompleteHelperConfig` assembles the required configuration for having a
+dropdown which can help to build an auto-complete/type-ahead suggestions
+element.
+
+    { dropdownMsg = ForDropdownMsg
+    , onSelectMsg = GotSelectItemMsg
+    , onFilterChangeMsg = FilterTextChangedMsg
+    , state = model.dropdownState
+    }
+
+-}
+type alias AutoCompleteHelperConfig item msg =
+    { dropdownMsg : Msg item -> msg
+    , onSelectMsg : Maybe item -> msg
+    , onFilterChangeMsg : String -> msg
     , state : State item
     }
 
@@ -177,6 +198,7 @@ basic prop =
         , items = []
         , dropdownMsg = prop.dropdownMsg
         , onSelectMsg = prop.onSelectMsg
+        , onFilterChangeMsg = Nothing
         , state = prop.state
         }
         defaultOptions
@@ -199,6 +221,32 @@ filterable prop =
         , items = []
         , dropdownMsg = prop.dropdownMsg
         , onSelectMsg = prop.onSelectMsg
+        , onFilterChangeMsg = Nothing
+        , state = prop.state
+        }
+        defaultOptions
+
+
+{-| Constructs a dropdown which allows it to behave as an auto-complete/type-ahead
+suggestions element by emitting a message when filter text changes. Also defines
+the handling function for messages, and the current dropdown's state.
+
+    Dropdown.autoCompleteHelper
+        { dropdownMsg = ForDropdownMsg
+        , onSelectMsg = GotSelectItemMsg
+        , onFilterChangeMsg = FilterTextChangedMsg
+        , state = model.dropdownState
+        }
+
+-}
+autoCompleteHelper : AutoCompleteHelperConfig item msg -> Dropdown item msg
+autoCompleteHelper prop =
+    Dropdown
+        { dropdownType = AutoCompleteHelper
+        , items = []
+        , dropdownMsg = prop.dropdownMsg
+        , onSelectMsg = prop.onSelectMsg
+        , onFilterChangeMsg = Just prop.onFilterChangeMsg
         , state = prop.state
         }
         defaultOptions
@@ -332,6 +380,23 @@ getConfig cfg ((Dropdown prop opt) as dropdown) =
                     )
                 |> customDropdown cfg dropdown
 
+        AutoCompleteHelper ->
+            Dropdown.autocompleteHelper
+                { itemsFromModel = always prop.items
+                , selectionFromModel = always opt.selected
+                , dropdownMsg = Msg >> prop.dropdownMsg
+                , onSelectMsg = prop.onSelectMsg
+                , onFilterChangeMsg = prop.onFilterChangeMsg
+                , itemToPrompt = itemToPrompt cfg dropdown
+                , itemToElement = itemToElement cfg dropdown
+                , itemToText = opt.itemToText
+                }
+                |> Dropdown.withFilterPlaceholder
+                    (Maybe.withDefault (Maybe.withDefault "" opt.placeholder)
+                        opt.filterPlaceholder
+                    )
+                |> customDropdown cfg dropdown
+
 
 itemToPrompt : RenderConfig -> Dropdown item msg -> item -> Element msg
 itemToPrompt cfg (Dropdown _ opts) item =
@@ -399,6 +464,9 @@ selectAttrs (Dropdown prop _) =
                     [ Element.pointer ]
 
                 Filterable ->
+                    []
+
+                AutoCompleteHelper ->
                     []
            )
 

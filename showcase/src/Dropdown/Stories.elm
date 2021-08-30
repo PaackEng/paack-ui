@@ -10,6 +10,7 @@ import Tables.Book exposing (Book, books)
 import UI.Dropdown as Dropdown exposing (Dropdown)
 import UI.Effect as Effect
 import UI.RenderConfig exposing (RenderConfig)
+import UI.Text as Text
 import UIExplorer exposing (storiesOf)
 import Utils
     exposing
@@ -30,7 +31,7 @@ update cfg msg model =
                 ( state, effect ) =
                     Dropdown.update cfg
                         subMsg
-                        (basicDropdownView model)
+                        (autocompleteDropdownView model)
             in
             ( { model | dropdownState = state }
             , Effect.perform effect
@@ -39,12 +40,16 @@ update cfg msg model =
         SelectMsg item ->
             ( { model | selectedBook = item }, Cmd.none )
 
+        FilterTextChanged text ->
+            ( { model | filterText = text }, Cmd.none )
+
 
 stories : RenderConfig -> ExplorerUI
 stories cfg =
     storiesOf "Dropdown"
         [ basicDropdownStory cfg
         , filterableDropdownStory cfg
+        , autocompleteDropdownStroy cfg
         ]
 
 
@@ -136,6 +141,60 @@ filterableDropdownCode =
 Dropdown.filterable
     { dropdownMsg = ForDropdownMsg >> RootMsg.DropdownStoriesMsg
     , onSelectMsg = SelectMsg >> RootMsg.DropdownStoriesMsg
+    , state = model.dropdownState
+    }
+    |> Dropdown.withPlaceholder "Choose a book"
+    |> Dropdown.withItems books
+    |> Dropdown.withSelected model.selectedBook
+    |> Dropdown.withItemToText .title
+    |> Dropdown.renderElement renderConfig
+    """
+
+
+autocompleteDropdownStroy : RenderConfig -> ExplorerStory
+autocompleteDropdownStroy cfg =
+    storyWithModel
+        ( "AutoComplete"
+        , \{ dropdownStories } ->
+            Element.column
+                [ Element.width Element.fill
+                , Element.spacing 8
+                ]
+                [ ("Filter text: " ++ dropdownStories.filterText)
+                    |> Text.body2
+                    |> Text.renderElement cfg
+                , autocompleteDropdownView dropdownStories
+                    |> Dropdown.renderElement cfg
+                    |> withIconSpreadsheet
+                ]
+        , { defaultWithMenu
+            | code = prettifyElmCode autocompleteDropdownCode
+            , note = goToDocsCallToAction "Dropdown"
+          }
+        )
+
+
+autocompleteDropdownView : Dropdown.Model -> Dropdown Book RootMsg.Msg
+autocompleteDropdownView model =
+    Dropdown.autoCompleteHelper
+        { dropdownMsg = ForDropdownMsg >> RootMsg.DropdownStoriesMsg
+        , onSelectMsg = SelectMsg >> RootMsg.DropdownStoriesMsg
+        , onFilterChangeMsg = FilterTextChanged >> RootMsg.DropdownStoriesMsg
+        , state = model.dropdownState
+        }
+        |> Dropdown.withPlaceholder "Choose a book"
+        |> Dropdown.withItems books
+        |> Dropdown.withSelected model.selectedBook
+        |> Dropdown.withItemToText .title
+
+
+autocompleteDropdownCode : String
+autocompleteDropdownCode =
+    """
+Dropdown.autoCompleteHelper
+    { dropdownMsg = ForDropdownMsg >> RootMsg.DropdownStoriesMsg
+    , onSelectMsg = SelectMsg >> RootMsg.DropdownStoriesMsg
+    , onFilterChangeMsg = FilterTextChanged >> RootMsg.DropdownStoriesMsg
     , state = model.dropdownState
     }
     |> Dropdown.withPlaceholder "Choose a book"
