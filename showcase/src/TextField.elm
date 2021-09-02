@@ -25,6 +25,7 @@ stories cfg =
         , passwordTextFieldStory cfg
         , fullWidthStory cfg
         , unitedStory cfg
+        , errorTextFieldStory cfg
         ]
 
 
@@ -57,6 +58,40 @@ defaultTextFieldCode =
     |> TextField.withPlaceholder "Enter your info here"
     |> TextField.setLabelVisible True
     |> TextField.renderElement renderCfg
+"""
+
+
+errorTextFieldStory : RenderConfig -> ExplorerStory
+errorTextFieldStory cfg =
+    story
+        ( "Input Error"
+        , errorTextFieldView cfg
+        , pluginOptions errorTextFieldCode
+        )
+
+
+errorTextFieldView : RenderConfig -> Element RootMsg.Msg
+errorTextFieldView cfg =
+    TextField.singlelineText (always RootMsg.NoOp)
+        "My input with error"
+        "Value"
+        |> TextField.withPlaceholder "Enter your info here"
+        |> TextField.withError "This field is required"
+        |> TextField.setLabelVisible True
+        |> TextField.renderElement cfg
+
+
+errorTextFieldCode : String
+errorTextFieldCode =
+    """
+TextField.singlelineText (always RootMsg.NoOp)
+    "My input with error"
+    "Value"
+    |> TextField.withPlaceholder "Enter your info here"
+    |> TextField.withError "This field is required"
+    |> TextField.setLabelVisible True
+    |> TextField.renderElement cfg
+
 """
 
 
