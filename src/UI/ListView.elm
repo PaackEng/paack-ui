@@ -2,7 +2,8 @@ module UI.ListView exposing
     ( ListView, selectList, simpleList
     , ToggleableConfig, ToggleableCover, toggleableList
     , withItems, withSelect, withSelected, withDomId
-    , SearchConfig, withSearchField, withActionBar, withSelectAllButton
+    , SearchConfig, withSearchField, withActionBar
+    , withBottomButtonsRow, withBottomButtonsColumn, withSelectAllButton
     , withFilter, withCustomExtraMenu, withHeader, withBadgedHeader
     , withWidth
     , SelectStyle, withSelectStyle
@@ -68,7 +69,8 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
 ## Extra elements
 
-@docs SearchConfig, withSearchField, withActionBar, withSelectAllButton
+@docs SearchConfig, withSearchField, withActionBar
+@docs withBottomButtonsRow, withBottomButtonsColumn, withSelectAllButton
 @docs withFilter, withCustomExtraMenu, withHeader, withBadgedHeader
 
 
@@ -95,7 +97,7 @@ import Element.Events as Events
 import Element.Font as Font
 import Element.Keyed as Keyed
 import UI.Badge as Badge exposing (Badge)
-import UI.Button as Button
+import UI.Button as Button exposing (Button)
 import UI.Checkbox as Checkbox
 import UI.Filter as Filter exposing (Filter)
 import UI.Icon as Icon
@@ -118,7 +120,7 @@ import UI.Utils.Element exposing (zeroPadding)
 type alias Options object msg =
     { items : List object
     , searchField : Maybe (SearchConfig object msg)
-    , actionBar : Maybe (Action.WithIcon msg)
+    , actions : Maybe (Actions msg)
     , select : Maybe (object -> msg)
     , isSelected : Maybe (object -> Bool)
     , width : Element.Length
@@ -214,6 +216,12 @@ type alias Dropdown msg =
 
 type DropdownBody msg
     = CustomDropdown (Element msg)
+
+
+type Actions msg
+    = Action (Action.WithIcon msg)
+    | ButtonRow (List (Button msg))
+    | ButtonColumn (List (Button msg))
 
 
 
@@ -313,7 +321,39 @@ withActionBar :
     -> ListView object msg
     -> ListView object msg
 withActionBar config (SelectList prop opt) =
-    SelectList prop { opt | actionBar = Just config }
+    SelectList prop { opt | actions = Just <| Action config }
+
+
+{-| Adds a row with buttons bellow the list.
+
+    ListView.withBottomButtonsRow
+        [ Button.fromLabel "Save"
+            |> Button.cmd FormSave Button.primary
+        , Button.fromLabel "Cancel"
+            |> Button.cmd FormCancel
+        ]
+        someListView
+
+-}
+withBottomButtonsRow : List (Button msg) -> ListView object msg -> ListView object msg
+withBottomButtonsRow buttons (SelectList prop opt) =
+    SelectList prop { opt | actions = Just <| ButtonRow buttons }
+
+
+{-| Adds a column with buttons bellow the list.
+
+    ListView.withBottomButtonsColumn
+        [ Button.fromLabel "Save"
+            |> Button.cmd FormSave Button.primary
+        , Button.fromLabel "Cancel"
+            |> Button.cmd FormCancel
+        ]
+        someListView
+
+-}
+withBottomButtonsColumn : List (Button msg) -> ListView object msg -> ListView object msg
+withBottomButtonsColumn buttons (SelectList prop opt) =
+    SelectList prop { opt | actions = Just <| ButtonColumn buttons }
 
 
 {-| Adds button to toggle a custom menu element.
@@ -540,7 +580,7 @@ renderElement cfg (SelectList prop opt) =
                  ]
                     |> prependMaybe (Maybe.map Element.id opt.containerId)
                 )
-        , actionBarView cfg opt.actionBar
+        , actionsView cfg opt.actions
         ]
 
 
@@ -548,10 +588,23 @@ renderElement cfg (SelectList prop opt) =
 -- Internal
 
 
-actionBarView : RenderConfig -> Maybe (Action.WithIcon msg) -> Element msg
-actionBarView cfg actionBar =
-    case actionBar of
-        Just { label, icon, action } ->
+buttonsAttrs : List (Element.Attribute msg)
+buttonsAttrs =
+    [ Element.width fill
+    , Element.paddingEach
+        { bottom = 16
+        , left = 16
+        , right = 16
+        , top = 20
+        }
+    , Element.spacingXY 16 16
+    ]
+
+
+actionsView : RenderConfig -> Maybe (Actions msg) -> Element msg
+actionsView cfg maybeActions =
+    case maybeActions of
+        Just (Action { label, icon, action }) ->
             Element.row
                 [ Element.width fill
                 , Element.paddingEach
@@ -576,6 +629,14 @@ actionBarView cfg actionBar =
                 |> Clickable.actionWrapElement cfg
                     [ Element.width fill ]
                     action
+
+        Just (ButtonRow buttons) ->
+            List.map (Button.renderElement cfg) buttons
+                |> Element.row buttonsAttrs
+
+        Just (ButtonColumn buttons) ->
+            List.map (Button.renderElement cfg) buttons
+                |> Element.column buttonsAttrs
 
         Nothing ->
             Element.none
@@ -756,7 +817,7 @@ defaultOptions : Options object msg
 defaultOptions =
     { items = []
     , searchField = Nothing
-    , actionBar = Nothing
+    , actions = Nothing
     , select = Nothing
     , isSelected = Nothing
     , width = Element.fill
