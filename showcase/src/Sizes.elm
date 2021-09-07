@@ -93,6 +93,7 @@ buttons : List ButtonBody
 buttons =
     [ Button.fromLabel "Prompt"
     , Button.fromIcon <| Icon.toggle "Toggle"
+    , Button.fromLabeledOnLeftIcon <| Icon.toggle "Toggle"
     ]
 
 

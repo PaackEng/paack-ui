@@ -40,6 +40,8 @@ type Button msg
 type ButtonBody
     = BodyText String
     | BodyIcon Icon
+    | BodyIconLeftText Icon
+    | BodyIconRightText Icon
 
 
 type ButtonAction msg
@@ -79,19 +81,39 @@ type alias ToggleProperties msg =
 
 bodyToElement : RenderConfig -> Size -> ButtonBody -> Element msg
 bodyToElement cfg size body =
-    case body of
-        BodyText str ->
-            Element.el
-                [ Font.size <| textSize size
-                , Element.centerX
-                , Element.spacing 8
-                ]
-                (Element.text str)
+    let
+        attrs =
+            [ Font.size <| textSize size
+            , Element.centerX
+            , Element.spacing 8
+            ]
 
-        BodyIcon icon ->
+        label str =
+            Element.text str
+
+        iconElement icon =
             icon
                 |> Icon.withSize size
                 |> Icon.renderElement cfg
+    in
+    case body of
+        BodyText str ->
+            Element.el attrs (label str)
+
+        BodyIcon icon ->
+            iconElement icon
+
+        BodyIconLeftText icon ->
+            Element.row attrs
+                [ label <| Icon.getHint icon
+                , iconElement icon
+                ]
+
+        BodyIconRightText icon ->
+            Element.row attrs
+                [ iconElement icon
+                , label <| Icon.getHint icon
+                ]
 
 
 textSize : Size -> Int

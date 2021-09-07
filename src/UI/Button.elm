@@ -1,6 +1,7 @@
 module UI.Button exposing
     ( Button, toggle, success, disabled, cmd, redirect
     , ButtonBody, fromLabel, fromIcon
+    , fromLabeledOnLeftIcon, fromLabeledOnRightIcon
     , ButtonStyle, hyperlink, primary, danger, light, clear
     , ButtonWidth, withWidth, widthFull, widthRelative
     , withSize
@@ -31,6 +32,7 @@ A button can be created and rendered as in the following pipeline:
 # Content
 
 @docs ButtonBody, fromLabel, fromIcon
+@docs fromLabeledOnLeftIcon, fromLabeledOnRightIcon
 
 
 # Style
@@ -248,6 +250,26 @@ fromLabel label =
 fromIcon : Icon -> ButtonBody
 fromIcon icon =
     BodyIcon icon
+
+
+{-| `Button.fromLabeledOnLeftIcon` initiates a button's body with icon-content and it's label on the left.
+
+    Button.fromLabeledOnLeftIcon (Icon.map "Go to maps")
+
+-}
+fromLabeledOnLeftIcon : Icon -> ButtonBody
+fromLabeledOnLeftIcon icon =
+    BodyIconLeftText icon
+
+
+{-| `Button.fromLabeledOnRightIcon` initiates a button's body with icon-content and it's label on the right.
+
+    Button.fromLabeledOnRightIcon (Icon.map "Go to maps")
+
+-}
+fromLabeledOnRightIcon : Icon -> ButtonBody
+fromLabeledOnRightIcon icon =
+    BodyIconRightText icon
 
 
 
@@ -559,7 +581,7 @@ staticView :
     -> Size
     -> ButtonWidth
     -> ButtonBody
-    -> (ButtonBody -> List (Attribute msg))
+    -> List (Attribute msg)
     -> Element msg
 staticView cfg size width body theme =
     let
@@ -569,7 +591,7 @@ staticView cfg size width body theme =
                 :: Font.semiBold
                 :: Element.disabled
                 ++ bodyAttrs body size
-                ++ theme body
+                ++ theme
     in
     body
         |> bodyToElement cfg size
@@ -597,6 +619,12 @@ bodyAttrs body size =
             textLayout size
 
         BodyIcon icon ->
+            iconLayout (Icon.getHint icon) size
+
+        BodyIconLeftText icon ->
+            iconLayout (Icon.getHint icon) size
+
+        BodyIconRightText icon ->
             iconLayout (Icon.getHint icon) size
 
 
@@ -806,36 +834,23 @@ workingTheme tone =
                 }
 
 
-disabledTheme : ButtonBody -> List (Attribute msg)
-disabledTheme body =
+disabledTheme : List (Attribute msg)
+disabledTheme =
     themeToAttributes <|
-        case body of
-            BodyIcon _ ->
-                { normal =
-                    { background = Palette.color Palette.toneGray brightnessLightest
-                    , border = Palette.color Palette.toneGray brightnessLightest
-                    , text =
-                        Palette.color Palette.toneGray brightnessLight
-                            |> Text.ColorPalette
-                    }
-                , hover = Nothing
-                }
-
-            BodyText _ ->
-                { normal =
-                    { background = Palette.color Palette.toneGray brightnessLight
-                    , border = Palette.color Palette.toneGray brightnessLight
-                    , text =
-                        Palette.color Palette.toneGray brightnessLight
-                            |> Palette.setContrasting True
-                            |> Text.ColorPalette
-                    }
-                , hover = Nothing
-                }
+        { normal =
+            { background = Palette.color Palette.toneGray brightnessLight
+            , border = Palette.color Palette.toneGray brightnessLight
+            , text =
+                Palette.color Palette.toneGray brightnessLight
+                    |> Palette.setContrasting True
+                    |> Text.ColorPalette
+            }
+        , hover = Nothing
+        }
 
 
-successTheme : ButtonBody -> List (Attribute msg)
-successTheme _ =
+successTheme : List (Attribute msg)
+successTheme =
     themeToAttributes <|
         { normal =
             { background = Palette.color Palette.toneSuccess brightnessMiddle
