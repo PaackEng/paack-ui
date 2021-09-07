@@ -1,5 +1,6 @@
 module UI.Internal.Button exposing
-    ( Button(..)
+    ( BodyIconLabelPosition(..)
+    , Button(..)
     , ButtonAction(..)
     , ButtonBody(..)
     , ButtonMode(..)
@@ -39,7 +40,12 @@ type Button msg
 
 type ButtonBody
     = BodyText String
-    | BodyIcon Icon
+    | BodyIcon Icon (Maybe BodyIconLabelPosition)
+
+
+type BodyIconLabelPosition
+    = LabelOnLeft
+    | LabelOnRight
 
 
 type ButtonAction msg
@@ -79,19 +85,39 @@ type alias ToggleProperties msg =
 
 bodyToElement : RenderConfig -> Size -> ButtonBody -> Element msg
 bodyToElement cfg size body =
-    case body of
-        BodyText str ->
-            Element.el
-                [ Font.size <| textSize size
-                , Element.centerX
-                , Element.spacing 8
-                ]
-                (Element.text str)
+    let
+        attrs =
+            [ Font.size <| textSize size
+            , Element.centerX
+            , Element.spacing 8
+            ]
 
-        BodyIcon icon ->
+        label str =
+            Element.text str
+
+        iconElement icon =
             icon
                 |> Icon.withSize size
                 |> Icon.renderElement cfg
+    in
+    case body of
+        BodyText str ->
+            Element.el attrs (label str)
+
+        BodyIcon icon Nothing ->
+            iconElement icon
+
+        BodyIcon icon (Just LabelOnLeft) ->
+            Element.row attrs
+                [ label <| Icon.getHint icon
+                , iconElement icon
+                ]
+
+        BodyIcon icon (Just LabelOnRight) ->
+            Element.row attrs
+                [ iconElement icon
+                , label <| Icon.getHint icon
+                ]
 
 
 textSize : Size -> Int

@@ -67,6 +67,12 @@ enabledView renderConfig tone =
     , Button.fromIcon (Icon.toggle "Toggle")
         |> Button.cmd Msg.NoOp tone
         |> Button.renderElement renderConfig
+    , Button.fromLabeledOnRightIcon (Icon.toggle "Toggle")
+        |> Button.cmd Msg.NoOp tone
+        |> Button.renderElement renderConfig
+    , Button.fromLabeledOnRightIcon (Icon.toggle "Toggle")
+        |> Button.cmd Msg.NoOp tone
+        |> Button.renderElement renderConfig
     ]
 
 

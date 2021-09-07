@@ -1,6 +1,7 @@
 module UI.Button exposing
     ( Button, toggle, success, disabled, cmd, redirect
     , ButtonBody, fromLabel, fromIcon
+    , fromLabeledOnLeftIcon, fromLabeledOnRightIcon
     , ButtonStyle, hyperlink, primary, danger, light, clear
     , ButtonWidth, withWidth, widthFull, widthRelative
     , withSize
@@ -31,6 +32,7 @@ A button can be created and rendered as in the following pipeline:
 # Content
 
 @docs ButtonBody, fromLabel, fromIcon
+@docs fromLabeledOnLeftIcon, fromLabeledOnRightIcon
 
 
 # Style
@@ -72,7 +74,8 @@ import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Basics exposing (lazyMap, pairUncurry, prependMaybe)
 import UI.Internal.Button as Internal
     exposing
-        ( Button(..)
+        ( BodyIconLabelPosition(..)
+        , Button(..)
         , ButtonAction(..)
         , ButtonBody(..)
         , ButtonMode(..)
@@ -247,7 +250,27 @@ fromLabel label =
 -}
 fromIcon : Icon -> ButtonBody
 fromIcon icon =
-    BodyIcon icon
+    BodyIcon icon Nothing
+
+
+{-| `Button.fromLabeledOnLeftIcon` initiates a button's body with icon-content and it's label on the left.
+
+    Button.fromLabeledOnLeftIcon (Icon.map "Go to maps")
+
+-}
+fromLabeledOnLeftIcon : Icon -> ButtonBody
+fromLabeledOnLeftIcon icon =
+    BodyIcon icon (Just LabelOnLeft)
+
+
+{-| `Button.fromLabeledOnRightIcon` initiates a button's body with icon-content and it's label on the right.
+
+    Button.fromLabeledOnRightIcon (Icon.map "Go to maps")
+
+-}
+fromLabeledOnRightIcon : Icon -> ButtonBody
+fromLabeledOnRightIcon icon =
+    BodyIcon icon (Just LabelOnRight)
 
 
 
@@ -596,7 +619,7 @@ bodyAttrs body size =
         BodyText _ ->
             textLayout size
 
-        BodyIcon icon ->
+        BodyIcon icon _ ->
             iconLayout (Icon.getHint icon) size
 
 
@@ -809,29 +832,16 @@ workingTheme tone =
 disabledTheme : ButtonBody -> List (Attribute msg)
 disabledTheme body =
     themeToAttributes <|
-        case body of
-            BodyIcon _ ->
-                { normal =
-                    { background = Palette.color Palette.toneGray brightnessLightest
-                    , border = Palette.color Palette.toneGray brightnessLightest
-                    , text =
-                        Palette.color Palette.toneGray brightnessLight
-                            |> Text.ColorPalette
-                    }
-                , hover = Nothing
-                }
-
-            BodyText _ ->
-                { normal =
-                    { background = Palette.color Palette.toneGray brightnessLight
-                    , border = Palette.color Palette.toneGray brightnessLight
-                    , text =
-                        Palette.color Palette.toneGray brightnessLight
-                            |> Palette.setContrasting True
-                            |> Text.ColorPalette
-                    }
-                , hover = Nothing
-                }
+        { normal =
+            { background = Palette.color Palette.toneGray brightnessLight
+            , border = Palette.color Palette.toneGray brightnessLight
+            , text =
+                Palette.color Palette.toneGray brightnessLight
+                    |> Palette.setContrasting True
+                    |> Text.ColorPalette
+            }
+        , hover = Nothing
+        }
 
 
 successTheme : ButtonBody -> List (Attribute msg)
