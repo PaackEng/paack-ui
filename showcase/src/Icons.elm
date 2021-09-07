@@ -64,6 +64,7 @@ icons =
     , ( Icon.fixing, "fixing" )
     , ( Icon.groups, "groups" )
     , ( Icon.location, "location" )
+    , ( Icon.loader, "loader" )
     , ( Icon.logout, "logout" )
     , ( Icon.moreActions, "moreActions" )
     , ( Icon.move, "move" )

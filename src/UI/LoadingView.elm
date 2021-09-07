@@ -14,6 +14,7 @@ import Element exposing (Element)
 import Html exposing (Html)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
+import UI.Internal.Svg as Svg
 
 
 {-| The version with a small (18x18px) spinner.
@@ -74,16 +75,7 @@ spinnerSvg floatSize =
                     ]
                     []
                 , Svg.path [ d "M36 18c0-9.94-8.06-18-18-18" ]
-                    [ animateTransform
-                        [ attributeName "transform"
-                        , type_ "rotate"
-                        , from "0 18 18"
-                        , to "360 18 18"
-                        , dur "1s"
-                        , repeatCount "indefinite"
-                        ]
-                        []
-                    ]
+                    [ Svg.animateSpin 18 18 ]
                 ]
             ]
         ]

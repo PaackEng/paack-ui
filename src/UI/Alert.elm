@@ -1,5 +1,6 @@
 module UI.Alert exposing
     ( Alert, primary, success, warning, danger
+    , withDefaultIcon
     , renderElement
     )
 
@@ -21,16 +22,24 @@ An alert can be created and render as in the following pipeline:
 @docs Alert, primary, success, warning, danger
 
 
+# Optional
+
+@docs withDefaultIcon
+
+
 # Rendering
 
 @docs renderElement
 
 -}
 
-import Element exposing (Element)
+import Element exposing (Element, fill, px)
 import Element.Background as Background
+import UI.Icon as Icon
+import UI.LoadingView as LoadingView
 import UI.Palette as Palette exposing (brightnessMiddle, toneDanger, tonePrimary, toneSuccess, toneWarning)
 import UI.RenderConfig exposing (RenderConfig)
+import UI.Size as Size
 import UI.Text as Text
 
 
@@ -40,10 +49,15 @@ type alias Properties =
     }
 
 
+type alias Options =
+    { defaultIcon : Bool
+    }
+
+
 {-| The `Alert msg` type is used for describing the component for later rendering.
 -}
 type Alert msg
-    = Alert Properties
+    = Alert Properties Options
 
 
 type AlertTone
@@ -62,6 +76,7 @@ primary : String -> Alert msg
 primary title =
     Alert
         { title = title, tone = TonePrimary }
+        defaultOptions
 
 
 {-| The success color scheme applied to the alert background.
@@ -73,6 +88,7 @@ success : String -> Alert msg
 success title =
     Alert
         { title = title, tone = ToneSuccess }
+        defaultOptions
 
 
 {-| The warning color scheme applied to the alert background.
@@ -84,6 +100,7 @@ warning : String -> Alert msg
 warning title =
     Alert
         { title = title, tone = ToneWarning }
+        defaultOptions
 
 
 {-| The danger color scheme applied to the alert background.
@@ -95,20 +112,38 @@ danger : String -> Alert msg
 danger title =
     Alert
         { title = title, tone = ToneDanger }
+        defaultOptions
+
+
+{-| Displays an icon in the right side of the alert, depending on its color scheme.
+
+    - Primary: Won't show any icon;
+    - Success: Shows [UI.Icon.check](UI-Icon#check);
+    - Warning: Will show a loading spinner;
+    - Danger: Shows [UI.Icon.warning](UI-Icon#warning).
+
+-}
+withDefaultIcon : Alert msg -> Alert msg
+withDefaultIcon (Alert prop opt) =
+    Alert prop { opt | defaultIcon = True }
 
 
 {-| End of the builder's life.
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
 renderElement : RenderConfig -> Alert msg -> Element msg
-renderElement cfg (Alert { title, tone }) =
+renderElement cfg (Alert { title, tone } { defaultIcon }) =
+    let
+        color =
+            getTextColor tone
+    in
     Element.row
-        [ Element.width Element.fill
-        , Element.height Element.shrink
+        [ Element.width fill
+        , Element.height (px 40)
         , Element.paddingEach
             { top = 12
             , left = 20
-            , right = 0
+            , right = 12
             , bottom = 12
             }
         , tone
@@ -118,13 +153,24 @@ renderElement cfg (Alert { title, tone }) =
         , Element.alignTop
         ]
         [ Text.subtitle2 title
-            |> Text.withColor (getTextColor tone)
+            |> Text.withColor color
             |> Text.renderElement cfg
+            |> Element.el [ Element.centerY, Element.width fill ]
+        , if defaultIcon then
+            icon cfg tone color
+
+          else
+            Element.none
         ]
 
 
 
 -- Internals
+
+
+defaultOptions : Options
+defaultOptions =
+    { defaultIcon = False }
 
 
 getTextColor : AlertTone -> Palette.Color
@@ -148,3 +194,26 @@ getBackgroundColor alertTone =
 
         ToneSuccess ->
             Palette.color toneSuccess brightnessMiddle
+
+
+icon : RenderConfig -> AlertTone -> Palette.Color -> Element msg
+icon renderConfig alertTone color =
+    let
+        defaultIcon iconFn =
+            iconFn ""
+                |> Icon.withSize Size.extraSmall
+                |> Icon.withColor color
+                |> Icon.renderElement renderConfig
+    in
+    case alertTone of
+        ToneWarning ->
+            defaultIcon Icon.loader
+
+        ToneDanger ->
+            defaultIcon Icon.warning
+
+        TonePrimary ->
+            Element.none
+
+        ToneSuccess ->
+            defaultIcon Icon.check

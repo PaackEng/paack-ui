@@ -5,7 +5,7 @@ import PluginOptions exposing (PluginOptions, defaultWithMenu)
 import UI.Alert as Alert
 import UI.RenderConfig exposing (RenderConfig)
 import UIExplorer exposing (storiesOf)
-import Utils exposing (ExplorerStory, ExplorerUI, goToDocsCallToAction, prettifyElmCode, story)
+import Utils exposing (ExplorerStory, ExplorerUI, goToDocsCallToAction, iconsSvgSprite, prettifyElmCode, story)
 
 
 stories : RenderConfig -> ExplorerUI
@@ -61,10 +61,14 @@ unitedStory renderConfig =
     story
         ( "United"
         , Element.column [ Element.width fill, Element.spacing 8 ]
-            [ alert Alert.primary renderConfig
+            [ iconsSvgSprite
+            , alert Alert.primary renderConfig
             , alert Alert.success renderConfig
             , alert Alert.warning renderConfig
             , alert Alert.danger renderConfig
+            , alertWithIcon Alert.success renderConfig
+            , alertWithIcon Alert.warning renderConfig
+            , alertWithIcon Alert.danger renderConfig
             ]
         , defaultWithMenu
         )
@@ -73,6 +77,13 @@ unitedStory renderConfig =
 alert : (String -> Alert.Alert msg) -> RenderConfig -> Element msg
 alert alertFn renderConfig =
     alertFn "Lorem ipsum dolor sit amet."
+        |> Alert.renderElement renderConfig
+
+
+alertWithIcon : (String -> Alert.Alert msg) -> RenderConfig -> Element msg
+alertWithIcon alertFn renderConfig =
+    alertFn "I have an icon."
+        |> Alert.withDefaultIcon
         |> Alert.renderElement renderConfig
 
 
