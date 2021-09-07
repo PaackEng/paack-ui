@@ -1,6 +1,6 @@
 module UI.Alert exposing
     ( Alert, primary, success, warning, danger
-    , withDefaultIcon
+    , withGenericIcon
     , renderElement
     )
 
@@ -24,7 +24,7 @@ An alert can be created and render as in the following pipeline:
 
 # Optional
 
-@docs withDefaultIcon
+@docs withGenericIcon
 
 
 # Rendering
@@ -50,7 +50,7 @@ type alias Properties =
 
 
 type alias Options =
-    { defaultIcon : Bool
+    { genericIcon : Bool
     }
 
 
@@ -123,16 +123,16 @@ danger title =
     - Danger: Shows [UI.Icon.warning](UI-Icon#warning).
 
 -}
-withDefaultIcon : Alert msg -> Alert msg
-withDefaultIcon (Alert prop opt) =
-    Alert prop { opt | defaultIcon = True }
+withGenericIcon : Alert msg -> Alert msg
+withGenericIcon (Alert prop opt) =
+    Alert prop { opt | genericIcon = True }
 
 
 {-| End of the builder's life.
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
 renderElement : RenderConfig -> Alert msg -> Element msg
-renderElement cfg (Alert { title, tone } { defaultIcon }) =
+renderElement cfg (Alert { title, tone } { genericIcon }) =
     let
         color =
             getTextColor tone
@@ -156,7 +156,7 @@ renderElement cfg (Alert { title, tone } { defaultIcon }) =
             |> Text.withColor color
             |> Text.renderElement cfg
             |> Element.el [ Element.centerY, Element.width fill ]
-        , if defaultIcon then
+        , if genericIcon then
             icon cfg tone color
 
           else
@@ -170,7 +170,7 @@ renderElement cfg (Alert { title, tone } { defaultIcon }) =
 
 defaultOptions : Options
 defaultOptions =
-    { defaultIcon = False }
+    { genericIcon = False }
 
 
 getTextColor : AlertTone -> Palette.Color
@@ -199,7 +199,7 @@ getBackgroundColor alertTone =
 icon : RenderConfig -> AlertTone -> Palette.Color -> Element msg
 icon renderConfig alertTone color =
     let
-        defaultIcon iconFn =
+        genericIcon iconFn =
             iconFn ""
                 |> Icon.withSize Size.extraSmall
                 |> Icon.withColor color
@@ -207,13 +207,13 @@ icon renderConfig alertTone color =
     in
     case alertTone of
         ToneWarning ->
-            defaultIcon Icon.loader
+            genericIcon Icon.loader
 
         ToneDanger ->
-            defaultIcon Icon.warning
+            genericIcon Icon.warning
 
         TonePrimary ->
             Element.none
 
         ToneSuccess ->
-            defaultIcon Icon.check
+            genericIcon Icon.check

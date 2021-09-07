@@ -83,7 +83,7 @@ alert alertFn renderConfig =
 alertWithIcon : (String -> Alert.Alert msg) -> RenderConfig -> Element msg
 alertWithIcon alertFn renderConfig =
     alertFn "I have an icon."
-        |> Alert.withDefaultIcon
+        |> Alert.withGenericIcon
         |> Alert.renderElement renderConfig
 
 
