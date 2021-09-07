@@ -582,7 +582,7 @@ staticView :
     -> Size
     -> ButtonWidth
     -> ButtonBody
-    -> (ButtonBody -> List (Attribute msg))
+    -> List (Attribute msg)
     -> Element msg
 staticView cfg size width body theme =
     let
@@ -592,7 +592,7 @@ staticView cfg size width body theme =
                 :: Font.semiBold
                 :: Element.disabled
                 ++ bodyAttrs body size
-                ++ theme body
+                ++ theme
     in
     body
         |> bodyToElement cfg size
@@ -829,8 +829,8 @@ workingTheme tone =
                 }
 
 
-disabledTheme : ButtonBody -> List (Attribute msg)
-disabledTheme body =
+disabledTheme : List (Attribute msg)
+disabledTheme =
     themeToAttributes <|
         { normal =
             { background = Palette.color Palette.toneGray brightnessLight
@@ -844,8 +844,8 @@ disabledTheme body =
         }
 
 
-successTheme : ButtonBody -> List (Attribute msg)
-successTheme _ =
+successTheme : List (Attribute msg)
+successTheme =
     themeToAttributes <|
         { normal =
             { background = Palette.color Palette.toneSuccess brightnessMiddle
