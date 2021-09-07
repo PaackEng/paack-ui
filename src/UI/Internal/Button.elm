@@ -1,6 +1,5 @@
 module UI.Internal.Button exposing
-    ( BodyIconLabelPosition(..)
-    , Button(..)
+    ( Button(..)
     , ButtonAction(..)
     , ButtonBody(..)
     , ButtonMode(..)
@@ -40,12 +39,9 @@ type Button msg
 
 type ButtonBody
     = BodyText String
-    | BodyIcon Icon (Maybe BodyIconLabelPosition)
-
-
-type BodyIconLabelPosition
-    = LabelOnLeft
-    | LabelOnRight
+    | BodyIcon Icon
+    | BodyIconLeftText Icon
+    | BodyIconRightText Icon
 
 
 type ButtonAction msg
@@ -104,16 +100,16 @@ bodyToElement cfg size body =
         BodyText str ->
             Element.el attrs (label str)
 
-        BodyIcon icon Nothing ->
+        BodyIcon icon ->
             iconElement icon
 
-        BodyIcon icon (Just LabelOnLeft) ->
+        BodyIconLeftText icon ->
             Element.row attrs
                 [ label <| Icon.getHint icon
                 , iconElement icon
                 ]
 
-        BodyIcon icon (Just LabelOnRight) ->
+        BodyIconRightText icon ->
             Element.row attrs
                 [ iconElement icon
                 , label <| Icon.getHint icon

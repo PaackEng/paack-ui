@@ -74,8 +74,7 @@ import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Basics exposing (lazyMap, pairUncurry, prependMaybe)
 import UI.Internal.Button as Internal
     exposing
-        ( BodyIconLabelPosition(..)
-        , Button(..)
+        ( Button(..)
         , ButtonAction(..)
         , ButtonBody(..)
         , ButtonMode(..)
@@ -250,7 +249,7 @@ fromLabel label =
 -}
 fromIcon : Icon -> ButtonBody
 fromIcon icon =
-    BodyIcon icon Nothing
+    BodyIcon icon
 
 
 {-| `Button.fromLabeledOnLeftIcon` initiates a button's body with icon-content and it's label on the left.
@@ -260,7 +259,7 @@ fromIcon icon =
 -}
 fromLabeledOnLeftIcon : Icon -> ButtonBody
 fromLabeledOnLeftIcon icon =
-    BodyIcon icon (Just LabelOnLeft)
+    BodyIconLeftText icon
 
 
 {-| `Button.fromLabeledOnRightIcon` initiates a button's body with icon-content and it's label on the right.
@@ -270,7 +269,7 @@ fromLabeledOnLeftIcon icon =
 -}
 fromLabeledOnRightIcon : Icon -> ButtonBody
 fromLabeledOnRightIcon icon =
-    BodyIcon icon (Just LabelOnRight)
+    BodyIconRightText icon
 
 
 
@@ -619,7 +618,13 @@ bodyAttrs body size =
         BodyText _ ->
             textLayout size
 
-        BodyIcon icon _ ->
+        BodyIcon icon ->
+            iconLayout (Icon.getHint icon) size
+
+        BodyIconLeftText icon ->
+            iconLayout (Icon.getHint icon) size
+
+        BodyIconRightText icon ->
             iconLayout (Icon.getHint icon) size
 
 
