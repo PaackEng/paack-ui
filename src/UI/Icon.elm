@@ -69,7 +69,6 @@ An icon can be created and rendered as in the following pipeline:
 import Element exposing (..)
 import Element.Font as Font
 import Html
-import Html.Attributes as HtmlAttrs
 import Svg exposing (Svg)
 import Svg.Attributes as SvgAttrs
 import UI.Internal.Size as Size exposing (Size)
