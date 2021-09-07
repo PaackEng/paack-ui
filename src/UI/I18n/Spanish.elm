@@ -1,5 +1,6 @@
 module UI.I18n.Spanish exposing (..)
 
+import UI.I18n.English as EmptyFallback
 import UI.I18n.Types exposing (..)
 
 
@@ -51,17 +52,10 @@ checkbox =
     }
 
 
-dropdown : Dropdown
-dropdown =
-    { show = "Expandir"
-    , collapse = "Colapsar"
-    }
-
-
 listView : ListView
 listView =
     { search = "Buscar"
-    , selectAll = "Select All"
+    , selectAll = EmptyFallback.listView.selectAll
     }
 
 
@@ -80,8 +74,8 @@ tablesDetails =
 
 tablesSorting : TablesSorting
 tablesSorting =
-    { ascending = "Sort Ascending"
-    , descending = "Sort Descending"
+    { ascending = EmptyFallback.tablesSorting.ascending
+    , descending = EmptyFallback.tablesSorting.descending
     }
 
 
@@ -89,8 +83,8 @@ tables : Tables
 tables =
     { details = tablesDetails
     , sorting = tablesSorting
-    , selectRow = "Select this row."
-    , selectAll = "Select all rows"
+    , selectRow = "Seleccionar esta fila."
+    , selectAll = "Seleccionar todas las filas"
     }
 
 
@@ -111,14 +105,14 @@ sidebar =
     { expand = "Expandir barra lateral"
     , collapse = "Minimizar barra lateral"
     , previous = "Atrás"
-    , moreActions = "More actions"
+    , moreActions = "Mas acciones"
     }
 
 
 contentPlaceholdersNothingToSeeHere : ContentPlaceholdersNothingToSeeHere
 contentPlaceholdersNothingToSeeHere =
-    { title = "Nothing to see here"
-    , body = "Look, you tried looking here. It’s ok, life can be difficult at times when we don’t find what we’re looking for..."
+    { title = "Nada que ver aquí"
+    , body = "Mira, trataste de mirar aquí. Esta bien, la vida puede ser difícil a veces cuando no encontramos lo que estamos buscando..."
     }
 
 
@@ -128,12 +122,18 @@ contentPlaceholders =
     }
 
 
+dropdown : Dropdown
+dropdown =
+    { show = EmptyFallback.dropdown.show
+    , collapse = EmptyFallback.dropdown.collapse
+    }
+
+
 root : Root
 root =
     { filters = filters
     , paginator = paginator
     , checkbox = checkbox
-    , dropdown = dropdown
     , listView = listView
     , radio = radio
     , tables = tables
@@ -141,4 +141,5 @@ root =
     , dialog = dialog
     , sidebar = sidebar
     , contentPlaceholders = contentPlaceholders
+    , dropdown = dropdown
     }
