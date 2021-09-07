@@ -4,9 +4,9 @@ module UI.Icon exposing
     , add, assignPerson, boxes, check, close, collapse, configure, delete, done
     , download, edit, eventLog, expand, filter, fix, fixIssues, fixing, groups
     , loader, location, logout, moreActions, move, nextContent, notifications
-    , paackSpaces, packages, person, persons, phone, pause, previousContent, print, remove
-    , sandwichMenu, search, searchSpace, seeMore, sortDecreasing
-    , sortIncreasing, toggle, toggleDown, toggleUp, wait, warning
+    , paackSpaces, packages, person, persons, phone, pause, previousContent
+    , print, reload, remove, sandwichMenu, search, searchSpace, seeMore
+    , sortDecreasing, sortIncreasing, toggle, toggleDown, toggleUp, wait, warning
     , getHint
     , withColor
     , withSize, withCustomSize
@@ -40,9 +40,9 @@ An icon can be created and rendered as in the following pipeline:
 @docs add, assignPerson, boxes, check, close, collapse, configure, delete, done
 @docs download, edit, eventLog, expand, filter, fix, fixIssues, fixing, groups
 @docs loader, location, logout, moreActions, move, nextContent, notifications
-@docs paackSpaces, packages, person, persons, phone, pause, previousContent, print, remove
-@docs sandwichMenu, search, searchSpace, seeMore, sortDecreasing
-@docs sortIncreasing, toggle, toggleDown, toggleUp, wait, warning
+@docs paackSpaces, packages, person, persons, phone, pause, previousContent
+@docs print, reload, remove, sandwichMenu, search, searchSpace, seeMore
+@docs sortDecreasing, sortIncreasing, toggle, toggleDown, toggleUp, wait, warning
 
 
 # Disassemble
@@ -379,6 +379,16 @@ Indicates the availability to print something related to the surrounding content
 print : String -> Icon
 print =
     defaultInit "Printer"
+
+
+{-| A refresh sign (loop arrow).
+
+    Icon.reload "Reload"
+
+-}
+reload : String -> Icon
+reload =
+    defaultInit "Reload"
 
 
 {-| A pen. For editing fields/properties.

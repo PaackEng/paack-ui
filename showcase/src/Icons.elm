@@ -78,6 +78,7 @@ icons =
     , ( Icon.phone, "phone" )
     , ( Icon.previousContent, "previousContent" )
     , ( Icon.print, "print" )
+    , ( Icon.reload, "reload" )
     , ( Icon.remove, "remove" )
     , ( Icon.sandwichMenu, "sandwichMenu" )
     , ( Icon.search, "search" )
