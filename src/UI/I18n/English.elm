@@ -29,7 +29,7 @@ filters : Filters
 filters =
     { dateFormat = "DD/MM/YYYY"
     , close = "Close"
-    , clear = "Clear All"
+    , clear = "Clear"
     , apply = "Apply"
     , period = filtersPeriod
     , range = filtersRange
@@ -48,13 +48,6 @@ paginator =
 checkbox : Checkbox
 checkbox =
     { toggle = "Toggle"
-    }
-
-
-dropdown : Dropdown
-dropdown =
-    { show = "Expand"
-    , collapse = "Collapse"
     }
 
 
@@ -128,12 +121,18 @@ contentPlaceholders =
     }
 
 
+dropdown : Dropdown
+dropdown =
+    { show = "Expand"
+    , collapse = "Collapse"
+    }
+
+
 root : Root
 root =
     { filters = filters
     , paginator = paginator
     , checkbox = checkbox
-    , dropdown = dropdown
     , listView = listView
     , radio = radio
     , tables = tables
@@ -141,4 +140,5 @@ root =
     , dialog = dialog
     , sidebar = sidebar
     , contentPlaceholders = contentPlaceholders
+    , dropdown = dropdown
     }

@@ -1,5 +1,6 @@
 module UI.I18n.French exposing (..)
 
+import UI.I18n.English as EmptyFallback
 import UI.I18n.Types exposing (..)
 
 
@@ -51,17 +52,10 @@ checkbox =
     }
 
 
-dropdown : Dropdown
-dropdown =
-    { show = "Elargir"
-    , collapse = "Crash"
-    }
-
-
 listView : ListView
 listView =
     { search = "Rechercher"
-    , selectAll = "Select All"
+    , selectAll = EmptyFallback.listView.selectAll
     }
 
 
@@ -80,8 +74,8 @@ tablesDetails =
 
 tablesSorting : TablesSorting
 tablesSorting =
-    { ascending = "Sort Ascending"
-    , descending = "Sort Descending"
+    { ascending = EmptyFallback.tablesSorting.ascending
+    , descending = EmptyFallback.tablesSorting.descending
     }
 
 
@@ -111,14 +105,14 @@ sidebar =
     { expand = "Elargir la barre latérale"
     , collapse = "Réduire la barre latérale"
     , previous = "Retourner"
-    , moreActions = "More actions"
+    , moreActions = "Autres actions"
     }
 
 
 contentPlaceholdersNothingToSeeHere : ContentPlaceholdersNothingToSeeHere
 contentPlaceholdersNothingToSeeHere =
-    { title = "Nothing to see here"
-    , body = "Look, you tried looking here. It’s ok, life can be difficult at times when we don’t find what we’re looking for..."
+    { title = "Rien a voir"
+    , body = "Écoute, tu as essayé de regarder ici. C’est bon, la vie peut être difficile parfois quand on ne trouve pas ce qu’on cherche..."
     }
 
 
@@ -128,12 +122,18 @@ contentPlaceholders =
     }
 
 
+dropdown : Dropdown
+dropdown =
+    { show = EmptyFallback.dropdown.show
+    , collapse = EmptyFallback.dropdown.collapse
+    }
+
+
 root : Root
 root =
     { filters = filters
     , paginator = paginator
     , checkbox = checkbox
-    , dropdown = dropdown
     , listView = listView
     , radio = radio
     , tables = tables
@@ -141,4 +141,5 @@ root =
     , dialog = dialog
     , sidebar = sidebar
     , contentPlaceholders = contentPlaceholders
+    , dropdown = dropdown
     }

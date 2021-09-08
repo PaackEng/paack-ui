@@ -1,5 +1,6 @@
 {
-	"source": "i18n",
-	"dest": "src",
-  "namespace": "UI.I18n"
+  "source": "i18n",
+  "dest": "src",
+  "namespace": "UI.I18n",
+  "emptyFallback": "English"
 }

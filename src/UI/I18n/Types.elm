@@ -43,12 +43,6 @@ type alias Checkbox =
     }
 
 
-type alias Dropdown =
-    { show : String
-    , collapse : String
-    }
-
-
 type alias ListView =
     { search : String
     , selectAll : String
@@ -109,11 +103,16 @@ type alias ContentPlaceholders =
     }
 
 
+type alias Dropdown =
+    { show : String
+    , collapse : String
+    }
+
+
 type alias Root =
     { filters : Filters
     , paginator : Paginator
     , checkbox : Checkbox
-    , dropdown : Dropdown
     , listView : ListView
     , radio : Radio
     , tables : Tables
@@ -121,4 +120,5 @@ type alias Root =
     , dialog : Dialog
     , sidebar : Sidebar
     , contentPlaceholders : ContentPlaceholders
+    , dropdown : Dropdown
     }

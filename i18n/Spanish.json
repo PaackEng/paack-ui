@@ -26,13 +26,9 @@
     "checkbox": {
         "toggle": "Agrupar"
     },
-    "dropdown": {
-        "show": "Expandir",
-        "collapse": "Colapsar"
-    },
     "listView": {
         "search": "Buscar",
-        "selectAll": "Select All"
+        "selectAll": ""
     },
     "radio": {
         "select": "Seleccionar item"
@@ -43,11 +39,11 @@
             "collapse": "Colapsar"
         },
         "sorting": {
-            "ascending": "Sort Ascending",
-            "descending": "Sort Descending"
+            "ascending": "",
+            "descending": ""
         },
-        "selectRow": "Select this row.",
-        "selectAll": "Select all rows"
+        "selectRow": "Seleccionar esta fila.",
+        "selectAll": "Seleccionar todas las filas"
     },
     "dateInput": {
         "invalid": "Formato de fecha inválido"
@@ -59,12 +55,16 @@
         "expand": "Expandir barra lateral",
         "collapse": "Minimizar barra lateral",
         "previous": "Atrás",
-        "moreActions": "More actions"
+        "moreActions": "Mas acciones"
     },
     "contentPlaceholders": {
         "nothingToSeeHere": {
-            "title": "Nothing to see here",
-            "body": "Look, you tried looking here. It’s ok, life can be difficult at times when we don’t find what we’re looking for..."
+            "title": "Nada que ver aquí",
+            "body": "Mira, trataste de mirar aquí. Esta bien, la vida puede ser difícil a veces cuando no encontramos lo que estamos buscando..."
         }
+    },
+    "dropdown": {
+        "show": "",
+        "collapse": ""
     }
 }

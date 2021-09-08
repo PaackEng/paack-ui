@@ -26,13 +26,9 @@
     "checkbox": {
         "toggle": "Basculer"
     },
-    "dropdown": {
-        "show": "Elargir",
-        "collapse": "Crash"
-    },
     "listView": {
         "search": "Rechercher",
-        "selectAll": "Select All"
+        "selectAll": ""
     },
     "radio": {
         "select": "Sélectionner l'élément"
@@ -43,8 +39,8 @@
             "collapse": "Crash"
         },
         "sorting": {
-            "ascending": "Sort Ascending",
-            "descending": "Sort Descending"
+            "ascending": "",
+            "descending": ""
         },
         "selectRow": "Sélectionner la ligne",
         "selectAll": "Sélectionner toutes les lignes"
@@ -59,12 +55,16 @@
         "expand": "Elargir la barre latérale",
         "collapse": "Réduire la barre latérale",
         "previous": "Retourner",
-        "moreActions": "More actions"
+        "moreActions": "Autres actions"
     },
     "contentPlaceholders": {
         "nothingToSeeHere": {
-            "title": "Nothing to see here",
-            "body": "Look, you tried looking here. It’s ok, life can be difficult at times when we don’t find what we’re looking for..."
+            "title": "Rien a voir",
+            "body": "Écoute, tu as essayé de regarder ici. C’est bon, la vie peut être difficile parfois quand on ne trouve pas ce qu’on cherche..."
         }
+    },
+    "dropdown": {
+        "show": "",
+        "collapse": ""
     }
 }
