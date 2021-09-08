@@ -25,7 +25,7 @@ Parcel's instructions are in [README](https://github.com/PaackEng/paack-ui/blob/
 
 An icon can be created and rendered as in the following pipeline:
 
-    Icon.logout "" Logout " from this account"
+    Icon.logout "Logout from this account"
         |> Icon.renderElement renderConfig
 
 
@@ -110,7 +110,7 @@ type Icon
 {-| Icons colors can variate to match text color or contrast with a background.
 See [`Palette.color`](UI-Palette#color) and [`Palette.setContrasting`](UI-Palette#setContrasting) for how to compose a valid color value.
 
-    Icon.search "" Search " logs"
+    Icon.search "Search logs"
         |> Icon.withColor (Palette.color Palette.tonePrimary Palette.brightnessMiddle)
         |> Icon.renderElement renderConfig
 
@@ -176,7 +176,7 @@ nextContent =
 
 {-| A foldable paper, toggle some content between showing/hiding, or full/collapsed.
 
-    Icon.toggle "" Expand " technical details"
+    Icon.toggle "Expand technical details"
 
 -}
 toggle : String -> Icon
@@ -187,7 +187,7 @@ toggle =
 {-| An arrow pointing up.
 May indicate the collapsing of the content below.
 
-    Icon.toggleUp "" Collapse " details"
+    Icon.toggleUp "Collapse details"
 
 -}
 toggleUp : String -> Icon
@@ -198,7 +198,7 @@ toggleUp =
 {-| An arrow pointing down.
 May indicate the expansion of a hidden content below.
 
-    Icon.toggleDown "" Expand " details"
+    Icon.toggleDown "Expand details"
 
 -}
 toggleDown : String -> Icon
@@ -218,7 +218,7 @@ add =
 
 {-| Piled up boxes.
 
-    Icon.packages "" Boxes - Filled ""
+    Icon.packages "Stacked boxed"
 
 -}
 boxes : String -> Icon
@@ -228,7 +228,7 @@ boxes =
 
 {-| A check mark, commonly used inside checkboxes and radio buttons.
 
-    Icon.check "" Notepad ""
+    Icon.check "Notepad"
 
 -}
 check : String -> Icon
@@ -238,7 +238,7 @@ check =
 
 {-| A times sign. Usually used for closing dialogs.
 
-    Icon.close "" Close " this notification"
+    Icon.close "Close this notification"
 
 -}
 close : String -> Icon
@@ -300,7 +300,7 @@ paackSpaces =
 
 {-| "Box-Outlined".
 
-    Icon.packages "" Box - Outlined ""
+    Icon.packages "Order's packages"
 
 -}
 packages : String -> Icon
@@ -361,7 +361,7 @@ logout =
 
 {-| A magnifying glass. For use in search-related queries.
 
-    Icon.search "" Search " package with barcode"
+    Icon.search "Search package with barcode"
 
 -}
 search : String -> Icon
@@ -372,7 +372,7 @@ search =
 {-| An A4 ink printer.
 Indicates the availability to print something related to the surrounding content.
 
-    Icon.print "" Printer " pacakage's barcode"
+    Icon.print "Printer pacakage's barcode"
 
 -}
 print : String -> Icon
@@ -392,7 +392,7 @@ reload =
 
 {-| A pen. For editing fields/properties.
 
-    Icon.edit "" Edit " contact informations"
+    Icon.edit "Edit contact informations"
 
 -}
 edit : String -> Icon
@@ -413,7 +413,7 @@ seeMore =
 
 {-| A warning sign (a triangle with an exclamation mark).
 
-    Icon.warning "" Warning ""
+    Icon.warning "Warning"
 
 -}
 warning : String -> Icon
@@ -423,7 +423,7 @@ warning =
 
 {-| A funnel symbol represented by 3 lines horizontally aligned.
 
-    Icon.filter "" Filter " title column"
+    Icon.filter "Filter title column"
 
 -}
 filter : String -> Icon
@@ -433,7 +433,7 @@ filter =
 
 {-| A set of dots aligned as a six-sided polygon
 
-    Icon.groups "" Groups ""
+    Icon.groups "Groups"
 
 -}
 groups : String -> Icon
@@ -443,7 +443,7 @@ groups =
 
 {-| A group of squares acting as files with an arrow pointing to the bottom
 
-    Icon.download "" Download " CSV"
+    Icon.download "Download CSV"
 
 -}
 download : String -> Icon
@@ -453,7 +453,7 @@ download =
 
 {-| Two arrows from the center to the border
 
-    Icon.expand "" Expand " view"
+    Icon.expand "Expand view"
 
 -}
 expand : String -> Icon
@@ -463,7 +463,7 @@ expand =
 
 {-| 2 Arrows from the border to the center
 
-    Icon.collapse "" Collapse " view"
+    Icon.collapse "Collapse view"
 
 -}
 collapse : String -> Icon
@@ -473,7 +473,7 @@ collapse =
 
 {-| The space icon with a search icon in the right-bottom.
 
-    Icon.searchSpace "" Search " Space"
+    Icon.searchSpace "Search Space"
 
 -}
 searchSpace : String -> Icon
@@ -483,7 +483,7 @@ searchSpace =
 
 {-| A circe with a line on center similar to a "No Way" road sign.
 
-    Icon.remove "" Remove " item"
+    Icon.remove "Remove item"
 
 -}
 remove : String -> Icon
@@ -493,7 +493,7 @@ remove =
 
 {-| A trash can with an "x" on it.
 
-    Icon.delete "" Trash " item"
+    Icon.delete "Trash item"
 
 -}
 delete : String -> Icon
@@ -503,7 +503,7 @@ delete =
 
 {-| Two vertical parallel arrows pointing to opposite directions.
 
-    Icon.move "" Move " item"
+    Icon.move "Move item"
 
 -}
 move : String -> Icon
@@ -533,7 +533,7 @@ sortDecreasing =
 
 {-| A monkey wrench.
 
-    Icon.fix "" Fix " all invalid values"
+    Icon.fix "Fix all invalid values"
 
 -}
 fix : String -> Icon
@@ -543,7 +543,7 @@ fix =
 
 {-| A monkey wrench with a red ball.
 
-    Icon.fixing "" Fix " something"
+    Icon.fixing "Fix something"
 
 -}
 fixing : String -> Icon
@@ -555,7 +555,7 @@ fixing hint =
 
 {-| A thunder bolt.
 
-    Icon.fixIssues "" Fix " issues from selected groups"
+    Icon.fixIssues "Fix issues from selected groups"
 
 -}
 fixIssues : String -> Icon
