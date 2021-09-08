@@ -467,26 +467,21 @@ renderElement cfg (TextField prop opt) =
                 ContentSinglelineText ->
                     inputAnyOptions cfg msg prop opt
                         |> Input.text elAttrs
-                        |> textFieldError cfg opt.errorCaption
 
                 ContentMultilineText ->
                     inputMultilineOptions cfg msg prop opt
                         |> Input.multiline elAttrs
-                        |> textFieldError cfg opt.errorCaption
 
                 ContentUsername ->
                     inputAnyOptions cfg msg prop opt
                         |> Input.username elAttrs
-                        |> textFieldError cfg opt.errorCaption
 
                 ContentPassword pswOpt ->
                     whenPassword msg pswOpt
-                        |> textFieldError cfg opt.errorCaption
 
                 ContentEmail ->
                     inputAnyOptions cfg msg prop opt
                         |> Input.email elAttrs
-                        |> textFieldError cfg opt.errorCaption
 
                 ContentSearch ->
                     inputAnyOptions cfg msg prop opt
@@ -495,7 +490,6 @@ renderElement cfg (TextField prop opt) =
                 ContentSpellChecked ->
                     inputAnyOptions cfg msg prop opt
                         |> Input.spellChecked elAttrs
-                        |> textFieldError cfg opt.errorCaption
 
         whenStatic value =
             Text.subtitle2 value
@@ -514,6 +508,7 @@ renderElement cfg (TextField prop opt) =
     case prop.changeable of
         Just msg ->
             nonStatic prop.content msg
+                |> textFieldError cfg opt.errorCaption
 
         Nothing ->
             whenStatic prop.currentValue
