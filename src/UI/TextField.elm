@@ -98,7 +98,7 @@ import UI.Internal.Colors as Colors
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Size as Size
 import UI.Internal.Text as Text
-import UI.Palette as Palette exposing (brightnessMiddle, toneGray)
+import UI.Palette as Palette exposing (brightnessDarkest, brightnessMiddle, toneDanger, toneGray)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size exposing (Size)
 import UI.Text as Text
@@ -247,8 +247,6 @@ setLabelVisible isVisible (TextField prop opt) =
 {-| Replaces the text with an error message and make the border red.
 
     TextField.withError "Minimum eight caracters." someTextField
-
-**NOTE**: Not ready, just make border red by now.
 
 -}
 withError : String -> TextField msg -> TextField msg
@@ -510,6 +508,7 @@ renderElement cfg (TextField prop opt) =
     case prop.changeable of
         Just msg ->
             nonStatic prop.content msg
+                |> textFieldError cfg opt.errorCaption
 
         Nothing ->
             whenStatic prop.currentValue
@@ -653,7 +652,7 @@ attrs cfg prop opt =
             opt.errorCaption /= Nothing
 
         isPlaceholder =
-            prop.currentValue /= ""
+            prop.currentValue == ""
 
         eventAttr acu =
             case opt.onEnterPressed of
@@ -721,7 +720,7 @@ genericAttr label isPlaceholder hasError width size =
     , Primitives.roundedBorders size
     , Border.color <|
         if hasError then
-            Colors.red500
+            Colors.red700
 
         else
             Colors.gray300
@@ -745,10 +744,13 @@ genericAttr label isPlaceholder hasError width size =
     , Font.color <|
         -- TODO: Use CSS pre-processor
         if isPlaceholder then
-            Colors.gray800
+            Colors.gray600
+
+        else if hasError && not isPlaceholder then
+            Colors.red700
 
         else
-            Colors.gray600
+            Colors.gray800
     , Element.title label
     ]
 
@@ -785,3 +787,21 @@ textFieldPadding size =
 
         Size.ExtraSmall ->
             Element.paddingXY 8 7
+
+
+textFieldError : RenderConfig -> Maybe String -> Element msg -> Element msg
+textFieldError cfg errorCaption inputElement =
+    case errorCaption of
+        Just caption ->
+            Element.column
+                [ Element.spacing 8 ]
+                [ inputElement
+                , caption
+                    |> Text.caption
+                    |> Text.withColor
+                        (Palette.color toneDanger brightnessDarkest)
+                    |> Text.renderElement cfg
+                ]
+
+        Nothing ->
+            inputElement
