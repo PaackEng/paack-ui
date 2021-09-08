@@ -3,10 +3,11 @@ module UI.Icon exposing
     , Icon
     , add, assignPerson, boxes, check, close, collapse, configure, delete, done
     , download, edit, eventLog, expand, filter, fix, fixIssues, fixing, groups
-    , loader, location, logout, moreActions, move, nextContent, notifications
-    , paackSpaces, packages, person, persons, phone, pause, previousContent
-    , print, reload, remove, sandwichMenu, search, searchSpace, seeMore
-    , sortDecreasing, sortIncreasing, toggle, toggleDown, toggleUp, wait, warning
+    , insert, loader, location, logout, moreActions, move, nextContent
+    , notifications, paackSpaces, packages, person, persons, phone, pause
+    , previousContent, print, reload, remove, sandwichMenu, search, searchSpace
+    , seeMore, sortDecreasing, sortIncreasing, toggle, toggleDown, toggleUp
+    , wait, warning
     , getHint
     , withColor
     , withSize, withCustomSize
@@ -39,10 +40,11 @@ An icon can be created and rendered as in the following pipeline:
 @docs Icon
 @docs add, assignPerson, boxes, check, close, collapse, configure, delete, done
 @docs download, edit, eventLog, expand, filter, fix, fixIssues, fixing, groups
-@docs loader, location, logout, moreActions, move, nextContent, notifications
-@docs paackSpaces, packages, person, persons, phone, pause, previousContent
-@docs print, reload, remove, sandwichMenu, search, searchSpace, seeMore
-@docs sortDecreasing, sortIncreasing, toggle, toggleDown, toggleUp, wait, warning
+@docs insert, loader, location, logout, moreActions, move, nextContent
+@docs notifications, paackSpaces, packages, person, persons, phone, pause
+@docs previousContent, print, reload, remove, sandwichMenu, search, searchSpace
+@docs seeMore, sortDecreasing, sortIncreasing, toggle, toggleDown, toggleUp
+@docs wait, warning
 
 
 # Disassemble
@@ -623,6 +625,16 @@ loader hint =
     Icon
         (Properties hint "Loader")
         { defaultOptions | spin = True }
+
+
+{-| A plus sign within a circle.
+
+    Icon.insert "Insert row"
+
+-}
+insert : String -> Icon
+insert =
+    defaultInit "Add-Circle"
 
 
 defaultInit : String -> String -> Icon
