@@ -771,7 +771,7 @@ notificationSvgIcon opt iconId =
             , useIcon opt iconId
             ]
         , Svg.circle
-            [ SvgAttrs.fill <| Palette.toCssColor Palette.danger
+            [ SvgAttrs.fill <| Palette.toCssColor Palette.red700
             , SvgAttrs.r "17%"
             , SvgAttrs.cx "75%"
             , SvgAttrs.cy "20%"

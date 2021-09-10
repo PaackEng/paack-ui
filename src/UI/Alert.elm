@@ -36,7 +36,7 @@ An alert can be created and render as in the following pipeline:
 import Element exposing (Element, fill, px)
 import Element.Background as Background
 import UI.Icon as Icon
-import UI.Palette as Palette exposing (brightnessMiddle, toneDanger, tonePrimary, toneSuccess, toneWarning)
+import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text

@@ -26,7 +26,7 @@ import Html.Attributes exposing (attribute)
 import List
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.Internal.Utils.Element exposing (overflowAttrs, overflowVisible)
-import UI.Palette as Palette exposing (brightnessDarkest, toneGray)
+import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig, isMobile)
 
 
@@ -97,7 +97,7 @@ textDefaultOptions =
 
 defaultColor : TextColor
 defaultColor =
-    ColorPalette <| Palette.color toneGray brightnessDarkest
+    ColorPalette Palette.gray800
 
 
 fontColor : TextColor -> Maybe Element.Color
