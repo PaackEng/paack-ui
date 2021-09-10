@@ -35,6 +35,7 @@ import Html.Attributes as HtmlAttrs
 -}
 type alias Focus msg =
     { onEnter : msg
+    , onLeave : msg
     , tabIndex : Int
     , hasFocus : Bool
     }
@@ -47,10 +48,11 @@ type alias Focus msg =
 
 -}
 toElementAttributes : Focus msg -> List (Attribute msg)
-toElementAttributes { onEnter, tabIndex, hasFocus } =
+toElementAttributes { onEnter, tabIndex, hasFocus, onLeave } =
     let
         any =
             [ Events.onFocus onEnter
+            , Events.onLoseFocus onLeave
             , tabIndex
                 |> HtmlAttrs.tabindex
                 |> Element.htmlAttribute
