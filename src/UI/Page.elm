@@ -1,19 +1,18 @@
-module UI.NavigationContainer exposing
+module UI.Page exposing
     ( Msg, State, stateInit, stateWithClosedMenu, stateUpdate
     , Navigator, navigator
-    , Container, containerMap
-    , Content, contentSingle, StackChild, contentStackChild
+    , Page, page, pageWithDialog, pageWithDefaultMenu, pageMap
+    , PageBody, bodySingle, Stack, bodyStack
     , withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages
     , MenuPage, menuPage, withSidebarStyle, sidebarPersistent
     , sidebarNonPersistent, showMenu, hideMenu
-    , Dialog, dialog, dialogV2
     , toBrowserDocument
     )
 
-{-| The `UI.NavigationContainer` (abbreviated as `Nav`) is a page presenter.
+{-| The `UI.Page` is a page presenter.
 Depending on the situation, it applies the sidebar menu, dialogs, and mobile's navbar over the current page.
 
-For this, a page must provide some required data through the [`Nav.Container`](#Container) record.
+For this, a page must provide some required data through the [`Nav.Page`](#Page) record.
 That aggregated with the current rendering configuration provided by [`UI.RenderConfig`](UI-RenderConfig#RenderConfig) and the [`Nav.State`](#State), multiplex between possible viewing layouts.
 
 Example of usage:
@@ -22,7 +21,7 @@ Example of usage:
     view renderConfig { navState, currentPage } =
         Nav.navigator Msg.NavMsg
             navState
-            (getPageContainer >> Nav.containerMap Msg.PageMsg)
+            (getPagePage >> Nav.pageMap Msg.PageMsg)
             |> Nav.withMenuPages
                 [ Nav.menuPage (Icon.packages "Packages")
                     (Link.link "/packages")
@@ -36,12 +35,12 @@ Example of usage:
             |> Nav.withMenuLogo "My company's logo" someLogoElement
             |> Nav.toBrowserDocument renderConfig currentPage
 
-    getPageContainer : Page.Page -> Nav.Container Page.Msg
-    getPageContainer page =
+    getPagePage : Page.Page -> Nav.Page Page.Msg
+    getPagePage page =
         case page of
             Page.Packages ->
                 { title = "Packages"
-                , content = Nav.contentSingle Packages.view
+                , content = Nav.bodySingle Packages.view
                 , dialog = Nothing
                 , hasMenu = False
                 }
@@ -59,12 +58,12 @@ Example of usage:
 
 # Page
 
-@docs Container, containerMap
+@docs Page, page, pageWithDialog, pageWithDefaultMenu, pageMap
 
 
-# Content
+# PageBody
 
-@docs Content, contentSingle, StackChild, contentStackChild
+@docs PageBody, bodySingle, Stack, bodyStack
 
 
 # Menu
@@ -72,11 +71,6 @@ Example of usage:
 @docs withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages
 @docs MenuPage, menuPage, withSidebarStyle, sidebarPersistent
 @docs sidebarNonPersistent, showMenu, hideMenu
-
-
-# Dialog
-
-@docs Dialog, dialog, dialogV2
 
 
 # Rendering
@@ -89,10 +83,8 @@ import Element exposing (Element, fill)
 import Html exposing (Html)
 import UI.Effect as Effect exposing (Effect)
 import UI.Icon as Icon exposing (Icon)
-import UI.Internal.Dialog as Dialog1
-import UI.Internal.DialogV2 exposing (dialogViewV2)
 import UI.Internal.Menu as Menu
-import UI.Internal.NavigationContainer as Internal
+import UI.Internal.Page as Internal
 import UI.Internal.SideBar as SideBar
 import UI.Link exposing (Link)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
@@ -136,26 +128,18 @@ type Msg
     = ToggleMenu Bool
 
 
-{-| The `Nav.Content msg` manages different kinds of pages' body.
+{-| The `Nav.PageBody msg` manages different kinds of pages' body.
 By now, the content is either a typical single page or a stacked child of mobile's views.
 
 The typical single page renders the way they come.
 The stacked child has a different header on mobile, where a back button replaces the sandwich button.
 
 -}
-type alias Content msg =
-    Internal.Content msg
+type alias PageBody msg =
+    Internal.PageBody msg
 
 
-{-| The `Nav.Dialog msg` is a record holding the description of a dialog.
-See [`Nav.dialog`](#dialog) to see how to create a dialog.
--}
-type Dialog msg
-    = Dialog1 (Dialog1.Dialog msg)
-    | Dialog2 (Dialog2.Dialog msg)
-
-
-{-| The `Nav.Container msg` describes the current page in its current state.
+{-| The `Nav.Page msg` describes the current page in its current state.
 
 The `title` field is exposed as to the browser and reused on the mobile's navbar.
 
@@ -165,15 +149,19 @@ The `hasMenu` field can hide the menu when undesired, e.g., login page.
 
 The `content` field must be the element holding the page's view.
 
-    { content = Nav.contentSingle <| Element.el [] [ Element.text "Element body" ]
+    { content = Nav.bodySingle <| Element.el [] [ Element.text "Element body" ]
     , title = "Example page"
     , dialog = Nothing -- or Just <| Nav.dialog <| ...
     , hasMenu = True
     }
 
 -}
-type alias Container msg =
-    { content : Content msg
+type Page msg
+    = Page (PageRecord msg)
+
+
+type alias PageRecord msg =
+    { content : PageBody msg
     , title : String
     , dialog : Maybe (Dialog msg)
     , hasMenu : Bool
@@ -188,7 +176,7 @@ type Navigator page msg
 
 
 type alias NavigatorRecord page msg =
-    { container : page -> Container msg
+    { container : page -> Page msg
     , menu : Menu.Menu msg
     , sidebarStyle : SidebarStyle
     }
@@ -218,8 +206,8 @@ That includes the back button's message, a title which overwrites the main page'
     }
 
 -}
-type alias StackChild msg =
-    Internal.StackChild msg
+type alias Stack msg =
+    Internal.Stack msg
 
 
 
@@ -336,8 +324,8 @@ hideMenu =
 
 {-| Transform the messages produced by a container.
 -}
-containerMap : (a -> b) -> Container a -> Container b
-containerMap applier data =
+pageMap : (a -> b) -> Page a -> Page b
+pageMap applier data =
     { title = data.title
     , hasMenu = data.hasMenu
     , content = contentMap applier data.content
@@ -345,18 +333,18 @@ containerMap applier data =
     }
 
 
-contentMap : (a -> b) -> Content a -> Content b
+contentMap : (a -> b) -> PageBody a -> PageBody b
 contentMap applier data =
     case data of
-        Internal.ContentSingle element ->
+        Internal.PageBodySingle element ->
             element
                 |> Element.map applier
-                |> Internal.ContentSingle
+                |> Internal.PageBodySingle
 
-        Internal.ContentStackChild stack element ->
+        Internal.PageBodyStack stack element ->
             element
                 |> Element.map applier
-                |> Internal.ContentStackChild
+                |> Internal.PageBodyStack
                     { title = stack.title
                     , goBackMsg = applier stack.goBackMsg
                     , action = Maybe.map (Action.iconMap applier) stack.action
@@ -404,21 +392,21 @@ stateWithClosedMenu (State state) =
     State { state | menuExpanded = False }
 
 
-{-| `Nav.contentSingle` indicates that the current page is a simple single page.
+{-| `Nav.bodySingle` indicates that the current page is a simple single page.
 It expects the final page's view in the only parameter.
 
-    Nav.contentSingle <| view renderConfig model
+    Nav.bodySingle <| view renderConfig model
 
 -}
-contentSingle : Element msg -> Content msg
-contentSingle body =
-    Internal.ContentSingle body
+bodySingle : Element msg -> PageBody msg
+bodySingle body =
+    Internal.PageBodySingle body
 
 
-{-| `Nav.contentStackChild` indicates that the current page is a stack child's page.
+{-| `Nav.bodyStack` indicates that the current page is a stack child's page.
 It expects the child's configuration and the final page's view as its parameters.
 
-    Nav.contentStackChild
+    Nav.bodyStack
         { title = "Edit: Card " ++ selectedCard.number
         , buttons =
             [ Icon.print "Print card"
@@ -431,9 +419,9 @@ It expects the child's configuration and the final page's view as its parameters
         cardEditView renderConfig selectedCard
 
 -}
-contentStackChild : StackChild msg -> Element msg -> Content msg
-contentStackChild prop body =
-    Internal.ContentStackChild prop body
+bodyStack : Stack msg -> Element msg -> PageBody msg
+bodyStack prop body =
+    Internal.PageBodyStack prop body
 
 
 {-| `Nav.menuPage` describes a page to [`Nav.withMenuPages`](#withMenuPages).
@@ -483,11 +471,11 @@ The third (and last) parameter is a lambda used to obtain the current page's con
 navigator :
     (Msg -> msg)
     -> State
-    -> (page -> Container msg)
+    -> (page -> Page msg)
     -> Navigator page msg
-navigator applier (State state) pagesContainers =
+navigator applier (State state) pagesPages =
     Navigator <|
-        NavigatorRecord pagesContainers
+        NavigatorRecord pagesPages
             (menu applier state)
             SidebarPersistent
 
@@ -624,14 +612,14 @@ menu applier { menuExpanded } =
 
 contentProps :
     String
-    -> Content msg
+    -> PageBody msg
     -> ( Element msg, Maybe ( msg, Maybe (Action.WithIcon msg) ), ( String, Maybe String ) )
 contentProps mainTitle content =
     case content of
-        Internal.ContentSingle body ->
+        Internal.PageBodySingle body ->
             ( body, Nothing, ( mainTitle, Nothing ) )
 
-        Internal.ContentStackChild { title, goBackMsg, action } body ->
+        Internal.PageBodyStack { title, goBackMsg, action } body ->
             ( body, Just ( goBackMsg, action ), title )
 
 
