@@ -24,21 +24,40 @@ import Html.Attributes as HtmlAttrs
 
 
 {-| Required configuration for managing focus.
-
-    { onEnter = Msg.OnFocusEnterThisComponent
-    , tabIndex = 2
-    , hasFocus = False
-    }
-
-`hasFocus` can be used for enforcing focus when loading a new page.
-
 -}
-type alias Focus msg =
-    { onEnter : msg
-    , onLeave : msg
-    , tabIndex : Int
-    , hasFocus : Bool
+type Focus msg
+    = Focus { hasFocus : Bool } (Optional msg)
+
+
+type alias Optional msg =
+    { onEnter : Maybe msg
+    , onLeave : Maybe msg
+    , tabIndex : Maybe Int
     }
+
+
+focus : Bool -> Focus msg
+focus hasFocus =
+    Focus { hasFocus = hasFocus }
+        { onEnter = Nothing
+        , onLeave = Nothing
+        , tabIndex = Nothing
+        }
+
+
+withOnEnter : msg -> Focus msg -> Focus msg
+withOnEnter msg (Focus prop opt) =
+    Focus prop { opt | onEnter = Just msg }
+
+
+withOnLeave : msg -> Focus msg -> Focus msg
+withOnLeave msg (Focus prop opt) =
+    Focus prop { opt | onLeave = Just msg }
+
+
+withTabIndex : Int -> Focus msg -> Focus msg
+withTabIndex value (Focus prop opt) =
+    Focus prop { opt | tabIndex = Just value }
 
 
 {-| Applies [`Focus`]`#Focus` into Elm UI attributes.
@@ -48,18 +67,40 @@ type alias Focus msg =
 
 -}
 toElementAttributes : Focus msg -> List (Attribute msg)
-toElementAttributes { onEnter, tabIndex, hasFocus, onLeave } =
+toElementAttributes (Focus { hasFocus } { onEnter, tabIndex, onLeave }) =
     let
-        any =
-            [ Events.onFocus onEnter
-            , Events.onLoseFocus onLeave
-            , tabIndex
-                |> HtmlAttrs.tabindex
-                |> Element.htmlAttribute
-            ]
-    in
-    if hasFocus then
-        Input.focusedOnLoad :: any
+        withFocusAttrs attributes =
+            if hasFocus then
+                Input.focusedOnLoad :: attributes
 
-    else
-        any
+            else
+                attributes
+
+        withOnEnterAttrs attributes =
+            case onEnter of
+                Just onEnterMsg ->
+                    Events.onFocus onEnterMsg :: attributes
+
+                Nothing ->
+                    attributes
+
+        withOnLeaveAttrs attributes =
+            case onLeave of
+                Just onLeaveMsg ->
+                    Events.onLoseFocus onLeaveMsg :: attributes
+
+                Nothing ->
+                    attributes
+
+        tabAttrs =
+            case tabIndex of
+                Just tabIndexInt ->
+                    tabIndexInt
+                        |> HtmlAttrs.tabindex
+                        |> Element.htmlAttribute
+                        |> List.singleton
+
+                Nothing ->
+                    []
+    in
+    tabAttrs |> withOnEnterAttrs |> withOnLeaveAttrs |> withFocusAttrs
