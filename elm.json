@@ -11,13 +11,14 @@
         "UI.Button",
         "UI.Checkbox",
         "UI.ContentPlaceholder",
+        "UI.Dialog",
         "UI.Dropdown",
         "UI.Effect",
         "UI.Filter",
         "UI.Icon",
         "UI.Link",
         "UI.LoadingView",
-        "UI.NavigationContainer",
+        "UI.Page",
         "UI.Paginator",
         "UI.Palette",
         "UI.Radio",
@@ -34,8 +35,7 @@
         "UI.Utils.ARIA",
         "UI.Utils.Element",
         "UI.Utils.Focus",
-        "UI.Utils.TypeNumbers",
-        "UI.V2.Dialog"
+        "UI.Utils.TypeNumbers"
     ],
     "elm-version": "0.19.0 <= v < 0.20.0",
     "dependencies": {

@@ -157,7 +157,7 @@ genericSkyBlue =
         []
 
 -}
-toBackgroundColor : Color -> Element.Attribute msg
+toBackgroundColor : Color -> Element.Decoration
 toBackgroundColor =
     toElementColor >> Background.color
 
@@ -172,7 +172,7 @@ toBackgroundColor =
         []
 
 -}
-toFontColor : Color -> Element.Attribute msg
+toFontColor : Color -> Element.Decoration
 toFontColor =
     toElementColor >> Font.color
 
@@ -187,7 +187,7 @@ toFontColor =
         []
 
 -}
-toBorderColor : Color -> Element.Attribute msg
+toBorderColor : Color -> Element.Decoration
 toBorderColor =
     toElementColor >> Border.color
 
