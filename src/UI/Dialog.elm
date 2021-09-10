@@ -1,10 +1,10 @@
-module UI.V2.Dialog exposing
+module UI.Dialog exposing
     ( Dialog(..), dialog
     , withBody, withButtons
     , map
     )
 
-{-| The `UI.V2.Dialog` is a component for displaying dialogs and modals.
+{-| The `UI.Dialog` is a component for displaying dialogs and modals.
 
 User must specify a title and an icon to be displayed in the title to construct
 it. Body and buttons can be specified optionally as in the following pipeline:
