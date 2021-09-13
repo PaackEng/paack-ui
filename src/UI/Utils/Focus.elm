@@ -76,21 +76,17 @@ toElementAttributes (Focus { hasFocus } { onEnter, tabIndex, onLeave }) =
             else
                 attributes
 
-        withOnEnterAttrs attributes =
-            case onEnter of
-                Just onEnterMsg ->
-                    Events.onFocus onEnterMsg :: attributes
+        withOnEnterAttrs =
+            Maybe.map
+                (Events.onFocus >> (::))
+                onEnter
+                |> Maybe.withDefault identity
 
-                Nothing ->
-                    attributes
-
-        withOnLeaveAttrs attributes =
-            case onLeave of
-                Just onLeaveMsg ->
-                    Events.onLoseFocus onLeaveMsg :: attributes
-
-                Nothing ->
-                    attributes
+        withOnLeaveAttrs =
+            Maybe.map
+                (Events.onLoseFocus >> (::))
+                onLeave
+                |> Maybe.withDefault identity
 
         tabAttrs =
             case tabIndex of
