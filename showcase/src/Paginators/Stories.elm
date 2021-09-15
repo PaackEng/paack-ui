@@ -60,13 +60,13 @@ code : String
 code =
     prettifyElmCode """
 Paginator.nonNumeric
-    { onNextButtonClicked = NextPage
-    , onPreviousButtonClicked = PreviousPage
-    , totalCount = List.length paginatorsStories.items
-    , offset = paginatorsStories.offset
-    , first = defaultPageSize
+    { onForwardClicked = NextPage
+    , onPreviousClicked = PreviousPage
+    , totalAmount = List.length paginatorsStories.items
+    , pageAmount = paginatorsStories.offset
     }
-    renderConfig
+    |> Paginator.withCurrentItem defaultPageSize
+    |> Paginator.renderElement renderConfig
 """
 
 
@@ -76,13 +76,13 @@ view renderConfig { paginatorsStories } =
         [ Element.spacing 20 ]
         [ iconsSvgSprite
         , Paginator.nonNumeric
-            { onNextButtonClicked = Msg.PaginatorsStoriesMsg Paginators.NextPage
-            , onPreviousButtonClicked = Msg.PaginatorsStoriesMsg Paginators.PreviousPage
-            , totalCount = List.length paginatorsStories.items
-            , offset = paginatorsStories.offset
-            , first = defaultPageSize
+            { onForwardClicked = Msg.PaginatorsStoriesMsg Paginators.NextPage
+            , onPreviousClicked = Msg.PaginatorsStoriesMsg Paginators.PreviousPage
+            , totalAmount = List.length paginatorsStories.items
+            , pageAmount = paginatorsStories.offset
             }
-            renderConfig
+            |> Paginator.withCurrentItem defaultPageSize
+            |> Paginator.renderElement renderConfig
         , paginatorsStories.items
             |> List.take (paginatorsStories.offset + defaultPageSize)
             |> List.drop paginatorsStories.offset

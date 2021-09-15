@@ -127,5 +127,5 @@ iconsView cfg =
         Element.column
             []
             [ iconsGroup cfg
-                (Palette.color Palette.toneGray Palette.brightnessMiddle)
+                Palette.gray700
             ]

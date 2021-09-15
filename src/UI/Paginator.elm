@@ -27,9 +27,9 @@ The following code applies the paginator to some simple list, and also applies p
             , onPreviousClicked = Msg.PreviousPage
             , totalAmount = List.length model.options
             , pageAmount = model.pageOffset
-            , current = 0
             }
-            renderConfig
+            |> Paginator.withCurrentItem model.current
+            |> Paginator.renderElement renderConfig
         ]
 
 

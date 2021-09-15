@@ -7,7 +7,6 @@ import Buttons.Model as Buttons
 import Checkboxes.Model as Checkboxes
 import Dropdown.Model as Dropdown
 import Filters.Model as Filters
-import Layouts.Model as Layouts
 import Paginators.Model as Paginators
 import Radio.Model as Radio
 import Sidebar.Model as Sidebar
@@ -22,7 +21,6 @@ type alias Model =
     , checkboxesStories : Checkboxes.Model
     , dropdownStories : Dropdown.Model
     , filtersStories : Filters.Model
-    , layoutsStories : Layouts.Model
     , paginatorsStories : Paginators.Model
     , radioStories : Radio.Model
     , sidebarStories : Sidebar.Model
@@ -39,7 +37,6 @@ init =
     , checkboxesStories = Checkboxes.initModel
     , dropdownStories = Dropdown.initModel
     , filtersStories = Filters.initModel
-    , layoutsStories = Layouts.initModel
     , paginatorsStories = Paginators.initModel
     , radioStories = Radio.initModel
     , sidebarStories = Sidebar.initModel

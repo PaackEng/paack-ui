@@ -8,7 +8,7 @@ import PluginOptions exposing (defaultWithMenu)
 import Return exposing (Return)
 import Tables.Book exposing (Book, books)
 import UI.Dropdown as Dropdown exposing (Dropdown)
-import UI.Effect as Effect
+import UI.Effects as Effect
 import UI.RenderConfig exposing (RenderConfig)
 import UIExplorer exposing (storiesOf)
 import Utils

@@ -9,7 +9,6 @@ import PluginOptions exposing (defaultWithMenu)
 import Return exposing (Return)
 import UI.Button as Button
 import UI.Filter as Filter
-import UI.ListView as ListView
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text

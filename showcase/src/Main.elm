@@ -11,7 +11,6 @@ import Filters.Stories as Filters
 import Html exposing (Html, div, img)
 import Html.Attributes exposing (src, style)
 import Icons
-import Layouts.Stories as Layouts
 import LoadingView
 import Model exposing (Model)
 import Msg exposing (Msg(..))
@@ -27,8 +26,7 @@ import Tables.Stories as Tables
 import Tabs.Stories as Tabs
 import TextField
 import Texts
-import UI.ListView exposing (ListView)
-import UI.NavigationContainer exposing (Navigator)
+import UI.Page exposing (Navigator)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UIExplorer
     exposing
@@ -47,14 +45,10 @@ import UIExplorer.Plugins.Tabs.Icons as TabsIconsPlugin
 import Utils exposing (ExplorerModel)
 
 
-{-| importing UI.NavigationContainer and UI.ListView mostly so they compile too
+{-| importing UI.Page mostly so they compile too
 -}
 type alias CompileNav =
     Navigator Never Never
-
-
-type alias CompilerListView =
-    ListView Never Never
 
 
 config : Config Model Msg PluginOptions
@@ -123,7 +117,6 @@ main =
             , Switches.stories renderConfig
             , Radio.stories renderConfig
             , Tabs.stories renderConfig
-            , Layouts.stories renderConfig
             , ContentPlaceholders.stories renderConfig
             , Dropdowns.stories renderConfig
             ]
@@ -187,11 +180,6 @@ updateStories msg ({ customModel } as model) =
         TabMsg submsg ->
             TabsPlugin.update submsg customModel.tabs
                 |> (\t -> ( { customModel | tabs = t }, Cmd.none ))
-                |> finishCustomUpdate model
-
-        LayoutsStoriesMsg submsg ->
-            Layouts.update submsg customModel.layoutsStories
-                |> R.map (\t -> { customModel | layoutsStories = t })
                 |> finishCustomUpdate model
 
         SidebarStoriesMsg submsg ->

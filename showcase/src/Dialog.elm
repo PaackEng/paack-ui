@@ -4,11 +4,11 @@ import Element exposing (Element)
 import Msg exposing (Msg)
 import PluginOptions exposing (defaultWithMenu)
 import UI.Button as Button exposing (Button)
+import UI.Dialog as Dialog
 import UI.Icon as Icon
-import UI.Internal.DialogV2 exposing (dialogViewV2)
+import UI.Internal.Dialog exposing (dialogView)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Text as Text
-import UI.V2.Dialog as Dialog
 import UIExplorer exposing (storiesOf)
 import Utils exposing (ExplorerStory, ExplorerUI, iconsSvgSprite, prettifyElmCode, story)
 
@@ -32,7 +32,7 @@ dialog cfg =
                 |> Text.renderElement cfg
             )
         |> Dialog.withButtons buttons
-        |> dialogViewV2 cfg
+        |> dialogView cfg
 
 
 dialogDesktop : RenderConfig -> ExplorerStory

@@ -6,7 +6,7 @@ import Return exposing (Return)
 import Tables.Book as Book exposing (Book)
 import Tables.Model as Stories
 import Tables.Msg as Stories
-import UI.Effect as Effect
+import UI.Effects as Effect
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Tables.Common as Tables
 import UI.Tables.Stateful as Stateful
