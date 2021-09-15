@@ -368,7 +368,7 @@ Do not ignore the returned `Cmd`, it may include remote filter's messages.
         Table.update subMsg oldModel.tableState
 
 -}
-update : Msg item -> State msg item columns -> ( State msg item columns, Effect msg )
+update : Msg item -> State msg item columns -> ( State msg item columns, Effects msg )
 update msg (State state) =
     case msg of
         MobileToggle index ->
@@ -381,10 +381,10 @@ update msg (State state) =
             updateSorters state subMsg
 
         FilterDialogOpen index ->
-            ( State { state | filterDialog = Just index }, Effect.none )
+            ( State { state | filterDialog = Just index }, Effects.none )
 
         FilterDialogClose ->
-            ( State { state | filterDialog = Nothing }, Effect.none )
+            ( State { state | filterDialog = Nothing }, Effects.none )
 
         SelectionToggleAll ->
             updateSelectionToggleAll state
@@ -393,7 +393,7 @@ update msg (State state) =
             updateSelectionSet state item value
 
 
-updateMobileToggle : StateModel msg item columns -> Int -> ( State msg item columns, Effect msg )
+updateMobileToggle : StateModel msg item columns -> Int -> ( State msg item columns, Effects msg )
 updateMobileToggle state index =
     ( State
         { state
@@ -404,11 +404,11 @@ updateMobileToggle state index =
                 else
                     Just index
         }
-    , Effect.none
+    , Effects.none
     )
 
 
-updateFilters : StateModel msg item columns -> Filters.Msg -> ( State msg item columns, Effect msg )
+updateFilters : StateModel msg item columns -> Filters.Msg -> ( State msg item columns, Effects msg )
 updateFilters state subMsg =
     let
         map ( newFilters, { effects, closeDialog } ) =
@@ -428,7 +428,7 @@ updateFilters state subMsg =
                 |> map
 
         Nothing ->
-            ( State state, Effect.none )
+            ( State state, Effects.none )
 
 
 applyFilters : Filters msg item columns -> StateModel msg item columns -> State msg item columns
@@ -443,7 +443,7 @@ applyFilters newFilters state =
         }
 
 
-updateSorters : StateModel msg item columns -> Sorters.Msg -> ( State msg item columns, Effect msg )
+updateSorters : StateModel msg item columns -> Sorters.Msg -> ( State msg item columns, Effects msg )
 updateSorters state subMsg =
     case state.sorters of
         Just sorters ->
@@ -457,7 +457,7 @@ updateSorters state subMsg =
                    )
 
         Nothing ->
-            ( State state, Effect.none )
+            ( State state, Effects.none )
 
 
 applySorters : Sorters item columns -> StateModel msg item columns -> State msg item columns
@@ -473,7 +473,7 @@ applySorters newSorters state =
         }
 
 
-updateSelectionToggleAll : StateModel msg item columns -> ( State msg item columns, Effect msg )
+updateSelectionToggleAll : StateModel msg item columns -> ( State msg item columns, Effects msg )
 updateSelectionToggleAll state =
     let
         invertAll old =
@@ -495,11 +495,11 @@ updateSelectionToggleAll state =
             }
     in
     ( State { state | localSelection = Maybe.map invertAll state.localSelection }
-    , Effect.none
+    , Effects.none
     )
 
 
-updateSelectionSet : StateModel msg item columns -> item -> Bool -> ( State msg item columns, Effect msg )
+updateSelectionSet : StateModel msg item columns -> item -> Bool -> ( State msg item columns, Effects msg )
 updateSelectionSet state item value =
     let
         setItem old =
@@ -517,7 +517,7 @@ updateSelectionSet state item value =
             }
     in
     ( State { state | localSelection = Maybe.map setItem state.localSelection }
-    , Effect.none
+    , Effects.none
     )
 
 
@@ -569,7 +569,7 @@ type alias Responsive msg item columns =
 
 -}
 type alias Cover =
-    ListView.ToggleableCover
+    { title : String, caption : String }
 
 
 {-| Used to render a cell in the mobile's layout.
