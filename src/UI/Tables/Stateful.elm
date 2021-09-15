@@ -183,6 +183,7 @@ import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.Tables.Common exposing (..)
 import UI.Internal.Tables.Filters as Filters
 import UI.Internal.Tables.FiltersView as FiltersView
+import UI.Internal.Tables.ListView as ListView
 import UI.Internal.Tables.Sorters as Sorters exposing (Sorters)
 import UI.Internal.Tables.View exposing (..)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
@@ -569,7 +570,7 @@ type alias Responsive msg item columns =
 
 -}
 type alias Cover =
-    { title : String, caption : String }
+    { title : String, caption : Maybe String }
 
 
 {-| Used to render a cell in the mobile's layout.

@@ -7,7 +7,7 @@ import Element.Font as Font
 import Element.Keyed as Keyed
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (ifThenElse)
-import UI.Palette as Palette exposing (brightnessDarkest, brightnessLight, brightnessLighter, brightnessLightest, brightnessMiddle, toneGray, tonePrimary)
+import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text exposing (ellipsize)
@@ -107,16 +107,16 @@ toggleableCard =
 titleColor : Bool -> Palette.Color
 titleColor selected =
     if selected then
-        Palette.blue700 |> Palette.setContrasting True
+        Palette.genericWhite
 
     else
-        Palette.color toneGray brightnessDarkest
+        Palette.gray800
 
 
 captionColor : Bool -> Palette.Color
 captionColor selected =
     if selected then
-        Palette.color tonePrimary brightnessLighter
+        Palette.blue400
 
     else
         Palette.gray600
