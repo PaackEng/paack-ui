@@ -1,4 +1,4 @@
-module Main exposing (CompileNav, CompilerListView, main)
+module Main exposing (CompileNav, main)
 
 import Alerts
 import Badges

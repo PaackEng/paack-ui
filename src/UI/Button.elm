@@ -791,7 +791,7 @@ primaryTheme =
     { normal =
         { background = Palette.blue700
         , border = Palette.blue700
-        , text = Text.ColorPalette Palette.blue700
+        , text = Text.ColorPalette Palette.genericWhite
         }
     , hover =
         Just

@@ -65,10 +65,10 @@ mediumView renderConfig { filtersStories } =
             (Msg.FiltersStoriesMsg << Story.FilterMsg)
             filtersStories.demoFilter
             |> Filter.renderElement renderConfig
-        , ListView.simpleList identity
-            (always <| Element.el [ Element.padding 8 ] << Text.renderElement renderConfig << Text.body2)
-            |> ListView.withItems (Filter.getItems filtersStories.demoFilter)
-            |> ListView.renderElement renderConfig
+        , List.map
+            (Element.el [ Element.padding 8 ] << Text.renderElement renderConfig << Text.body2)
+            (Filter.getItems filtersStories.demoFilter)
+            |> Element.column [ Element.width fill ]
         ]
 
 
@@ -92,10 +92,11 @@ view renderConfig model =
             Msg.ForFilter
             model.demoFilter
             |> Filter.renderElement renderConfig
-        , ListView.simpleList identity
-            (always <| Text.renderElement renderConfig << Text.body2)
-            |> ListView.withItems (Filter.getItems model.demoFilter)
-            |> ListView.renderElement renderConfig
+        , List.map
+            (Text.renderElement renderConfig << Text.body2)
+            (Filter.getItems model.demoFilter)
+            |> Element.column [ Element.width fill ]
+
         ]
 """
 
@@ -121,10 +122,10 @@ smallView renderConfig { filtersStories } =
             filtersStories.demoFilter
             |> Filter.withSize Filter.sizeExtraSmall
             |> Filter.renderElement renderConfig
-        , ListView.simpleList identity
-            (always <| Element.el [ Element.padding 8 ] << Text.renderElement renderConfig << Text.body2)
-            |> ListView.withItems (Filter.getItems filtersStories.demoFilter)
-            |> ListView.renderElement renderConfig
+        , List.map
+            (Element.el [ Element.padding 8 ] << Text.renderElement renderConfig << Text.body2)
+            (Filter.getItems filtersStories.demoFilter)
+            |> Element.column [ Element.width fill ]
         ]
 
 
@@ -149,10 +150,11 @@ view renderConfig model =
             model.demoFilter
             |> Filter.withSize Filter.sizeExtraSmall
             |> Filter.renderElement renderConfig
-        , ListView.simpleList identity
-            (always <| Text.renderElement renderConfig << Text.body2)
-            |> ListView.withItems (Filter.getItems model.demoFilter)
-            |> ListView.renderElement renderConfig
+        , List.map
+            (Text.renderElement renderConfig << Text.body2)
+            (Filter.getItems model.demoFilter)
+            |> Element.column [ Element.width fill ]
+
         ]
 """
 

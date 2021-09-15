@@ -192,7 +192,7 @@ getBackgroundColor : AlertTone -> Palette.Color
 getBackgroundColor alertTone =
     case alertTone of
         ToneWarning ->
-            Palette.blue700
+            Palette.yellow500
 
         ToneDanger ->
             Palette.red700
