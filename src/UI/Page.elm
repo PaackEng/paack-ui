@@ -81,15 +81,16 @@ Example of usage:
 
 import Element exposing (Element, fill)
 import Html exposing (Html)
-import UI.Effect as Effect exposing (Effect)
+import UI.Dialog as Dialog exposing (Dialog)
+import UI.Effects as Effects exposing (Effects)
 import UI.Icon as Icon exposing (Icon)
+import UI.Internal.Dialog as Dialog
 import UI.Internal.Menu as Menu
 import UI.Internal.Page as Internal
 import UI.Internal.SideBar as SideBar
 import UI.Link exposing (Link)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Utils.Action as Action
-import UI.V2.Dialog as Dialog2
 
 
 
@@ -171,12 +172,12 @@ type alias PageRecord msg =
 {-| The `Nav.Navigator` handles menu, dialogs and page viewing.
 It must be initialized using [`Nav.navigator`](#navigator).
 -}
-type Navigator page msg
-    = Navigator (NavigatorRecord page msg)
+type Navigator pageSet msg
+    = Navigator (NavigatorRecord pageSet msg)
 
 
-type alias NavigatorRecord page msg =
-    { container : page -> Page msg
+type alias NavigatorRecord pageSet msg =
+    { container : pageSet -> Page msg
     , menu : Menu.Menu msg
     , sidebarStyle : SidebarStyle
     }
@@ -322,15 +323,36 @@ hideMenu =
 -- Helpers
 
 
+page : String -> PageBody msg -> Page msg
+page title content =
+    Page
+        { title = title
+        , content = content
+        , hasMenu = False
+        , dialog = Nothing
+        }
+
+
+pageWithDialog : Maybe (Dialog msg) -> Page msg -> Page msg
+pageWithDialog dialog (Page pageRecord) =
+    Page { pageRecord | dialog = dialog }
+
+
+pageWithDefaultMenu : Page msg -> Page msg
+pageWithDefaultMenu (Page pageRecord) =
+    Page { pageRecord | hasMenu = True }
+
+
 {-| Transform the messages produced by a container.
 -}
 pageMap : (a -> b) -> Page a -> Page b
-pageMap applier data =
-    { title = data.title
-    , hasMenu = data.hasMenu
-    , content = contentMap applier data.content
-    , dialog = Maybe.map (dialogMap applier) data.dialog
-    }
+pageMap applier (Page data) =
+    Page
+        { title = data.title
+        , hasMenu = data.hasMenu
+        , content = contentMap applier data.content
+        , dialog = Maybe.map (Dialog.map applier) data.dialog
+        }
 
 
 contentMap : (a -> b) -> PageBody a -> PageBody b
@@ -356,16 +378,16 @@ contentMap applier data =
 stateUpdate : Msg -> State -> ( State, Cmd Msg )
 stateUpdate msg state =
     stateUpdateWithoutPerform msg state
-        |> Tuple.mapSecond Effect.perform
+        |> Tuple.mapSecond Effects.perform
 
 
 {-| Similar to [`stateUpdate`], but using Effects.
 -}
-stateUpdateWithoutPerform : Msg -> State -> ( State, Effect Msg )
+stateUpdateWithoutPerform : Msg -> State -> ( State, Effects Msg )
 stateUpdateWithoutPerform msg (State state) =
     case msg of
         ToggleMenu newVal ->
-            ( State { state | menuExpanded = newVal }, Effect.none )
+            ( State { state | menuExpanded = newVal }, Effects.none )
 
 
 
@@ -471,54 +493,13 @@ The third (and last) parameter is a lambda used to obtain the current page's con
 navigator :
     (Msg -> msg)
     -> State
-    -> (page -> Page msg)
-    -> Navigator page msg
+    -> (pageSet -> Page msg)
+    -> Navigator pageSet msg
 navigator applier (State state) pagesPages =
     Navigator <|
         NavigatorRecord pagesPages
             (menu applier state)
             SidebarPersistent
-
-
-{-| `Nav.dialog` constructs a [`Nav.Dialog`](#Dialog) from a title, a close message, and the dialog's view.
-Note that the title renders inside the dialog's decoration, with a close button on the opposite side.
-
-This dialog and its decoration render over the current page's view, adding a transparent black layer between them.
-Clicking on the black layer also activates the closing message.
-
-    Nav.dialog
-        "Create a new card"
-        Msg.NewCardDiscard
-        (cardNewView model)
-
-**Note**: This is deprecated, use 'Nav.dialogV2' instead
-
--}
-dialog : String -> msg -> Element msg -> Dialog msg
-dialog title onClose body =
-    Dialog1
-        { title = title
-        , close = onClose
-        , body = body
-        }
-
-
-{-|
-
-    `Nav.dialogV2` constructs a [`Nav.Dialog`](#Dialog) from dialog v2.
-    This variant of the dialog does not require you to specify body at the time
-    of construction and you can specify it alongside buttons as an option
-    like this:
-
-    Dialogv2.dialog "An example dialog" Icon.warning closeMsg
-        |> Dialogv2.withBody (Element.text "Dialog body")
-        |> Dialogv2.withButtons [submitButton, cancleButton]
-        |> dialogV2
-
--}
-dialogV2 : Dialog2.Dialog msg -> Dialog msg
-dialogV2 dlg =
-    Dialog2 dlg
 
 
 
@@ -535,13 +516,13 @@ There is an additional parameter that is the page identifier, used to obtain the
 -}
 toBrowserDocument :
     RenderConfig
-    -> page
-    -> Navigator page msg
+    -> pageSet
+    -> Navigator pageSet msg
     -> { body : List (Html msg), title : String }
-toBrowserDocument cfg page (Navigator model) =
+toBrowserDocument cfg pageItem (Navigator model) =
     let
-        container =
-            model.container page
+        (Page container) =
+            model.container pageItem
 
         { content, title, hasMenu } =
             container
@@ -571,12 +552,8 @@ toBrowserDocument cfg page (Navigator model) =
 
         dialogView =
             case container.dialog of
-                Just (Dialog1 dialogState) ->
-                    Dialog1.view cfg dialogState
-
-                Just (Dialog2 dialogState) ->
-                    dialogState
-                        |> dialogViewV2 cfg
+                Just dialog ->
+                    Dialog.dialogView cfg dialog
 
                 Nothing ->
                     Element.none
@@ -621,13 +598,3 @@ contentProps mainTitle content =
 
         Internal.PageBodyStack { title, goBackMsg, action } body ->
             ( body, Just ( goBackMsg, action ), title )
-
-
-dialogMap : (a -> b) -> Dialog a -> Dialog b
-dialogMap applier dlg =
-    case dlg of
-        Dialog1 dialogState ->
-            Dialog1 <| Dialog1.dialogMap applier dialogState
-
-        Dialog2 dialogState ->
-            Dialog2 <| Dialog2.map applier dialogState

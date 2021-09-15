@@ -12,7 +12,7 @@ module UI.Internal.Tables.Sorters exposing
     , update
     )
 
-import UI.Effect as Effect exposing (Effect)
+import UI.Effects as Effects exposing (Effects)
 import UI.Internal.Analytics as Analytics
 import UI.Internal.Filter.Sorter as Sorter exposing (Sorter, SortingDirection(..))
 import UI.Internal.NArray as NArray exposing (NArray)
@@ -39,7 +39,7 @@ type alias ColumnStatus item =
     Maybe ( Maybe SortingDirection, Sorter item )
 
 
-update : Msg -> Sorters item columns -> ( Sorters item columns, Effect msg )
+update : Msg -> Sorters item columns -> ( Sorters item columns, Effects msg )
 update msg sorters =
     case msg of
         SetSorting index direction ->
@@ -50,14 +50,14 @@ update msg sorters =
             ( sort direction index sorters
             , Analytics.SetSorting index reverse
                 |> Analytics.TableAnalytics
-                |> Effect.analytics
+                |> Effects.analytics
             )
 
         ClearSorting ->
             ( clear sorters
             , Analytics.ClearSorting
                 |> Analytics.TableAnalytics
-                |> Effect.analytics
+                |> Effects.analytics
             )
 
 

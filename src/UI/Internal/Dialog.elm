@@ -1,9 +1,10 @@
-module UI.Internal.DialogV2 exposing (dialogViewV2)
+module UI.Internal.Dialog exposing (dialogView)
 
 import Element exposing (Element, fill, shrink)
 import Element.Border as Border
 import Element.Events as Events
 import UI.Button as Button exposing (Button)
+import UI.Dialog as Dialog
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Colors exposing (mainBackground, overlayBackground)
 import UI.Internal.RenderConfig exposing (RenderConfig)
@@ -13,11 +14,10 @@ import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
 import UI.Utils.Element exposing (RectangleSides)
-import UI.V2.Dialog as Dialog
 
 
-dialogViewV2 : RenderConfig -> Dialog.Dialog msg -> Element msg
-dialogViewV2 cfg ((Dialog.Dialog _ { overlayClickCloseMsg }) as dlg) =
+dialogView : RenderConfig -> Dialog.Dialog msg -> Element msg
+dialogView cfg ((Dialog.Dialog _ { overlayClickCloseMsg }) as dlg) =
     if RenderConfig.isMobile cfg then
         viewWithOverlay
             { top = 0, bottom = 0, left = 20, right = 20 }
@@ -32,7 +32,7 @@ dialogViewV2 cfg ((Dialog.Dialog _ { overlayClickCloseMsg }) as dlg) =
 
 
 viewWithOverlay : RectangleSides -> Maybe msg -> Element msg -> Element msg
-viewWithOverlay padding overlayClickCloseMsg dialogView =
+viewWithOverlay padding overlayClickCloseMsg dialogElement =
     Element.el
         [ Element.width fill
         , Element.height fill
@@ -40,7 +40,7 @@ viewWithOverlay padding overlayClickCloseMsg dialogView =
         , Element.paddingEach padding
         , zIndex 20
         ]
-        dialogView
+        dialogElement
 
 
 desktopDialogView : RenderConfig -> Dialog.Dialog msg -> Element msg
@@ -156,7 +156,7 @@ titleText cfg title =
 
 headerColor : Palette.Color
 headerColor =
-    Palette.color Palette.toneGray Palette.brightnessMiddle
+    Palette.gray700
 
 
 {-| Making overlay part of the dialog since it is almost always used with it and

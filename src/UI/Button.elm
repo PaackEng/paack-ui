@@ -478,7 +478,7 @@ hyperlinkView cfg size width body action =
     let
         attrs =
             buttonWidth width
-                :: (Palette.color tonePrimary brightnessMiddle
+                :: (Palette.blue700
                         |> Palette.toElementColor
                         |> Font.color
                    )
@@ -701,20 +701,18 @@ toggleTheme current =
 
         else
             { normal =
-                { background =
-                    Palette.color Palette.tonePrimary brightnessMiddle
-                        |> Palette.setContrasting True
-                , border = Palette.color Palette.tonePrimary brightnessMiddle
+                { background = Palette.genericWhite
+                , border = Palette.blue700
                 , text =
-                    Palette.color Palette.tonePrimary brightnessMiddle
+                    Palette.blue700
                         |> Text.ColorPalette
                 }
             , hover =
                 Just
-                    { background = Palette.color Palette.tonePrimary brightnessLightest
-                    , border = Palette.color Palette.tonePrimary brightnessDarkest
+                    { background = Palette.blue200
+                    , border = Palette.blue800
                     , text =
-                        Palette.color Palette.tonePrimary brightnessDarkest
+                        Palette.blue800
                             |> Text.ColorPalette
                     }
             }
@@ -729,61 +727,49 @@ workingTheme tone =
 
             ToneDanger ->
                 { normal =
-                    { background = Palette.color Palette.toneDanger brightnessMiddle
-                    , border = Palette.color Palette.toneDanger brightnessMiddle
-                    , text =
-                        Palette.color Palette.toneDanger brightnessMiddle
-                            |> Palette.setContrasting True
-                            |> Text.ColorPalette
+                    { background = Palette.red600
+                    , border = Palette.red600
+                    , text = Text.ColorPalette Palette.genericWhite
                     }
                 , hover =
                     Just
-                        { background = Palette.color Palette.toneDanger brightnessDarkest
-                        , border = Palette.color Palette.toneDanger brightnessDarkest
-                        , text =
-                            Palette.color Palette.toneDanger brightnessDarkest
-                                |> Palette.setContrasting True
-                                |> Text.ColorPalette
+                        { background = Palette.red700
+                        , border = Palette.red700
+                        , text = Text.ColorPalette Palette.genericWhite
                         }
                 }
 
             ToneLight ->
                 { normal =
-                    { background = Palette.color Palette.toneGray brightnessLightest
-                    , border = Palette.color Palette.toneGray brightnessLightest
+                    { background = Palette.gray200
+                    , border = Palette.gray200
                     , text =
-                        Palette.color Palette.tonePrimary brightnessMiddle
+                        Palette.blue700
                             |> Text.ColorPalette
                     }
                 , hover =
                     Just
-                        { background = Palette.color Palette.toneGray brightnessLighter
-                        , border = Palette.color Palette.toneGray brightnessLighter
-                        , text =
-                            Palette.color Palette.tonePrimary brightnessDarkest
-                                |> Text.ColorPalette
+                        { background = Palette.gray300
+                        , border = Palette.gray300
+                        , text = Text.ColorPalette Palette.blue800
                         }
                 }
 
             ToneClear ->
                 { normal =
                     { background =
-                        Palette.color Palette.tonePrimary brightnessMiddle
+                        Palette.blue700
                             |> Palette.withAlpha 0
                     , border =
-                        Palette.color Palette.tonePrimary brightnessMiddle
+                        Palette.blue700
                             |> Palette.withAlpha 0
-                    , text =
-                        Palette.color Palette.tonePrimary brightnessMiddle
-                            |> Text.ColorPalette
+                    , text = Text.ColorPalette Palette.blue700
                     }
                 , hover =
                     Just
-                        { background = Palette.color Palette.toneGray brightnessLightest
-                        , border = Palette.color Palette.toneGray brightnessLightest
-                        , text =
-                            Palette.color Palette.tonePrimary brightnessMiddle
-                                |> Text.ColorPalette
+                        { background = Palette.gray200
+                        , border = Palette.gray200
+                        , text = Text.ColorPalette Palette.blue700
                         }
                 }
 
@@ -792,12 +778,9 @@ disabledTheme : List (Attribute msg)
 disabledTheme =
     themeToAttributes <|
         { normal =
-            { background = Palette.color Palette.toneGray brightnessLight
-            , border = Palette.color Palette.toneGray brightnessLight
-            , text =
-                Palette.color Palette.toneGray brightnessLight
-                    |> Palette.setContrasting True
-                    |> Text.ColorPalette
+            { background = Palette.gray600
+            , border = Palette.gray600
+            , text = Text.ColorPalette Palette.genericWhite
             }
         , hover = Nothing
         }
@@ -806,20 +789,14 @@ disabledTheme =
 primaryTheme : ButtonTheme
 primaryTheme =
     { normal =
-        { background = Palette.color Palette.tonePrimary brightnessMiddle
-        , border = Palette.color Palette.tonePrimary brightnessMiddle
-        , text =
-            Palette.color Palette.tonePrimary brightnessMiddle
-                |> Palette.setContrasting True
-                |> Text.ColorPalette
+        { background = Palette.blue700
+        , border = Palette.blue700
+        , text = Text.ColorPalette Palette.blue700
         }
     , hover =
         Just
-            { background = Palette.color Palette.tonePrimary brightnessDarkest
-            , border = Palette.color Palette.tonePrimary brightnessDarkest
-            , text =
-                Palette.color Palette.tonePrimary brightnessDarkest
-                    |> Palette.setContrasting True
-                    |> Text.ColorPalette
+            { background = Palette.blue800
+            , border = Palette.blue800
+            , text = Text.ColorPalette Palette.blue800
             }
     }

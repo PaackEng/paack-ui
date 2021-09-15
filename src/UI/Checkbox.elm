@@ -198,12 +198,7 @@ boxCheck renderConfig =
     (renderConfig |> localeTerms >> .checkbox >> .toggle)
         |> Icon.check
         |> Icon.withCustomSize 14
-        |> Icon.withColor
-            (Palette.color
-                Palette.tonePrimary
-                Palette.brightnessMiddle
-                |> Palette.setContrasting True
-            )
+        |> Icon.withColor Palette.genericWhite
         |> Icon.renderElement renderConfig
         |> Element.el
             [ Element.centerY

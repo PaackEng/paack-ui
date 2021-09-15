@@ -48,7 +48,7 @@ import Element.Font as Font
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.Size exposing (Size(..))
-import UI.Palette as Palette exposing (brightnessLight, toneGray)
+import UI.Palette as Palette
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UI.Utils.Element as Element
@@ -217,7 +217,7 @@ renderElement renderConfig component =
         ]
         [ icon title
             |> Icon.withCustomSize iconSize
-            |> Icon.withColor (Palette.color toneGray brightnessLight)
+            |> Icon.withColor Palette.gray600
             |> Icon.renderElement renderConfig
             |> Element.el
                 [ Element.centerX

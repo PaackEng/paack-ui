@@ -71,8 +71,8 @@ type alias Options =
     { current : Int }
 
 
-type Paginator
-    = NonNumeric Properties Options
+type Paginator msg
+    = NonNumeric (Properties msg) Options
 
 
 {-| This paginator style has a label, followed by the previous and next buttons.
@@ -80,28 +80,41 @@ type Paginator
 The label looks like: {{current + 1}} - {{min (pageAmount + current) max)}} of {{max}}
 
     Paginator.nonNumeric
-        paginatorConfig
+        { onForwardClicked = Msg.Forward
+        , onPreviousClicked = Msg.Previous
+        , totalAmount = 999
+        , pageAmount = 10
+        }
         renderConfig
 
 -}
-nonNumeric : Paginator msg
-nonNumeric =
-    NonNumeric
+nonNumeric :
+    { onForwardClicked : msg
+    , onPreviousClicked : msg
+    , totalAmount : Int
+    , pageAmount : Int
+    }
+    -> Paginator msg
+nonNumeric prop =
+    NonNumeric prop { current = 0 }
 
 
 withCurrentItem : Int -> Paginator msg -> Paginator msg
 withCurrentItem value (NonNumeric prop opt) =
-    nonNumeric prop { opt | current = value }
+    NonNumeric prop { opt | current = value }
 
 
 withCurrentPage : Int -> Paginator msg -> Paginator msg
 withCurrentPage pageNumber (NonNumeric prop opt) =
-    nonNumeric prop { opt | current = pageNumber * pageAmount }
+    NonNumeric prop { opt | current = pageNumber * prop.pageAmount }
 
 
 renderElement : RenderConfig -> Paginator msg -> Element msg
 renderElement renderConfig (NonNumeric prop { current }) =
     let
+        { pageAmount, totalAmount } =
+            prop
+
         currentItemCount =
             pageAmount
                 + 1
@@ -127,7 +140,7 @@ renderElement renderConfig (NonNumeric prop { current }) =
     Element.row
         []
         [ paginatorsTerms.format
-            { current = currentItemCount
+            { first = currentItemCount
             , last = lastItemCount
             , total = String.fromInt totalAmount
             }
@@ -138,7 +151,7 @@ renderElement renderConfig (NonNumeric prop { current }) =
                     { zeroPadding | right = 80 }
                 , Element.width fill
                 ]
-        , button paginator.onPreviousClicked
+        , button prop.onPreviousClicked
             noPrevious
             (Icon.previousContent paginatorsTerms.previous)
             |> Button.renderElement renderConfig
@@ -146,7 +159,7 @@ renderElement renderConfig (NonNumeric prop { current }) =
                 [ Element.paddingEach
                     { zeroPadding | right = 8 }
                 ]
-        , button paginator.onForwardClicked
+        , button prop.onForwardClicked
             noNext
             (Icon.nextContent paginatorsTerms.next)
             |> Button.renderElement renderConfig

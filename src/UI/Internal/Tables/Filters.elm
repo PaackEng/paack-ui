@@ -1,6 +1,6 @@
 module UI.Internal.Tables.Filters exposing (..)
 
-import UI.Effect as Effect exposing (Effect)
+import UI.Effects as Effects exposing (Effects)
 import UI.Internal.Analytics as Analytics
 import UI.Internal.Basics exposing (flip)
 import UI.Internal.Filter.Model exposing (Filter, filterGet)
@@ -56,7 +56,7 @@ push newValue model =
 
 
 type alias OutMsg msg =
-    { effects : Effect msg
+    { effects : Effects msg
     , closeDialog : Bool
     }
 
@@ -72,18 +72,18 @@ update (FilterMsg column subMsg) model =
                 newEffects =
                     case outMsg.registerAnalytics of
                         Just Filter.Applied ->
-                            Effect.batch
+                            Effects.batch
                                 [ Analytics.ApplyFilter column
                                     |> Analytics.TableAnalytics
-                                    |> Effect.analytics
+                                    |> Effects.analytics
                                 , outMsg.effects
                                 ]
 
                         Just Filter.Cleared ->
-                            Effect.batch
+                            Effects.batch
                                 [ Analytics.ClearFilter column
                                     |> Analytics.TableAnalytics
-                                    |> Effect.analytics
+                                    |> Effects.analytics
                                 , outMsg.effects
                                 ]
 
@@ -93,7 +93,7 @@ update (FilterMsg column subMsg) model =
             ( set column newFilter model, { effects = newEffects, closeDialog = outMsg.closeDialog } )
 
         Nothing ->
-            ( model, { effects = Effect.none, closeDialog = False } )
+            ( model, { effects = Effects.none, closeDialog = False } )
 
 
 

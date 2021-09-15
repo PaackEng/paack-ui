@@ -7,7 +7,7 @@ import UI.Icon as Icon
 import UI.Internal.Clickable as Clickable
 import UI.Internal.Colors as Colors
 import UI.Internal.RenderConfig exposing (localeTerms)
-import UI.Palette as Palette exposing (brightnessMiddle, toneGray)
+import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text exposing (ellipsize)
@@ -96,7 +96,7 @@ renderAction renderConfig action =
             (Icon.withSize
                 Size.medium
                 >> Icon.withColor
-                    (Palette.color toneGray brightnessMiddle)
+                    Palette.gray700
             )
         |> Clickable.actionIcon renderConfig
             [ Element.padding 8

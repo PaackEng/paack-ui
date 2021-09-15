@@ -128,7 +128,12 @@ The second is the message triggered when there is a selection.
         Radio.group "Pick a card" Msg.CardPicking
 
 -}
-group : Properties option msg -> RadioGroup option msg
+group :
+    { label : String
+    , onSelectMsg : String -> option -> msg
+    , idPrefix : String
+    }
+    -> RadioGroup option msg
 group props =
     RadioGroup props
         { selected = Nothing

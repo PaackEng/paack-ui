@@ -173,7 +173,7 @@ import Element.Keyed as Keyed
 import Set exposing (Set)
 import Time
 import UI.Checkbox as Checkbox exposing (checkbox)
-import UI.Effect as Effect exposing (Effect)
+import UI.Effects as Effects exposing (Effects)
 import UI.Internal.Basics exposing (ifThenElse, maybeThen, prependMaybe)
 import UI.Internal.DateInput as DateInput exposing (DateInput, PeriodDate, RangeDate)
 import UI.Internal.Filter.Model as Filter
@@ -185,7 +185,6 @@ import UI.Internal.Tables.Filters as Filters
 import UI.Internal.Tables.FiltersView as FiltersView
 import UI.Internal.Tables.Sorters as Sorters exposing (Sorters)
 import UI.Internal.Tables.View exposing (..)
-import UI.ListView as ListView
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Tables.Common as Common exposing (..)
 import UI.Utils.TypeNumbers as T

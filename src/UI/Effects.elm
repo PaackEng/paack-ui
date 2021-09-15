@@ -1,4 +1,4 @@
-module UI.Effect exposing
+module UI.Effects exposing
     ( Effects, SideEffect(..), none, batch, msgToCmd, analytics, domFocus
     , map, perform
     )

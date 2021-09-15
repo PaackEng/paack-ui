@@ -29,7 +29,7 @@ import UI.Internal.Nav.StackHeader as StackHeader
 import UI.Internal.Primitives as Primitives
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Link as Link exposing (Link)
-import UI.Palette as Palette exposing (brightnessLight, brightnessMiddle, toneGray, tonePrimary)
+import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
@@ -98,7 +98,7 @@ sidebarOverlay (Menu.Menu prop _) =
     Element.el
         (width fill
             :: height fill
-            :: (Palette.black
+            :: (Palette.genericBlack
                     |> Palette.toElementColor
                     |> Background.color
                )
@@ -200,7 +200,7 @@ viewSide cfg config (Menu.Menu prop opt) =
                 headerView cfg toggleMsg opt.logo
 
             else
-                slimHeaderView cfg toggleMsg Palette.grayLight1
+                slimHeaderView cfg toggleMsg Palette.gray600
     in
     Element.column
         [ height fill
@@ -253,7 +253,7 @@ headerView cfg toggleMsg logo =
             (cfg |> localeTerms >> .sidebar >> .collapse)
                 |> Icon.close
                 |> Icon.withSize Size.small
-                |> Icon.withColor (Palette.color toneGray brightnessLight)
+                |> Icon.withColor Palette.gray600
                 |> Icon.renderElement cfg
                 |> Element.el (headerButtonAttr toggleMsg)
     in
@@ -351,7 +351,7 @@ selectedItemOutline isSelected =
             ]
 
         selectedColor =
-            Palette.primaryLight3 |> Palette.toElementColor
+            Palette.blue200 |> Palette.toElementColor
 
         attrs =
             if isSelected then
@@ -368,7 +368,7 @@ pageItem : RenderConfig -> Icon -> Link -> Bool -> Element msg
 pageItem cfg icon link isSelected =
     let
         textColor =
-            Palette.color tonePrimary brightnessMiddle
+            Palette.blue700
     in
     selectedItemOutline
         isSelected
@@ -389,7 +389,7 @@ slimPageItem : RenderConfig -> Icon -> Link -> Bool -> Element msg
 slimPageItem cfg icon link isSelected =
     icon
         |> Icon.withSize Size.small
-        |> Icon.withColor Palette.primary
+        |> Icon.withColor Palette.blue700
         |> Icon.renderElement cfg
         |> Element.el [ Font.center ]
         |> List.singleton
@@ -410,12 +410,12 @@ actionItem cfg icon msg =
     Element.row attrs
         [ icon
             |> Icon.withSize Size.small
-            |> Icon.withColor (Palette.color tonePrimary brightnessMiddle)
+            |> Icon.withColor Palette.blue700
             |> Icon.renderElement cfg
             |> Element.el [ Font.center ]
         , Icon.getHint icon
             |> Text.body1
-            |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
+            |> Text.withColor Palette.blue700
             |> Text.renderElement cfg
         ]
 
@@ -424,7 +424,7 @@ slimActionItem : RenderConfig -> Icon -> msg -> Element msg
 slimActionItem cfg icon msg =
     icon
         |> Icon.withSize Size.small
-        |> Icon.withColor Palette.primary
+        |> Icon.withColor Palette.blue700
         |> Icon.renderElement cfg
         |> Element.el
             (Element.pointer

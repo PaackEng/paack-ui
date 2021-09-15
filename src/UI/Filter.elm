@@ -118,7 +118,7 @@ There is also the possibility to create a custom filter, where you set the sorti
 import Element exposing (Element)
 import Time
 import UI.Button exposing (Button)
-import UI.Effect as Effect exposing (Effect)
+import UI.Effects as Effects exposing (Effects)
 import UI.Internal.Filter.Model as Internal
 import UI.Internal.Filter.Msg as Internal
 import UI.Internal.Filter.Sorter as Sorter
@@ -277,7 +277,7 @@ appliedHeader label clearMsg =
 
 {-| A classic update function.
 -}
-update : (FilterMsg -> msg) -> FilterMsg -> FilterModel msg item -> ( FilterModel msg item, Effect msg )
+update : (FilterMsg -> msg) -> FilterMsg -> FilterModel msg item -> ( FilterModel msg item, Effects msg )
 update toExternalMsg msg (FilterModel ({ filter, items } as model)) =
     case msg of
         FilterMsg subMsg ->
@@ -299,7 +299,7 @@ update toExternalMsg msg (FilterModel ({ filter, items } as model)) =
                 effects =
                     case outMsg.focusElement of
                         Just focusElement ->
-                            Effect.batch [ outMsg.effects, Effect.domFocus (Internal.DomFocusResult >> FilterMsg >> toExternalMsg) focusElement ]
+                            Effects.batch [ outMsg.effects, Effects.domFocus (Internal.DomFocusResult >> FilterMsg >> toExternalMsg) focusElement ]
 
                         Nothing ->
                             outMsg.effects
@@ -316,12 +316,12 @@ update toExternalMsg msg (FilterModel ({ filter, items } as model)) =
                         model.sorting
             in
             ( FilterModel { model | sorting = newSorting, result = Internal.apply filter newSorting items, isOpen = False }
-            , Effect.none
+            , Effects.none
             )
 
         SetOpen newState ->
             ( FilterModel { model | isOpen = newState }
-            , Effect.none
+            , Effects.none
             )
 
 

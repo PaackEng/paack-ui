@@ -1,13 +1,13 @@
 module UI.Internal.Filter.Update exposing (Analytics(..), OutMsg, apply, emptyOutMsg, update)
 
-import UI.Effect as Effect exposing (Effect)
+import UI.Effects as Effects exposing (Effects)
 import UI.Internal.Filter.Model exposing (..)
 import UI.Internal.Filter.Msg exposing (Msg(..))
 import UI.Internal.Filter.Sorter as Sorter
 
 
 type alias OutMsg msg =
-    { effects : Effect msg
+    { effects : Effects msg
     , closeDialog : Bool
     , registerAnalytics : Maybe Analytics
     , focusElement : Maybe String
@@ -77,12 +77,12 @@ update msg model =
 
 emptyOutMsg : OutMsg msg
 emptyOutMsg =
-    { effects = Effect.none, closeDialog = False, registerAnalytics = Nothing, focusElement = Nothing }
+    { effects = Effects.none, closeDialog = False, registerAnalytics = Nothing, focusElement = Nothing }
 
 
 focusElementOutMsg : String -> OutMsg msg
 focusElementOutMsg element =
-    { effects = Effect.none, closeDialog = False, registerAnalytics = Nothing, focusElement = Just element }
+    { effects = Effects.none, closeDialog = False, registerAnalytics = Nothing, focusElement = Just element }
 
 
 dispatchApply : Strategy msg value item -> value -> Filter msg item -> ( Filter msg item, OutMsg msg )
@@ -95,7 +95,7 @@ dispatchApply strategy value newModel =
 
         Remote { applyMsg } ->
             ( newModel
-            , { effects = Effect.msgToCmd <| applyMsg value
+            , { effects = Effects.msgToCmd <| applyMsg value
               , closeDialog = True
               , registerAnalytics = Just Applied
               , focusElement = Nothing
@@ -113,7 +113,7 @@ dispatchClear strategy newModel =
 
         Remote { clearMsg } ->
             ( newModel
-            , { effects = Effect.msgToCmd clearMsg
+            , { effects = Effects.msgToCmd clearMsg
               , closeDialog = True
               , registerAnalytics = Just Cleared
               , focusElement = Nothing

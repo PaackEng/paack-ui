@@ -174,25 +174,34 @@ defaultOptions =
 
 getTextColor : AlertTone -> Palette.Color
 getTextColor alertTone =
-    alertTone
-        |> getBackgroundColor
-        |> Palette.setContrasting True
+    case alertTone of
+        ToneWarning ->
+            Palette.genericBlack
+
+        ToneDanger ->
+            Palette.genericWhite
+
+        TonePrimary ->
+            Palette.genericWhite
+
+        ToneSuccess ->
+            Palette.genericBlack
 
 
 getBackgroundColor : AlertTone -> Palette.Color
 getBackgroundColor alertTone =
     case alertTone of
         ToneWarning ->
-            Palette.color toneWarning brightnessMiddle
+            Palette.blue700
 
         ToneDanger ->
-            Palette.color toneDanger brightnessMiddle
+            Palette.red700
 
         TonePrimary ->
-            Palette.color tonePrimary brightnessMiddle
+            Palette.blue700
 
         ToneSuccess ->
-            Palette.color toneSuccess brightnessMiddle
+            Palette.green500
 
 
 icon : RenderConfig -> AlertTone -> Palette.Color -> Element msg

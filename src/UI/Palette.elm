@@ -6,6 +6,7 @@ module UI.Palette exposing
     , Hue, hueBlue, hueGray, hueGreen, hueRed, hueYellow
     , Shade, shade100, shade200, shade300, shade400, shade500, shade600, shade700, shade800
     , Color, color, toBackgroundColor, toFontColor, toBorderColor
+    , genericBlack, genericWhite, genericSkyBlue
     , withAlpha
     , toElementColor, toCssColor
     )
@@ -37,6 +38,11 @@ module UI.Palette exposing
 # Building
 
 @docs Color, color, toBackgroundColor, toFontColor, toBorderColor
+
+
+# Generic colors
+
+@docs genericBlack, genericWhite, genericSkyBlue
 
 
 # Making it transparent
@@ -196,7 +202,7 @@ toBorderColor =
 
     let
         backgroundColor =
-            Palette.color tonePrimary brightnessMiddle
+            Palette.blue700
     in
     Element.el
         [ backgroundColor

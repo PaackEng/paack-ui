@@ -74,7 +74,7 @@ detailItem renderConfig ( label, content ) =
     , Element.column indentedDetailItemAttributes
         [ label
             |> Text.overline
-            |> Text.withColor (Palette.color toneGray brightnessLight)
+            |> Text.withColor Palette.gray600
             |> Text.withOverflow ellipsize
             |> Text.renderElement renderConfig
         , content
@@ -86,7 +86,7 @@ indentedDetailItemAttributes : List (Attribute msg)
 indentedDetailItemAttributes =
     [ Element.paddingEach { zeroPadding | left = 8 }
     , Border.widthEach { zeroPadding | left = 2 }
-    , Palette.color tonePrimary brightnessMiddle
+    , Palette.blue700
         |> Palette.toElementColor
         |> Border.color
     , Element.width fill
@@ -96,7 +96,7 @@ indentedDetailItemAttributes =
 toggleableCard : List (Attribute msg)
 toggleableCard =
     [ Element.paddingEach { top = 16, bottom = 19, left = 28, right = 20 }
-    , Palette.color toneGray brightnessLightest
+    , Palette.gray200
         |> Palette.toElementColor
         |> Background.color
     , Element.width fill
@@ -107,7 +107,7 @@ toggleableCard =
 titleColor : Bool -> Palette.Color
 titleColor selected =
     if selected then
-        Palette.color tonePrimary brightnessMiddle |> Palette.setContrasting True
+        Palette.blue700 |> Palette.setContrasting True
 
     else
         Palette.color toneGray brightnessDarkest
@@ -119,7 +119,7 @@ captionColor selected =
         Palette.color tonePrimary brightnessLighter
 
     else
-        Palette.color toneGray brightnessLight
+        Palette.gray600
 
 
 coverView : RenderConfig -> Cover -> Bool -> Element msg

@@ -760,7 +760,7 @@ inputLabel cfg label labelVisible =
     if labelVisible then
         Text.caption label
             |> Text.withColor
-                (Palette.color toneGray brightnessMiddle)
+                Palette.gray700
             |> Text.renderElement cfg
             |> Input.labelAbove
                 [ Element.paddingEach
@@ -799,7 +799,7 @@ textFieldError cfg errorCaption inputElement =
                 , caption
                     |> Text.caption
                     |> Text.withColor
-                        (Palette.color toneDanger brightnessDarkest)
+                        Palette.red700
                     |> Text.renderElement cfg
                 ]
 
