@@ -84,37 +84,31 @@ Also, it can optionally filter when having a search bar, and add an action bar.
 
 -}
 
-import Element exposing (Element, fill, shrink)
+import Element exposing (Attribute, Element, fill, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
 import Element.Keyed as Keyed
 import UI.Badge as Badge exposing (Badge)
-import UI.Button as Button exposing (Button)
 import UI.Checkbox as Checkbox
 import UI.Filter as Filter exposing (Filter)
 import UI.Icon as Icon
-import UI.Internal.Basics exposing (maybeAnd, prependMaybe)
-import UI.Internal.Clickable as Clickable
+import UI.Internal.Basics exposing (ifThenElse, maybeAnd, prependMaybe)
 import UI.Internal.Colors as Colors
 import UI.Internal.RenderConfig exposing (localeTerms)
-import UI.Internal.Size as Size
-import UI.Internal.ToggleableList as ToggleableList
 import UI.Internal.Utils.Element as Element
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
-import UI.Text as Text
+import UI.Text as Text exposing (ellipsize)
 import UI.TextField as TextField
-import UI.Utils.Action as Action
 import UI.Utils.Element exposing (zeroPadding)
 
 
 type alias Options object msg =
     { items : List object
     , searchField : Maybe (SearchConfig object msg)
-    , actions : Maybe (Actions msg)
     , select : Maybe (object -> msg)
     , isSelected : Maybe (object -> Bool)
     , width : Element.Length
@@ -122,7 +116,6 @@ type alias Options object msg =
     , containerId : Maybe String
     , header : Maybe String
     , headerBadge : Maybe Badge
-    , dropdown : Maybe (Dropdown msg)
     , selectAll : Maybe (SelectAll msg)
     , filter : Maybe (Filter msg)
     }
@@ -190,71 +183,21 @@ type alias SelectStyle =
 
 -}
 type alias ToggleableConfig object msg =
-    ToggleableList.Config object msg
-
-
-{-| What is displayed in a collapsed toggleable-list.
-
-    { title = "Some item"
-    , caption = Just "Created at 2020-06-10"
+    { detailsShowLabel : String
+    , detailsCollapseLabel : String
+    , toCover : object -> Cover
+    , toDetails : object -> List ( String, Element msg )
+    , selectMsg : object -> msg
+    , toKey : object -> String
     }
 
--}
-type alias ToggleableCover =
-    ToggleableList.Cover
 
-
-type alias Dropdown msg =
-    { toggleMsg : msg, isEnabled : Bool, body : DropdownBody msg }
-
-
-type DropdownBody msg
-    = CustomDropdown (Element msg)
-
-
-type Actions msg
-    = Action (Action.WithIcon msg)
-    | ButtonRow (List (Button msg))
-    | ButtonColumn (List (Button msg))
+type alias Cover =
+    { title : String, caption : Maybe String }
 
 
 
 -- Constructor
-
-
-{-| The main variation of `UI.ListView`.
-Click an element, and it will be selected.
-
-    ListView.selectList Msg.SelectElement
-        (\{ name } ->
-            Element.el [ Element.padding 8 ]
-                (Element.text name)
-        )
-
--}
-selectList :
-    (object -> msg)
-    -> (object -> String)
-    -> (Bool -> object -> Element msg)
-    -> ListView object msg
-selectList selectMsg toKey renderItem =
-    simpleList toKey renderItem
-        |> withSelect selectMsg
-
-
-{-| A `UI.ListView` without built-in selection support.
-
-    ListView.simpleList
-        (\{ name } ->
-            Element.el [ Element.padding 8 ]
-                (Element.text name)
-        )
-
--}
-simpleList : (object -> String) -> (Bool -> object -> Element msg) -> ListView object msg
-simpleList toKey renderItem =
-    SelectList (Properties toKey (always renderItem))
-        defaultOptions
 
 
 {-| Toggleable-lists are a variation of select-lists where the selected element expands with details while all other's details keep collapsed.
@@ -284,109 +227,58 @@ toggleableList config =
     let
         toggleableItemView parentCfg selected item =
             if selected then
-                ToggleableList.selectedRow parentCfg config item
+                selectedRow parentCfg config item
 
             else
-                ToggleableList.defaultRow parentCfg config selected item
+                defaultRow parentCfg config selected item
     in
     defaultOptions
         |> SelectList (Properties config.toKey toggleableItemView)
         |> withSelect config.selectMsg
 
 
+defaultRow : RenderConfig -> ToggleableConfig object msg -> Bool -> object -> Element msg
+defaultRow renderConfig config selected object =
+    Element.row
+        [ Element.width fill
+        , Element.paddingEach { top = 11, bottom = 11, left = 28, right = 12 }
+        , Element.height Element.shrink
+        ]
+        [ coverView renderConfig (config.toCover object) selected
+            |> Element.el
+                [ Element.width fill
+                , Element.centerY
+                , Element.clipX
+                , Element.paddingXY 0 5
+                ]
+        , ifThenElse selected
+            (Icon.toggleUp config.detailsCollapseLabel)
+            (Icon.toggleDown config.detailsShowLabel)
+            |> Icon.withSize Size.large
+            |> Icon.withColor (titleColor selected)
+            |> Icon.renderElement renderConfig
+            |> Element.el
+                [ Font.center
+                , Element.width (px 32)
+                , Element.paddingXY 0 6
+                , Element.centerY
+                ]
+        ]
+
+
+selectedRow : RenderConfig -> ToggleableConfig object msg -> object -> Element msg
+selectedRow renderConfig config object =
+    Element.column [ Element.width fill ]
+        [ defaultRow renderConfig config True object
+        , object
+            |> config.toDetails
+            |> List.map (detailItem renderConfig)
+            |> Keyed.column toggleableCard
+        ]
+
+
 
 -- Options
-
-
-{-| Replaces the component's action-bar.
-An action-bar is an additional pre-styled stick row that, when clicked, triggers an action.
-
-    ListView.withActionBar
-        { label = "Create new element"
-        , icon = Icon.add
-        , onClick =
-            Msg.UuidGen (Msg.ForDialog << DialogMsg.OpenElementCreation)
-        }
-        someListView
-
--}
-withActionBar :
-    Action.WithIcon msg
-    -> ListView object msg
-    -> ListView object msg
-withActionBar config (SelectList prop opt) =
-    SelectList prop { opt | actions = Just <| Action config }
-
-
-{-| Adds a row with buttons bellow the list.
-
-    ListView.withBottomButtonsRow
-        [ Button.fromLabel "Save"
-            |> Button.cmd FormSave Button.primary
-        , Button.fromLabel "Cancel"
-            |> Button.cmd FormCancel
-        ]
-        someListView
-
--}
-withBottomButtonsRow : List (Button msg) -> ListView object msg -> ListView object msg
-withBottomButtonsRow buttons (SelectList prop opt) =
-    SelectList prop { opt | actions = Just <| ButtonRow buttons }
-
-
-{-| Adds a column with buttons bellow the list.
-
-    ListView.withBottomButtonsColumn
-        [ Button.fromLabel "Save"
-            |> Button.cmd FormSave Button.primary
-        , Button.fromLabel "Cancel"
-            |> Button.cmd FormCancel
-        ]
-        someListView
-
--}
-withBottomButtonsColumn : List (Button msg) -> ListView object msg -> ListView object msg
-withBottomButtonsColumn buttons (SelectList prop opt) =
-    SelectList prop { opt | actions = Just <| ButtonColumn buttons }
-
-
-{-| Adds button to toggle a custom menu element.
-
-    ListView.withCustomExtraMenu toggleMsg
-        isMenuVisible
-        menuBody
-        someListView
-
--}
-withCustomExtraMenu : msg -> Bool -> Element msg -> ListView object msg -> ListView object msg
-withCustomExtraMenu toggleMsg isEnabled body (SelectList prop opt) =
-    SelectList prop
-        { opt
-            | dropdown = Just <| Dropdown toggleMsg isEnabled (CustomDropdown body)
-        }
-
-
-{-| Adds a button to select every entry.
-
-    ListView.withSelectAllButton Msg.SelectAll
-        isEverythingSelected
-        someListView
-
--}
-withSelectAllButton : (Bool -> msg) -> Bool -> ListView object msg -> ListView object msg
-withSelectAllButton message state (SelectList prop opt) =
-    SelectList prop { opt | selectAll = Just <| SelectAll state message }
-
-
-{-| Adds a button to apply additional filters.
-
-    ListView.withFilter additionalFilters
-        someListView
-
--}
-withFilter : Filter msg -> ListView object msg -> ListView object msg
-withFilter filter (SelectList prop opt) =
-    SelectList prop { opt | filter = Just filter }
 
 
 {-| Replaces the component's list of elements.
@@ -401,32 +293,6 @@ withFilter filter (SelectList prop opt) =
 withItems : List object -> ListView object msg -> ListView object msg
 withItems items (SelectList prop opt) =
     SelectList prop { opt | items = items }
-
-
-{-| Replaces the component's search-field and allow filtering the elements.
-
-    ListView.withSearchFied
-        { detailsShowLabel = "Show details" -- For accessibility only
-        , detailsCollapseLabel = "Hide details" -- For accessibility only
-        , toCover =
-            \{ name } ->
-                -- ListView.ToggleableCover
-                { title = name, caption = Nothing }
-        , toDetails =
-            \{ age } ->
-                [ ( "Age", Element.text age ) ]
-        , selectMsg = Msg.ElementSelect
-        }
-        someListView
-
--}
-withSearchField :
-    SearchConfig object msg
-    -> ListView object msg
-    -> ListView object msg
-withSearchField options (SelectList prop opt) =
-    { opt | searchField = Just options }
-        |> SelectList prop
 
 
 {-| Adds a message to be dispatched when an item is selected.
@@ -451,76 +317,6 @@ withSelect options (SelectList prop opt) =
 withSelected : (object -> Bool) -> ListView object msg -> ListView object msg
 withSelected isSelected (SelectList prop opt) =
     SelectList prop { opt | isSelected = Just isSelected }
-
-
-{-| Applies [`Element.width`](/packages/mdgriffith/elm-ui/latest/Element#width) to the component.
-
-    ListView.withWidth
-        (Element.fill |> Element.minimum 220)
-        someListView
-
--}
-withWidth : Element.Length -> ListView object msg -> ListView object msg
-withWidth width (SelectList prop opt) =
-    SelectList prop { opt | width = width }
-
-
-{-| Overwrite the appearance of the selected item.
-
-    ListView.withSelectStyle
-        { backgroundColor = Palette.color toneDanger brightnessMiddle }
-        someListView
-
--}
-withSelectStyle : SelectStyle -> ListView object msg -> ListView object msg
-withSelectStyle style (SelectList prop opt) =
-    SelectList prop { opt | selectStyle = style }
-
-
-{-| Add id attribute to the HTML tags of the elements and the list itself.
-
-    ListView.selectList
-        Msg.SelectDrink
-        softDrinkToString
-        softDrinkView
-        |> ListView.withDomId "softDrinks"
-
-Generates:
-
-    < ... id="softDriks">
-        <... id="fanta">...</...>
-        <... id="coke">...</...>
-        <... id="drPepper">...</...>
-    </...>
-
-**NOTE**: Only when `withDomId` is used children have `id`s.
-
--}
-withDomId : String -> ListView object msg -> ListView object msg
-withDomId containerId (SelectList prop opt) =
-    SelectList prop { opt | containerId = Just containerId }
-
-
-{-| Adds a header above the list.
-
-    ListView.withHeader "ListView Header" someListView
-
--}
-withHeader : String -> ListView object msg -> ListView object msg
-withHeader header (SelectList prop opt) =
-    SelectList prop { opt | header = Just header }
-
-
-{-| Adds a header above the list, including a badge.
-
-    ListView.withBadgedHeader "ListView Header"
-        (Badge.primaryLight "NEW")
-        someListView
-
--}
-withBadgedHeader : String -> Badge -> ListView object msg -> ListView object msg
-withBadgedHeader header badge (SelectList prop opt) =
-    SelectList prop { opt | header = Just header, headerBadge = Just badge }
 
 
 
@@ -574,66 +370,11 @@ renderElement cfg (SelectList prop opt) =
                  ]
                     |> prependMaybe (Maybe.map Element.id opt.containerId)
                 )
-        , actionsView cfg opt.actions
         ]
 
 
 
 -- Internal
-
-
-buttonsAttrs : List (Element.Attribute msg)
-buttonsAttrs =
-    [ Element.width fill
-    , Element.paddingEach
-        { bottom = 16
-        , left = 16
-        , right = 16
-        , top = 20
-        }
-    , Element.spacingXY 16 16
-    ]
-
-
-actionsView : RenderConfig -> Maybe (Actions msg) -> Element msg
-actionsView cfg maybeActions =
-    case maybeActions of
-        Just (Action { label, icon, action }) ->
-            Element.row
-                [ Element.width fill
-                , Element.paddingEach
-                    { bottom = 12
-                    , left = 20
-                    , right = 12
-                    , top = 12
-                    }
-                , Background.color Colors.navyBlue200
-                , Font.color Colors.navyBlue700
-                ]
-                [ Text.body2 label
-                    |> Text.withColor Palette.blue700
-                    |> Text.renderElement cfg
-                , icon label
-                    |> Icon.withSize Size.small
-                    |> Icon.renderElement cfg
-                    |> Element.el
-                        [ Element.alignRight
-                        ]
-                ]
-                |> Clickable.actionWrapElement cfg
-                    [ Element.width fill ]
-                    action
-
-        Just (ButtonRow buttons) ->
-            List.map (Button.renderElement cfg) buttons
-                |> Element.row buttonsAttrs
-
-        Just (ButtonColumn buttons) ->
-            List.map (Button.renderElement cfg) buttons
-                |> Element.column buttonsAttrs
-
-        Nothing ->
-            Element.none
 
 
 searchFieldView : RenderConfig -> Options object msg -> Element msg
@@ -715,39 +456,7 @@ headerView cfg opt =
                 [ Text.heading5 header
                     |> Text.renderElement cfg
                 , headerBadge cfg opt
-                , dropdown cfg opt.dropdown
                 ]
-
-        Nothing ->
-            Element.none
-
-
-dropdown : RenderConfig -> Maybe (Dropdown msg) -> Element msg
-dropdown cfg dropdownOptions =
-    case dropdownOptions of
-        Just opt ->
-            let
-                body =
-                    if opt.isEnabled then
-                        [ Element.below <| dropdownBody opt.body ]
-
-                    else
-                        []
-            in
-            (cfg |> localeTerms >> .sidebar >> .moreActions)
-                |> Icon.moreActions
-                |> Icon.withColor Palette.blue700
-                |> Icon.withSize Size.Small
-                |> Button.fromIcon
-                |> Button.cmd opt.toggleMsg Button.clear
-                |> Button.withSize Size.small
-                |> Button.renderElement cfg
-                |> Element.el
-                    (Element.alignRight
-                        :: Element.pointer
-                        :: Element.alignTop
-                        :: body
-                    )
 
         Nothing ->
             Element.none
@@ -763,13 +472,6 @@ headerBadge cfg opt =
 
         Nothing ->
             Element.none
-
-
-dropdownBody : DropdownBody msg -> Element msg
-dropdownBody body =
-    case body of
-        CustomDropdown html ->
-            html
 
 
 itemView :
@@ -811,7 +513,6 @@ defaultOptions : Options object msg
 defaultOptions =
     { items = []
     , searchField = Nothing
-    , actions = Nothing
     , select = Nothing
     , isSelected = Nothing
     , width = Element.fill
@@ -819,7 +520,6 @@ defaultOptions =
     , containerId = Nothing
     , header = Nothing
     , headerBadge = Nothing
-    , dropdown = Nothing
     , selectAll = Nothing
     , filter = Nothing
     }
@@ -842,3 +542,82 @@ filterOptions searchOpt all =
 
         Nothing ->
             all
+
+
+titleColor : Bool -> Palette.Color
+titleColor selected =
+    if selected then
+        Palette.genericWhite
+
+    else
+        Palette.gray800
+
+
+coverView : RenderConfig -> Cover -> Bool -> Element msg
+coverView cfg { title, caption } selected =
+    let
+        titleComponent =
+            Text.body1 title
+                |> Text.withColor (titleColor selected)
+
+        captionApplied =
+            case caption of
+                Just captionStr ->
+                    Text.combination
+                        [ titleComponent
+                        , Text.caption captionStr
+                            |> Text.withColor (captionColor selected)
+                        ]
+
+                Nothing ->
+                    titleComponent
+    in
+    captionApplied
+        |> Text.withOverflow ellipsize
+        |> Text.renderElement cfg
+        |> Element.el [ Element.width fill, Element.clipX ]
+
+
+toggleableCard : List (Attribute msg)
+toggleableCard =
+    [ Element.paddingEach { top = 16, bottom = 19, left = 28, right = 20 }
+    , Palette.gray200
+        |> Palette.toElementColor
+        |> Background.color
+    , Element.width fill
+    , Element.spacing 12
+    ]
+
+
+detailItem : RenderConfig -> ( String, Element msg ) -> ( String, Element msg )
+detailItem renderConfig ( label, content ) =
+    ( label
+    , Element.column indentedDetailItemAttributes
+        [ label
+            |> Text.overline
+            |> Text.withColor Palette.gray600
+            |> Text.withOverflow ellipsize
+            |> Text.renderElement renderConfig
+        , content
+        ]
+    )
+
+
+indentedDetailItemAttributes : List (Attribute msg)
+indentedDetailItemAttributes =
+    [ Element.paddingEach { zeroPadding | left = 8 }
+    , Border.widthEach { zeroPadding | left = 2 }
+    , Palette.blue700
+        |> Palette.toElementColor
+        |> Border.color
+    , Element.width fill
+    ]
+
+
+captionColor : Bool -> Palette.Color
+captionColor selected =
+    if selected then
+        Palette.blue400
+
+    else
+        Palette.gray600

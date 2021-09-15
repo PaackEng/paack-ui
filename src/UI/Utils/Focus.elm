@@ -1,5 +1,6 @@
 module UI.Utils.Focus exposing
-    ( Focus
+    ( Focus, focus
+    , withOnEnter, withOnLeave, withTabIndex
     , toElementAttributes
     )
 
@@ -8,7 +9,8 @@ module UI.Utils.Focus exposing
 
 # Configuration
 
-@docs Focus
+@docs Focus, focus
+@docs withOnEnter, withOnLeave, withTabIndex
 
 
 # Element Attributes
