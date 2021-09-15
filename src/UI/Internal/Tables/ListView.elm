@@ -1,123 +1,33 @@
 module UI.Internal.Tables.ListView exposing
-    ( toggleableList
-    , withItems, withSelected
-    , renderElement
+    ( renderElement
+    , toggleableList
+    , withItems
+    , withSelected
     )
 
-{-| `UI.ListView` is a styled searchable row list.
-The main variation (select-lists) has the capability of having one of its rows selected.
-
-The developer is responsible for coding the row's view.
-While this component then applies the borders and the click event.
-Also, it can optionally filter when having a search bar, and add an action bar.
-
-    view : RenderConfig -> Model -> Element Msg
-    view renderConfig model =
-        ListView.selectList Msg.SelectElement
-            elementToKey
-            elementView
-            |> ListView.withItems model.myListElements
-            |> ListView.withSearchField
-                { label = "Search for elements matching name.."
-                , searchMsg = Msg.FilterSet
-                , currentFilter =
-                    Maybe.map
-                        (\str -> ( str, elementHasString ))
-                        model.currentFilter
-                }
-            |> ListView.withActionBar
-                { label = "Create new element"
-                , icon = Icon.add
-                , action =
-                    DialogMsg.OpenElementCreation
-                        |> Msg.ForDialog
-                        |> Action.DispatchMsg
-                }
-            |> ListView.withSelected
-                (\{ id } ->
-                    Maybe.map (.id >> (==) id) model.selectedElement
-                        |> Maybe.withDefault False
-                )
-            |> ListView.withWidth Element.fill
-            |> ListView.renderElement renderConfig
-
-    elementHasString : String -> Element -> Bool
-    elementHasString str { name } =
-        String.contains str name
-
-
-# Building
-
-@docs ListView, selectList, simpleList
-
-
-# Toggleable variation
-
-@docs ToggleableConfig, ToggleableCover, toggleableList
-
-
-# Options
-
-@docs withItems, withSelect, withSelected, withDomId
-
-
-## Extra elements
-
-@docs SearchConfig, withSearchField, withActionBar
-@docs withBottomButtonsRow, withBottomButtonsColumn, withSelectAllButton
-@docs withFilter, withCustomExtraMenu, withHeader, withBadgedHeader
-
-
-## Width
-
-@docs withWidth
-
-
-## Select Style
-
-@docs SelectStyle, withSelectStyle
-
-
-# Rendering
-
-@docs renderElement
-
--}
-
-import Element exposing (Attribute, Element, fill, px, shrink)
+import Element exposing (Attribute, Element, fill, px)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
 import Element.Keyed as Keyed
-import UI.Badge as Badge exposing (Badge)
-import UI.Checkbox as Checkbox
-import UI.Filter as Filter exposing (Filter)
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (ifThenElse, maybeAnd, prependMaybe)
 import UI.Internal.Colors as Colors
-import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Internal.Utils.Element as Element
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text exposing (ellipsize)
-import UI.TextField as TextField
 import UI.Utils.Element exposing (zeroPadding)
 
 
 type alias Options object msg =
     { items : List object
-    , searchField : Maybe (SearchConfig object msg)
     , select : Maybe (object -> msg)
     , isSelected : Maybe (object -> Bool)
     , width : Element.Length
-    , selectStyle : SelectStyle
     , containerId : Maybe String
-    , header : Maybe String
-    , headerBadge : Maybe Badge
-    , selectAll : Maybe (SelectAll msg)
-    , filter : Maybe (Filter msg)
     }
 
 
@@ -131,36 +41,6 @@ type alias Properties object msg =
 -}
 type ListView object msg
     = SelectList (Properties object msg) (Options object msg)
-
-
-{-| `SearchConfig` assembles the required configuration for having a search field and filter.
-
-    { title = "Elements"
-    , label = "Search for elements matching name.."
-    , searchMsg = Msg.FilterSet
-    , currentFilter =
-        Maybe.map
-            (\str -> ( str, elementHasString ))
-            model.currentFilter
-    }
-
--}
-type alias SearchConfig object msg =
-    { label : String
-    , searchMsg : String -> msg
-    , currentFilter : Maybe ( String, String -> object -> Bool )
-    }
-
-
-{-| The selected item can be styled using [`ListView.withSelectStyle`](#withSelectStyle).
-
-  - `backgroundColor`: The color in which the background assumes for selected items.
-    When `Nothing` no color is applied.
-
--}
-type alias SelectStyle =
-    { backgroundColor : Maybe Palette.Color
-    }
 
 
 
@@ -200,28 +80,6 @@ type alias Cover =
 -- Constructor
 
 
-{-| Toggleable-lists are a variation of select-lists where the selected element expands with details while all other's details keep collapsed.
-
-We recommend using `UI.Table` instead, as it uses toggleable-lists for its responsive mode.
-
-    ListView.toggleableList
-        { detailsShowLabel = "Show details" -- For accessibility only
-        , detailsCollapseLabel = "Hide details" -- For accessibility only
-        , toCover =
-            \{ name } ->
-                { title = name, caption = Nothing }
-        , toDetails =
-            \{ age } ->
-                [ ( "Age", Element.text age ) ]
-        , selectMsg = Msg.ElementSelect
-        }
-        |> ListView.withItems model.items
-        |> ListView.withSelected isElementSelected
-        |> ListView.renderElement renderConfig
-
-**NOTE**: Toggleable-list elements' view is not codable.
-
--}
 toggleableList : ToggleableConfig object msg -> ListView object msg
 toggleableList config =
     let
@@ -323,12 +181,6 @@ withSelected isSelected (SelectList prop opt) =
 -- Render
 
 
-type alias SelectAll msg =
-    { state : Bool
-    , message : Bool -> msg
-    }
-
-
 {-| End of the builder's life.
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
@@ -348,16 +200,13 @@ renderElement cfg (SelectList prop opt) =
         , Element.height fill
         , Element.scrollbarY
         ]
-        [ searchFieldView cfg opt
-        , toolbarView cfg opt
-        , opt.items
-            |> filterOptions opt.searchField
+        [ opt.items
             |> List.map
                 (\obj ->
                     itemView cfg
                         prop
                         opt
-                        opt.selectStyle.backgroundColor
+                        (Just Palette.blue700)
                         (isSelected obj)
                         obj
                 )
@@ -375,103 +224,6 @@ renderElement cfg (SelectList prop opt) =
 
 
 -- Internal
-
-
-searchFieldView : RenderConfig -> Options object msg -> Element msg
-searchFieldView cfg opt =
-    case opt.searchField of
-        Just { label, searchMsg, currentFilter } ->
-            Element.column
-                [ Element.width fill
-                , Element.padding 12
-                ]
-                [ headerView cfg opt
-                , currentFilter
-                    |> Maybe.map Tuple.first
-                    |> Maybe.withDefault ""
-                    |> TextField.search searchMsg label
-                    |> TextField.withWidth TextField.widthFull
-                    |> TextField.withPlaceholder label
-                    |> TextField.withIcon
-                        (cfg |> localeTerms >> .listView >> .search |> Icon.search)
-                    |> TextField.renderElement cfg
-                ]
-
-        Nothing ->
-            Element.none
-
-
-toolbarView : RenderConfig -> Options object msg -> Element msg
-toolbarView cfg opt =
-    let
-        entries =
-            []
-                |> prependMaybe
-                    (Maybe.map (filterView cfg) opt.filter)
-                |> prependMaybe
-                    (Maybe.map (selectAllButtonView cfg) opt.selectAll)
-    in
-    if List.isEmpty entries then
-        Element.none
-
-    else
-        Element.row
-            [ Element.width Element.fill
-            , Element.paddingEach
-                { bottom = 12
-                , left = 15
-                , right = 15
-                , top = 0
-                }
-            ]
-            entries
-
-
-selectAllButtonView : RenderConfig -> SelectAll msg -> Element msg
-selectAllButtonView cfg { state, message } =
-    Checkbox.checkbox (cfg |> localeTerms >> .listView >> .selectAll) message state
-        |> Checkbox.renderElement cfg
-        |> Element.el [ Element.width fill, Element.alignTop ]
-
-
-filterView : RenderConfig -> Filter msg -> Element msg
-filterView cfg filter =
-    filter
-        |> Filter.withSize Filter.sizeExtraSmall
-        |> Filter.withAlignRight
-        |> Filter.renderElement cfg
-        |> Element.el [ Element.width shrink, Element.alignRight, Element.alignTop ]
-
-
-headerView : RenderConfig -> Options object msg -> Element msg
-headerView cfg opt =
-    case opt.header of
-        Just header ->
-            Element.row
-                [ Element.width fill
-                , Element.height fill
-                , Element.paddingXY 0 12
-                , Element.spacing 8
-                ]
-                [ Text.heading5 header
-                    |> Text.renderElement cfg
-                , headerBadge cfg opt
-                ]
-
-        Nothing ->
-            Element.none
-
-
-headerBadge : RenderConfig -> Options object msg -> Element msg
-headerBadge cfg opt =
-    case opt.headerBadge of
-        Just badge ->
-            badge
-                |> Badge.renderElement cfg
-                |> Element.el [ Element.centerY ]
-
-        Nothing ->
-            Element.none
 
 
 itemView :
@@ -512,36 +264,15 @@ itemView cfg { renderItem, toKey } { select, containerId } background selected o
 defaultOptions : Options object msg
 defaultOptions =
     { items = []
-    , searchField = Nothing
     , select = Nothing
     , isSelected = Nothing
     , width = Element.fill
-    , selectStyle = defaultSelectStyle
     , containerId = Nothing
-    , header = Nothing
-    , headerBadge = Nothing
-    , selectAll = Nothing
-    , filter = Nothing
     }
-
-
-defaultSelectStyle : SelectStyle
-defaultSelectStyle =
-    { backgroundColor = Just Palette.blue700 }
 
 
 
 -- Filter Internals
-
-
-filterOptions : Maybe (SearchConfig object msg) -> List object -> List object
-filterOptions searchOpt all =
-    case Maybe.andThen .currentFilter searchOpt of
-        Just ( value, filter ) ->
-            List.filter (\obj -> filter value obj) all
-
-        Nothing ->
-            all
 
 
 titleColor : Bool -> Palette.Color
