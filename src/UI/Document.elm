@@ -1,6 +1,6 @@
-module UI.Page exposing
-    ( Msg, State, stateInit, stateWithClosedMenu, stateUpdate
-    , Navigator, navigator
+module UI.Document exposing
+    ( Msg, Model, modelInit, modelWithClosedMenu, modelUpdate
+    , Document, document
     , Page, page, pageWithDialog, pageWithDefaultMenu, pageMap
     , PageBody, bodySingle, Stack, bodyStack
     , withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages
@@ -9,51 +9,50 @@ module UI.Page exposing
     , toBrowserDocument
     )
 
-{-| The `UI.Page` is a page presenter.
+{-| The `UI.Document` is paack-ui's page presenter and document.
 Depending on the situation, it applies the sidebar menu, dialogs, and mobile's navbar over the current page.
 
-For this, a page must provide some required data through the [`Nav.Page`](#Page) record.
-That aggregated with the current rendering configuration provided by [`UI.RenderConfig`](UI-RenderConfig#RenderConfig) and the [`Nav.State`](#State), multiplex between possible viewing layouts.
+For this, a page must provide some required data through the [`Document.Page`](#Page) record.
+That aggregated with the current rendering configuration provided by [`UI.RenderConfig`](UI-RenderConfig#RenderConfig) and the [`Document.Model`](#Model), multiplex between possible viewing layouts.
 
 Example of usage:
 
     view : RenderConfig -> Model.Model -> { body : List (Html Msg.Msg), title : String }
-    view renderConfig { navState, currentPage } =
-        Nav.navigator Msg.NavMsg
-            navState
-            (getPagePage >> Nav.pageMap Msg.PageMsg)
-            |> Nav.withMenuPages
-                [ Nav.menuPage (Icon.packages "Packages")
+    view renderConfig { documentModel, currentPage } =
+        Document.document Msg.DocumentMsg
+            documentModel
+            (getPagePage >> Document.pageMap Msg.PageMsg)
+            |> Document.withMenuPages
+                [ Document.menuPage (Icon.packages "Packages")
                     (Link.link "/packages")
                     (currentPage == Page.Packages)
                 ]
-            |> Nav.withMenuActions
-                [ Nav.menuAction
+            |> Document.withMenuActions
+                [ Document.menuAction
                     (Icon.logout "Logout")
                     Msg.SessionLogout
                 ]
-            |> Nav.withMenuLogo "My company's logo" someLogoElement
-            |> Nav.toBrowserDocument renderConfig currentPage
+            |> Document.withMenuLogo "My company's logo" someLogoElement
+            |> Document.toBrowserDocument renderConfig currentPage
 
-    getPagePage : Page.Page -> Nav.Page Page.Msg
+    getPagePage : Page.Page -> Document.Page Page.Msg
     getPagePage page =
         case page of
-            Page.Packages ->
-                { title = "Packages"
-                , content = Nav.bodySingle Packages.view
-                , dialog = Nothing
-                , hasMenu = False
-                }
+            Page.Packages pageModel ->
+                Document.page "Packages"
+                    (Document.bodySingle <| Packages.view pageModel)
+                    |> Document.pageWithDialog pageModel.maybeDialog
+                    |> Document.pageWithDefaultMenu
 
 
 # Model & Update
 
-@docs Msg, State, stateInit, stateWithClosedMenu, stateUpdate
+@docs Msg, Model, modelInit, modelWithClosedMenu, modelUpdate
 
 
 # Building
 
-@docs Navigator, navigator
+@docs Document, document
 
 
 # Page
@@ -97,13 +96,13 @@ import UI.Utils.Action as Action
 -- Expose
 
 
-{-| This record must be generated with [`Nav.menuPage`](#menuPage)
+{-| This record must be generated with [`Document.menuPage`](#menuPage)
 -}
 type MenuPage
     = MenuPage Menu.Page
 
 
-{-| This record must be generated with [`Nav.menuAction`](#menuAction)
+{-| This record must be generated with [`Document.menuAction`](#menuAction)
 -}
 type MenuAction msg
     = MenuAction (Menu.Action msg)
@@ -115,21 +114,21 @@ type MenuAction msg
 
 {-| Keep this one in your Model, it holds the current navigation state.
 -}
-type State
-    = State StateRecord
+type Model
+    = Model ModelRecord
 
 
-type alias StateRecord =
+type alias ModelRecord =
     { menuExpanded : Bool }
 
 
-{-| The `Nav.Msg` handles menu related messages.
+{-| The `Document.Msg` handles menu related messages.
 -}
 type Msg
     = ToggleMenu Bool
 
 
-{-| The `Nav.PageBody msg` manages different kinds of pages' body.
+{-| The `Document.PageBody msg` manages different kinds of pages' body.
 By now, the content is either a typical single page or a stacked child of mobile's views.
 
 The typical single page renders the way they come.
@@ -140,7 +139,7 @@ type alias PageBody msg =
     Internal.PageBody msg
 
 
-{-| The `Nav.Page msg` describes the current page in its current state.
+{-| The `Document.Page msg` describes the current page in its current state.
 
 The `title` field is exposed as to the browser and reused on the mobile's navbar.
 
@@ -150,9 +149,9 @@ The `hasMenu` field can hide the menu when undesired, e.g., login page.
 
 The `content` field must be the element holding the page's view.
 
-    { content = Nav.bodySingle <| Element.el [] [ Element.text "Element body" ]
+    { content = Document.bodySingle <| Element.el [] [ Element.text "Element body" ]
     , title = "Example page"
-    , dialog = Nothing -- or Just <| Nav.dialog <| ...
+    , dialog = Nothing -- or Just <| Document.dialog <| ...
     , hasMenu = True
     }
 
@@ -169,14 +168,14 @@ type alias PageRecord msg =
     }
 
 
-{-| The `Nav.Navigator` handles menu, dialogs and page viewing.
-It must be initialized using [`Nav.navigator`](#navigator).
+{-| The `Document.Document` handles menu, dialogs and page viewing.
+It must be initialized using [`Document.document`](#document).
 -}
-type Navigator pageSet msg
-    = Navigator (NavigatorRecord pageSet msg)
+type Document pageSet msg
+    = Document (DocumentRecord pageSet msg)
 
 
-type alias NavigatorRecord pageSet msg =
+type alias DocumentRecord pageSet msg =
     { container : pageSet -> Page msg
     , menu : Menu.Menu msg
     , sidebarStyle : SidebarStyle
@@ -215,78 +214,78 @@ type alias Stack msg =
 -- Options
 
 
-{-| `Nav.withMenuPages` replaces the list of the menu's navigable pages.
+{-| `Document.withMenuPages` replaces the list of the menu's navigable pages.
 Therefore changing the list of items showed at the top of the sidebar.
 
-    Nav.withMenuPages
-        [ Nav.menuPage (Icon.edit "Manage cards")
+    Document.withMenuPages
+        [ Document.menuPage (Icon.edit "Manage cards")
             (Link.link "/edit-cards")
             (currentPage == Page.CardsEdit)
-        , Nav.menuPage (Icon.add "New manager")
+        , Document.menuPage (Icon.add "New manager")
             (Link.link "/add-manager")
             (currentPage == Page.ManagerAdd)
         ]
         someNav
 
 -}
-withMenuPages : List MenuPage -> Navigator page msg -> Navigator page msg
-withMenuPages pages (Navigator nav) =
+withMenuPages : List MenuPage -> Document page msg -> Document page msg
+withMenuPages pages (Document nav) =
     let
         menuWithPages (Menu.Menu prop opt) =
             Menu.Menu prop { opt | pages = List.map (\(MenuPage p) -> p) pages }
     in
-    Navigator { nav | menu = menuWithPages nav.menu }
+    Document { nav | menu = menuWithPages nav.menu }
 
 
-{-| `Nav.withMenuActions` replaces the list of the menu's actions.
+{-| `Document.withMenuActions` replaces the list of the menu's actions.
 Therefore changing the list of items showed at the bottom of the sidebar.
 
-    Nav.withMenuActions
-        [ Nav.menuAction
+    Document.withMenuActions
+        [ Document.menuAction
             (Icon.language "Change to English")
             (Msg.SetLanguage Lang.English)
-        , Nav.menuAction
+        , Document.menuAction
             (Icon.logout "Logout")
             Msg.SessionLogout
         ]
         someNav
 
 -}
-withMenuActions : List (MenuAction msg) -> Navigator page msg -> Navigator page msg
-withMenuActions actions (Navigator nav) =
+withMenuActions : List (MenuAction msg) -> Document page msg -> Document page msg
+withMenuActions actions (Document nav) =
     let
         menuWithActions (Menu.Menu prop opt) =
             Menu.Menu prop { opt | actions = List.map (\(MenuAction a) -> a) actions }
     in
-    Navigator { nav | menu = menuWithActions nav.menu }
+    Document { nav | menu = menuWithActions nav.menu }
 
 
-{-| `Nav.withMenuLogo` replaces the logo shown on the menu.
+{-| `Document.withMenuLogo` replaces the logo shown on the menu.
 By now, this logo is only visible at the desktop's sidebar.
 
 The first parameter is a hint that exists for accessibility reasons.
 
-    Nav.withMenuLogo "Paack - Time Matters"
+    Document.withMenuLogo "Paack - Time Matters"
         Vectors.paackLogoWhite
         someNav
 
 -}
-withMenuLogo : String -> Element msg -> Navigator page msg -> Navigator page msg
-withMenuLogo hint body (Navigator nav) =
+withMenuLogo : String -> Element msg -> Document page msg -> Document page msg
+withMenuLogo hint body (Document nav) =
     let
         menuWithLogo (Menu.Menu prop opt) =
             Menu.Menu prop
                 { opt | logo = Just <| Menu.Logo hint body }
     in
-    Navigator { nav | menu = menuWithLogo nav.menu }
+    Document { nav | menu = menuWithLogo nav.menu }
 
 
-{-| `Nav.withSidebarStyle` takes a `SidebarStyle` setting the
+{-| `Document.withSidebarStyle` takes a `SidebarStyle` setting the
 appearance/behavior of the sidebar when it is enabled by the `hasMenu` flag.
 -}
-withSidebarStyle : SidebarStyle -> Navigator page msg -> Navigator page msg
-withSidebarStyle style (Navigator nav) =
-    Navigator { nav | sidebarStyle = style }
+withSidebarStyle : SidebarStyle -> Document page msg -> Document page msg
+withSidebarStyle style (Document nav) =
+    Document { nav | sidebarStyle = style }
 
 
 {-| Persistent style of the sidebar. It occupies more space when open pushing
@@ -323,6 +322,12 @@ hideMenu =
 -- Helpers
 
 
+{-| Initializes a page's description
+
+    Document.page "My page's title"
+        (Document.bodySingle <| SomePage.view somePageModel)
+
+-}
 page : String -> PageBody msg -> Page msg
 page title content =
     Page
@@ -333,11 +338,24 @@ page title content =
         }
 
 
+{-| Overlay (or not) a dialog over the page.
+
+    Document.pageWithDialog
+        (Just <| Element.text "Hello World")
+        someDocumentPage
+
+-}
 pageWithDialog : Maybe (Dialog msg) -> Page msg -> Page msg
 pageWithDialog dialog (Page pageRecord) =
     Page { pageRecord | dialog = dialog }
 
 
+{-| Make the document's default menu available in this page.
+
+    Document.pageWithDefaultMenu
+        someDocumentPage
+
+-}
 pageWithDefaultMenu : Page msg -> Page msg
 pageWithDefaultMenu (Page pageRecord) =
     Page { pageRecord | hasMenu = True }
@@ -373,51 +391,51 @@ contentMap applier data =
                     }
 
 
-{-| Given a message, apply an update to the [`Nav.State`](#State).
+{-| Given a message, apply an update to the [`Document.Model`](#Model).
 -}
-stateUpdate : Msg -> State -> ( State, Cmd Msg )
-stateUpdate msg state =
-    stateUpdateWithoutPerform msg state
+modelUpdate : Msg -> Model -> ( Model, Cmd Msg )
+modelUpdate msg state =
+    modelUpdateWithoutPerform msg state
         |> Tuple.mapSecond Effects.perform
 
 
-{-| Similar to [`stateUpdate`], but using Effects.
+{-| Similar to [`modelUpdate`], but using Effects.
 -}
-stateUpdateWithoutPerform : Msg -> State -> ( State, Effects Msg )
-stateUpdateWithoutPerform msg (State state) =
+modelUpdateWithoutPerform : Msg -> Model -> ( Model, Effects Msg )
+modelUpdateWithoutPerform msg (Model state) =
     case msg of
         ToggleMenu newVal ->
-            ( State { state | menuExpanded = newVal }, Effects.none )
+            ( Model { state | menuExpanded = newVal }, Effects.none )
 
 
 
 -- Constructors
 
 
-{-| The default way of instantiating a [`Nav.State`](#State).
+{-| The default way of instantiating a [`Document.Model`](#Model).
 
-    Nav.stateInit renderConfig
-
--}
-stateInit : RenderConfig -> State
-stateInit cfg =
-    State { menuExpanded = not <| RenderConfig.isMobile cfg }
-
-
-{-| Force the menu to be closed on the [`Nav.State`](#State).
-
-    Nav.stateInitWithClosedMenu renderConfig
+    Document.modelInit renderConfig
 
 -}
-stateWithClosedMenu : State -> State
-stateWithClosedMenu (State state) =
-    State { state | menuExpanded = False }
+modelInit : RenderConfig -> Model
+modelInit cfg =
+    Model { menuExpanded = not <| RenderConfig.isMobile cfg }
 
 
-{-| `Nav.bodySingle` indicates that the current page is a simple single page.
+{-| Force the menu to be closed on the [`Document.Model`](#Model).
+
+    Document.modelInitWithClosedMenu renderConfig
+
+-}
+modelWithClosedMenu : Model -> Model
+modelWithClosedMenu (Model state) =
+    Model { state | menuExpanded = False }
+
+
+{-| `Document.bodySingle` indicates that the current page is a simple single page.
 It expects the final page's view in the only parameter.
 
-    Nav.bodySingle <| view renderConfig model
+    Document.bodySingle <| view renderConfig model
 
 -}
 bodySingle : Element msg -> PageBody msg
@@ -425,10 +443,10 @@ bodySingle body =
     Internal.PageBodySingle body
 
 
-{-| `Nav.bodyStack` indicates that the current page is a stack child's page.
+{-| `Document.bodyStack` indicates that the current page is a stack child's page.
 It expects the child's configuration and the final page's view as its parameters.
 
-    Nav.bodyStack
+    Document.bodyStack
         { title = "Edit: Card " ++ selectedCard.number
         , buttons =
             [ Icon.print "Print card"
@@ -446,9 +464,9 @@ bodyStack prop body =
     Internal.PageBodyStack prop body
 
 
-{-| `Nav.menuPage` describes a page to [`Nav.withMenuPages`](#withMenuPages).
+{-| `Document.menuPage` describes a page to [`Document.withMenuPages`](#withMenuPages).
 
-    Nav.menuPage (Icon.edit "Edit cards")
+    Document.menuPage (Icon.edit "Edit cards")
         (Link.link "/edit-cards")
         (currentPage == Pages.CardsEdit)
 
@@ -458,9 +476,9 @@ menuPage icon link isCurrent =
     MenuPage <| Menu.Page icon link isCurrent
 
 
-{-| `Nav.menuPage` describes an action to [`Nav.withMenuActions`](#withMenuActions).
+{-| `Document.menuPage` describes an action to [`Document.withMenuActions`](#withMenuActions).
 
-    Nav.menuAction
+    Document.menuAction
         (Icon.logout "Logout")
         Msg.SessionLogout
 
@@ -470,16 +488,16 @@ menuAction icon msg =
     MenuAction <| Menu.Action icon msg
 
 
-{-| `Nav.navigator` holds the minimum amount of information required for all the features (menu, dialogs, and page's layout) to work.
+{-| `Document.document` holds the minimum amount of information required for all the features (menu, dialogs, and page's layout) to work.
 
-The first parameter is a function that should transform [`Nav.Msg`](#Msg) in a message type controlled by the user.
+The first parameter is a function that should transform [`Document.Msg`](#Msg) in a message type controlled by the user.
 
-The second is the current [`Nav.State`](#State), do not initialize this on view, hold it on the app's model, and then pass it to this function.
+The second is the current [`Document.Model`](#Model), do not initialize this on view, hold it on the app's model, and then pass it to this function.
 
 The third (and last) parameter is a lambda used to obtain the current page's container.
 
-    Nav.Navigator Msg.FromNav
-        model.navState
+    Document.Document Msg.FromNav
+        model.documentModel
         (\page ->
             case page of
                 Page.CardsEdit ->
@@ -490,14 +508,14 @@ The third (and last) parameter is a lambda used to obtain the current page's con
         )
 
 -}
-navigator :
+document :
     (Msg -> msg)
-    -> State
+    -> Model
     -> (pageSet -> Page msg)
-    -> Navigator pageSet msg
-navigator applier (State state) pagesPages =
-    Navigator <|
-        NavigatorRecord pagesPages
+    -> Document pageSet msg
+document applier (Model state) pagesPages =
+    Document <|
+        DocumentRecord pagesPages
             (menu applier state)
             SidebarPersistent
 
@@ -511,15 +529,15 @@ The result of this function is a ready-to-use [`Browser.Document`](/packages/elm
 
 There is an additional parameter that is the page identifier, used to obtain the current container.
 
-    Nav.toBrowserDocument renderConfig currentPage navigator
+    Document.toBrowserDocument renderConfig currentPage document
 
 -}
 toBrowserDocument :
     RenderConfig
     -> pageSet
-    -> Navigator pageSet msg
+    -> Document pageSet msg
     -> { body : List (Html msg), title : String }
-toBrowserDocument cfg pageItem (Navigator model) =
+toBrowserDocument cfg pageItem (Document model) =
     let
         (Page container) =
             model.container pageItem
@@ -582,7 +600,7 @@ toBrowserDocument cfg pageItem (Navigator model) =
 -- Internals
 
 
-menu : (Msg -> msg) -> StateRecord -> Menu.Menu msg
+menu : (Msg -> msg) -> ModelRecord -> Menu.Menu msg
 menu applier { menuExpanded } =
     Menu.default (ToggleMenu >> applier) menuExpanded
 

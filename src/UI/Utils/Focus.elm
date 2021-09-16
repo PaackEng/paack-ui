@@ -38,6 +38,11 @@ type alias Optional msg =
     }
 
 
+{-| Allow paack-ui to know the one useful thing for visually focus feedback: Is it focused?
+
+    Focus.focus True
+
+-}
 focus : Bool -> Focus msg
 focus hasFocus =
     Focus { hasFocus = hasFocus }
@@ -47,16 +52,34 @@ focus hasFocus =
         }
 
 
+{-| Allow paack-ui to message a feedback when focus enters the element.
+
+    Focus.focus model.isInputFocused
+        |> Focus.withOnEnter Msg.InputFocused
+
+-}
 withOnEnter : msg -> Focus msg -> Focus msg
 withOnEnter msg (Focus prop opt) =
     Focus prop { opt | onEnter = Just msg }
 
 
+{-| Allow paack-ui to message a feedback when focus leaves the element.
+
+    Focus.focus model.isInputFocused
+        |> Focus.withOnLeave Msg.InputFocusLost
+
+-}
 withOnLeave : msg -> Focus msg -> Focus msg
 withOnLeave msg (Focus prop opt) =
     Focus prop { opt | onLeave = Just msg }
 
 
+{-| Makes the element keyboard-interactive.
+
+    Focus.focus model.isInputFocused
+        |> Focus.withTabIndex -1
+
+-}
 withTabIndex : Int -> Focus msg -> Focus msg
 withTabIndex value (Focus prop opt) =
     Focus prop { opt | tabIndex = Just value }

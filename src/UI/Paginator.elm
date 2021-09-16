@@ -71,6 +71,8 @@ type alias Options =
     { current : Int }
 
 
+{-| The `Paginator msg` type is used for describing the component for later rendering.
+-}
 type Paginator msg
     = NonNumeric (Properties msg) Options
 
@@ -99,16 +101,29 @@ nonNumeric prop =
     NonNumeric prop { current = 0 }
 
 
+{-| The current item, most probably the first one displayed in your list.
+
+    Paginator.withCurrentItem 11 somePaginator
+
+-}
 withCurrentItem : Int -> Paginator msg -> Paginator msg
 withCurrentItem value (NonNumeric prop opt) =
     NonNumeric prop { opt | current = value }
 
 
+{-| The current page. Similar to [`withCurrentItem`](#withCurrentItem), but considering `pageAmount`.
+
+    Paginator.withCurrentPage 2 somePaginator
+
+-}
 withCurrentPage : Int -> Paginator msg -> Paginator msg
 withCurrentPage pageNumber (NonNumeric prop opt) =
     NonNumeric prop { opt | current = pageNumber * prop.pageAmount }
 
 
+{-| End of the builder's life.
+The result of this function is a ready-to-insert Elm UI's Element.
+-}
 renderElement : RenderConfig -> Paginator msg -> Element msg
 renderElement renderConfig (NonNumeric prop { current }) =
     let
