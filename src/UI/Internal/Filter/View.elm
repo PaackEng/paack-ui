@@ -467,10 +467,10 @@ sizeToRadio : FilterSize -> Radio.RadioSize
 sizeToRadio size =
     case size of
         ExtraSmall ->
-            Radio.sizeSM
+            Radio.sizeSmall
 
         Medium ->
-            Radio.sizeMD
+            Radio.sizeMedium
 
 
 renderElement : RenderConfig -> FullFilter msg -> Element msg

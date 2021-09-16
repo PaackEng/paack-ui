@@ -20,7 +20,7 @@ import UI.Internal.Primitives as Primitives
 import UI.Internal.Tables.Common exposing (..)
 import UI.Internal.Utils.Element as InternalElement
 import UI.Link as Link exposing (Link)
-import UI.Palette as Palette exposing (brightnessMiddle, toneGray, tonePrimary)
+import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Tables.Common as Common exposing (..)
 import UI.Text as Text exposing (Text, ellipsizeWithTooltip)
@@ -58,13 +58,13 @@ linkedText : RenderConfig -> Link -> Text -> Element msg
 linkedText renderConfig link text =
     text
         |> Text.withOverflow ellipsizeWithTooltip
-        |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
+        |> Text.withColor Palette.blue700
         |> Text.renderElement renderConfig
         |> Element.el cellTextAttributes
         |> Link.wrapElement renderConfig
             [ Element.width fill
             , InternalElement.overflowVisible
-            , Palette.color tonePrimary brightnessMiddle
+            , Palette.blue700
                 |> Palette.toElementColor
                 |> Font.color
 
@@ -148,7 +148,7 @@ simpleHeaderRender renderConfig header =
     header
         |> String.toUpper
         |> Text.overline
-        |> Text.withColor (Palette.color toneGray brightnessMiddle)
+        |> Text.withColor Palette.gray700
         |> cellFromText
         |> cellContentRender renderConfig
 

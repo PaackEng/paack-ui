@@ -7,7 +7,7 @@ import PluginOptions exposing (defaultWithMenu)
 import Radio.Model as RadioModel exposing (Options)
 import Radio.Msg as RadioMsg
 import Return exposing (Return)
-import UI.Effect as Effect
+import UI.Effects as Effect
 import UI.Radio as Radio
 import UI.RenderConfig exposing (RenderConfig)
 import UIExplorer exposing (storiesOf)
@@ -54,7 +54,7 @@ radioGroupVertical : RenderConfig -> ExplorerStory
 radioGroupVertical renderConfig =
     storyWithModel
         ( "Vertical"
-        , view Radio.vertical Radio.sizeSM renderConfig
+        , view Radio.vertical Radio.sizeSmall renderConfig
         , { defaultWithMenu
             | code = codeForVerticalRadioGroup
             , note = goToDocsCallToAction "Radio"
@@ -66,7 +66,7 @@ radioGroupHorizontal : RenderConfig -> ExplorerStory
 radioGroupHorizontal renderConfig =
     storyWithModel
         ( "Horizontal"
-        , view Radio.horizontal Radio.sizeSM renderConfig
+        , view Radio.horizontal Radio.sizeSmall renderConfig
         , { defaultWithMenu
             | code = codeForHorizontalRadioGroup
             , note = goToDocsCallToAction "Radio"
@@ -78,7 +78,7 @@ radioGroupMedium : RenderConfig -> ExplorerStory
 radioGroupMedium renderConfig =
     storyWithModel
         ( "Medium"
-        , view Radio.vertical Radio.sizeMD renderConfig
+        , view Radio.vertical Radio.sizeMedium renderConfig
         , { defaultWithMenu
             | code = codeForHorizontalRadioGroup
             , note = goToDocsCallToAction "Radio"
@@ -133,9 +133,9 @@ unitedView : RenderConfig -> Element Msg
 unitedView renderConfig =
     Element.column
         [ Element.spacing 8 ]
-        [ radioGroupView Radio.vertical Radio.sizeSM renderConfig (\_ _ -> Msg.RadioStoriesMsg RadioMsg.NoOp) { selected = Nothing }
-        , radioGroupView Radio.horizontal Radio.sizeSM renderConfig (\_ _ -> Msg.RadioStoriesMsg RadioMsg.NoOp) { selected = Nothing }
-        , radioGroupView Radio.vertical Radio.sizeMD renderConfig (\_ _ -> Msg.RadioStoriesMsg RadioMsg.NoOp) { selected = Nothing }
+        [ radioGroupView Radio.vertical Radio.sizeSmall renderConfig (\_ _ -> Msg.RadioStoriesMsg RadioMsg.NoOp) { selected = Nothing }
+        , radioGroupView Radio.horizontal Radio.sizeSmall renderConfig (\_ _ -> Msg.RadioStoriesMsg RadioMsg.NoOp) { selected = Nothing }
+        , radioGroupView Radio.vertical Radio.sizeMedium renderConfig (\_ _ -> Msg.RadioStoriesMsg RadioMsg.NoOp) { selected = Nothing }
         ]
 
 

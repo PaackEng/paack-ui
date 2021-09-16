@@ -1,6 +1,7 @@
 module UI.Paginator exposing
-    ( PaginatorConfig
-    , nonNumeric
+    ( Paginator, nonNumeric
+    , withCurrentItem, withCurrentPage
+    , renderElement
     )
 
 {-| `UI.Paginator` is a component for helping navigation in a large sample of elements.
@@ -22,24 +23,29 @@ The following code applies the paginator to some simple list, and also applies p
                 , Element.height fill
                 ]
         , Paginator.nonNumeric
-            { onNextButtonClicked = Msg.NextPage
-            , onPreviousButtonClicked = Msg.PreviousPage
-            , totalCount = List.length model.options
-            , offset = model.pageOffset
-            , first = 0
+            { onForwardClicked = Msg.NextPage
+            , onPreviousClicked = Msg.PreviousPage
+            , totalAmount = List.length model.options
+            , pageAmount = model.pageOffset
             }
-            renderConfig
+            |> Paginator.withCurrentItem model.current
+            |> Paginator.renderElement renderConfig
         ]
 
 
 # Building
 
-@docs PaginatorConfig
+@docs Paginator, nonNumeric
+
+
+# Options
+
+@docs withCurrentItem, withCurrentPage
 
 
 # Rendering
 
-@docs nonNumeric
+@docs renderElement
 
 -}
 
@@ -53,54 +59,95 @@ import UI.Text as Text
 import UI.Utils.Element exposing (zeroPadding)
 
 
-{-| `PaginatorConfig` holds the configuration required to present a Paginator.
-
-    { onNextButtonClicked = Msg.NextPage
-    , onPreviousButtonClicked = Msg.PreviousPage
-    , totalCount = List.length model.options
-    , offset = model.pageOffset
-    , first = 0
+type alias Properties msg =
+    { onForwardClicked : msg
+    , onPreviousClicked : msg
+    , totalAmount : Int
+    , pageAmount : Int
     }
 
+
+type alias Options =
+    { current : Int }
+
+
+{-| The `Paginator msg` type is used for describing the component for later rendering.
 -}
-type alias PaginatorConfig msg =
-    { onNextButtonClicked : msg
-    , onPreviousButtonClicked : msg
-    , totalCount : Int
-    , offset : Int
-    , first : Int
-    }
+type Paginator msg
+    = NonNumeric (Properties msg) Options
 
 
-{-| Given a [`PaginatorConfig`](UI-Paginator#PaginatorConfig), renders paginator.
-This paginator style (non-numeric) has only the next and previous buttons. In between those, it presents the current offset.
+{-| This paginator style has a label, followed by the previous and next buttons.
+
+The label looks like: {{current + 1}} - {{min (pageAmount + current) max)}} of {{max}}
 
     Paginator.nonNumeric
-        paginatorConfig
+        { onForwardClicked = Msg.Forward
+        , onPreviousClicked = Msg.Previous
+        , totalAmount = 999
+        , pageAmount = 10
+        }
         renderConfig
 
 -}
-nonNumeric : PaginatorConfig msg -> RenderConfig -> Element msg
-nonNumeric ({ first, offset, totalCount } as paginator) renderConfig =
+nonNumeric :
+    { onForwardClicked : msg
+    , onPreviousClicked : msg
+    , totalAmount : Int
+    , pageAmount : Int
+    }
+    -> Paginator msg
+nonNumeric prop =
+    NonNumeric prop { current = 0 }
+
+
+{-| The current item, most probably the first one displayed in your list.
+
+    Paginator.withCurrentItem 11 somePaginator
+
+-}
+withCurrentItem : Int -> Paginator msg -> Paginator msg
+withCurrentItem value (NonNumeric prop opt) =
+    NonNumeric prop { opt | current = value }
+
+
+{-| The current page. Similar to [`withCurrentItem`](#withCurrentItem), but considering `pageAmount`.
+
+    Paginator.withCurrentPage 2 somePaginator
+
+-}
+withCurrentPage : Int -> Paginator msg -> Paginator msg
+withCurrentPage pageNumber (NonNumeric prop opt) =
+    NonNumeric prop { opt | current = pageNumber * prop.pageAmount }
+
+
+{-| End of the builder's life.
+The result of this function is a ready-to-insert Elm UI's Element.
+-}
+renderElement : RenderConfig -> Paginator msg -> Element msg
+renderElement renderConfig (NonNumeric prop { current }) =
     let
-        firstItemCount =
-            offset
+        { pageAmount, totalAmount } =
+            prop
+
+        currentItemCount =
+            pageAmount
                 + 1
                 |> String.fromInt
 
         lastItemCount =
             String.fromInt <|
-                if (offset + first) > totalCount then
-                    totalCount
+                if (pageAmount + current) > totalAmount then
+                    totalAmount
 
                 else
-                    offset + first
+                    pageAmount + current
 
         noPrevious =
-            offset == 0
+            pageAmount == 0
 
         noNext =
-            first + offset >= totalCount
+            current + pageAmount >= totalAmount
 
         paginatorsTerms =
             renderConfig |> localeTerms >> .paginator
@@ -108,9 +155,9 @@ nonNumeric ({ first, offset, totalCount } as paginator) renderConfig =
     Element.row
         []
         [ paginatorsTerms.format
-            { first = firstItemCount
+            { first = currentItemCount
             , last = lastItemCount
-            , total = String.fromInt totalCount
+            , total = String.fromInt totalAmount
             }
             |> Text.body2
             |> Text.renderElement renderConfig
@@ -119,7 +166,7 @@ nonNumeric ({ first, offset, totalCount } as paginator) renderConfig =
                     { zeroPadding | right = 80 }
                 , Element.width fill
                 ]
-        , button paginator.onPreviousButtonClicked
+        , button prop.onPreviousClicked
             noPrevious
             (Icon.previousContent paginatorsTerms.previous)
             |> Button.renderElement renderConfig
@@ -127,7 +174,7 @@ nonNumeric ({ first, offset, totalCount } as paginator) renderConfig =
                 [ Element.paddingEach
                     { zeroPadding | right = 8 }
                 ]
-        , button paginator.onNextButtonClicked
+        , button prop.onForwardClicked
             noNext
             (Icon.nextContent paginatorsTerms.next)
             |> Button.renderElement renderConfig

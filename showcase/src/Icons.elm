@@ -63,6 +63,7 @@ icons =
     , ( Icon.fixIssues, "fixIssues" )
     , ( Icon.fixing, "fixing" )
     , ( Icon.groups, "groups" )
+    , ( Icon.insert, "insert" )
     , ( Icon.location, "location" )
     , ( Icon.loader, "loader" )
     , ( Icon.logout, "logout" )
@@ -126,5 +127,5 @@ iconsView cfg =
         Element.column
             []
             [ iconsGroup cfg
-                (Palette.color Palette.toneGray Palette.brightnessMiddle)
+                Palette.gray700
             ]

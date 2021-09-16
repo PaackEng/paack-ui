@@ -3,7 +3,7 @@ module Palette exposing (stories)
 import Element exposing (Element, px)
 import Element.Border as Border
 import PluginOptions exposing (defaultWithoutMenu)
-import UI.Palette.V2 as Palette exposing (Hue)
+import UI.Palette as Palette exposing (Hue)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UIExplorer exposing (storiesOf)

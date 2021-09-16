@@ -232,51 +232,51 @@ colors : BadgeTone -> BadgeBrightness -> ( Palette.Color, Palette.Color )
 colors tone brightness =
     case ( brightness, tone ) of
         ( Light, ToneGray ) ->
-            ( Palette.color Palette.toneGray Palette.brightnessLighter
-            , Palette.color Palette.toneGray Palette.brightnessDarkest
+            ( Palette.gray300
+            , Palette.gray800
             )
 
         ( Light, TonePrimary ) ->
-            ( Palette.color Palette.tonePrimary Palette.brightnessLightest
-            , Palette.color Palette.tonePrimary Palette.brightnessDarkest
+            ( Palette.blue200
+            , Palette.blue800
             )
 
         ( Light, ToneWarning ) ->
-            ( Palette.color Palette.toneWarning Palette.brightnessLightest
-            , Palette.color Palette.toneWarning Palette.brightnessDarkest
+            ( Palette.yellow200
+            , Palette.yellow800
             )
 
         ( Light, ToneDanger ) ->
-            ( Palette.color Palette.toneDanger Palette.brightnessLightest
-            , Palette.color Palette.toneDanger Palette.brightnessDarkest
+            ( Palette.red200
+            , Palette.red700
             )
 
         ( Light, ToneSuccess ) ->
-            ( Palette.color Palette.toneSuccess Palette.brightnessLightest
-            , Palette.color Palette.toneSuccess Palette.brightnessDarkest
+            ( Palette.green200
+            , Palette.green700
             )
 
         ( Dark, ToneGray ) ->
-            ( Palette.color Palette.toneGray Palette.brightnessDarkest
-            , Palette.color Palette.toneGray Palette.brightnessLightest
+            ( Palette.gray800
+            , Palette.gray200
             )
 
         ( Dark, TonePrimary ) ->
-            ( Palette.color Palette.tonePrimary Palette.brightnessDarkest
-            , Palette.color Palette.tonePrimary Palette.brightnessLightest
+            ( Palette.blue800
+            , Palette.blue200
             )
 
         ( Dark, ToneWarning ) ->
-            ( Palette.color Palette.toneWarning Palette.brightnessDarkest
-            , Palette.color Palette.toneWarning Palette.brightnessLightest
+            ( Palette.yellow800
+            , Palette.yellow200
             )
 
         ( Dark, ToneDanger ) ->
-            ( Palette.color Palette.toneDanger Palette.brightnessDarkest
-            , Palette.color Palette.toneDanger Palette.brightnessLightest
+            ( Palette.red700
+            , Palette.red200
             )
 
         ( Dark, ToneSuccess ) ->
-            ( Palette.color Palette.toneSuccess Palette.brightnessDarkest
-            , Palette.color Palette.toneSuccess Palette.brightnessLightest
+            ( Palette.green700
+            , Palette.green200
             )

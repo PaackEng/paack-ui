@@ -1,5 +1,5 @@
-module UI.Effect exposing
-    ( Effect, SideEffect(..), none, batch, msgToCmd, analytics, domFocus
+module UI.Effects exposing
+    ( Effects, SideEffect(..), none, batch, msgToCmd, analytics, domFocus
     , map, perform
     )
 
@@ -18,7 +18,7 @@ they fit in real applications.
 
 # Create
 
-@docs Effect, SideEffect, none, batch, msgToCmd, analytics, domFocus
+@docs Effects, SideEffect, none, batch, msgToCmd, analytics, domFocus
 
 
 # Transform
@@ -34,7 +34,7 @@ import UI.Analytics exposing (Analytics)
 
 {-| A list of side-effects to be performed later.
 -}
-type alias Effect msg =
+type alias Effects msg =
     List (SideEffect msg)
 
 
@@ -48,21 +48,21 @@ type SideEffect msg
 
 {-| Tells the `perform` function that there are no side-effects. Parallels `Cmd.none`.
 -}
-none : Effect msg
+none : Effects msg
 none =
     []
 
 
 {-| Batch effects together. Parallels `Cmd.batch`.
 -}
-batch : List (Effect msg) -> Effect msg
+batch : List (Effects msg) -> Effects msg
 batch =
     List.concat
 
 
 {-| Transform the messages produced by a effect. Parallels `Cmd.map`.
 -}
-map : (a -> b) -> Effect a -> Effect b
+map : (a -> b) -> Effects a -> Effects b
 map =
     let
         mapSideEffect f e =
@@ -81,21 +81,21 @@ map =
 
 {-| The effect of returning a `msg`.
 -}
-msgToCmd : msg -> Effect msg
+msgToCmd : msg -> Effects msg
 msgToCmd msg =
     [ MsgToCmd msg ]
 
 
 {-| The effect of returning `Analytics`.
 -}
-analytics : Analytics -> Effect msg
+analytics : Analytics -> Effects msg
 analytics analytics_ =
     [ Analytics analytics_ ]
 
 
 {-| The dom focus effect constructor.
 -}
-domFocus : (Result Dom.Error () -> msg) -> String -> Effect msg
+domFocus : (Result Dom.Error () -> msg) -> String -> Effects msg
 domFocus msg id =
     [ DomFocus msg id ]
 
@@ -103,7 +103,7 @@ domFocus msg id =
 {-| Perform a minimal interpretation of side-effects into commands.
 Use this if you don't care to change how to interpret them.
 -}
-perform : Effect msg -> Cmd msg
+perform : Effects msg -> Cmd msg
 perform effect =
     effect
         |> List.map performSideEffect

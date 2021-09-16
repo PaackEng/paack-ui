@@ -1,11 +1,11 @@
 module UI.Button exposing
-    ( Button, toggle, success, disabled, cmd, redirect
+    ( Button, toggle, disabled, cmd, redirect
     , ButtonBody, fromLabel, fromIcon
     , fromLabeledOnLeftIcon, fromLabeledOnRightIcon
     , ButtonStyle, hyperlink, primary, danger, light, clear
     , ButtonWidth, withWidth, widthFull, widthRelative
     , withSize
-    , withDisabledIf, withSuccessIf
+    , withDisabledIf
     , renderElement
     , map
     )
@@ -26,7 +26,7 @@ A button can be created and rendered as in the following pipeline:
 
 # Building
 
-@docs Button, toggle, success, disabled, cmd, redirect
+@docs Button, toggle, disabled, cmd, redirect
 
 
 # Content
@@ -52,7 +52,7 @@ A button can be created and rendered as in the following pipeline:
 
 # Conditional states
 
-@docs withDisabledIf, withSuccessIf
+@docs withDisabledIf
 
 
 # Rendering
@@ -87,7 +87,7 @@ import UI.Internal.Primitives as Primitives
 import UI.Internal.Size as Size exposing (Size)
 import UI.Internal.Text as Text exposing (TextColor)
 import UI.Link as Link exposing (Link)
-import UI.Palette as Palette exposing (brightnessDarkest, brightnessLight, brightnessLighter, brightnessLightest, brightnessMiddle, tonePrimary)
+import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element
@@ -179,22 +179,6 @@ disabled body =
     Button { mode = ButtonDisabled, body = body } defaultOptions
 
 
-{-| This `Button.success` builds an embossed-looking, without-message, greenish-colored button.
-It's another approach for [`Button.withSuccessIf`](#withSuccessIf), helping when you can't compose a message for the desired action at the occasion.
-
-    case event of
-        Just id ->
-            Button.cmd (TriggerEvent id) Button.primary body
-
-        Nothing ->
-            Button.success body
-
--}
-success : ButtonBody -> Button msg
-success body =
-    Button { mode = ButtonSuccess, body = body } defaultOptions
-
-
 {-| This is the most common builder.
 It uses a simple message that is triggered on a click and renders as an embossed and themed button.
 
@@ -274,30 +258,6 @@ fromLabeledOnRightIcon icon =
 
 
 -- Options
-
-
-{-| After asserting some condition, `Button.withSuccessIf` will attempt to set the button to a visually-noticeable success state (a greenish button where the action can no longer be triggered).
-
-    Button.fromLabel "Send Someting"
-        |> Button.cmd (QuerySend "Something") Button.primary
-        |> Button.withSuccessIf (model.queryResult == QueryOkay)
-        |> Button.renderElement renderConfig
-
-**NOTE**: In case the button is a toggle or the condition resolves as False, nothing will happen.
-
--}
-withSuccessIf : Bool -> Button msg -> Button msg
-withSuccessIf condition button =
-    if condition then
-        case button of
-            Toggle _ _ ->
-                button
-
-            Button { body } opt ->
-                Button { mode = ButtonSuccess, body = body } opt
-
-    else
-        button
 
 
 {-| After asserting some condition, `Button.withDisabledIf` will attempt to set the button to a visually-noticeable disabled state (a grayish button where the action can no longer be triggered).
@@ -447,9 +407,6 @@ map applier button =
                 ButtonDisabled ->
                     Button { mode = ButtonDisabled, body = body } opt
 
-                ButtonSuccess ->
-                    Button { mode = ButtonSuccess, body = body } opt
-
         Toggle { current, toggleMsg, hint } opt ->
             Toggle
                 { current = current
@@ -482,9 +439,6 @@ renderElement cfg button =
 
                 ButtonDisabled ->
                     staticView cfg size width body disabledTheme
-
-                ButtonSuccess ->
-                    staticView cfg size width body successTheme
 
 
 
@@ -524,7 +478,7 @@ hyperlinkView cfg size width body action =
     let
         attrs =
             buttonWidth width
-                :: (Palette.color tonePrimary brightnessMiddle
+                :: (Palette.blue700
                         |> Palette.toElementColor
                         |> Font.color
                    )
@@ -747,20 +701,18 @@ toggleTheme current =
 
         else
             { normal =
-                { background =
-                    Palette.color Palette.tonePrimary brightnessMiddle
-                        |> Palette.setContrasting True
-                , border = Palette.color Palette.tonePrimary brightnessMiddle
+                { background = Palette.genericWhite
+                , border = Palette.blue700
                 , text =
-                    Palette.color Palette.tonePrimary brightnessMiddle
+                    Palette.blue700
                         |> Text.ColorPalette
                 }
             , hover =
                 Just
-                    { background = Palette.color Palette.tonePrimary brightnessLightest
-                    , border = Palette.color Palette.tonePrimary brightnessDarkest
+                    { background = Palette.blue200
+                    , border = Palette.blue800
                     , text =
-                        Palette.color Palette.tonePrimary brightnessDarkest
+                        Palette.blue800
                             |> Text.ColorPalette
                     }
             }
@@ -775,61 +727,49 @@ workingTheme tone =
 
             ToneDanger ->
                 { normal =
-                    { background = Palette.color Palette.toneDanger brightnessMiddle
-                    , border = Palette.color Palette.toneDanger brightnessMiddle
-                    , text =
-                        Palette.color Palette.toneDanger brightnessMiddle
-                            |> Palette.setContrasting True
-                            |> Text.ColorPalette
+                    { background = Palette.red600
+                    , border = Palette.red600
+                    , text = Text.ColorPalette Palette.genericWhite
                     }
                 , hover =
                     Just
-                        { background = Palette.color Palette.toneDanger brightnessDarkest
-                        , border = Palette.color Palette.toneDanger brightnessDarkest
-                        , text =
-                            Palette.color Palette.toneDanger brightnessDarkest
-                                |> Palette.setContrasting True
-                                |> Text.ColorPalette
+                        { background = Palette.red700
+                        , border = Palette.red700
+                        , text = Text.ColorPalette Palette.genericWhite
                         }
                 }
 
             ToneLight ->
                 { normal =
-                    { background = Palette.color Palette.toneGray brightnessLightest
-                    , border = Palette.color Palette.toneGray brightnessLightest
+                    { background = Palette.gray200
+                    , border = Palette.gray200
                     , text =
-                        Palette.color Palette.tonePrimary brightnessMiddle
+                        Palette.blue700
                             |> Text.ColorPalette
                     }
                 , hover =
                     Just
-                        { background = Palette.color Palette.toneGray brightnessLighter
-                        , border = Palette.color Palette.toneGray brightnessLighter
-                        , text =
-                            Palette.color Palette.tonePrimary brightnessDarkest
-                                |> Text.ColorPalette
+                        { background = Palette.gray300
+                        , border = Palette.gray300
+                        , text = Text.ColorPalette Palette.blue800
                         }
                 }
 
             ToneClear ->
                 { normal =
                     { background =
-                        Palette.color Palette.tonePrimary brightnessMiddle
+                        Palette.blue700
                             |> Palette.withAlpha 0
                     , border =
-                        Palette.color Palette.tonePrimary brightnessMiddle
+                        Palette.blue700
                             |> Palette.withAlpha 0
-                    , text =
-                        Palette.color Palette.tonePrimary brightnessMiddle
-                            |> Text.ColorPalette
+                    , text = Text.ColorPalette Palette.blue700
                     }
                 , hover =
                     Just
-                        { background = Palette.color Palette.toneGray brightnessLightest
-                        , border = Palette.color Palette.toneGray brightnessLightest
-                        , text =
-                            Palette.color Palette.tonePrimary brightnessMiddle
-                                |> Text.ColorPalette
+                        { background = Palette.gray200
+                        , border = Palette.gray200
+                        , text = Text.ColorPalette Palette.blue700
                         }
                 }
 
@@ -838,57 +778,25 @@ disabledTheme : List (Attribute msg)
 disabledTheme =
     themeToAttributes <|
         { normal =
-            { background = Palette.color Palette.toneGray brightnessLight
-            , border = Palette.color Palette.toneGray brightnessLight
-            , text =
-                Palette.color Palette.toneGray brightnessLight
-                    |> Palette.setContrasting True
-                    |> Text.ColorPalette
+            { background = Palette.gray600
+            , border = Palette.gray600
+            , text = Text.ColorPalette Palette.genericWhite
             }
         , hover = Nothing
-        }
-
-
-successTheme : List (Attribute msg)
-successTheme =
-    themeToAttributes <|
-        { normal =
-            { background = Palette.color Palette.toneSuccess brightnessMiddle
-            , border = Palette.color Palette.toneSuccess brightnessMiddle
-            , text =
-                Palette.color Palette.toneSuccess brightnessMiddle
-                    |> Palette.setContrasting True
-                    |> Text.ColorPalette
-            }
-        , hover =
-            Just
-                { background = Palette.color Palette.toneSuccess brightnessDarkest
-                , border = Palette.color Palette.toneSuccess brightnessDarkest
-                , text =
-                    Palette.color Palette.toneSuccess brightnessDarkest
-                        |> Palette.setContrasting True
-                        |> Text.ColorPalette
-                }
         }
 
 
 primaryTheme : ButtonTheme
 primaryTheme =
     { normal =
-        { background = Palette.color Palette.tonePrimary brightnessMiddle
-        , border = Palette.color Palette.tonePrimary brightnessMiddle
-        , text =
-            Palette.color Palette.tonePrimary brightnessMiddle
-                |> Palette.setContrasting True
-                |> Text.ColorPalette
+        { background = Palette.blue700
+        , border = Palette.blue700
+        , text = Text.ColorPalette Palette.genericWhite
         }
     , hover =
         Just
-            { background = Palette.color Palette.tonePrimary brightnessDarkest
-            , border = Palette.color Palette.tonePrimary brightnessDarkest
-            , text =
-                Palette.color Palette.tonePrimary brightnessDarkest
-                    |> Palette.setContrasting True
-                    |> Text.ColorPalette
+            { background = Palette.blue800
+            , border = Palette.blue800
+            , text = Text.ColorPalette Palette.blue800
             }
     }

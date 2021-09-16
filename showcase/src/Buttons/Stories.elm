@@ -38,7 +38,6 @@ stories renderConfig =
         "Buttons"
         [ primaryStory renderConfig
         , disabledButtonStory renderConfig
-        , successStory renderConfig
         , dangerStory renderConfig
         , lightStory renderConfig
         , clearStory renderConfig
@@ -146,45 +145,6 @@ dangerStory cfg =
         "Danger"
         Button.danger
         "Button.danger"
-
-
-successStory : RenderConfig -> ExplorerStory
-successStory renderConfig =
-    storyList
-        ( "Success"
-        , successView renderConfig |> (::) iconsSvgSprite
-        , pluginOptions successCode
-        )
-
-
-successView : RenderConfig -> List (Element Msg)
-successView renderConfig =
-    [ Button.fromLabel "Prompt"
-        |> Button.success
-        |> Button.renderElement renderConfig
-    , Button.fromIcon (Icon.toggle "Toggle")
-        |> Button.cmd Msg.NoOp Button.primary
-        |> Button.withSuccessIf True
-        |> Button.renderElement renderConfig
-    ]
-
-
-successCode : String
-successCode =
-    """
--- Text
-
-Button.fromLabel "Some Text"
-    |> Button.success
-    |> Button.renderElement renderConfig
-
-
--- Icon
-Button.fromIcon Icon.someIcon
-    |> Button.cmd YourMessage
-    |> Button.withSuccessIf True
-    |> Button.renderElement renderConfig
-"""
 
 
 lightStory : RenderConfig -> ExplorerStory
@@ -320,7 +280,6 @@ unitedView renderConfig =
         , unitedItem <| enabledView renderConfig Button.danger
         , unitedItem <| enabledView renderConfig Button.light
         , unitedItem <| enabledView renderConfig Button.clear
-        , unitedItem <| successView renderConfig
         , unitedItem <| [ linkView renderConfig ]
         , unitedItem <| [ fullWidthView renderConfig ]
         , unitedItem <| [ toggleButtonView renderConfig False, toggleButtonView renderConfig True ]

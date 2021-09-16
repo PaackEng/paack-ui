@@ -1,50 +1,48 @@
 module UI.Palette exposing
-    ( primaryDark1, primary, primaryLight1, primaryLight2, primaryLight3, primaryLight4
-    , successDark1, success, successLight1, successLight2, successLight3, successLight4
-    , dangerDark1, danger, dangerLight1, dangerLight2, dangerLight3, dangerLight4
-    , warningDark1, warning, warningLight1, warningLight2, warningLight3, warningLight4
-    , black, gray, grayLight1, grayLight2, grayLight3, grayLight4
-    , Tone, toneGray, tonePrimary, toneSuccess, toneWarning, toneDanger
-    , Brightness, brightnessDarkest, brightnessMiddle, brightnessLight, brightnessLighter, brightnessLightest, brightnessLight4
-    , Color, color
-    , setContrasting
+    ( blue, gray, green, red, yellow
+    , blue100, blue200, blue300, blue400, blue500, blue600, blue700, blue800
+    , gray100, gray200, gray300, gray400, gray500, gray600, gray700, gray800
+    , green800, red100, red200, red300, red400, red500, red600, red700, green100, green200, green300, green400, green500, green600, green700, red800, yellow100, yellow200, yellow300, yellow400, yellow500, yellow600, yellow700, yellow800
+    , Hue, hueBlue, hueGray, hueGreen, hueRed, hueYellow
+    , Shade, shade100, shade200, shade300, shade400, shade500, shade600, shade700, shade800
+    , Color, color, toBackgroundColor, toFontColor, toBorderColor
+    , genericBlack, genericWhite, genericSkyBlue
     , withAlpha
     , toElementColor, toCssColor
     )
 
 {-| `UI.Palette` is an interface offering all colors variations proposed in the design system.
 
-    Palette.color tonePrimary brightnessMiddle
+    Palette.blue600
         |> Palette.toElementColor
 
 
-# What color
+# Which color
 
-@docs primaryDark1, primary, primaryLight1, primaryLight2, primaryLight3, primaryLight4
-@docs successDark1, success, successLight1, successLight2, successLight3, successLight4
-@docs dangerDark1, danger, dangerLight1, dangerLight2, dangerLight3, dangerLight4
-@docs warningDark1, warning, warningLight1, warningLight2, warningLight3, warningLight4
-@docs black, gray, grayLight1, grayLight2, grayLight3, grayLight4
-
-
-# What tone
-
-@docs Tone, toneGray, tonePrimary, toneSuccess, toneWarning, toneDanger
+@docs blue, gray, green, red, yellow
+@docs blue100, blue200, blue300, blue400, blue500, blue600, blue700, blue800
+@docs gray100, gray200, gray300, gray400, gray500, gray600, gray700, gray800
+@docs green800, red100, red200, red300, red400, red500, red600, red700, green100, green200, green300, green400, green500, green600, green700, red800, yellow100, yellow200, yellow300, yellow400, yellow500, yellow600, yellow700, yellow800
 
 
-# How much bright
+# Which hue
 
-@docs Brightness, brightnessDarkest, brightnessMiddle, brightnessLight, brightnessLighter, brightnessLightest, brightnessLight4
+@docs Hue, hueBlue, hueGray, hueGreen, hueRed, hueYellow
+
+
+# Which shade
+
+@docs Shade, shade100, shade200, shade300, shade400, shade500, shade600, shade700, shade800
 
 
 # Building
 
-@docs Color, color
+@docs Color, color, toBackgroundColor, toFontColor, toBorderColor
 
 
-# Inverting
+# Generic colors
 
-@docs setContrasting
+@docs genericBlack, genericWhite, genericSkyBlue
 
 
 # Making it transparent
@@ -59,284 +57,155 @@ module UI.Palette exposing
 -}
 
 import Element
-import UI.Internal.Colors as Internal exposing (..)
+import Element.Background as Background
+import Element.Border as Border
+import Element.Font as Font
+import UI.Internal.Colors as Internal
 import UI.Utils.Element exposing (colorSetOpacity)
 
 
-{-| `Palette.Color` upholds data about some desired color.
+{-| `Palette.Color` holds data about some desired color.
 -}
 type Color
     = Color Properties Options
+    | Generic GenericColor Options
+
+
+type GenericColor
+    = GenericBlack
+    | GenericWhite
+    | GenericSkyBlue
 
 
 type alias Properties =
-    { tone : Tone, brightness : Brightness }
+    { hue : Hue, shade : Shade }
 
 
 type alias Options =
-    { contrast : Bool
-    , alpha : Float
+    { alpha : Float
     }
 
 
-{-| The design system describes four main entries that here are called Tones.
+{-| The design system describes four main entries that here are called Hues.
 
-A tone is a color with five brightness variations and a specific purpose.
-
-The four tones are Gray, Primary, Success, Warning, and Danger.
+A hue is one of the five pure colors of the palette.
 
 -}
-type Tone
-    = ToneGray
-    | TonePrimary
-    | ToneSuccess
-    | ToneDanger
-    | ToneWarning
+type Hue
+    = HueGray
+    | HueBlue
+    | HueGreen
+    | HueYellow
+    | HueRed
 
 
-{-| Each [tone](UI-Palette#Tone) is later split in five brightness variations.
+{-| Each [hue](UI-Palette#Hue) can be paired with eight different shades.
 
-The five variations are Darkest, Middle, Light, Lighter, Lightest.
+The shades are 800, 700, 600, 500, 400, 300, 200 and 100.
 
 -}
-type Brightness
-    = BrightnessDark1
-    | BrightnessMiddle
-    | BrightnessLight1
-    | BrightnessLight2
-    | BrightnessLight3
-    | BrightnessLight4
+type Shade
+    = Shade800
+    | Shade700
+    | Shade600
+    | Shade500
+    | Shade400
+    | Shade300
+    | Shade200
+    | Shade100
 
 
-{-| Shorthand for the primary tone with dark brightness
--}
-primaryDark1 : Color
-primaryDark1 =
-    color TonePrimary BrightnessDark1
+{-| Given a hue and shade it constructs a color.
 
-
-{-| Shorthand for the default primary tone
--}
-primary : Color
-primary =
-    color TonePrimary BrightnessMiddle
-
-
-{-| Shorthand for the primary tone with light brightness
--}
-primaryLight1 : Color
-primaryLight1 =
-    color TonePrimary BrightnessLight1
-
-
-{-| Shorthand for the primary tone with light brightness
--}
-primaryLight2 : Color
-primaryLight2 =
-    color TonePrimary BrightnessLight2
-
-
-{-| Shorthand for the primary tone with light brightness
--}
-primaryLight3 : Color
-primaryLight3 =
-    color TonePrimary BrightnessLight3
-
-
-{-| Shorthand for the primary tone with light brightness
--}
-primaryLight4 : Color
-primaryLight4 =
-    color TonePrimary BrightnessLight4
-
-
-{-| Shorthand for the success tone with dark brightness
--}
-successDark1 : Color
-successDark1 =
-    color ToneSuccess BrightnessDark1
-
-
-{-| Shorthand for the default success tone
--}
-success : Color
-success =
-    color ToneSuccess BrightnessMiddle
-
-
-{-| Shorthand for the success tone with light brightness
--}
-successLight1 : Color
-successLight1 =
-    color ToneSuccess BrightnessLight1
-
-
-{-| Shorthand for the success tone with light brightness
--}
-successLight2 : Color
-successLight2 =
-    color ToneSuccess BrightnessLight2
-
-
-{-| Shorthand for the success tone with light brightness
--}
-successLight3 : Color
-successLight3 =
-    color ToneSuccess BrightnessLight3
-
-
-{-| Shorthand for the success tone with light brightness
--}
-successLight4 : Color
-successLight4 =
-    color ToneSuccess BrightnessLight4
-
-
-{-| Shorthand for the success danger tone with dark brightness
--}
-dangerDark1 : Color
-dangerDark1 =
-    color ToneDanger BrightnessDark1
-
-
-{-| Shorthand for the default danger tone
--}
-danger : Color
-danger =
-    color ToneDanger BrightnessMiddle
-
-
-{-| Shorthand for the danger tone with light brightness
--}
-dangerLight1 : Color
-dangerLight1 =
-    color ToneDanger BrightnessLight1
-
-
-{-| Shorthand for the danger tone with light brightness
--}
-dangerLight2 : Color
-dangerLight2 =
-    color ToneDanger BrightnessLight2
-
-
-{-| Shorthand for the danger tone with light brightness
--}
-dangerLight3 : Color
-dangerLight3 =
-    color ToneDanger BrightnessLight3
-
-
-{-| Shorthand for the danger tone with light brightness
--}
-dangerLight4 : Color
-dangerLight4 =
-    color ToneDanger BrightnessLight4
-
-
-{-| Shorthand for the danger warning with dark brightness
--}
-warningDark1 : Color
-warningDark1 =
-    color ToneWarning BrightnessDark1
-
-
-{-| Shorthand for the default warning
--}
-warning : Color
-warning =
-    color ToneWarning BrightnessMiddle
-
-
-{-| Shorthand for the warning with light brightness
--}
-warningLight1 : Color
-warningLight1 =
-    color ToneWarning BrightnessLight1
-
-
-{-| Shorthand for the warning with light brightness
--}
-warningLight2 : Color
-warningLight2 =
-    color ToneWarning BrightnessLight2
-
-
-{-| Shorthand for the warning with light brightness
--}
-warningLight3 : Color
-warningLight3 =
-    color ToneWarning BrightnessLight3
-
-
-{-| Shorthand for the warning with light brightness
--}
-warningLight4 : Color
-warningLight4 =
-    color ToneWarning BrightnessLight4
-
-
-{-| Shorthand for the gray tone with dark brightness
--}
-black : Color
-black =
-    color ToneGray BrightnessDark1
-
-
-{-| Shorthand for the default gray tone
--}
-gray : Color
-gray =
-    color ToneGray BrightnessMiddle
-
-
-{-| Shorthand for the gray tone with light brightness
--}
-grayLight1 : Color
-grayLight1 =
-    color ToneGray BrightnessLight1
-
-
-{-| Shorthand for the gray tone with light brightness
--}
-grayLight2 : Color
-grayLight2 =
-    color ToneGray BrightnessLight2
-
-
-{-| Shorthand for the gray tone with light brightness
--}
-grayLight3 : Color
-grayLight3 =
-    color ToneGray BrightnessLight3
-
-
-{-| Shorthand for the gray tone with light brightness
--}
-grayLight4 : Color
-grayLight4 =
-    color ToneGray BrightnessLight4
-
-
-{-| Given a tone and brightness, initiates the building of a color.
-
-    Palette.color tonePrimary brightnessMiddle
+    Palette.color hueBlue shade600
 
 -}
-color : Tone -> Brightness -> Color
-color tone brightness =
-    Color (Properties tone brightness) defaultOptions
+color : Hue -> Shade -> Color
+color hue shade =
+    Color (Properties hue shade) defaultOptions
 
 
-{-| Transforms a [`Palette.Color`](UI-Palette#Color) into an Elm-UI-compatible color.
+{-| Black as in `#000`.
+
+    Palette.genericBlack
+
+-}
+genericBlack : Color
+genericBlack =
+    Generic GenericBlack defaultOptions
+
+
+{-| White as in `#FFF`.
+
+    Palette.genericWhite
+
+-}
+genericWhite : Color
+genericWhite =
+    Generic GenericWhite defaultOptions
+
+
+{-| That blue used in our visual identity.
+
+    Palette.genericSkyBlue
+
+-}
+genericSkyBlue : Color
+genericSkyBlue =
+    Generic GenericSkyBlue defaultOptions
+
+
+{-| Shorthand for setting background colors
+
+    Element.row
+        [ Palette.blue600 |> Palette.toBackgroundColor
+        ]
+        []
+
+-}
+toBackgroundColor : Color -> Element.Attr decorative msg
+toBackgroundColor =
+    toElementColor >> Background.color
+
+
+{-| Shorthand for setting font colors
+
+    Element.row
+        [ Palette.blue600 |> Palette.toFontColor
+        , Font.size 16
+        , Font.justify
+        ]
+        []
+
+-}
+toFontColor : Color -> Element.Attr decorative msg
+toFontColor =
+    toElementColor >> Font.color
+
+
+{-| Shorthand for setting border colors
+
+    Element.row
+        [ Palette.blue600 |> Palette.toBorderColor
+        , Border.width 2
+        , Border.solid
+        ]
+        []
+
+-}
+toBorderColor : Color -> Element.Attr decorative msg
+toBorderColor =
+    toElementColor >> Border.color
+
+
+{-| Manually transforms a [`Palette.Color`](UI-Palette#Color) into an Elm-UI-compatible color.
 
     let
         backgroundColor =
-            Palette.color tonePrimary brightnessMiddle
+            Palette.blue700
     in
     Element.el
         [ backgroundColor
-            |> Palette.setContrasting True
             |> Palette.toElementColor
             |> Element.Font.color
         , backgroundColor
@@ -348,25 +217,27 @@ color tone brightness =
 
 -}
 toElementColor : Color -> Element.Color
-toElementColor (Color { tone, brightness } { alpha, contrast }) =
-    backportColorV2 tone brightness contrast
-        |> colorSetOpacity alpha
+toElementColor color_ =
+    case color_ of
+        Color { hue, shade } { alpha } ->
+            toColor shade hue
+                |> colorSetOpacity alpha
+
+        Generic genericColor { alpha } ->
+            (case genericColor of
+                GenericBlack ->
+                    Element.rgb 0 0 0
+
+                GenericWhite ->
+                    Element.rgb 1 1 1
+
+                GenericSkyBlue ->
+                    Element.rgb255 0 163 224
+            )
+                |> colorSetOpacity alpha
 
 
-{-| Given some color, inverts it to contrast. Useful for contrasting text with the background.
-
-    backgroundColor
-        |> Palette.setContrasting True
-        |> Palette.toElementColor
-        |> Element.Font.color
-
--}
-setContrasting : Bool -> Color -> Color
-setContrasting enabled (Color prop opt) =
-    Color prop { opt | contrast = enabled }
-
-
-{-| Applies an alpha value to the color, making it transparent.
+{-| Applies an alpha value to the color adding transparency.
 
     backgroundColor
         |> Palette.withAlpha 0.5
@@ -375,13 +246,18 @@ setContrasting enabled (Color prop opt) =
 
 -}
 withAlpha : Float -> Color -> Color
-withAlpha alpha (Color prop opt) =
-    Color prop { opt | alpha = alpha }
+withAlpha alpha color_ =
+    case color_ of
+        Color prop opt ->
+            Color prop { opt | alpha = alpha }
+
+        Generic genericColor opt ->
+            Generic genericColor { opt | alpha = alpha }
 
 
 {-| Transforms a [`Palette.Color`](UI-Palette#Color) into a CSS-compatible parameter.
 
-    Palette.color tonePrimary brightnessMiddle
+    Palette.blue700
         |> Palette.toCssColor
         |> Html.Attributes.style "font-color"
 
@@ -390,205 +266,422 @@ toCssColor : Color -> String
 toCssColor data =
     toElementColor data
         |> Element.toRgb
-        |> (\{ red, green, blue, alpha } ->
+        |> (\rgb ->
                 "rgba("
-                    ++ String.fromInt (ceiling (red * 255))
+                    ++ String.fromInt (ceiling (rgb.red * 255))
                     ++ ","
-                    ++ String.fromInt (ceiling (green * 255))
+                    ++ String.fromInt (ceiling (rgb.green * 255))
                     ++ ","
-                    ++ String.fromInt (ceiling (blue * 255))
+                    ++ String.fromInt (ceiling (rgb.blue * 255))
                     ++ ","
-                    ++ String.fromFloat alpha
+                    ++ String.fromFloat rgb.alpha
                     ++ ")"
            )
 
 
-{-| The darkest variation of some tone.
--}
-brightnessDarkest : Brightness
-brightnessDarkest =
-    BrightnessDark1
+getShade : Shade -> Internal.Shades -> Element.Color
+getShade shade =
+    .background
+        << (case shade of
+                Shade800 ->
+                    .shade800
+
+                Shade700 ->
+                    .shade700
+
+                Shade600 ->
+                    .shade600
+
+                Shade500 ->
+                    .shade500
+
+                Shade400 ->
+                    .shade400
+
+                Shade300 ->
+                    .shade300
+
+                Shade200 ->
+                    .shade200
+
+                Shade100 ->
+                    .shade100
+           )
 
 
-{-| The first light variation of some tone.
--}
-brightnessLight : Brightness
-brightnessLight =
-    BrightnessLight1
+toColor : Shade -> Hue -> Element.Color
+toColor shade hue =
+    case hue of
+        HueBlue ->
+            getShade shade Internal.navyBlue
 
+        HueRed ->
+            getShade shade Internal.red
 
-{-| The increased-light variation of some tone.
--}
-brightnessLighter : Brightness
-brightnessLighter =
-    BrightnessLight2
+        HueGray ->
+            getShade shade Internal.gray
 
+        HueYellow ->
+            getShade shade Internal.yellow
 
-{-| The greatly increased-light variation of some tone.
--}
-brightnessLightest : Brightness
-brightnessLightest =
-    BrightnessLight3
-
-
-{-| The lightest variation of some tone.
--}
-brightnessLight4 : Brightness
-brightnessLight4 =
-    BrightnessLight4
-
-
-{-| The base of all variations of some tone.
--}
-brightnessMiddle : Brightness
-brightnessMiddle =
-    BrightnessMiddle
-
-
-{-| A redish tone.
--}
-toneDanger : Tone
-toneDanger =
-    ToneDanger
-
-
-{-| A grayish tone.
--}
-toneGray : Tone
-toneGray =
-    ToneGray
-
-
-{-| A blueish tone.
--}
-tonePrimary : Tone
-tonePrimary =
-    TonePrimary
-
-
-{-| A greenish tone.
--}
-toneSuccess : Tone
-toneSuccess =
-    ToneSuccess
-
-
-{-| A yellowish tone.
--}
-toneWarning : Tone
-toneWarning =
-    ToneWarning
-
-
-
--- Internals
+        HueGreen ->
+            getShade shade Internal.green
 
 
 defaultOptions : Options
 defaultOptions =
     { alpha = 1
-    , contrast = False
     }
 
 
-backportColorV2 : Tone -> Brightness -> Bool -> Element.Color
-backportColorV2 tone brightness contrast =
-    let
-        mimicContrast { text, background } =
-            if contrast then
-                Maybe.withDefault Internal.white text
+{-| Shorthand for the most common occurrence of blue. Equivalent to blue700
+-}
+blue : Color
+blue =
+    blue700
 
-            else
-                background
-    in
-    mimicContrast <|
-        case ( tone, brightness ) of
-            ( ToneGray, BrightnessDark1 ) ->
-                Internal.gray.shade800
 
-            ( ToneGray, BrightnessMiddle ) ->
-                Internal.gray.shade700
+{-| Shorthand for the most common occurrence of red. Equivalent to red600
+-}
+red : Color
+red =
+    red600
 
-            ( ToneGray, BrightnessLight1 ) ->
-                Internal.gray.shade600
 
-            ( ToneGray, BrightnessLight2 ) ->
-                Internal.gray.shade300
+{-| Shorthand for the most common occurrence of gray. Equivalent to gray700
+-}
+gray : Color
+gray =
+    gray700
 
-            ( ToneGray, BrightnessLight3 ) ->
-                Internal.gray.shade200
 
-            ( ToneGray, BrightnessLight4 ) ->
-                Internal.gray.shade100
+{-| Shorthand for the most common occurrence of yellow. Equivalent to yellow500
+-}
+yellow : Color
+yellow =
+    yellow500
 
-            ( TonePrimary, BrightnessDark1 ) ->
-                Internal.navyBlue.shade800
 
-            ( TonePrimary, BrightnessMiddle ) ->
-                Internal.navyBlue.shade700
+{-| Shorthand for the most common occurrence of green. Equivalent to green500
+-}
+green : Color
+green =
+    green500
 
-            ( TonePrimary, BrightnessLight1 ) ->
-                Internal.navyBlue.shade600
 
-            ( TonePrimary, BrightnessLight2 ) ->
-                Internal.navyBlue.shade400
+{-| -}
+shade800 : Shade
+shade800 =
+    Shade800
 
-            ( TonePrimary, BrightnessLight3 ) ->
-                Internal.navyBlue.shade200
 
-            ( TonePrimary, BrightnessLight4 ) ->
-                Internal.navyBlue.shade100
+{-| -}
+shade700 : Shade
+shade700 =
+    Shade700
 
-            ( ToneSuccess, BrightnessDark1 ) ->
-                Internal.green.shade700
 
-            ( ToneSuccess, BrightnessMiddle ) ->
-                Internal.green.shade500
+{-| -}
+shade600 : Shade
+shade600 =
+    Shade600
 
-            ( ToneSuccess, BrightnessLight1 ) ->
-                Internal.green.shade400
 
-            ( ToneSuccess, BrightnessLight2 ) ->
-                Internal.green.shade300
+{-| -}
+shade500 : Shade
+shade500 =
+    Shade500
 
-            ( ToneSuccess, BrightnessLight3 ) ->
-                Internal.green.shade200
 
-            ( ToneSuccess, BrightnessLight4 ) ->
-                Internal.green.shade100
+{-| -}
+shade400 : Shade
+shade400 =
+    Shade400
 
-            ( ToneWarning, BrightnessDark1 ) ->
-                Internal.yellow.shade800
 
-            ( ToneWarning, BrightnessMiddle ) ->
-                Internal.yellow.shade500
+{-| -}
+shade300 : Shade
+shade300 =
+    Shade300
 
-            ( ToneWarning, BrightnessLight1 ) ->
-                Internal.yellow.shade400
 
-            ( ToneWarning, BrightnessLight2 ) ->
-                Internal.yellow.shade300
+{-| -}
+shade200 : Shade
+shade200 =
+    Shade200
 
-            ( ToneWarning, BrightnessLight3 ) ->
-                Internal.yellow.shade200
 
-            ( ToneWarning, BrightnessLight4 ) ->
-                Internal.yellow.shade100
+{-| -}
+shade100 : Shade
+shade100 =
+    Shade100
 
-            ( ToneDanger, BrightnessDark1 ) ->
-                Internal.red.shade700
 
-            ( ToneDanger, BrightnessMiddle ) ->
-                Internal.red.shade600
+{-| -}
+hueGray : Hue
+hueGray =
+    HueGray
 
-            ( ToneDanger, BrightnessLight1 ) ->
-                Internal.red.shade500
 
-            ( ToneDanger, BrightnessLight2 ) ->
-                Internal.red.shade400
+{-| -}
+hueBlue : Hue
+hueBlue =
+    HueBlue
 
-            ( ToneDanger, BrightnessLight3 ) ->
-                Internal.red.shade200
 
-            ( ToneDanger, BrightnessLight4 ) ->
-                Internal.red.shade100
+{-| -}
+hueGreen : Hue
+hueGreen =
+    HueGreen
+
+
+{-| -}
+hueYellow : Hue
+hueYellow =
+    HueYellow
+
+
+{-| -}
+hueRed : Hue
+hueRed =
+    HueRed
+
+
+{-| -}
+gray800 : Color
+gray800 =
+    color HueGray Shade800
+
+
+{-| -}
+gray700 : Color
+gray700 =
+    color HueGray Shade700
+
+
+{-| -}
+gray600 : Color
+gray600 =
+    color HueGray Shade600
+
+
+{-| -}
+gray500 : Color
+gray500 =
+    color HueGray Shade500
+
+
+{-| -}
+gray400 : Color
+gray400 =
+    color HueGray Shade400
+
+
+{-| -}
+gray300 : Color
+gray300 =
+    color HueGray Shade300
+
+
+{-| -}
+gray200 : Color
+gray200 =
+    color HueGray Shade200
+
+
+{-| -}
+gray100 : Color
+gray100 =
+    color HueGray Shade100
+
+
+{-| -}
+blue800 : Color
+blue800 =
+    color HueBlue Shade800
+
+
+{-| -}
+blue700 : Color
+blue700 =
+    color HueBlue Shade700
+
+
+{-| -}
+blue600 : Color
+blue600 =
+    color HueBlue Shade600
+
+
+{-| -}
+blue500 : Color
+blue500 =
+    color HueBlue Shade500
+
+
+{-| -}
+blue400 : Color
+blue400 =
+    color HueBlue Shade400
+
+
+{-| -}
+blue300 : Color
+blue300 =
+    color HueBlue Shade300
+
+
+{-| -}
+blue200 : Color
+blue200 =
+    color HueBlue Shade200
+
+
+{-| -}
+blue100 : Color
+blue100 =
+    color HueBlue Shade100
+
+
+{-| -}
+green800 : Color
+green800 =
+    color HueGreen Shade800
+
+
+{-| -}
+green700 : Color
+green700 =
+    color HueGreen Shade700
+
+
+{-| -}
+green600 : Color
+green600 =
+    color HueGreen Shade600
+
+
+{-| -}
+green500 : Color
+green500 =
+    color HueGreen Shade500
+
+
+{-| -}
+green400 : Color
+green400 =
+    color HueGreen Shade400
+
+
+{-| -}
+green300 : Color
+green300 =
+    color HueGreen Shade300
+
+
+{-| -}
+green200 : Color
+green200 =
+    color HueGreen Shade200
+
+
+{-| -}
+green100 : Color
+green100 =
+    color HueGreen Shade100
+
+
+{-| -}
+yellow800 : Color
+yellow800 =
+    color HueYellow Shade800
+
+
+{-| -}
+yellow700 : Color
+yellow700 =
+    color HueYellow Shade700
+
+
+{-| -}
+yellow600 : Color
+yellow600 =
+    color HueYellow Shade600
+
+
+{-| -}
+yellow500 : Color
+yellow500 =
+    color HueYellow Shade500
+
+
+{-| -}
+yellow400 : Color
+yellow400 =
+    color HueYellow Shade400
+
+
+{-| -}
+yellow300 : Color
+yellow300 =
+    color HueYellow Shade300
+
+
+{-| -}
+yellow200 : Color
+yellow200 =
+    color HueYellow Shade200
+
+
+{-| -}
+yellow100 : Color
+yellow100 =
+    color HueYellow Shade100
+
+
+{-| -}
+red800 : Color
+red800 =
+    color HueRed Shade800
+
+
+{-| -}
+red700 : Color
+red700 =
+    color HueRed Shade700
+
+
+{-| -}
+red600 : Color
+red600 =
+    color HueRed Shade600
+
+
+{-| -}
+red500 : Color
+red500 =
+    color HueRed Shade500
+
+
+{-| -}
+red400 : Color
+red400 =
+    color HueRed Shade400
+
+
+{-| -}
+red300 : Color
+red300 =
+    color HueRed Shade300
+
+
+{-| -}
+red200 : Color
+red200 =
+    color HueRed Shade200
+
+
+{-| -}
+red100 : Color
+red100 =
+    color HueRed Shade100

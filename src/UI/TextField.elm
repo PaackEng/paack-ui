@@ -98,7 +98,7 @@ import UI.Internal.Colors as Colors
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Size as Size
 import UI.Internal.Text as Text
-import UI.Palette as Palette exposing (brightnessDarkest, brightnessMiddle, toneDanger, toneGray)
+import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size exposing (Size)
 import UI.Text as Text
@@ -760,7 +760,7 @@ inputLabel cfg label labelVisible =
     if labelVisible then
         Text.caption label
             |> Text.withColor
-                (Palette.color toneGray brightnessMiddle)
+                Palette.gray700
             |> Text.renderElement cfg
             |> Input.labelAbove
                 [ Element.paddingEach
@@ -799,7 +799,7 @@ textFieldError cfg errorCaption inputElement =
                 , caption
                     |> Text.caption
                     |> Text.withColor
-                        (Palette.color toneDanger brightnessDarkest)
+                        Palette.red700
                     |> Text.renderElement cfg
                 ]
 

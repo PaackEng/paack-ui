@@ -4,7 +4,6 @@ import Buttons.Msg as Buttons
 import Checkboxes.Msg as Checkboxes
 import Dropdown.Msg as Dropdown
 import Filters.Msg as Filters
-import Layouts.Msg as Layouts
 import Paginators.Msg as Paginators
 import Radio.Msg as Radio
 import Sidebar.Msg as Sidebar
@@ -19,7 +18,6 @@ type Msg
     | CheckboxesStoriesMsg Checkboxes.Msg
     | DropdownStoriesMsg Dropdown.Msg
     | FiltersStoriesMsg Filters.Msg
-    | LayoutsStoriesMsg Layouts.Msg
     | PaginatorsStoriesMsg Paginators.Msg
     | RadioStoriesMsg Radio.Msg
     | SidebarStoriesMsg Sidebar.Msg

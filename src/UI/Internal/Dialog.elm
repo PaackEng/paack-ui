@@ -1,81 +1,110 @@
-module UI.Internal.Dialog exposing (Dialog, dialogMap, view)
+module UI.Internal.Dialog exposing (dialogView)
 
 import Element exposing (Element, fill, shrink)
 import Element.Border as Border
 import Element.Events as Events
-import UI.Icon as Icon
-import UI.Internal.Colors as Colors
-import UI.Internal.RenderConfig exposing (localeTerms)
+import UI.Button as Button exposing (Button)
+import UI.Dialog as Dialog
+import UI.Icon as Icon exposing (Icon)
+import UI.Internal.Colors exposing (mainBackground, overlayBackground)
+import UI.Internal.RenderConfig exposing (RenderConfig)
+import UI.Internal.Utils.Element exposing (zIndex)
 import UI.Palette as Palette
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
-import UI.Utils.ARIA as ARIA
 import UI.Utils.Element exposing (RectangleSides)
 
 
-type alias Dialog msg =
-    { title : String
-    , close : msg
-    , body : Element msg
-    }
-
-
-dialogMap : (a -> b) -> Dialog a -> Dialog b
-dialogMap applier data =
-    { title = data.title
-    , close = applier data.close
-    , body = Element.map applier data.body
-    }
-
-
-view : RenderConfig -> Dialog msg -> Element msg
-view cfg dialog =
+dialogView : RenderConfig -> Dialog.Dialog msg -> Element msg
+dialogView cfg ((Dialog.Dialog _ { overlayClickCloseMsg }) as dlg) =
     if RenderConfig.isMobile cfg then
-        mobileView cfg dialog
+        viewWithOverlay
+            { top = 0, bottom = 0, left = 20, right = 20 }
+            overlayClickCloseMsg
+            (mobileView cfg dlg)
 
     else
-        desktopView cfg dialog
+        viewWithOverlay
+            { top = 0, bottom = 0, left = 0, right = 0 }
+            overlayClickCloseMsg
+            (desktopDialogView cfg dlg)
 
 
-desktopView : RenderConfig -> Dialog msg -> Element msg
-desktopView cfg dialog =
-    -- Desktop has a black background
-    desktopDialogView cfg dialog
-        |> Element.el
-            [ Element.width fill
-            , Element.height fill
-            , Element.behindContent (blackBlock dialog.close)
-            ]
-
-
-desktopDialogView : RenderConfig -> Dialog msg -> Element msg
-desktopDialogView cfg { title, body, close } =
+viewWithOverlay : RectangleSides -> Maybe msg -> Element msg -> Element msg
+viewWithOverlay padding overlayClickCloseMsg dialogElement =
     Element.el
+        [ Element.width fill
+        , Element.height fill
+        , Element.behindContent (blackBlock overlayClickCloseMsg)
+        , Element.paddingEach padding
+        , zIndex 20
+        ]
+        dialogElement
+
+
+desktopDialogView : RenderConfig -> Dialog.Dialog msg -> Element msg
+desktopDialogView cfg (Dialog.Dialog { title, icon } { body, buttons }) =
+    Element.column
         [ Element.width shrink
         , Element.centerY
         , Element.centerX
-        , Colors.mainBackground
-        , Element.above
-            (desktopHeaderRow cfg close title)
+        , mainBackground
         , Element.paddingEach
-            { top = 8, left = 32, right = 32, bottom = 32 }
+            { top = 0
+            , right = 32
+            , bottom = 32
+            , left = 32
+            }
         , Border.roundEach
             { topLeft = 0
             , topRight = 0
             , bottomLeft = 6
             , bottomRight = 6
             }
+        , Element.above
+            (desktopHeaderRow cfg title icon)
         ]
-        body
+        [ body
+        , buttonsRow cfg buttons
+        ]
 
 
-desktopHeaderRow : RenderConfig -> msg -> String -> Element msg
-desktopHeaderRow cfg close title =
+buttonsColumn : RenderConfig -> List (Button msg) -> Element msg
+buttonsColumn cfg buttons =
+    Element.column
+        [ Element.spacing 12
+        , Element.width fill
+        , Element.paddingEach { top = 20, left = 0, right = 0, bottom = 0 }
+        ]
+    <|
+        List.map
+            (Button.withSize Size.medium
+                >> Button.withWidth Button.widthFull
+                >> Button.renderElement cfg
+            )
+            buttons
+
+
+buttonsRow : RenderConfig -> List (Button msg) -> Element msg
+buttonsRow cfg buttons =
     Element.row
-        [ Element.width fill
-        , Element.paddingEach { top = 12, right = 12, left = 0, bottom = 0 }
-        , Colors.mainBackground
+        [ Element.spacing 16
+        , Element.paddingEach { top = 24, left = 0, right = 0, bottom = 0 }
+        ]
+    <|
+        List.map
+            (Button.withSize Size.medium >> Button.renderElement cfg)
+            buttons
+
+
+desktopHeaderRow : RenderConfig -> String -> Icon -> Element msg
+desktopHeaderRow cfg title icon =
+    Element.row
+        [ Element.spacing 12
+        , Element.width fill
+        , Element.paddingEach { top = 32, bottom = 8, right = 32, left = 32 }
+        , mainBackground
         , Border.roundEach
             { topLeft = 6
             , topRight = 6
@@ -83,80 +112,67 @@ desktopHeaderRow cfg close title =
             , bottomRight = 0
             }
         ]
-        [ titleText cfg
-            { top = 20, left = 32, right = 0, bottom = 0 }
-            title
-        , closeButton cfg close
+        [ icon
+            |> Icon.withColor headerColor
+            |> Icon.renderElement cfg
+        , titleText cfg title |> Element.el [ Element.width fill ]
         ]
 
 
-mobileView : RenderConfig -> Dialog msg -> Element msg
-mobileView cfg { title, body, close } =
+mobileView : RenderConfig -> Dialog.Dialog msg -> Element msg
+mobileView cfg (Dialog.Dialog { title, icon } { body, buttons }) =
     Element.column
-        [ Element.width fill
-        , Element.height fill
-        , Element.alignTop
+        [ mainBackground
+        , Element.centerX
+        , Element.centerY
+        , Element.padding 32
         , Element.spacing 8
-        , Colors.mainBackground
+        , Border.rounded 6
         ]
-        [ mobileHeaderRow cfg close title
+        [ mobileHeader cfg title icon
         , body
-            |> Element.el
-                [ Element.width fill
-                , Element.paddingEach
-                    { top = 0, left = 20, right = 20, bottom = 20 }
-                ]
+        , buttonsColumn cfg buttons
         ]
 
 
-mobileHeaderRow : RenderConfig -> msg -> String -> Element msg
-mobileHeaderRow cfg close title =
-    Element.row
-        [ Element.width fill
-        , Element.padding 0
-        ]
-        [ titleText cfg
-            { top = 40, left = 20, right = 0, bottom = 0 }
-            title
-        , closeButton cfg close
+mobileHeader : RenderConfig -> String -> Icon -> Element msg
+mobileHeader cfg title icon =
+    Element.column
+        [ Element.spacing 12 ]
+        [ icon
+            |> Icon.withColor headerColor
+            |> Icon.renderElement cfg
+            |> Element.el [ Element.alignLeft ]
+        , titleText cfg title
         ]
 
 
-titleText : RenderConfig -> RectangleSides -> String -> Element msg
-titleText cfg padding title =
+titleText : RenderConfig -> String -> Element msg
+titleText cfg title =
     Text.heading5 title
+        |> Text.withColor headerColor
         |> Text.renderElement cfg
-        |> Element.el
-            [ Element.width fill
-            , Element.paddingEach padding
-            , Element.alignTop
-            ]
 
 
-closeButton : RenderConfig -> msg -> Element msg
-closeButton cfg close =
-    (cfg |> localeTerms >> .dialog >> .close)
-        |> Icon.close
-        |> Icon.withSize Size.small
-        |> Icon.withColor (Palette.color Palette.toneGray Palette.brightnessLight)
-        |> Icon.renderElement cfg
-        |> Element.el
-            (ARIA.toElementAttributes ARIA.roleButton
-                ++ [ Events.onClick close
-                   , Element.pointer
-                   , Element.padding 12
-                   , Element.height shrink
-                   , Element.alignTop
-                   ]
-            )
+headerColor : Palette.Color
+headerColor =
+    Palette.gray700
 
 
-blackBlock : msg -> Element msg
+{-| Making overlay part of the dialog since it is almost always used with it and
+almost all of the major UI frameworks follow this practice.
+-}
+blackBlock : Maybe msg -> Element msg
 blackBlock close =
     Element.el
         [ Element.width fill
         , Element.height fill
-        , Colors.overlayBackground
-        , Events.onClick close
+        , overlayBackground
+        , case close of
+            Just msg ->
+                Events.onClick msg
+
+            Nothing ->
+                Element.width fill
         ]
         Element.none

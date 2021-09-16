@@ -1,5 +1,6 @@
 module UI.Utils.Focus exposing
-    ( Focus
+    ( Focus, focus
+    , withOnEnter, withOnLeave, withTabIndex
     , toElementAttributes
     )
 
@@ -8,7 +9,8 @@ module UI.Utils.Focus exposing
 
 # Configuration
 
-@docs Focus
+@docs Focus, focus
+@docs withOnEnter, withOnLeave, withTabIndex
 
 
 # Element Attributes
@@ -24,21 +26,63 @@ import Html.Attributes as HtmlAttrs
 
 
 {-| Required configuration for managing focus.
+-}
+type Focus msg
+    = Focus { hasFocus : Bool } (Optional msg)
 
-    { onEnter = Msg.OnFocusEnterThisComponent
-    , tabIndex = 2
-    , hasFocus = False
+
+type alias Optional msg =
+    { onEnter : Maybe msg
+    , onLeave : Maybe msg
+    , tabIndex : Maybe Int
     }
 
-`hasFocus` can be used for enforcing focus when loading a new page.
+
+{-| Allow paack-ui to know the one useful thing for visually focus feedback: Is it focused?
+
+    Focus.focus True
 
 -}
-type alias Focus msg =
-    { onEnter : msg
-    , onLeave : msg
-    , tabIndex : Int
-    , hasFocus : Bool
-    }
+focus : Bool -> Focus msg
+focus hasFocus =
+    Focus { hasFocus = hasFocus }
+        { onEnter = Nothing
+        , onLeave = Nothing
+        , tabIndex = Nothing
+        }
+
+
+{-| Allow paack-ui to message a feedback when focus enters the element.
+
+    Focus.focus model.isInputFocused
+        |> Focus.withOnEnter Msg.InputFocused
+
+-}
+withOnEnter : msg -> Focus msg -> Focus msg
+withOnEnter msg (Focus prop opt) =
+    Focus prop { opt | onEnter = Just msg }
+
+
+{-| Allow paack-ui to message a feedback when focus leaves the element.
+
+    Focus.focus model.isInputFocused
+        |> Focus.withOnLeave Msg.InputFocusLost
+
+-}
+withOnLeave : msg -> Focus msg -> Focus msg
+withOnLeave msg (Focus prop opt) =
+    Focus prop { opt | onLeave = Just msg }
+
+
+{-| Makes the element keyboard-interactive.
+
+    Focus.focus model.isInputFocused
+        |> Focus.withTabIndex -1
+
+-}
+withTabIndex : Int -> Focus msg -> Focus msg
+withTabIndex value (Focus prop opt) =
+    Focus prop { opt | tabIndex = Just value }
 
 
 {-| Applies [`Focus`]`#Focus` into Elm UI attributes.
@@ -48,18 +92,36 @@ type alias Focus msg =
 
 -}
 toElementAttributes : Focus msg -> List (Attribute msg)
-toElementAttributes { onEnter, tabIndex, hasFocus, onLeave } =
+toElementAttributes (Focus { hasFocus } { onEnter, tabIndex, onLeave }) =
     let
-        any =
-            [ Events.onFocus onEnter
-            , Events.onLoseFocus onLeave
-            , tabIndex
-                |> HtmlAttrs.tabindex
-                |> Element.htmlAttribute
-            ]
-    in
-    if hasFocus then
-        Input.focusedOnLoad :: any
+        withFocusAttrs attributes =
+            if hasFocus then
+                Input.focusedOnLoad :: attributes
 
-    else
-        any
+            else
+                attributes
+
+        withOnEnterAttrs =
+            Maybe.map
+                (Events.onFocus >> (::))
+                onEnter
+                |> Maybe.withDefault identity
+
+        withOnLeaveAttrs =
+            Maybe.map
+                (Events.onLoseFocus >> (::))
+                onLeave
+                |> Maybe.withDefault identity
+
+        tabAttrs =
+            case tabIndex of
+                Just tabIndexInt ->
+                    tabIndexInt
+                        |> HtmlAttrs.tabindex
+                        |> Element.htmlAttribute
+                        |> List.singleton
+
+                Nothing ->
+                    []
+    in
+    tabAttrs |> withOnEnterAttrs |> withOnLeaveAttrs |> withFocusAttrs

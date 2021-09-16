@@ -46,7 +46,7 @@ import Dropdown
 import Element exposing (Attribute, Element, maximum, shrink)
 import Element.Background as Background
 import Element.Border as Border
-import UI.Effect as Effect exposing (Effect)
+import UI.Effects as Effects exposing (Effects)
 import UI.Icon as Icon
 import UI.Internal.Colors as Colors
 import UI.Internal.RenderConfig exposing (localeTerms)
@@ -135,7 +135,7 @@ Do not ignore the returned `Effect`, it may include remote select's messages.
         Dropdown.update renderConfig subMsg dropdown
 
 -}
-update : RenderConfig -> Msg item -> Dropdown item msg -> ( State item, Effect msg )
+update : RenderConfig -> Msg item -> Dropdown item msg -> ( State item, Effects msg )
 update cfg (Msg msg) dropdown =
     let
         (Dropdown prop _) =
@@ -150,14 +150,14 @@ update cfg (Msg msg) dropdown =
     ( State state_, List.map translateEffect effects )
 
 
-translateEffect : Dropdown.Effect msg -> Effect.SideEffect msg
+translateEffect : Dropdown.Effect msg -> Effects.SideEffect msg
 translateEffect effect =
     case effect of
         Dropdown.Loopback msg ->
-            Effect.MsgToCmd msg
+            Effects.MsgToCmd msg
 
         Dropdown.DomFocus msg id ->
-            Effect.DomFocus msg id
+            Effects.DomFocus msg id
 
 
 {-| Constructs a basic dropdown.
@@ -336,7 +336,7 @@ getConfig cfg ((Dropdown prop opt) as dropdown) =
 itemToPrompt : RenderConfig -> Dropdown item msg -> item -> Element msg
 itemToPrompt cfg (Dropdown _ opts) item =
     Text.subtitle2 (opts.itemToText item)
-        |> Text.withColor Palette.primary
+        |> Text.withColor Palette.blue700
         |> Text.renderElement cfg
 
 
@@ -345,10 +345,10 @@ itemToElement cfg (Dropdown _ opts) selected highlighted item =
     Element.el
         [ Background.color <|
             if selected then
-                Palette.toElementColor Palette.primary
+                Palette.toElementColor Palette.blue700
 
             else if highlighted then
-                Palette.toElementColor Palette.grayLight2
+                Palette.toElementColor Palette.gray300
 
             else
                 Colors.white
@@ -359,10 +359,10 @@ itemToElement cfg (Dropdown _ opts) selected highlighted item =
         (Text.body2 (opts.itemToText item)
             |> Text.withColor
                 (if selected then
-                    Palette.grayLight4
+                    Palette.gray100
 
                  else
-                    Palette.gray
+                    Palette.gray700
                 )
             |> Text.renderElement cfg
         )
@@ -381,8 +381,7 @@ customDropdown cfg dropdown =
 promptElement : RenderConfig -> Dropdown item msg -> Element msg
 promptElement cfg (Dropdown _ opt) =
     Text.body2 (Maybe.withDefault "" <| opt.placeholder)
-        |> Text.withColor
-            (Palette.color Palette.toneGray Palette.brightnessDarkest)
+        |> Text.withColor Palette.gray800
         |> Text.renderElement cfg
 
 
@@ -391,9 +390,9 @@ selectAttrs (Dropdown prop _) =
     Element.width Element.fill
         :: Element.paddingXY 14 10
         :: Border.width 1
-        :: Border.color (Palette.toElementColor Palette.grayLight2)
+        :: Border.color (Palette.toElementColor Palette.gray300)
         :: Border.rounded 6
-        :: Background.color (Palette.toElementColor Palette.grayLight4)
+        :: Background.color (Palette.toElementColor Palette.gray100)
         :: (case prop.dropdownType of
                 Basic ->
                     [ Element.pointer ]
@@ -415,7 +414,7 @@ listAttrs (Dropdown _ opt) =
     , Element.scrollbarY
     , Element.padding 4
     , Border.width 1
-    , Border.color <| Palette.toElementColor Palette.grayLight3
+    , Border.color <| Palette.toElementColor Palette.gray200
     , Border.rounded 4
     , Border.shadow
         { offset = ( 0, 2 )
@@ -438,7 +437,7 @@ openCloseButtons : RenderConfig -> { openButton : Element msg, closeButton : Ele
 openCloseButtons cfg =
     let
         renderButton =
-            Icon.withColor Palette.primary
+            Icon.withColor Palette.blue700
                 >> Icon.withCustomSize 12
                 >> Icon.renderElement cfg
                 >> Element.el [ Element.alignTop, Element.alignRight ]

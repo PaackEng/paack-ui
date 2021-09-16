@@ -19,7 +19,7 @@ import Html exposing (Html)
 import Model exposing (Model)
 import Msg exposing (Msg)
 import PluginOptions exposing (PluginOptions, defaultWithMenu)
-import UI.Palette as Palette exposing (brightnessMiddle, toneGray)
+import UI.Palette as Palette
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UIExplorer
 
@@ -74,7 +74,7 @@ storyBorder view =
     Element.el
         [ Border.dashed
         , Border.width 2
-        , Palette.color toneGray brightnessMiddle
+        , Palette.gray700
             |> Palette.toElementColor
             |> Border.color
         , Element.width Element.fill

@@ -36,7 +36,7 @@ An alert can be created and render as in the following pipeline:
 import Element exposing (Element, fill, px)
 import Element.Background as Background
 import UI.Icon as Icon
-import UI.Palette as Palette exposing (brightnessMiddle, toneDanger, tonePrimary, toneSuccess, toneWarning)
+import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
@@ -174,25 +174,34 @@ defaultOptions =
 
 getTextColor : AlertTone -> Palette.Color
 getTextColor alertTone =
-    alertTone
-        |> getBackgroundColor
-        |> Palette.setContrasting True
+    case alertTone of
+        ToneWarning ->
+            Palette.genericBlack
+
+        ToneDanger ->
+            Palette.genericWhite
+
+        TonePrimary ->
+            Palette.genericWhite
+
+        ToneSuccess ->
+            Palette.genericBlack
 
 
 getBackgroundColor : AlertTone -> Palette.Color
 getBackgroundColor alertTone =
     case alertTone of
         ToneWarning ->
-            Palette.color toneWarning brightnessMiddle
+            Palette.yellow500
 
         ToneDanger ->
-            Palette.color toneDanger brightnessMiddle
+            Palette.red700
 
         TonePrimary ->
-            Palette.color tonePrimary brightnessMiddle
+            Palette.blue700
 
         ToneSuccess ->
-            Palette.color toneSuccess brightnessMiddle
+            Palette.green500
 
 
 icon : RenderConfig -> AlertTone -> Palette.Color -> Element msg

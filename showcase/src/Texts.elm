@@ -82,7 +82,7 @@ stylesView : RenderConfig -> String -> Element msg
 stylesView renderConfig title =
     Element.column [ Element.width Element.fill, Element.spacing 40 ]
         [ Text.overline title
-            |> Text.withColor Palette.primaryLight1
+            |> Text.withColor Palette.blue600
             |> Text.renderElement renderConfig
         , styles
             |> List.map (styleView renderConfig)

@@ -52,7 +52,6 @@ type ButtonAction msg
 type ButtonMode msg
     = ButtonActive (ButtonAction msg) ButtonStyle
     | ButtonDisabled
-    | ButtonSuccess
 
 
 type EmbossedTone
