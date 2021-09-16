@@ -138,13 +138,6 @@ describe('Percy Snapshots', () => {
     })
   })
 
-  describe('Layouts', () => {
-    it('Creates the Layouts page snapshot', () => {
-      cy.visit('/#Basics/Layouts/SplitSelectable')
-      cy.percySnapshot('Layouts')
-    })
-  })
-
   describe('Sidebar', () => {
     it('Creates the Persistent Sidebar page snapshot', () => {
       cy.visit('/#Complex%20components/Sidebar/Persistent')
