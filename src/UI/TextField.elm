@@ -251,8 +251,20 @@ setLabelVisible isVisible (TextField prop opt) =
 -}
 withError : String -> TextField msg -> TextField msg
 withError caption (TextField prop opt) =
+    let
+        trimmedCaption =
+            String.trim caption
+    in
     TextField prop
-        { opt | errorCaption = Just caption }
+        { opt
+            | errorCaption =
+                case trimmedCaption of
+                    "" ->
+                        Nothing
+
+                    _ ->
+                        Just trimmedCaption
+        }
 
 
 {-| Trigger message when the users press return-key while editing the text field.
@@ -649,9 +661,7 @@ attrs : RenderConfig -> Properties msg -> Options msg -> List (Attribute msg)
 attrs cfg prop opt =
     let
         hasError =
-            opt.errorCaption
-                |> Maybe.map showError
-                |> Maybe.withDefault False
+            opt.errorCaption /= Nothing
 
         isPlaceholder =
             prop.currentValue == ""
@@ -795,26 +805,17 @@ textFieldError : RenderConfig -> Maybe String -> Element msg -> Element msg
 textFieldError cfg errorCaption inputElement =
     case errorCaption of
         Just caption ->
-            if showError caption then
-                Element.column
-                    [ Element.width Element.fill
-                    , Element.spacing 8
-                    ]
-                    [ inputElement
-                    , caption
-                        |> Text.caption
-                        |> Text.withColor
-                            Palette.red700
-                        |> Text.renderElement cfg
-                    ]
-
-            else
-                inputElement
+            Element.column
+                [ Element.width Element.fill
+                , Element.spacing 8
+                ]
+                [ inputElement
+                , caption
+                    |> Text.caption
+                    |> Text.withColor
+                        Palette.red700
+                    |> Text.renderElement cfg
+                ]
 
         Nothing ->
             inputElement
-
-
-showError : String -> Bool
-showError error =
-    (error |> String.trim |> String.length) > 0
