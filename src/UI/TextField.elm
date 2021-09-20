@@ -251,8 +251,20 @@ setLabelVisible isVisible (TextField prop opt) =
 -}
 withError : String -> TextField msg -> TextField msg
 withError caption (TextField prop opt) =
+    let
+        trimmedCaption =
+            String.trim caption
+    in
     TextField prop
-        { opt | errorCaption = Just caption }
+        { opt
+            | errorCaption =
+                case trimmedCaption of
+                    "" ->
+                        Nothing
+
+                    _ ->
+                        Just trimmedCaption
+        }
 
 
 {-| Trigger message when the users press return-key while editing the text field.
@@ -791,17 +803,19 @@ textFieldPadding size =
 
 textFieldError : RenderConfig -> Maybe String -> Element msg -> Element msg
 textFieldError cfg errorCaption inputElement =
-    case errorCaption of
-        Just caption ->
-            Element.column
-                [ Element.spacing 8 ]
-                [ inputElement
-                , caption
+    Element.column
+        [ Element.width Element.fill
+        , Element.spacing 8
+        ]
+        [ inputElement
+        , case errorCaption of
+            Just caption ->
+                caption
                     |> Text.caption
                     |> Text.withColor
                         Palette.red700
                     |> Text.renderElement cfg
-                ]
 
-        Nothing ->
-            inputElement
+            Nothing ->
+                Element.none
+        ]
