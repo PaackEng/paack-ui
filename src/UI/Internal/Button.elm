@@ -84,35 +84,72 @@ bodyToElement cfg size body =
         attrs =
             [ Font.size <| textSize size
             , Element.centerX
-            , Element.spacing 8
             ]
 
         label str =
             Element.text str
-
-        iconElement icon =
-            icon
-                |> Icon.withSize size
-                |> Icon.renderElement cfg
     in
     case body of
         BodyText str ->
             Element.el attrs (label str)
 
         BodyIcon icon ->
-            iconElement icon
+            icon
+                |> Icon.withSize size
+                |> Icon.renderElement cfg
 
         BodyIconLeftText icon ->
-            Element.row attrs
+            Element.row
+                (Element.spacing (companionSpacing size) :: attrs)
                 [ label <| Icon.getHint icon
-                , iconElement icon
+                , companionIcon cfg size icon
                 ]
 
         BodyIconRightText icon ->
-            Element.row attrs
-                [ iconElement icon
+            Element.row
+                (Element.spacing (companionSpacing size) :: attrs)
+                [ companionIcon cfg size icon
                 , label <| Icon.getHint icon
                 ]
+
+
+companionIcon : RenderConfig -> Size -> Icon -> Element msg
+companionIcon cfg size icon =
+    icon
+        |> Icon.withCustomSize (companionIconSize size)
+        |> Icon.renderElement cfg
+
+
+companionIconSize : Size -> Int
+companionIconSize size =
+    case size of
+        Size.Large ->
+            28
+
+        Size.Medium ->
+            20
+
+        Size.Small ->
+            16
+
+        Size.ExtraSmall ->
+            12
+
+
+companionSpacing : Size -> Int
+companionSpacing size =
+    case size of
+        Size.Large ->
+            8
+
+        Size.Medium ->
+            4
+
+        Size.Small ->
+            4
+
+        Size.ExtraSmall ->
+            2
 
 
 textSize : Size -> Int

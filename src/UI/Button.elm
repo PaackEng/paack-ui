@@ -576,10 +576,10 @@ bodyAttrs body size =
             iconLayout (Icon.getHint icon) size
 
         BodyIconLeftText icon ->
-            iconLayout (Icon.getHint icon) size
+            companionLayout size
 
         BodyIconRightText icon ->
-            iconLayout (Icon.getHint icon) size
+            companionLayout size
 
 
 iconLayout : String -> Size -> List (Attribute msg)
@@ -627,6 +627,31 @@ textLayout size =
 
                 Size.ExtraSmall ->
                     ( 12 - border, ((24 - 10) // 2) - border )
+    in
+    [ pairUncurry Element.paddingXY paddingXY
+    , Border.width border
+    ]
+
+
+companionLayout : Size -> List (Attribute msg)
+companionLayout size =
+    let
+        border =
+            borderWidth size
+
+        paddingXY =
+            case size of
+                Size.Large ->
+                    ( 40 - border, ((60 - 28) // 2) - border )
+
+                Size.Medium ->
+                    ( 32 - border, ((48 - 20) // 2) - border )
+
+                Size.Small ->
+                    ( 20 - border, ((36 - 16) // 2) - border )
+
+                Size.ExtraSmall ->
+                    ( 12 - border, ((24 - 12) // 2) - border )
     in
     [ pairUncurry Element.paddingXY paddingXY
     , Border.width border
@@ -727,14 +752,14 @@ workingTheme tone =
 
             ToneDanger ->
                 { normal =
-                    { background = Palette.red600
-                    , border = Palette.red600
+                    { background = Palette.red700
+                    , border = Palette.red700
                     , text = Text.ColorPalette Palette.genericWhite
                     }
                 , hover =
                     Just
-                        { background = Palette.red700
-                        , border = Palette.red700
+                        { background = Palette.red800
+                        , border = Palette.red800
                         , text = Text.ColorPalette Palette.genericWhite
                         }
                 }
@@ -758,10 +783,10 @@ workingTheme tone =
             ToneClear ->
                 { normal =
                     { background =
-                        Palette.blue700
+                        Palette.genericWhite
                             |> Palette.withAlpha 0
                     , border =
-                        Palette.blue700
+                        Palette.genericWhite
                             |> Palette.withAlpha 0
                     , text = Text.ColorPalette Palette.blue700
                     }
@@ -778,8 +803,8 @@ disabledTheme : List (Attribute msg)
 disabledTheme =
     themeToAttributes <|
         { normal =
-            { background = Palette.gray600
-            , border = Palette.gray600
+            { background = Palette.gray300
+            , border = Palette.gray300
             , text = Text.ColorPalette Palette.genericWhite
             }
         , hover = Nothing
@@ -797,6 +822,6 @@ primaryTheme =
         Just
             { background = Palette.blue800
             , border = Palette.blue800
-            , text = Text.ColorPalette Palette.blue800
+            , text = Text.ColorPalette Palette.genericWhite
             }
     }
