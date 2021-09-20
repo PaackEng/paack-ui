@@ -803,19 +803,19 @@ textFieldPadding size =
 
 textFieldError : RenderConfig -> Maybe String -> Element msg -> Element msg
 textFieldError cfg errorCaption inputElement =
-    case errorCaption of
-        Just caption ->
-            Element.column
-                [ Element.width Element.fill
-                , Element.spacing 8
-                ]
-                [ inputElement
-                , caption
+    Element.column
+        [ Element.width Element.fill
+        , Element.spacing 8
+        ]
+        [ inputElement
+        , case errorCaption of
+            Just caption ->
+                caption
                     |> Text.caption
                     |> Text.withColor
                         Palette.red700
                     |> Text.renderElement cfg
-                ]
 
-        Nothing ->
-            inputElement
+            Nothing ->
+                Element.none
+        ]
