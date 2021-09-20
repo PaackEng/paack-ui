@@ -2695,7 +2695,7 @@ cssstyle@^1.1.1:
   dependencies:
     cssom "0.3.x"
 
-cypress@^8.4.0:
+cypress@^8.4.1:
   version "8.4.1"
   resolved "https://registry.yarnpkg.com/cypress/-/cypress-8.4.1.tgz#8b5898bf49359cadc28f02ba05d51f63b8e3a717"
   integrity sha512-itJXq0Vx3sXCUrDyBi2IUrkxVu/gTTp1VhjB5tzGgkeCR8Ae+/T8WV63rsZ7fS8Tpq7LPPXiyoM/sEdOX7cR6A==
