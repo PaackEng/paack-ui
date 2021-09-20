@@ -575,10 +575,10 @@ bodyAttrs body size =
         BodyIcon icon ->
             iconLayout (Icon.getHint icon) size
 
-        BodyIconLeftText icon ->
+        BodyIconLeftText _ ->
             companionLayout size
 
-        BodyIconRightText icon ->
+        BodyIconRightText _ ->
             companionLayout size
 
 
