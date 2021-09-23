@@ -17,24 +17,22 @@ module Pages.Login.View exposing (container)
 
 import Element exposing (Element, fill, maximum, minimum, shrink)
 import UI.Button as Button
-import UI.NavigationContainer as Nav
+import UI.Document as Nav
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UI.TextField as TextField
 -- and others
 
 
-container : AppConfig -> Model -> Nav.Container Msg
+container : AppConfig -> Model -> Nav.Page Msg
 container appConfig model =
-    { title = pageTitle appConfig.locale model
-    , content = Nav.contentSingle <| viewBody appConfig model
-    , dialog = Nothing
-    , hasMenu = False
-    }
+  viewBody appConfig model
+    |> Nav.bodySingle
+    |> Nav.page (pageTitle appConfig.locale model)
 
 
 loginForm : Locale -> RenderConfig -> Model -> Element Msg
-loginForm ({ t } as locale) cfg model =
+loginForm ({ terms } as locale) renderCfg model =
     Element.column
         [ Element.centerY
         , Element.centerX
@@ -42,33 +40,33 @@ loginForm ({ t } as locale) cfg model =
         , Element.padding 32
         ]
         [ TextField.username SetEmail  -- UI.TextField
-            (t "pages.login.username")
+            terms.pages.login.username
             model.email
             |> TextField.withPlaceholder "jon@paack.co"
             |> TextField.setLabelVisible True
             |> TextField.withWidth TextField.widthFull
-            |> TextField.renderElement cfg
+            |> TextField.renderElement renderCfg
         , TextField.currentPassword SetPassword -- UI.TextField
-            (t "pages.login.password")
+            terms.pages.login.password
             model.password
             |> TextField.withPlaceholder "********"
             |> TextField.setLabelVisible True
             |> TextField.withWidth TextField.widthFull
             |> TextField.withOnEnterPressed GetCredentials
-            |> TextField.renderElement cfg -- UI.TextField
-        , Button.fromLabel (t "pages.login.login") -- UI.Button
+            |> TextField.renderElement renderCfg -- UI.TextField
+        , Button.fromLabel (terms.pages.login.login) -- UI.Button
             |> Button.cmd GetCredentials Button.primary
-            |> Button.renderElement cfg
+            |> Button.renderElement renderCfg
         ]
 
 
 loginTitle : Locale -> RenderConfig -> Element Msg
-loginTitle { t } cfg =
-    t "pages.login.description"
+loginTitle { terms } renderCfg =
+    terms.pages.login.description
         |> String.split "\n"
         |> Text.multiline Text.heading5 -- UI.Text
         |> Text.withColor (Palette.color tonePrimary brightnessMiddle)
-        |> Text.renderElement cfg
+        |> Text.renderElement renderCfg
         |> Element.el
             [ Element.paddingXY 0 20
             , Element.width fill
@@ -100,6 +98,6 @@ Also, you have to import or provide the "Fira Sans" font family, with the follow
 
 ## Where to begin?
 
-See [the `UI.NavigationContainer` module documentation](http://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-NavigationContainer) for the top-level component.
+See [the `UI.Document` module documentation](http://package.elm-lang.org/packages/PaackEng/paack-ui/latest/UI-Document) for the top-level component.
 
 There is a showcase demo available. Run `npm showcase` and navigate to the pointed link. In this demo, you can see all different components in actions with some code samples.

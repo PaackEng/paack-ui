@@ -1,5 +1,5 @@
 module UI.Document exposing
-    ( Msg, Model, modelInit, modelWithClosedMenu, modelUpdate
+    ( Msg, Model, modelInit, modelWithClosedMenu, modelUpdate, modelUpdateWithoutPerform
     , Document, document
     , Page, page, pageWithDialog, pageWithDefaultMenu, pageMap
     , PageBody, bodySingle, Stack, bodyStack
@@ -47,7 +47,7 @@ Example of usage:
 
 # Model & Update
 
-@docs Msg, Model, modelInit, modelWithClosedMenu, modelUpdate
+@docs Msg, Model, modelInit, modelWithClosedMenu, modelUpdate, modelUpdateWithoutPerform
 
 
 # Building
