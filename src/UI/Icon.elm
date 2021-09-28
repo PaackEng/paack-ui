@@ -1,7 +1,7 @@
 module UI.Icon exposing
     ( svgSpriteImport
     , Icon
-    , add, assignPerson, boxes, check, close, collapse, configure, delete, done
+    , add, assignPerson, boxes, check, success, close, collapse, configure, delete, done
     , download, edit, eventLog, expand, filter, fix, fixIssues, fixing, groups
     , insert, loader, location, logout, moreActions, move, nextContent
     , notifications, paackSpaces, packages, person, persons, phone, pause
@@ -38,7 +38,7 @@ An icon can be created and rendered as in the following pipeline:
 # Building
 
 @docs Icon
-@docs add, assignPerson, boxes, check, close, collapse, configure, delete, done
+@docs add, assignPerson, boxes, check, success, close, collapse, configure, delete, done
 @docs download, edit, eventLog, expand, filter, fix, fixIssues, fixing, groups
 @docs insert, loader, location, logout, moreActions, move, nextContent
 @docs notifications, paackSpaces, packages, person, persons, phone, pause
@@ -236,6 +236,16 @@ boxes =
 check : String -> Icon
 check =
     defaultInit "Checkmark"
+
+
+{-| A check mark in circle, commonly used to indicate a success state.
+
+    Icon.success "Success"
+
+-}
+success : String -> Icon
+success =
+    defaultInit "Checkmark-Circle"
 
 
 {-| A times sign. Usually used for closing dialogs.
