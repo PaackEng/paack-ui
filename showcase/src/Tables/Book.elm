@@ -11,7 +11,7 @@ module Tables.Book exposing
     )
 
 import Time exposing (millisToPosix, posixToMillis)
-import UI.Internal.DateInput as DateInput
+import UI.DateInput as DateInput
 import UI.Tables.Common as Tables exposing (cellFromText, column, columnWidthPixels, columnWidthPortion, columnsEmpty, rowCellText, rowEmpty)
 import UI.Tables.Stateful as Stateful exposing (detailHidden, detailShown, detailsEmpty)
 import UI.Text as Text
