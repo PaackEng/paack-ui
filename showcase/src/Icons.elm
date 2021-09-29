@@ -49,6 +49,7 @@ icons =
     , ( Icon.assignPerson, "assignPerson" )
     , ( Icon.boxes, "boxes" )
     , ( Icon.check, "check" )
+    , ( Icon.success, "success" )
     , ( Icon.close, "close" )
     , ( Icon.collapse, "collapse" )
     , ( Icon.configure, "configure" )
