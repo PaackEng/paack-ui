@@ -11,6 +11,7 @@
         "UI.Button",
         "UI.Checkbox",
         "UI.ContentPlaceholder",
+        "UI.DateInput",
         "UI.Dialog",
         "UI.Document",
         "UI.Dropdown",
