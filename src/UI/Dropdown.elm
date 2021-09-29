@@ -1,8 +1,9 @@
 module UI.Dropdown exposing
     ( Dropdown, BasicConfig, basic, filterable
     , State, Msg, init, update
-    , withPlaceholder, withFilterPlaceholder, withItems, withSelected, withItemToText
-    , withMaximumListHeight
+    , withPlaceholder, withFilterPlaceholder, withItems, withSelected
+    , withItemToText, withItemToPrompt
+    , withMaximumListHeight, withListWidth, withListAlignedRight
     , renderElement
     )
 
@@ -32,8 +33,9 @@ module UI.Dropdown exposing
 
 # Options
 
-@docs withPlaceholder, withFilterPlaceholder, withItems, withSelected, withItemToText
-@docs withMaximumListHeight
+@docs withPlaceholder, withFilterPlaceholder, withItems, withSelected
+@docs withItemToText, withItemToPrompt
+@docs withMaximumListHeight, withListWidth, withListAlignedRight
 
 
 # Rendering
@@ -75,7 +77,10 @@ type alias Options item =
     , filterPlaceholder : Maybe String
     , selected : Maybe item
     , itemToText : item -> String
+    , itemToPrompt : Maybe (item -> String)
     , listHeight : Maybe Int
+    , listWidth : Maybe Int
+    , listRightAlign : Bool
     }
 
 
@@ -210,7 +215,10 @@ defaultOptions =
     , filterPlaceholder = Nothing
     , selected = Nothing
     , itemToText = always ""
+    , itemToPrompt = Nothing
     , listHeight = Nothing
+    , listWidth = Nothing
+    , listRightAlign = False
     }
 
 
@@ -272,6 +280,17 @@ withItemToText itemToText (Dropdown prop opt) =
     Dropdown prop { opt | itemToText = itemToText }
 
 
+{-| Changes the way prompt is formatted.
+
+    Dropdown.withItemToPrompt (.name >> String.toUpper)
+        someDropdown
+
+-}
+withItemToPrompt : (item -> String) -> Dropdown item msg -> Dropdown item msg
+withItemToPrompt toPrompt (Dropdown prop opt) =
+    Dropdown prop { opt | itemToPrompt = Just toPrompt }
+
+
 {-| Changes the maximum height of the dropdown list.
 
     Dropdown.withMaximumListHeight 200
@@ -281,6 +300,29 @@ withItemToText itemToText (Dropdown prop opt) =
 withMaximumListHeight : Int -> Dropdown item msg -> Dropdown item msg
 withMaximumListHeight height (Dropdown prop opt) =
     Dropdown prop { opt | listHeight = Just height }
+
+
+{-| Set the width of list dropdown, in case it needs to have a different width
+then the prompt.
+
+    Dropdown.withListWidth 200
+        someDropdown
+
+-}
+withListWidth : Int -> Dropdown item msg -> Dropdown item msg
+withListWidth width (Dropdown prop opt) =
+    Dropdown prop { opt | listWidth = Just width }
+
+
+{-| Sets the alignment of dropdown list in case its width differs from prompt.
+
+    Dropdown.withListAlignedRight True
+        someDropdown
+
+-}
+withListAlignedRight : Bool -> Dropdown item msg -> Dropdown item msg
+withListAlignedRight shouldAlignRight (Dropdown prop opt) =
+    Dropdown prop { opt | listRightAlign = shouldAlignRight }
 
 
 {-| End of the builder's life.
@@ -335,7 +377,14 @@ getConfig cfg ((Dropdown prop opt) as dropdown) =
 
 itemToPrompt : RenderConfig -> Dropdown item msg -> item -> Element msg
 itemToPrompt cfg (Dropdown _ opts) item =
-    Text.subtitle2 (opts.itemToText item)
+    Text.subtitle2
+        (case opts.itemToPrompt of
+            Just toPrompt ->
+                toPrompt item
+
+            Nothing ->
+                opts.itemToText item
+        )
         |> Text.withColor Palette.blue700
         |> Text.renderElement cfg
 
@@ -404,7 +453,17 @@ selectAttrs (Dropdown prop _) =
 
 listAttrs : Dropdown item msg -> List (Attribute msg)
 listAttrs (Dropdown _ opt) =
-    [ Element.width Element.fill
+    [ case opt.listWidth of
+        Just width ->
+            Element.width <| Element.px width
+
+        Nothing ->
+            Element.width Element.fill
+    , if opt.listRightAlign then
+        Element.alignRight
+
+      else
+        Element.alignLeft
     , case opt.listHeight of
         Just height ->
             Element.height <| maximum height shrink
