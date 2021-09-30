@@ -116,13 +116,13 @@ alertWithIcon alertFn renderConfig =
 inlineAlert : (String -> Alert.Alert msg) -> RenderConfig -> Element msg
 inlineAlert alertFn renderConfig =
     alertFn "I'm an inline alert !"
-        |> Alert.isInline
+        |> Alert.withInlineStyle
         |> Alert.renderElement renderConfig
 
 inlineAlertWithGenericIcon : (String -> Alert.Alert msg) -> RenderConfig -> Element msg
 inlineAlertWithGenericIcon alertFn renderConfig =
     alertFn "I'm an inline alert !"
-        |> Alert.isInline
+        |> Alert.withInlineStyle
         |> Alert.withGenericIcon
         |> Alert.renderElement renderConfig
 
