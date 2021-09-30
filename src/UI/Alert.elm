@@ -1,6 +1,7 @@
 module UI.Alert exposing
     ( Alert, primary, success, warning, danger
     , withGenericIcon
+    , isInline
     , renderElement
     )
 
@@ -40,6 +41,8 @@ import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
+import Element.Border
+import UI.Internal.Primitives as Primitives
 
 
 type alias Properties =
@@ -49,7 +52,8 @@ type alias Properties =
 
 
 type alias Options =
-    { genericIcon : Bool
+    { genericIcon : Bool,
+      inline : Bool  
     }
 
 
@@ -126,12 +130,16 @@ withGenericIcon : Alert msg -> Alert msg
 withGenericIcon (Alert prop opt) =
     Alert prop { opt | genericIcon = True }
 
+isInline : Alert msg -> Alert msg
+isInline (Alert prop opt) =
+    Alert prop { opt | inline = True }
+
 
 {-| End of the builder's life.
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
 renderElement : RenderConfig -> Alert msg -> Element msg
-renderElement cfg (Alert { title, tone } { genericIcon }) =
+renderElement cfg (Alert { title, tone } { genericIcon, inline }) =
     let
         color =
             getTextColor tone
@@ -150,6 +158,9 @@ renderElement cfg (Alert { title, tone } { genericIcon }) =
             |> Palette.toElementColor
             |> Background.color
         , Element.alignTop
+        , if inline then
+            Primitives.roundedBorders Size.medium
+            else Element.Border.rounded 0
         ]
         [ Text.subtitle2 title
             |> Text.withColor color
@@ -157,7 +168,6 @@ renderElement cfg (Alert { title, tone } { genericIcon }) =
             |> Element.el [ Element.centerY, Element.width fill ]
         , if genericIcon then
             icon cfg tone color
-
           else
             Element.none
         ]
@@ -169,7 +179,7 @@ renderElement cfg (Alert { title, tone } { genericIcon }) =
 
 defaultOptions : Options
 defaultOptions =
-    { genericIcon = False }
+    { genericIcon = False, inline = False }
 
 
 getTextColor : AlertTone -> Palette.Color
