@@ -60,7 +60,7 @@ spinnerSvg floatSize =
         [ width size
         , height size
         , viewBox "-1 -1 40 40"
-        , stroke (Palette.blue800|>Palette.toCssColor)
+        , stroke (Palette.blue800 |> Palette.toCssColor)
         , id "loading-view"
         ]
         [ g
