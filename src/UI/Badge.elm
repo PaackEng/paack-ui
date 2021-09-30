@@ -212,7 +212,7 @@ renderElement cfg (Badge { content, tone, brightness }) =
         ( background, textColor ) =
             colors tone brightness
     in
-    Text.overline content
+    Text.subtitle2 content
         |> Text.withColor textColor
         |> Text.withOverflow Text.ellipsize
         |> Text.renderElement cfg
@@ -222,9 +222,9 @@ renderElement cfg (Badge { content, tone, brightness }) =
             , background
                 |> Palette.toElementColor
                 |> Background.color
-            , Element.paddingEach { top = 4, bottom = 4, left = 7, right = 6 }
-            , Element.height (px 20)
-            , Border.rounded 10
+            , Element.paddingEach { top = 6, bottom = 6, left = 8, right = 8 }
+            , Element.height (px 24)
+            , Border.rounded 12
             ]
 
 
@@ -248,12 +248,12 @@ colors tone brightness =
 
         ( Light, ToneDanger ) ->
             ( Palette.red200
-            , Palette.red700
+            , Palette.red800
             )
 
         ( Light, ToneSuccess ) ->
             ( Palette.green200
-            , Palette.green700
+            , Palette.green800
             )
 
         ( Dark, ToneGray ) ->
@@ -272,11 +272,11 @@ colors tone brightness =
             )
 
         ( Dark, ToneDanger ) ->
-            ( Palette.red700
+            ( Palette.red800
             , Palette.red200
             )
 
         ( Dark, ToneSuccess ) ->
-            ( Palette.green700
+            ( Palette.green800
             , Palette.green200
             )
