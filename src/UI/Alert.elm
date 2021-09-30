@@ -2,7 +2,6 @@ module UI.Alert exposing
     ( Alert, primary, success, warning, danger
     , withGenericIcon
     , renderElement
-    , isInline
     )
 
 {-| The `UI.Alert` is a component for displaying feedback in a full-width banner.
@@ -36,9 +35,7 @@ An alert can be created and render as in the following pipeline:
 
 import Element exposing (Element, fill, px)
 import Element.Background as Background
-import Element.Border
 import UI.Icon as Icon
-import UI.Internal.Primitives as Primitives
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
@@ -53,7 +50,6 @@ type alias Properties =
 
 type alias Options =
     { genericIcon : Bool
-    , inline : Bool
     }
 
 
@@ -131,16 +127,11 @@ withGenericIcon (Alert prop opt) =
     Alert prop { opt | genericIcon = True }
 
 
-isInline : Alert msg -> Alert msg
-isInline (Alert prop opt) =
-    Alert prop { opt | inline = True }
-
-
 {-| End of the builder's life.
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
 renderElement : RenderConfig -> Alert msg -> Element msg
-renderElement cfg (Alert { title, tone } { genericIcon, inline }) =
+renderElement cfg (Alert { title, tone } { genericIcon }) =
     let
         color =
             getTextColor tone
@@ -159,11 +150,6 @@ renderElement cfg (Alert { title, tone } { genericIcon, inline }) =
             |> Palette.toElementColor
             |> Background.color
         , Element.alignTop
-        , if inline then
-            Primitives.roundedBorders Size.medium
-
-          else
-            Element.Border.rounded 0
         ]
         [ Text.subtitle2 title
             |> Text.withColor color
@@ -183,7 +169,7 @@ renderElement cfg (Alert { title, tone } { genericIcon, inline }) =
 
 defaultOptions : Options
 defaultOptions =
-    { genericIcon = False, inline = False }
+    { genericIcon = False }
 
 
 getTextColor : AlertTone -> Palette.Color

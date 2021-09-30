@@ -15,7 +15,6 @@ import Html exposing (Html)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import UI.Internal.Svg as Svg
-import UI.Palette as Palette
 
 
 {-| The version with a small (18x18px) spinner.
@@ -59,17 +58,17 @@ spinnerSvg floatSize =
     svg
         [ width size
         , height size
-        , viewBox "-1 -1 40 40"
-        , stroke (Palette.blue800 |> Palette.toCssColor)
+        , viewBox "0 0 38 38"
+        , stroke "#1747CE"
         , id "loading-view"
         ]
         [ g
             [ fill "none"
             , fillRule "evenodd"
             ]
-            [ g [ transform "translate(1 1)", strokeWidth "3" ]
+            [ g [ transform "translate(1 1)", strokeWidth "2" ]
                 [ circle
-                    [ strokeOpacity "0.1"
+                    [ strokeOpacity "0.5"
                     , cx "18"
                     , cy "18"
                     , r "18"
