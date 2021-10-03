@@ -19,13 +19,13 @@ type alias PeriodComparison =
 {-| `DateInput.PeriodDate` is used to contain both date and comparison information.
 -}
 type alias PeriodDate =
-    Internal.PeriodDate
+    { date : DateInput, comparison : PeriodComparison }
 
 
 {-| `DateInput.RangeDate` is used to describe a range of dates.
 -}
 type alias RangeDate =
-    Internal.RangeDate
+    { from : DateInput, to : DateInput }
 
 
 {-| Transforms a string into a `DateInput.DateInput`
