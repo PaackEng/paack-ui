@@ -1,8 +1,7 @@
 module UI.Alert exposing
     ( Alert, primary, success, warning, danger
-    , withGenericIcon
+    , withGenericIcon, withInlineStyle
     , renderElement
-    , isInline
     )
 
 {-| The `UI.Alert` is a component for displaying feedback in a full-width banner.
@@ -129,11 +128,6 @@ danger title =
 withGenericIcon : Alert msg -> Alert msg
 withGenericIcon (Alert prop opt) =
     Alert prop { opt | genericIcon = True }
-
-
-isInline : Alert msg -> Alert msg
-isInline (Alert prop opt) =
-    Alert prop { opt | inline = True }
 
 
 {-| Inline style makes the alert's corners rounded
