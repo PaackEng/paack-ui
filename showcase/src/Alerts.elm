@@ -3,7 +3,9 @@ module Alerts exposing (stories)
 import Element exposing (Element, fill)
 import PluginOptions exposing (PluginOptions, defaultWithMenu)
 import UI.Alert as Alert
+import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
+import UI.Text as Text
 import UIExplorer exposing (storiesOf)
 import Utils exposing (ExplorerStory, ExplorerUI, goToDocsCallToAction, iconsSvgSprite, prettifyElmCode, story)
 
@@ -60,15 +62,41 @@ unitedStory : RenderConfig -> ExplorerStory
 unitedStory renderConfig =
     story
         ( "United"
-        , Element.column [ Element.width fill, Element.spacing 8 ]
-            [ iconsSvgSprite
-            , alert Alert.primary renderConfig
-            , alert Alert.success renderConfig
-            , alert Alert.warning renderConfig
-            , alert Alert.danger renderConfig
-            , alertWithIcon Alert.success renderConfig
-            , alertWithIcon Alert.warning renderConfig
-            , alertWithIcon Alert.danger renderConfig
+        , Element.column [ Element.width fill, Element.spacing 40 ]
+            [ Element.column [ Element.width fill, Element.spacing 20 ]
+                [ Element.column [ Element.width fill, Element.spacing 8 ]
+                    [ Text.overline "FULL BLEED ALERTS"
+                        |> Text.withColor Palette.gray700
+                        |> Text.renderElement renderConfig
+                    ]
+                , Element.column [ Element.width fill, Element.spacing 8 ]
+                    [ iconsSvgSprite
+                    , alert Alert.primary renderConfig
+                    , alert Alert.success renderConfig
+                    , alert Alert.warning renderConfig
+                    , alert Alert.danger renderConfig
+                    , alertWithIcon Alert.success renderConfig
+                    , alertWithIcon Alert.warning renderConfig
+                    , alertWithIcon Alert.danger renderConfig
+                    ]
+                ]
+            , Element.column [ Element.width fill, Element.spacing 20 ]
+                [ Element.column [ Element.width fill, Element.spacing 8 ]
+                    [ Text.overline "INLINE ALERTS"
+                        |> Text.withColor Palette.gray700
+                        |> Text.renderElement renderConfig
+                    ]
+                , Element.column [ Element.width fill, Element.spacing 8 ]
+                    [ iconsSvgSprite
+                    , inlineAlert Alert.primary renderConfig
+                    , inlineAlert Alert.success renderConfig
+                    , inlineAlert Alert.warning renderConfig
+                    , inlineAlert Alert.danger renderConfig
+                    , inlineAlertWithGenericIcon Alert.success renderConfig
+                    , inlineAlertWithGenericIcon Alert.warning renderConfig
+                    , inlineAlertWithGenericIcon Alert.danger renderConfig
+                    ]
+                ]
             ]
         , defaultWithMenu
         )
@@ -83,6 +111,21 @@ alert alertFn renderConfig =
 alertWithIcon : (String -> Alert.Alert msg) -> RenderConfig -> Element msg
 alertWithIcon alertFn renderConfig =
     alertFn "I have an icon."
+        |> Alert.withGenericIcon
+        |> Alert.renderElement renderConfig
+
+
+inlineAlert : (String -> Alert.Alert msg) -> RenderConfig -> Element msg
+inlineAlert alertFn renderConfig =
+    alertFn "I'm an inline alert !"
+        |> Alert.withInlineStyle
+        |> Alert.renderElement renderConfig
+
+
+inlineAlertWithGenericIcon : (String -> Alert.Alert msg) -> RenderConfig -> Element msg
+inlineAlertWithGenericIcon alertFn renderConfig =
+    alertFn "I'm an inline alert !"
+        |> Alert.withInlineStyle
         |> Alert.withGenericIcon
         |> Alert.renderElement renderConfig
 
