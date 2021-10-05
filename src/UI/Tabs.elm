@@ -1,5 +1,5 @@
 module UI.Tabs exposing
-    ( TabList, tabList
+    ( TabList, tabList, actionTabList
     , renderElement
     )
 
@@ -19,7 +19,7 @@ Example of usage:
 
 # Building
 
-@docs TabList, tabList
+@docs TabList, tabList, actionTabList
 
 
 # Rendering
@@ -34,8 +34,10 @@ import Element.Font as Font
 import Element.Input as Input
 import UI.Internal.Basics exposing (ifThenElse)
 import UI.Internal.Colors as Colors
+import UI.Link as Link
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Utils.ARIA as ARIA
+import UI.Utils.Action as Action exposing (Action)
 import UI.Utils.Element exposing (zeroPadding)
 
 
@@ -46,7 +48,7 @@ type TabList msg a
 
 
 type alias Properties msg a =
-    { selectMsg : a -> msg
+    { action : a -> Action msg
     , label : a -> String
     , items : List a
     , current : a
@@ -64,7 +66,25 @@ type alias Properties msg a =
 tabList : (a -> msg) -> (a -> String) -> List a -> a -> TabList msg a
 tabList selectMsg label items current =
     TabList
-        { selectMsg = selectMsg
+        { action = \item -> Action.DispatchMsg <| selectMsg item
+        , label = label
+        , items = items
+        , current = current
+        }
+
+
+{-| Similar to [`tabList`](#tabList) but using [`Àction msg`](UI-Utils-Action#Action) instead.
+
+    Tabs.actionTabList (tabToLink >> Action.TriggerRedirect)
+        tabToString
+        [ TabOne, TabTwo ]
+        model.tabSelected
+
+-}
+actionTabList : (a -> Action msg) -> (a -> String) -> List a -> a -> TabList msg a
+actionTabList action label items current =
+    TabList
+        { action = \item -> action item
         , label = label
         , items = items
         , current = current
@@ -75,12 +95,12 @@ tabList selectMsg label items current =
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
 renderElement : RenderConfig -> TabList msg a -> Element msg
-renderElement renderConfig (TabList { selectMsg, items, label, current }) =
+renderElement renderConfig (TabList { action, items, label, current }) =
     items
         |> List.map
             (\item ->
                 itemView renderConfig
-                    (selectMsg item)
+                    (action item)
                     (label item)
                     (current == item)
             )
@@ -95,17 +115,27 @@ renderElement renderConfig (TabList { selectMsg, items, label, current }) =
             ]
 
 
-itemView : RenderConfig -> msg -> String -> Bool -> Element msg
-itemView _ selectMsg label isCurrent =
-    Input.button (buttonAttributes isCurrent)
-        { onPress =
-            if isCurrent then
-                Nothing
+itemView : RenderConfig -> Action msg -> String -> Bool -> Element msg
+itemView renderConfig action label isCurrent =
+    let
+        attrs =
+            buttonAttributes isCurrent
+    in
+    case action of
+        Action.DispatchMsg selectMsg ->
+            Input.button attrs
+                { onPress =
+                    if isCurrent then
+                        Nothing
 
-            else
-                Just selectMsg
-        , label = itemLabel label isCurrent
-        }
+                    else
+                        Just selectMsg
+                , label = itemLabel label isCurrent
+                }
+
+        Action.TriggerRedirect link ->
+            Link.wrapElement renderConfig attrs link <|
+                itemLabel label isCurrent
 
 
 itemLabel : String -> Bool -> Element msg

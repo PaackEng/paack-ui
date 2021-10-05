@@ -92,7 +92,7 @@ describe('Percy Snapshots', () => {
 
   describe('Tabs', () => {
     it('Creates the Tabs page snapshot', () => {
-      cy.visit('/#Basics/Tabs/Tabs')
+      cy.visit('/#Basics/Tabs/United')
       cy.percySnapshot('Tabs')
     })
   })

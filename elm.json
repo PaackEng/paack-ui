@@ -3,7 +3,7 @@
     "name": "PaackEng/paack-ui",
     "summary": "Paack's Design System applied over Elm UI",
     "license": "BSD-3-Clause",
-    "version": "7.3.0",
+    "version": "7.4.0",
     "exposed-modules": [
         "UI.Alert",
         "UI.Analytics",
@@ -33,6 +33,7 @@
         "UI.TextField",
         "UI.Utils.Action",
         "UI.Utils.ARIA",
+        "UI.Utils.DateInput",
         "UI.Utils.Element",
         "UI.Utils.Focus",
         "UI.Utils.TypeNumbers"
