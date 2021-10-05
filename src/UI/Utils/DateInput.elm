@@ -1,4 +1,27 @@
-module UI.DateInput exposing (DateInput, PeriodComparison, PeriodDate, RangeDate, fromPosix, toDD_MM_YYYY)
+module UI.Utils.DateInput exposing
+    ( DateInput, PeriodComparison
+    , PeriodDate, RangeDate
+    , toDD_MM_YYYY, fromPosix
+    )
+
+{-| Required type for comparing and validating date inputs.
+
+
+# Internal types
+
+@docs DateInput, PeriodComparison
+
+
+# Useful record
+
+@docs PeriodDate, RangeDate
+
+
+# Transformation
+
+@docs toDD_MM_YYYY, fromPosix
+
+-}
 
 import Time
 import UI.Internal.DateInput as Internal
