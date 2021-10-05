@@ -1,12 +1,14 @@
 module Tabs.Stories exposing (stories, update)
 
-import Element exposing (Element)
+import Element exposing (Element, fill)
 import Msg exposing (Msg)
 import Return exposing (Return)
 import Tabs.Model as Stories
 import Tabs.Msg as Stories
+import UI.Link as Link
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Tabs as Tabs
+import UI.Utils.Action as Action exposing (Action)
 import UIExplorer exposing (storiesOf)
 import Utils exposing (ExplorerStory, ExplorerUI, reducedToDocs, storyWithModel)
 
@@ -22,15 +24,39 @@ stories : RenderConfig -> ExplorerUI
 stories renderConfig =
     storiesOf
         "Tabs"
-        [ artistsStory renderConfig
+        [ normalStory renderConfig
+        , actionStory renderConfig
+        , unitedStory renderConfig
         ]
 
 
-artistsStory : RenderConfig -> ExplorerStory
-artistsStory renderConfig =
+normalStory : RenderConfig -> ExplorerStory
+normalStory renderConfig =
     storyWithModel
-        ( "Tabs"
+        ( "Normal Tabs"
         , \{ tabsStories } -> artistsTabs renderConfig tabsStories.selected
+        , reducedToDocs "Tabs"
+        )
+
+
+actionStory : RenderConfig -> ExplorerStory
+actionStory renderConfig =
+    storyWithModel
+        ( "Action Tabs"
+        , always <| redirectTabs renderConfig RedirectTabStory
+        , reducedToDocs "Tabs"
+        )
+
+
+unitedStory : RenderConfig -> ExplorerStory
+unitedStory renderConfig =
+    storyWithModel
+        ( "United"
+        , \{ tabsStories } ->
+            Element.column [ Element.width fill, Element.spacing 16 ]
+                [ redirectTabs renderConfig UnitedStory
+                , artistsTabs renderConfig tabsStories.selected
+                ]
         , reducedToDocs "Tabs"
         )
 
@@ -49,6 +75,49 @@ artistsTabs renderConfig selected =
         , Stories.AlexTurner
         , Stories.GerardWay
         ]
+        selected
+        |> Tabs.renderElement renderConfig
+
+
+type RedirectTabs
+    = NormalTabStory
+    | RedirectTabStory
+    | UnitedStory
+
+
+redirectTabsToString : RedirectTabs -> String
+redirectTabsToString tab =
+    case tab of
+        NormalTabStory ->
+            "Normal Tabs"
+
+        RedirectTabStory ->
+            "Redirect Tabs"
+
+        UnitedStory ->
+            "United"
+
+
+redirectTabsToAction : RedirectTabs -> Action msg
+redirectTabsToAction tab =
+    Action.TriggerRedirect <|
+        case tab of
+            NormalTabStory ->
+                Link.link "#Basics/Tabs/Normal Tabs"
+
+            RedirectTabStory ->
+                Link.link "#Basics/Tabs/Action Tabs"
+
+            UnitedStory ->
+                Link.link "#Basics/Tabs/United"
+
+
+redirectTabs : RenderConfig -> RedirectTabs -> Element Msg.Msg
+redirectTabs renderConfig selected =
+    Tabs.actionTabList
+        redirectTabsToAction
+        redirectTabsToString
+        [ NormalTabStory, RedirectTabStory, UnitedStory ]
         selected
         |> Tabs.renderElement renderConfig
 
