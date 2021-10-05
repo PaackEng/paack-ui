@@ -11,7 +11,6 @@
         "UI.Button",
         "UI.Checkbox",
         "UI.ContentPlaceholder",
-        "UI.DateInput",
         "UI.Dialog",
         "UI.Document",
         "UI.Dropdown",
@@ -34,6 +33,7 @@
         "UI.TextField",
         "UI.Utils.Action",
         "UI.Utils.ARIA",
+        "UI.Utils.DateInput",
         "UI.Utils.Element",
         "UI.Utils.Focus",
         "UI.Utils.TypeNumbers"
