@@ -114,6 +114,7 @@ icons =
     , ( Icon.toggleDown, "toggleDown" )
     , ( Icon.toggleUp, "toggleUp" )
     , ( Icon.truck, "truck" )
+    , ( Icon.unassignPerson, "unassignPerson" )
     , ( Icon.van, "van" )
     , ( Icon.wait, "wait" )
     , ( Icon.warning, "warning" )
