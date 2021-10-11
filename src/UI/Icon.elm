@@ -10,7 +10,7 @@ module UI.Icon exposing
     , notifications, otp, paackSpaces, packages, person, persons, phone, pause
     , previousContent, print, reload, remove, sandwichMenu, search, searchSpace
     , seeMore, sort, sortDecreasing, sortIncreasing, toggle, toggleDown, toggleUp
-    , truck, van, wait, warning, webhook
+    , truck, unassignPerson, van, wait, warning, webhook
     , getHint
     , withColor
     , withSize, withCustomSize
@@ -50,7 +50,7 @@ An icon can be created and rendered as in the following pipeline:
 @docs notifications, otp, paackSpaces, packages, person, persons, phone, pause
 @docs previousContent, print, reload, remove, sandwichMenu, search, searchSpace
 @docs seeMore, sort, sortDecreasing, sortIncreasing, toggle, toggleDown, toggleUp
-@docs truck, van, wait, warning, webhook
+@docs truck, unassignPerson, van, wait, warning, webhook
 
 
 # Disassemble
@@ -901,6 +901,16 @@ legacyRetailerDashboard =
 legacySignOut : String -> Icon
 legacySignOut =
     defaultInit "Legacy-SignOut"
+
+
+{-| A person with a plus sign on the bottom-right.
+
+    Icon.assingPerson "Select Manager"
+
+-}
+unassignPerson : String -> Icon
+unassignPerson =
+    defaultInit "Person-Unassign"
 
 
 defaultInit : String -> String -> Icon
