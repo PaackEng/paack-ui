@@ -5,7 +5,7 @@ module UI.Document exposing
     , PageBody, bodySingle, Stack, bodyStack
     , withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages
     , MenuPage, menuPage, withSidebarStyle, sidebarPersistent
-    , sidebarNonPersistent, showMenu, hideMenu
+    , sidebarNonPersistent, withLegacyTransitionMenuStyle, showMenu, hideMenu
     , toBrowserDocument
     )
 
@@ -69,7 +69,7 @@ Example of usage:
 
 @docs withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages
 @docs MenuPage, menuPage, withSidebarStyle, sidebarPersistent
-@docs sidebarNonPersistent, showMenu, hideMenu
+@docs sidebarNonPersistent, withLegacyTransitionMenuStyle, showMenu, hideMenu
 
 
 # Rendering
@@ -84,6 +84,7 @@ import UI.Dialog as Dialog exposing (Dialog)
 import UI.Effects as Effects exposing (Effects)
 import UI.Icon as Icon exposing (Icon)
 import UI.Internal.Dialog as Dialog
+import UI.Internal.LegacySideBar as LegacySideBar
 import UI.Internal.Menu as Menu
 import UI.Internal.Page as Internal
 import UI.Internal.SideBar as SideBar
@@ -179,6 +180,7 @@ type alias DocumentRecord pageSet msg =
     { container : pageSet -> Page msg
     , menu : Menu.Menu msg
     , sidebarStyle : SidebarStyle
+    , hasLegacySidebar : Bool
     }
 
 
@@ -286,6 +288,14 @@ appearance/behavior of the sidebar when it is enabled by the `hasMenu` flag.
 withSidebarStyle : SidebarStyle -> Document page msg -> Document page msg
 withSidebarStyle style (Document nav) =
     Document { nav | sidebarStyle = style }
+
+
+{-| `Document.withLegacyTransitionMenuStyle` takes a Legacy `SidebarStyle` setting the
+appearance/behavior of the sidebar when it is enabled by the `hasMenu` flag.
+-}
+withLegacyTransitionMenuStyle : Document page msg -> Document page msg
+withLegacyTransitionMenuStyle (Document nav) =
+    Document { nav | hasLegacySidebar = True }
 
 
 {-| Persistent style of the sidebar. It occupies more space when open pushing
@@ -515,9 +525,11 @@ document :
     -> Document pageSet msg
 document applier (Model state) pagesPages =
     Document <|
-        DocumentRecord pagesPages
-            (menu applier state)
-            SidebarPersistent
+        { container = pagesPages
+        , menu = menu applier state
+        , sidebarStyle = SidebarPersistent
+        , hasLegacySidebar = False
+        }
 
 
 
@@ -551,16 +563,28 @@ toBrowserDocument cfg pageItem (Document model) =
         body =
             if hasMenu then
                 if RenderConfig.isMobile cfg then
-                    SideBar.mobile cfg
-                        contentBody
-                        model.menu
-                        seenTitle
-                        maybeStack
+                    if model.hasLegacySidebar then
+                        LegacySideBar.mobile cfg
+                            contentBody
+                            model.menu
+                            seenTitle
+                            maybeStack
+
+                    else
+                        SideBar.mobile cfg
+                            contentBody
+                            model.menu
+                            seenTitle
+                            maybeStack
 
                 else
                     case model.sidebarStyle of
                         SidebarPersistent ->
-                            SideBar.desktopPersistent cfg contentBody model.menu
+                            if model.hasLegacySidebar then
+                                LegacySideBar.desktopPersistent cfg contentBody model.menu
+
+                            else
+                                SideBar.desktopPersistent cfg contentBody model.menu
 
                         SidebarNonPersistent ->
                             SideBar.desktopNonPersistent cfg contentBody model.menu

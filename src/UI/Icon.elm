@@ -1,13 +1,16 @@
 module UI.Icon exposing
     ( svgSpriteImport
     , Icon
-    , add, assignPerson, boxes, check, success, close, collapse, configure, delete, done
-    , download, edit, eventLog, expand, filter, fix, fixIssues, fixing, groups
-    , insert, loader, location, logout, moreActions, move, nextContent
-    , notifications, paackSpaces, packages, person, persons, phone, pause
+    , add, arrowUp, assignPerson, bicycle, bike, boxes, check, success, car, close
+    , collapse, clockIssue, configure, clockLocked, coins, delete, done, download
+    , eBike, eCar, edit, eVan, eventLog, expand, filter, fix
+    , fixIssues, fixing, groups, insert, legacyApis, legacyHistorical, legacyLabelPrinter
+    , legacyReport, legacyRetailerDashboard, legacySignOut, loader, location, lock
+    , logout, messageLock, messageOTP, microphoneMute, moreActions, move, nextContent
+    , notifications, otp, paackSpaces, packages, person, persons, phone, pause
     , previousContent, print, reload, remove, sandwichMenu, search, searchSpace
-    , seeMore, sortDecreasing, sortIncreasing, toggle, toggleDown, toggleUp
-    , wait, warning
+    , seeMore, sort, sortDecreasing, sortIncreasing, toggle, toggleDown, toggleUp
+    , truck, van, wait, warning, webhook
     , getHint
     , withColor
     , withSize, withCustomSize
@@ -38,13 +41,16 @@ An icon can be created and rendered as in the following pipeline:
 # Building
 
 @docs Icon
-@docs add, assignPerson, boxes, check, success, close, collapse, configure, delete, done
-@docs download, edit, eventLog, expand, filter, fix, fixIssues, fixing, groups
-@docs insert, loader, location, logout, moreActions, move, nextContent
-@docs notifications, paackSpaces, packages, person, persons, phone, pause
+@docs add, arrowUp, assignPerson, bicycle, bike, boxes, check, success, car, close
+@docs collapse, clockIssue, configure, clockLocked, coins, delete, done, download
+@docs eBike, eCar, edit, eVan, eventLog, expand, filter, fix
+@docs fixIssues, fixing, groups, insert, legacyApis, legacyHistorical, legacyLabelPrinter
+@docs legacyReport, legacyRetailerDashboard, legacySignOut, loader, location, lock
+@docs logout, messageLock, messageOTP, microphoneMute, moreActions, move, nextContent
+@docs notifications, otp, paackSpaces, packages, person, persons, phone, pause
 @docs previousContent, print, reload, remove, sandwichMenu, search, searchSpace
-@docs seeMore, sortDecreasing, sortIncreasing, toggle, toggleDown, toggleUp
-@docs wait, warning
+@docs seeMore, sort, sortDecreasing, sortIncreasing, toggle, toggleDown, toggleUp
+@docs truck, van, wait, warning, webhook
 
 
 # Disassemble
@@ -645,6 +651,256 @@ loader hint =
 insert : String -> Icon
 insert =
     defaultInit "Add-Circle"
+
+
+{-| An arrow pointing up.
+
+    Icon.arrowUp "Arrow Up"
+
+-}
+arrowUp : String -> Icon
+arrowUp =
+    defaultInit "Arrow-Up"
+
+
+{-| A bicycle.
+
+    Icon.bicycle "Bicycle"
+
+-}
+bicycle : String -> Icon
+bicycle =
+    defaultInit "Bicycle"
+
+
+{-| A bike.
+
+    Icon.bike "Bike"
+
+-}
+bike : String -> Icon
+bike =
+    defaultInit "Bike"
+
+
+{-| A car.
+
+    Icon.car "Car"
+
+-}
+car : String -> Icon
+car =
+    defaultInit "Car"
+
+
+{-| A clock with danger signal.
+
+    Icon.clockIssue "Clock issue"
+
+-}
+clockIssue : String -> Icon
+clockIssue =
+    defaultInit "Clock-Issue"
+
+
+{-| A clock with a lock.
+
+    Icon.clockLocked "Clock Locked"
+
+-}
+clockLocked : String -> Icon
+clockLocked =
+    defaultInit "Clock-Locked"
+
+
+{-| A stack of coins.
+
+    Icon.coins "Coins"
+
+-}
+coins : String -> Icon
+coins =
+    defaultInit "Coins"
+
+
+{-| An electric bike.
+
+    Icon.eBike "Electric bike"
+
+-}
+eBike : String -> Icon
+eBike =
+    defaultInit "E-Bike"
+
+
+{-| An electric car.
+
+    Icon.eCar "Electric car"
+
+-}
+eCar : String -> Icon
+eCar =
+    defaultInit "E-Car"
+
+
+{-| An electric van.
+
+    Icon.eVan "Electric van"
+
+-}
+eVan : String -> Icon
+eVan =
+    defaultInit "E-Van"
+
+
+{-| A lock.
+
+    Icon.lock "Lock"
+
+-}
+lock : String -> Icon
+lock =
+    defaultInit "Lock"
+
+
+{-| A lock in a bubble message.
+
+    Icon.messageLock "Message lock"
+
+-}
+messageLock : String -> Icon
+messageLock =
+    defaultInit "Message-Lock"
+
+
+{-| A secret in a bubble message.
+
+    Icon.messageOTP "Message Otp"
+
+-}
+messageOTP : String -> Icon
+messageOTP =
+    defaultInit "Message-OTP"
+
+
+{-| A microphone muted.
+
+    Icon.microphoneMute "Microphone Muted"
+
+-}
+microphoneMute : String -> Icon
+microphoneMute =
+    defaultInit "Microphone-Mute"
+
+
+{-| A One time password.
+
+    Icon.otp "One time password"
+
+-}
+otp : String -> Icon
+otp =
+    defaultInit "OTP"
+
+
+{-| A sort icon.
+
+    Icon.sort "Sort"
+
+-}
+sort : String -> Icon
+sort =
+    defaultInit "Sort"
+
+
+{-| A truck.
+
+    Icon.truck "Truck"
+
+-}
+truck : String -> Icon
+truck =
+    defaultInit "Truck"
+
+
+{-| A van.
+
+    Icon.van "Van"
+
+-}
+van : String -> Icon
+van =
+    defaultInit "Van"
+
+
+{-| A webhook.
+
+    Icon.webhook "Webhook"
+
+-}
+webhook : String -> Icon
+webhook =
+    defaultInit "Webhook"
+
+
+{-| A legacy apis.
+
+    Icon.legacyApis "Legacy apis"
+
+-}
+legacyApis : String -> Icon
+legacyApis =
+    defaultInit "Legacy-Apis"
+
+
+{-| A legacy historical.
+
+    Icon.legacyHistorical "Legacy historical"
+
+-}
+legacyHistorical : String -> Icon
+legacyHistorical =
+    defaultInit "Legacy-Historical"
+
+
+{-| A legacy label printer.
+
+    Icon.legacyLabelPrinter "Legacy label printer"
+
+-}
+legacyLabelPrinter : String -> Icon
+legacyLabelPrinter =
+    defaultInit "Legacy-LabelPrinter"
+
+
+{-| A legacy label report.
+
+    Icon.legacyReport "Legacy report"
+
+-}
+legacyReport : String -> Icon
+legacyReport =
+    defaultInit "Legacy-Report"
+
+
+{-| A legacy retailer dashboard.
+
+    Icon.legacyRetailerDashboard "Legacy retailer dashboard"
+
+-}
+legacyRetailerDashboard : String -> Icon
+legacyRetailerDashboard =
+    defaultInit "Legacy-RetailerDashboard"
+
+
+{-| A legacy sign-out.
+
+    Icon.legacySignOut "Legacy sign-out"
+
+-}
+legacySignOut : String -> Icon
+legacySignOut =
+    defaultInit "Legacy-SignOut"
 
 
 defaultInit : String -> String -> Icon
