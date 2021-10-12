@@ -13,7 +13,7 @@ import UI.Size as Size exposing (Size)
 import UI.TextField as TextField
 import UIExplorer exposing (storiesOf)
 import Utils exposing (ExplorerUI, goToDocsCallToAction, iconsSvgSprite, prettifyElmCode)
-
+import UI.Dropdown as Dropdown exposing (Dropdown)
 
 stories : RenderConfig -> ExplorerUI
 stories cfg =
@@ -96,6 +96,21 @@ buttons =
     , Button.fromLabeledOnLeftIcon <| Icon.toggle "Toggle"
     ]
 
+dropdowns : List (Dropdown item Msg)
+dropdowns =
+    [ Dropdown.basic
+        { dropdownMsg = \_ -> Msg.NoOp
+        , onSelectMsg = \_ ->Msg.NoOp
+        , state = Dropdown.init "heh"
+        } ]
+
+dropdownView : RenderConfig -> Size ->  Dropdown item Msg -> Element Msg
+dropdownView cfg size dropdown =
+    dropdown
+        |> Dropdown.withPlaceholder "Choose a book"
+        |> Dropdown.withSize size
+        |> Dropdown.withMaximumListHeight 200
+        |> Dropdown.renderElement cfg
 
 buttonView : RenderConfig -> Size -> ButtonBody -> Element Msg
 buttonView cfg size body =
@@ -109,6 +124,7 @@ sizeView : RenderConfig -> Size -> Element Msg
 sizeView cfg size =
     [ List.map (iconView cfg size) icons
     , List.map (buttonView cfg size) buttons
+    , List.map (dropdownView cfg size) dropdowns
     , [ TextField.singlelineText (always Msg.NoOp)
             "Whatever"
             ""

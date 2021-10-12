@@ -1,7 +1,9 @@
 module UI.Dropdown exposing
     ( Dropdown, BasicConfig, basic, filterable
     , State, Msg, init, update
-    , withPlaceholder, withFilterPlaceholder, withItems, withSelected
+    , withPlaceholder, withFilterPlaceholder
+    , withSize
+    , withItems, withSelected
     , withItemToText, withItemToPrompt
     , withMaximumListHeight, withListWidth, withListAlignedRight
     , renderElement
@@ -33,7 +35,9 @@ module UI.Dropdown exposing
 
 # Options
 
-@docs withPlaceholder, withFilterPlaceholder, withItems, withSelected
+@docs withPlaceholder, withFilterPlaceholder
+@docs withSize
+@docs withItems, withSelected
 @docs withItemToText, withItemToPrompt
 @docs withMaximumListHeight, withListWidth, withListAlignedRight
 
@@ -54,6 +58,7 @@ import UI.Internal.Colors as Colors
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
+import UI.Size as Size exposing (Size)
 import UI.Text as Text
 
 
@@ -81,6 +86,7 @@ type alias Options item =
     , listHeight : Maybe Int
     , listWidth : Maybe Int
     , listRightAlign : Bool
+    , size : Size
     }
 
 
@@ -219,6 +225,7 @@ defaultOptions =
     , listHeight = Nothing
     , listWidth = Nothing
     , listRightAlign = False
+    , size = Size.extraSmall
     }
 
 
@@ -242,6 +249,23 @@ withPlaceholder placeholder (Dropdown prop opt) =
 withFilterPlaceholder : String -> Dropdown item msg -> Dropdown item msg
 withFilterPlaceholder placeholder (Dropdown prop opt) =
     Dropdown prop { opt | filterPlaceholder = Just placeholder }
+
+
+{-| With `Dropdown.withSize`, you'll be able to scale the field between the [standard sizes][size].
+
+[size]: UI-Size
+
+The sizes (in height) are: Large - 60px; Medium - 48px; Small - 36px; Extra Small - 28px.
+
+    Dropdown.withSize Size.large someField
+
+**NOTE**: Dropdown's default size is [`Size.medium`](UI-Size#medium)
+
+-}
+withSize : Size -> Dropdown item msg -> Dropdown item msg
+withSize size (Dropdown prop opt) =
+    Dropdown prop
+        { opt | size = size }
 
 
 {-| Changes the component's list of elements.
@@ -424,7 +448,7 @@ customDropdown cfg dropdown =
         >> Dropdown.withSelectAttributes (selectAttrs dropdown)
         >> Dropdown.withListAttributes (listAttrs dropdown)
         >> Dropdown.withSearchAttributes [ Border.width 0, Element.padding 0 ]
-        >> Dropdown.withOpenCloseButtons (openCloseButtons cfg)
+        >> Dropdown.withOpenCloseButtons (openCloseButtons cfg dropdown)
 
 
 promptElement : RenderConfig -> Dropdown item msg -> Element msg
@@ -492,12 +516,12 @@ listAttrs (Dropdown _ opt) =
     ]
 
 
-openCloseButtons : RenderConfig -> { openButton : Element msg, closeButton : Element msg }
-openCloseButtons cfg =
+openCloseButtons : RenderConfig -> Dropdown item msg -> { openButton : Element msg, closeButton : Element msg }
+openCloseButtons cfg (Dropdown _ opts) =
     let
         renderButton =
             Icon.withColor Palette.blue700
-                >> Icon.withCustomSize 12
+                >> Icon.withSize opts.size
                 >> Icon.renderElement cfg
                 >> Element.el [ Element.alignTop, Element.alignRight ]
 
