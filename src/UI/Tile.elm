@@ -163,7 +163,7 @@ tileRender renderConfig onSelectMsg selected (SelectionTile option icon) =
         ( backgroundColor, borderColor ) =
             if isSelected then
                 ( { normal = Palette.blue100, hovered = Palette.blue200, focused = Palette.blue200 }
-                , { normal = Palette.blue700, hovered = Palette.blue700, focused = Palette.blue700 }
+                , { normal = Palette.blue700, hovered = Palette.blue700, focused = Palette.blue600 }
                 )
 
             else
