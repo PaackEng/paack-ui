@@ -61,14 +61,14 @@ view renderConfig { tileStories } =
         , Tile.group (TileMsg.Select >> Msg.TileStoriesMsg)
             "Pick a delivery vehicle"
             |> Tile.withTiles
-                [ Tile.selectionTile TileModel.Car <| Icon.car "Car"
-                , Tile.selectionTile TileModel.Van <| Icon.van "Van"
-                , Tile.selectionTile TileModel.Truck <| Icon.truck "Truck"
-                , Tile.selectionTile TileModel.Motorbike <| Icon.bike "Motorbike"
-                , Tile.selectionTile TileModel.Bicycle <| Icon.bicycle "Bicycle"
-                , Tile.selectionTile TileModel.ECar <| Icon.eCar "E-Car"
-                , Tile.selectionTile TileModel.EVan <| Icon.eVan "E-Van"
-                , Tile.selectionTile TileModel.EBike <| Icon.eBike "E-Bike"
+                [ Tile.tile TileModel.Car <| Icon.car "Car"
+                , Tile.tile TileModel.Van <| Icon.van "Van"
+                , Tile.tile TileModel.Truck <| Icon.truck "Truck"
+                , Tile.tile TileModel.Motorbike <| Icon.bike "Motorbike"
+                , Tile.tile TileModel.Bicycle <| Icon.bicycle "Bicycle"
+                , Tile.tile TileModel.ECar <| Icon.eCar "E-Car"
+                , Tile.tile TileModel.EVan <| Icon.eVan "E-Van"
+                , Tile.tile TileModel.EBike <| Icon.eBike "E-Bike"
                 ]
             |> Tile.withSelected tileStories.selected
             |> Tile.renderElement renderConfig
@@ -82,14 +82,14 @@ Tile.group Msg.SetTile
     "Pick a delivery vehicle"
     |> Tile.withSelected model.selected
     |> Tile.withButtons
-        [ Tile.selectionTile TileModel.Car <| Icon.car "Car"
-        , Tile.selectionTile TileModel.Van <| Icon.van "Van"
-        , Tile.selectionTile TileModel.Truck <| Icon.truck "Truck"
-        , Tile.selectionTile TileModel.Motorbike <| Icon.bike "Motorbike"
-        , Tile.selectionTile TileModel.Bicycle <| Icon.bicycle "Bicycle"
-        , Tile.selectionTile TileModel.ECar <| Icon.eCar "E-Car"
-        , Tile.selectionTile TileModel.EVan <| Icon.eVan "E-Van"
-        , Tile.selectionTile TileModel.EBike <| Icon.eBike "E-Bike"
+        [ Tile.tile TileModel.Car <| Icon.car "Car"
+        , Tile.tile TileModel.Van <| Icon.van "Van"
+        , Tile.tile TileModel.Truck <| Icon.truck "Truck"
+        , Tile.tile TileModel.Motorbike <| Icon.bike "Motorbike"
+        , Tile.tile TileModel.Bicycle <| Icon.bicycle "Bicycle"
+        , Tile.tile TileModel.ECar <| Icon.eCar "E-Car"
+        , Tile.tile TileModel.EVan <| Icon.eVan "E-Van"
+        , Tile.tile TileModel.EBike <| Icon.eBike "E-Bike"
         ]
     |> Tile.renderElement renderConfig
 """

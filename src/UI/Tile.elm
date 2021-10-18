@@ -1,17 +1,44 @@
 module UI.Tile exposing
     ( SelectionTiles, SelectionTile
-    , selectionTile, group, withTiles
-    , withSelected
+    , tile, group
+    , withTiles, withSelected
     , renderElement
     )
 
-{-|
+{-| Use this when you want [Radios](UI-Radio) with icons.
+
+    Tile.group Msg.SetTile
+        "Pick a delivery vehicle"
+        |> Tile.withSelected model.selected
+        |> Tile.withButtons
+            [ Tile.tile TileModel.Car <| Icon.car "Car"
+            , Tile.tile TileModel.Van <| Icon.van "Van"
+            , Tile.tile TileModel.Truck <| Icon.truck "Truck"
+            , Tile.tile TileModel.Motorbike <| Icon.bike "Motorbike"
+            , Tile.tile TileModel.Bicycle <| Icon.bicycle "Bicycle"
+            , Tile.tile TileModel.ECar <| Icon.eCar "E-Car"
+            , Tile.tile TileModel.EVan <| Icon.eVan "E-Van"
+            , Tile.tile TileModel.EBike <| Icon.eBike "E-Bike"
+            ]
+        |> Tile.renderElement renderConfig
+
+
+# Types
 
 @docs SelectionTiles, SelectionTile
 
-@docs selectionTile, group, withTiles
 
-@docs withSelected
+# Constructors
+
+@docs tile, group
+
+
+# Group management
+
+@docs withTiles, withSelected
+
+
+# Rendering
 
 @docs renderElement
 
@@ -30,32 +57,49 @@ import UI.Utils.Element as Element
 import UI.Utils.Focus as Focus
 
 
-type SelectionTiles value msg
-    = SelectionTiles (Properties value msg) (Options value)
+{-| The `SelectionTiles option msg` type is used for describing the component for later rendering.
+-}
+type SelectionTiles option msg
+    = SelectionTiles (Properties option msg) (Options option)
 
 
-type SelectionTile value
-    = SelectionTile value Icon
+{-| The `SelectionTile option` describes an individual selection-tile.
+-}
+type SelectionTile option
+    = SelectionTile option Icon
 
 
-type alias Properties value msg =
+type alias Properties option msg =
     { label : String
-    , onSelectMsg : value -> msg
+    , onSelectMsg : option -> msg
     }
 
 
-type alias Options value =
-    { selected : Maybe value
-    , tiles : List (SelectionTile value)
+type alias Options option =
+    { selected : Maybe option
+    , tiles : List (SelectionTile option)
     }
 
 
-selectionTile : value -> Icon -> SelectionTile value
-selectionTile value icon =
-    SelectionTile value icon
+{-| A selection-tile and an element of a selection-tiles group.
+
+    Tile.tile Model.OrangeJuice <| Icon.orangeJuice "Orange Juice"
+
+-}
+tile : option -> Icon -> SelectionTile option
+tile option icon =
+    SelectionTile option icon
 
 
-group : (value -> msg) -> String -> SelectionTiles value msg
+{-| Starts an empty selection-tile group.
+The first argument is the message triggered when there is a selection.
+The second one is the label used for accessibility (ARIA).
+
+    someTileGroup =
+        Tile.group Msg.CardPicking "Pick a card"
+
+-}
+group : (option -> msg) -> String -> SelectionTiles option msg
 group onSelectMsg label =
     SelectionTiles
         { label = label
@@ -66,18 +110,36 @@ group onSelectMsg label =
         }
 
 
-withTiles : List (SelectionTile value) -> SelectionTiles value msg -> SelectionTiles value msg
+{-| Replaces a group's list of selection-tiles.
+
+    Tile.withTiles
+        [ Tile.tile Model.OrangeJuice <| Icon.orangeJuice "Orange Juice"
+        , Tile.tile Model.Lemonade <| Icon.lemonade "Lemonade"
+        , Tile.tile Model.SodaSoftDrink <| Icon.sodaSoftDrink "Soda"
+        ]
+        someTileGroup
+
+-}
+withTiles : List (SelectionTile option) -> SelectionTiles option msg -> SelectionTiles option msg
 withTiles tiles (SelectionTiles prop opt) =
     SelectionTiles prop
         { opt | tiles = tiles }
 
 
-withSelected : Maybe value -> SelectionTiles value msg -> SelectionTiles value msg
+{-| Define one element as selected.
+
+    Tile.withSelected (Just Model.DoubleCheddar)
+
+-}
+withSelected : Maybe option -> SelectionTiles option msg -> SelectionTiles option msg
 withSelected newSelected (SelectionTiles prop opt) =
     SelectionTiles prop { opt | selected = newSelected }
 
 
-renderElement : RenderConfig -> SelectionTiles value msg -> Element msg
+{-| End of the builder's life.
+The result of this function is a ready-to-insert Elm UI's Element.
+-}
+renderElement : RenderConfig -> SelectionTiles option msg -> Element msg
 renderElement renderConfig (SelectionTiles prop opt) =
     let
         ariaAttrs =
@@ -89,14 +151,14 @@ renderElement renderConfig (SelectionTiles prop opt) =
         |> Element.wrappedRow (Element.spacing 14 :: ariaAttrs)
 
 
-tileRender : RenderConfig -> (value -> msg) -> Maybe value -> SelectionTile value -> Element msg
-tileRender renderConfig onSelectMsg selected (SelectionTile value icon) =
+tileRender : RenderConfig -> (option -> msg) -> Maybe option -> SelectionTile option -> Element msg
+tileRender renderConfig onSelectMsg selected (SelectionTile option icon) =
     let
         isSelected =
-            selected == Just value
+            selected == Just option
 
         selectThisMsg =
-            onSelectMsg value
+            onSelectMsg option
 
         ( backgroundColor, borderColor ) =
             if isSelected then
