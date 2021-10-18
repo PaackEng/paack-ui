@@ -25,6 +25,7 @@ import UI.Icon as Icon exposing (Icon)
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
+import UI.Utils.ARIA as ARIA
 import UI.Utils.Element as Element
 import UI.Utils.Focus as Focus
 
@@ -38,7 +39,8 @@ type SelectionTile value
 
 
 type alias Properties value msg =
-    { onSelectMsg : value -> msg
+    { label : String
+    , onSelectMsg : value -> msg
     }
 
 
@@ -53,10 +55,11 @@ selectionTile value icon =
     SelectionTile value icon
 
 
-group : (value -> msg) -> SelectionTiles value msg
-group onSelectMsg =
+group : (value -> msg) -> String -> SelectionTiles value msg
+group onSelectMsg label =
     SelectionTiles
-        { onSelectMsg = onSelectMsg
+        { label = label
+        , onSelectMsg = onSelectMsg
         }
         { selected = Nothing
         , tiles = []
@@ -76,9 +79,14 @@ withSelected newSelected (SelectionTiles prop opt) =
 
 renderElement : RenderConfig -> SelectionTiles value msg -> Element msg
 renderElement renderConfig (SelectionTiles prop opt) =
+    let
+        ariaAttrs =
+            ARIA.roleRadioGroup prop.label
+                |> ARIA.toElementAttributes
+    in
     opt.tiles
         |> List.map (tileRender renderConfig prop.onSelectMsg opt.selected)
-        |> Element.wrappedRow [ Element.spacing 14 ]
+        |> Element.wrappedRow (Element.spacing 14 :: ariaAttrs)
 
 
 tileRender : RenderConfig -> (value -> msg) -> Maybe value -> SelectionTile value -> Element msg
@@ -122,11 +130,16 @@ tileRender renderConfig onSelectMsg selected (SelectionTile value icon) =
                 ]
             ]
 
+        ariaAttrs =
+            ARIA.roleRadio isSelected
+                |> ARIA.toElementAttributes
+
         attributes =
             Focus.focus isSelected
                 |> Focus.withTabIndex 0
                 |> Focus.toElementAttributes
                 |> (++) baseAttrs
+                |> (++) ariaAttrs
     in
     Element.column attributes
         [ icon
