@@ -13,6 +13,7 @@ import Sidebar.Model as Sidebar
 import Switches.Model as Switches
 import Tables.Model as Tables
 import Tabs.Model as Tabs
+import Tile.Model as Tile
 import UIExplorer.Plugins.Tabs as TabsPlugin
 
 
@@ -27,6 +28,7 @@ type alias Model =
     , switchesStories : Switches.Model
     , tablesStories : Tables.Model
     , tabsStories : Tabs.Model
+    , tileStories : Tile.Model
     , tabs : TabsPlugin.Model
     }
 
@@ -43,5 +45,6 @@ init =
     , switchesStories = Switches.initModel
     , tablesStories = Tables.initModel
     , tabsStories = Tabs.initModel
+    , tileStories = Tile.initModel
     , tabs = TabsPlugin.initialModel
     }
