@@ -44,7 +44,7 @@ module UI.Tile exposing
 
 -}
 
-import Element exposing (Attribute, Element, fill, px)
+import Element exposing (Element, fill, px)
 import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font

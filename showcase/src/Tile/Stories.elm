@@ -5,9 +5,8 @@ import Model exposing (Model)
 import Msg exposing (Msg)
 import PluginOptions exposing (defaultWithMenu)
 import Return exposing (Return)
-import Tile.Model as TileModel exposing (Options)
+import Tile.Model as TileModel
 import Tile.Msg as TileMsg
-import UI.Effects as Effect
 import UI.Icon as Icon
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Tile as Tile
@@ -19,7 +18,6 @@ import Utils
         , goToDocsCallToAction
         , iconsSvgSprite
         , prettifyElmCode
-        , story
         , storyWithModel
         )
 
