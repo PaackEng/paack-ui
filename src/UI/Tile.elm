@@ -63,7 +63,7 @@ type SelectionTiles option msg
     = SelectionTiles (Properties option msg) (Options option)
 
 
-{-| The `SelectionTile option` describes an individual selection-tile.
+{-| The `SelectionTile option` describes an individual selection tile.
 -}
 type SelectionTile option
     = SelectionTile option Icon
@@ -81,7 +81,7 @@ type alias Options option =
     }
 
 
-{-| A selection-tile and an element of a selection-tiles group.
+{-| A selection tile and an element of a selection tiles group.
 
     Tile.tile Model.OrangeJuice <| Icon.orangeJuice "Orange Juice"
 
@@ -91,7 +91,7 @@ tile option icon =
     SelectionTile option icon
 
 
-{-| Starts an empty selection-tile group.
+{-| Starts an empty selection tile group.
 The first argument is the message triggered when there is a selection.
 The second one is the label used for accessibility (ARIA).
 
@@ -110,7 +110,7 @@ group onSelectMsg label =
         }
 
 
-{-| Replaces a group's list of selection-tiles.
+{-| Replaces a group's list of selection tiles.
 
     Tile.withTiles
         [ Tile.tile Model.OrangeJuice <| Icon.orangeJuice "Orange Juice"
