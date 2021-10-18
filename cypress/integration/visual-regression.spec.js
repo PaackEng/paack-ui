@@ -99,7 +99,7 @@ describe('Percy Snapshots', () => {
 
   describe('Tile', () => {
     it('Creates the Tile page snapshot', () => {
-      cy.visit('/Basics/Tile/Horizontal')
+      cy.visit('/#Basics/Tile/Horizontal')
       cy.percySnapshot('Tile')
     })
   })
