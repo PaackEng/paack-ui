@@ -97,6 +97,13 @@ describe('Percy Snapshots', () => {
     })
   })
 
+  describe('Tile', () => {
+    it('Creates the Tile page snapshot', () => {
+      cy.visit('/Basics/Tile/Horizontal')
+      cy.percySnapshot('Tile')
+    })
+  })
+
   describe('Tables', () => {
     it('Creates the Desktop Tables page snapshot', () => {
       cy.visit('/#Complex%20components/Tables/Desktop')
