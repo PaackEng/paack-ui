@@ -1,7 +1,7 @@
 module UI.Tile exposing
     ( SelectionTiles, SelectionTile
     , tile, group
-    , withTiles, withSelected
+    , withTiles, withSelected, withMultipleSelected, withExplicitStateMsg
     , renderElement
     )
 
@@ -35,7 +35,7 @@ module UI.Tile exposing
 
 # Group management
 
-@docs withTiles, withSelected
+@docs withTiles, withSelected, withMultipleSelected, withExplicitStateMsg
 
 
 # Rendering
@@ -71,12 +71,12 @@ type SelectionTile option
 
 type alias Properties option msg =
     { label : String
-    , onSelectMsg : option -> msg
+    , onSelectMsg : option -> Bool -> msg
     }
 
 
 type alias Options option =
-    { selected : Maybe option
+    { selected : List option
     , tiles : List (SelectionTile option)
     }
 
@@ -103,9 +103,9 @@ group : (option -> msg) -> String -> SelectionTiles option msg
 group onSelectMsg label =
     SelectionTiles
         { label = label
-        , onSelectMsg = onSelectMsg
+        , onSelectMsg = \k _ -> onSelectMsg k
         }
-        { selected = Nothing
+        { selected = []
         , tiles = []
         }
 
@@ -133,7 +133,37 @@ withTiles tiles (SelectionTiles prop opt) =
 -}
 withSelected : Maybe option -> SelectionTiles option msg -> SelectionTiles option msg
 withSelected newSelected (SelectionTiles prop opt) =
-    SelectionTiles prop { opt | selected = newSelected }
+    SelectionTiles prop
+        { opt
+            | selected =
+                newSelected
+                    |> Maybe.map List.singleton
+                    |> Maybe.withDefault []
+        }
+
+
+{-| Define multiple elements as selected.
+
+    Tile.withMultipleSelected [ Model.DoubleCheddar, Model.XSalad ]
+
+-}
+withMultipleSelected : List option -> SelectionTiles option msg -> SelectionTiles option msg
+withMultipleSelected newSelected (SelectionTiles prop opt) =
+    SelectionTiles prop
+        { opt | selected = newSelected }
+
+
+{-| Receive in the message the correct new state of the tile.
+
+    Tile.group
+        (\which newBooleanState -> SetSomeTile which newBooleanState)
+        "SomeGroup"
+        |> Tile.withExplicitStateMsg
+
+-}
+withExplicitStateMsg : SelectionTiles option (Bool -> msg) -> SelectionTiles option msg
+withExplicitStateMsg (SelectionTiles prop opt) =
+    SelectionTiles { label = prop.label, onSelectMsg = \k v -> prop.onSelectMsg k v v } opt
 
 
 {-| End of the builder's life.
@@ -151,14 +181,14 @@ renderElement renderConfig (SelectionTiles prop opt) =
         |> Element.wrappedRow (Element.spacing 14 :: ariaAttrs)
 
 
-tileRender : RenderConfig -> (option -> msg) -> Maybe option -> SelectionTile option -> Element msg
+tileRender : RenderConfig -> (option -> Bool -> msg) -> List option -> SelectionTile option -> Element msg
 tileRender renderConfig onSelectMsg selected (SelectionTile option icon) =
     let
         isSelected =
-            selected == Just option
+            List.member option selected
 
         selectThisMsg =
-            onSelectMsg option
+            onSelectMsg option <| not isSelected
 
         ( backgroundColor, borderColor ) =
             if isSelected then
