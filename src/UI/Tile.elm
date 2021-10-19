@@ -161,9 +161,9 @@ withMultipleSelected newSelected (SelectionTiles prop opt) =
         |> Tile.withExplicitStateMsg
 
 -}
-withExplicitStateMsg : SelectionTiles option (Bool -> msg2) -> SelectionTiles option msg2
+withExplicitStateMsg : SelectionTiles option (Bool -> msg) -> SelectionTiles option msg
 withExplicitStateMsg (SelectionTiles prop opt) =
-    SelectionTiles { label = prop.label, onSelectMsg = \k -> prop.onSelectMsg k True } opt
+    SelectionTiles { label = prop.label, onSelectMsg = \k v -> prop.onSelectMsg k v v } opt
 
 
 {-| End of the builder's life.
