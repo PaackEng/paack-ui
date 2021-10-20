@@ -24,9 +24,9 @@ stories cfg =
         , usernameTextFieldStory cfg
         , passwordTextFieldStory cfg
         , fullWidthStory cfg
-        , unitedStory cfg
         , errorTextFieldStory cfg
         , staticStory cfg
+        , unitedStory cfg
         ]
 
 
@@ -240,7 +240,7 @@ type Msg
 unitedStory : RenderConfig -> ExplorerStory
 unitedStory cfg =
     story
-        ( "Full Width"
+        ( "United"
         , unitedView cfg
         , pluginOptions fullWidthCode
         )
@@ -253,4 +253,6 @@ unitedView cfg =
         , usernameTextFieldView cfg
         , passwordTextFieldView cfg
         , fullWidthView cfg
+        , errorTextFieldView cfg
+        , staticView cfg
         ]
