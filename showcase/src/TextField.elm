@@ -26,6 +26,7 @@ stories cfg =
         , fullWidthStory cfg
         , unitedStory cfg
         , errorTextFieldStory cfg
+        , staticStory cfg
         ]
 
 
@@ -184,6 +185,37 @@ TextField.singlelineText OnTextFieldChanged
     |> TextField.setLabelVisible True
     |> TextField.withWidth TextField.widthFull
     |> TextField.renderElement renderCfg
+"""
+
+
+staticStory : RenderConfig -> ExplorerStory
+staticStory cfg =
+    story
+        ( "Static Read-Only"
+        , staticView cfg
+        , pluginOptions staticCode
+        )
+
+
+staticView : RenderConfig -> Element RootMsg.Msg
+staticView cfg =
+    TextField.static
+        "My ReadOnly TextField"
+        "My ReadOnly TextField"
+        |> TextField.withWidth TextField.widthFull
+        |> TextField.renderElement cfg
+
+
+staticCode : String
+staticCode =
+    """
+-- Static
+TextField.static
+        "My TextField"
+        "My TextField"
+        |> TextField.setLabelVisible True
+        |> TextField.withWidth TextField.widthFull
+        |> TextField.renderElement cfg
 """
 
 
