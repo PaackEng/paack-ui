@@ -750,6 +750,19 @@ focusedAttrs hasError =
         ]
 
 
+hoveredAttrs : Bool -> List (Element.Attr decorative msg)
+hoveredAttrs hasError =
+    if hasError then
+        [ Background.color Colors.red100
+        , Border.color Colors.red700
+        ]
+
+    else
+        [ Background.color Colors.gray200
+        , Border.color Colors.gray400
+        ]
+
+
 genericAttr : String -> Bool -> Bool -> TextFieldWidth -> Size -> List (Attribute msg)
 genericAttr label isPlaceholder hasError width size =
     [ Background.color Colors.gray100
@@ -768,10 +781,7 @@ genericAttr label isPlaceholder hasError width size =
             1
     , textFieldPadding size
     , Element.focused <| focusedAttrs hasError
-    , Element.mouseOver
-        [ Background.color Colors.gray200
-        , Border.color Colors.gray400
-        ]
+    , Element.mouseOver <| hoveredAttrs hasError
     , Element.width <|
         case width of
             WidthFull ->
