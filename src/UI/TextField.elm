@@ -88,13 +88,11 @@ Different from [`Element.Input`](/packages/mdgriffith/elm-ui/latest/Element-Inpu
 
 -}
 
-import Browser.Dom exposing (focus)
-import Element exposing (Attribute, Decoration, Element, FocusStyle)
+import Element exposing (Attribute, Element)
 import Element.Background as Background
 import Element.Border as Border exposing (shadow)
 import Element.Font as Font
 import Element.Input as Input
-import Maybe exposing (withDefault)
 import UI.Icon exposing (Icon)
 import UI.Internal.Colors as Colors
 import UI.Internal.Primitives as Primitives
