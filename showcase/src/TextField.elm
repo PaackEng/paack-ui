@@ -24,8 +24,9 @@ stories cfg =
         , usernameTextFieldStory cfg
         , passwordTextFieldStory cfg
         , fullWidthStory cfg
-        , unitedStory cfg
         , errorTextFieldStory cfg
+        , staticStory cfg
+        , unitedStory cfg
         ]
 
 
@@ -187,6 +188,37 @@ TextField.singlelineText OnTextFieldChanged
 """
 
 
+staticStory : RenderConfig -> ExplorerStory
+staticStory cfg =
+    story
+        ( "Static Read-Only"
+        , staticView cfg
+        , pluginOptions staticCode
+        )
+
+
+staticView : RenderConfig -> Element RootMsg.Msg
+staticView cfg =
+    TextField.static
+        "My ReadOnly TextField"
+        "My ReadOnly TextField"
+        |> TextField.withWidth TextField.widthFull
+        |> TextField.renderElement cfg
+
+
+staticCode : String
+staticCode =
+    """
+-- Static
+TextField.static
+        "My TextField"
+        "My TextField"
+        |> TextField.setLabelVisible True
+        |> TextField.withWidth TextField.widthFull
+        |> TextField.renderElement cfg
+"""
+
+
 pluginOptions : String -> PluginOptions
 pluginOptions code =
     { defaultWithMenu
@@ -208,7 +240,7 @@ type Msg
 unitedStory : RenderConfig -> ExplorerStory
 unitedStory cfg =
     story
-        ( "Full Width"
+        ( "United"
         , unitedView cfg
         , pluginOptions fullWidthCode
         )
@@ -221,4 +253,6 @@ unitedView cfg =
         , usernameTextFieldView cfg
         , passwordTextFieldView cfg
         , fullWidthView cfg
+        , errorTextFieldView cfg
+        , staticView cfg
         ]
