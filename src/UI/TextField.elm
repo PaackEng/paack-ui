@@ -745,11 +745,15 @@ focusedAttrs hasError =
         ]
 
 
-hoveredAttrs : Bool -> List (Element.Attr decorative msg)
-hoveredAttrs hasError =
+hoveredAttrs : Bool -> Bool -> List (Element.Attr decorative msg)
+hoveredAttrs hasError isStatic =
     if hasError then
         [ Background.color Colors.red100
         , Border.color Colors.red700
+        ]
+
+    else if isStatic then
+        [ Background.color Colors.white
         ]
 
     else
@@ -765,11 +769,14 @@ genericAttr label isPlaceholder isStatic hasError width size =
             Colors.white
 
         else
-            Colors.gray200
+            Colors.gray100
     , Primitives.roundedBorders size
     , Border.color <|
         if hasError then
             Colors.red700
+
+        else if isStatic then
+            Colors.gray300
 
         else
             Colors.gray500
@@ -781,7 +788,7 @@ genericAttr label isPlaceholder isStatic hasError width size =
             1
     , textFieldPadding size
     , Element.focused <| focusedAttrs hasError
-    , Element.mouseOver <| hoveredAttrs hasError
+    , Element.mouseOver <| hoveredAttrs hasError isStatic
     , Element.width <|
         case width of
             WidthFull ->
