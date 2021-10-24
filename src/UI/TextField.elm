@@ -504,7 +504,7 @@ renderElement cfg (TextField prop opt) =
                         |> Input.spellChecked elAttrs
 
         whenStatic value =
-            Text.subtitle2 value
+            Text.body2 value
                 |> Text.withColor Palette.gray600
                 |> Text.renderElement cfg
                 |> Element.el elAttrs
