@@ -3,7 +3,7 @@
     "name": "PaackEng/paack-ui",
     "summary": "Paack's Design System applied over Elm UI",
     "license": "BSD-3-Clause",
-    "version": "7.4.0",
+    "version": "7.4.1",
     "exposed-modules": [
         "UI.Alert",
         "UI.Analytics",

@@ -684,14 +684,6 @@ attrs cfg prop opt =
                 Nothing ->
                     acu
 
-        -- hasFocus acu =
-        --     case opt.focus of
-        --     Just details ->
-        --             Focus.toElementAttributes hasFocus
-        --             Focus.focus
-        --                 ++ acu
-        --         Nothing ->
-        --             acu
         usernameAttr acu =
             case prop.content of
                 ContentUsername ->
