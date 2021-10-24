@@ -505,6 +505,7 @@ renderElement cfg (TextField prop opt) =
 
         whenStatic value =
             Text.subtitle2 value
+                |> Text.withColor Palette.gray600
                 |> Text.renderElement cfg
                 |> Element.el elAttrs
 
@@ -694,9 +695,13 @@ attrs cfg prop opt =
 
                 _ ->
                     acu
+
+        isStatic =
+            prop.changeable == Nothing
     in
     genericAttr prop.label
         isPlaceholder
+        isStatic
         hasError
         opt.width
         opt.size
@@ -753,9 +758,14 @@ hoveredAttrs hasError =
         ]
 
 
-genericAttr : String -> Bool -> Bool -> TextFieldWidth -> Size -> List (Attribute msg)
-genericAttr label isPlaceholder hasError width size =
-    [ Background.color Colors.gray100
+genericAttr : String -> Bool -> Bool -> Bool -> TextFieldWidth -> Size -> List (Attribute msg)
+genericAttr label isPlaceholder isStatic hasError width size =
+    [ Background.color <|
+        if isStatic then
+            Colors.white
+
+        else
+            Colors.gray200
     , Primitives.roundedBorders size
     , Border.color <|
         if hasError then
