@@ -26,6 +26,7 @@ import Tables.Stories as Tables
 import Tabs.Stories as Tabs
 import TextField
 import Texts
+import Tile.Stories as Tile
 import UI.Document exposing (Document)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UIExplorer
@@ -117,6 +118,7 @@ main =
             , Switches.stories renderConfig
             , Radio.stories renderConfig
             , Tabs.stories renderConfig
+            , Tile.stories renderConfig
             , ContentPlaceholders.stories renderConfig
             , Dropdowns.stories renderConfig
             ]
@@ -175,6 +177,11 @@ updateStories msg ({ customModel } as model) =
         TabsStoriesMsg subMsg ->
             Tabs.update subMsg customModel.tabsStories
                 |> R.map (\t -> { customModel | tabsStories = t })
+                |> finishCustomUpdate model
+
+        TileStoriesMsg subMsg ->
+            Tile.update subMsg customModel.tileStories
+                |> R.map (\t -> { customModel | tileStories = t })
                 |> finishCustomUpdate model
 
         TabMsg submsg ->

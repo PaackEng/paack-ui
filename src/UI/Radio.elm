@@ -78,7 +78,7 @@ type RadioGroup option msg
     = RadioGroup (Properties option msg) (Options option)
 
 
-{-| The `RadioButton option` describes an individual radiobutton
+{-| The `RadioButton option` describes an individual radio-button
 -}
 type RadioButton option
     = RadioButton option String
@@ -121,11 +121,13 @@ type alias Options option =
 
 
 {-| Starts an empty radio group.
-The first argument is the label used for accessibility.
-The second is the message triggered when there is a selection.
 
     someRadioGroup =
-        Radio.group "Pick a card" Msg.CardPicking
+        Radio.group
+            { label = "Pick a card"
+            , onSelectMsg = Msg.CardPicking
+            , idPrefix = "card" -- Will result in "card-king-spades"
+            }
 
 -}
 group :

@@ -10,6 +10,7 @@ import Sidebar.Msg as Sidebar
 import Switches.Msg as Switches
 import Tables.Msg as Tables
 import Tabs.Msg as Tabs
+import Tile.Msg as Tile
 import UIExplorer.Plugins.Tabs as TabsPlugin
 
 
@@ -24,5 +25,6 @@ type Msg
     | SwitchesStoriesMsg Switches.Msg
     | TablesStoriesMsg Tables.Msg
     | TabsStoriesMsg Tabs.Msg
+    | TileStoriesMsg Tile.Msg
     | NoOp
     | TabMsg TabsPlugin.Msg
