@@ -90,7 +90,7 @@ Different from [`Element.Input`](/packages/mdgriffith/elm-ui/latest/Element-Inpu
 
 import Element exposing (Attribute, Element)
 import Element.Background as Background
-import Element.Border as Border
+import Element.Border as Border exposing (shadow)
 import Element.Font as Font
 import Element.Input as Input
 import UI.Icon exposing (Icon)
@@ -504,7 +504,7 @@ renderElement cfg (TextField prop opt) =
                         |> Input.spellChecked elAttrs
 
         whenStatic value =
-            Text.subtitle2 value
+            Text.body2 value
                 |> Text.withColor Palette.gray600
                 |> Text.renderElement cfg
                 |> Element.el elAttrs
@@ -717,18 +717,49 @@ textAttrs cfg size =
         textSize =
             case size of
                 Size.Large ->
-                    Text.SizeSubtitle2
+                    Text.SizeBody1
 
                 Size.Medium ->
-                    Text.SizeSubtitle2
+                    Text.SizeBody2
 
                 Size.Small ->
-                    Text.SizeSubtitle2
+                    Text.SizeCaption
 
                 Size.ExtraSmall ->
                     Text.SizeCaption
     in
     Text.attributes cfg textSize Text.wrap Text.ColorInherit
+
+
+focusedAttrs : Bool -> List (Element.Attr decorative msg)
+focusedAttrs hasError =
+    if hasError then
+        [ Border.color Colors.red700
+        , Background.color Colors.white
+        ]
+
+    else
+        [ Border.color Colors.navyBlue700
+        , shadow { color = Colors.navyBlue700, offset = ( 0, 0 ), blur = 0, size = 1.2 }
+        , Background.color Colors.white
+        ]
+
+
+hoveredAttrs : Bool -> Bool -> List (Element.Attr decorative msg)
+hoveredAttrs hasError isStatic =
+    if hasError then
+        [ Background.color Colors.red100
+        , Border.color Colors.red700
+        ]
+
+    else if isStatic then
+        [ Background.color Colors.white
+        ]
+
+    else
+        [ Background.color Colors.gray200
+        , Border.color Colors.gray400
+        ]
 
 
 genericAttr : String -> Bool -> Bool -> Bool -> TextFieldWidth -> Size -> List (Attribute msg)
@@ -738,14 +769,17 @@ genericAttr label isPlaceholder isStatic hasError width size =
             Colors.white
 
         else
-            Colors.gray200
+            Colors.gray100
     , Primitives.roundedBorders size
     , Border.color <|
         if hasError then
             Colors.red700
 
-        else
+        else if isStatic then
             Colors.gray300
+
+        else
+            Colors.gray500
     , Border.width <|
         if hasError then
             2
@@ -753,9 +787,8 @@ genericAttr label isPlaceholder isStatic hasError width size =
         else
             1
     , textFieldPadding size
-    , Element.focused
-        [ Border.color Colors.navyBlue300
-        ]
+    , Element.focused <| focusedAttrs hasError
+    , Element.mouseOver <| hoveredAttrs hasError isStatic
     , Element.width <|
         case width of
             WidthFull ->
@@ -766,7 +799,7 @@ genericAttr label isPlaceholder isStatic hasError width size =
     , Font.color <|
         -- TODO: Use CSS pre-processor
         if isPlaceholder then
-            Colors.gray600
+            Colors.gray400
 
         else if hasError && not isPlaceholder then
             Colors.red700
@@ -780,7 +813,7 @@ genericAttr label isPlaceholder isStatic hasError width size =
 inputLabel : RenderConfig -> String -> Bool -> Input.Label msg
 inputLabel cfg label labelVisible =
     if labelVisible then
-        Text.caption label
+        Text.body2 label
             |> Text.withColor
                 Palette.gray700
             |> Text.renderElement cfg
