@@ -8,6 +8,7 @@ module UI.Button exposing
     , withDisabledIf
     , renderElement
     , map
+    , switchedOn
     )
 
 {-| The `UI.Button` is a component that can render as a hyperlink, a togglable button, a stylized button, or a clear padded-icon.
@@ -351,6 +352,13 @@ This button usually commits the main task.
 primary : ButtonStyle
 primary =
     StyleEmbossed TonePrimary
+
+
+{-| The switched on state for a button. Any active button can be in a a possible "On" state.
+-}
+switchedOn : ButtonStyle
+switchedOn =
+    StyleEmbossed ToneSwitchedOn
 
 
 {-| A hyperlink-styled button looks like classical web links: Blue with an underline.
@@ -798,6 +806,9 @@ workingTheme tone =
                         }
                 }
 
+            ToneSwitchedOn ->
+                switchedOnTheme
+
 
 disabledTheme : List (Attribute msg)
 disabledTheme =
@@ -809,6 +820,22 @@ disabledTheme =
             }
         , hover = Nothing
         }
+
+
+switchedOnTheme : ButtonTheme
+switchedOnTheme =
+    { normal =
+        { background = Palette.blue300
+        , border = Palette.blue300
+        , text = Text.ColorPalette Palette.blue700
+        }
+    , hover =
+        Just
+            { background = Palette.blue400
+            , border = Palette.blue400
+            , text = Text.ColorPalette Palette.blue800
+            }
+    }
 
 
 primaryTheme : ButtonTheme

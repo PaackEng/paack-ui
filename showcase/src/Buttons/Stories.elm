@@ -38,6 +38,7 @@ stories renderConfig =
         "Buttons"
         [ primaryStory renderConfig
         , disabledButtonStory renderConfig
+        , switchedOnStory renderConfig
         , dangerStory renderConfig
         , lightStory renderConfig
         , clearStory renderConfig
@@ -162,6 +163,13 @@ clearStory cfg =
         Button.clear
         "Button.clear"
 
+switchedOnStory : RenderConfig -> ExplorerStory
+switchedOnStory cfg =
+    enabledStory cfg
+        "Switched On"
+        Button.switchedOn
+        "Button.switchedOn"
+
 
 linkStory : RenderConfig -> ExplorerStory
 linkStory renderConfig =
@@ -280,6 +288,7 @@ unitedView renderConfig =
         , unitedItem <| enabledView renderConfig Button.danger
         , unitedItem <| enabledView renderConfig Button.light
         , unitedItem <| enabledView renderConfig Button.clear
+        , unitedItem <| enabledView renderConfig Button.switchedOn
         , unitedItem <| [ linkView renderConfig ]
         , unitedItem <| [ fullWidthView renderConfig ]
         , unitedItem <| [ toggleButtonView renderConfig False, toggleButtonView renderConfig True ]
