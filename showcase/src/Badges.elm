@@ -17,6 +17,7 @@ stories cfg =
         , oneBadge cfg Badge.warningLight Badge.warningDark "warning"
         , oneBadge cfg Badge.dangerLight Badge.dangerDark "danger"
         , oneBadge cfg Badge.successLight Badge.successDark "success"
+        , oneBadge cfg Badge.outlineLight Badge.outlineDark "outline"
         , allBadge cfg
         ]
 
@@ -40,7 +41,6 @@ oneBadge cfg constructorLight constructorDark variation =
           }
         )
 
-
 allBadge : RenderConfig -> ExplorerStory
 allBadge cfg =
     story
@@ -49,6 +49,7 @@ allBadge cfg =
           , [ Badge.warningLight, Badge.warningDark ]
           , [ Badge.dangerLight, Badge.dangerDark ]
           , [ Badge.successLight, Badge.successDark ]
+          , [ Badge.outlineLight, Badge.outlineDark ]
           ]
             |> List.map (uniteVariation cfg)
             |> Element.column [ Element.spacing 8 ]
