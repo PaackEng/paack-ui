@@ -825,14 +825,14 @@ disabledTheme =
 switchedOnTheme : ButtonTheme
 switchedOnTheme =
     { normal =
-        { background = Palette.blue300
-        , border = Palette.blue300
+        { background = Palette.blue200
+        , border = Palette.blue200
         , text = Text.ColorPalette Palette.blue700
         }
     , hover =
         Just
-            { background = Palette.blue400
-            , border = Palette.blue400
+            { background = Palette.blue300
+            , border = Palette.blue300
             , text = Text.ColorPalette Palette.blue800
             }
     }
