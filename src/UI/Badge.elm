@@ -4,7 +4,7 @@ module UI.Badge exposing
     , grayDark, primaryDark, successDark, warningDark, dangerDark
     , withTone
     , renderElement
-    , outlineDark, outlineLight
+    , dangerDarkWithIcon, dangerLightWithIcon, grayDarkWithIcon, grayLightWithIcon, outlineDark, outlineDarkWithIcon, outlineLight, outlineLightWithIcon, primaryDarkWithIcon, primaryLightWithIcon, successDarkWithIcon, successLightWithIcon, warningDarkWithIcon, warningLightWithIcon
     )
 
 {-| Badges are small elements displayed, usually on the right of texts or top-right corner of the view, serving as counters, tags, or labels.
@@ -74,8 +74,7 @@ type alias Properties =
 
 
 type alias Options =
-    { withOutline : Bool
-    , withIcon : Maybe Icon
+    { withIcon : Maybe Icon
     }
 
 
@@ -93,21 +92,21 @@ type BadgeBrightness
     | Dark
 
 
-{-| A grayscale variation of the badge with outline.
+{-| A variation of the badge with outline for light backgrounds.
 
-    Badge.outline "OUTLINE"
+    Badge.outlineLight "SENT"
 
 -}
 outlineLight : String -> Badge
 outlineLight content =
-    Options True Nothing
+    Options Nothing
         |> Badge { content = content, tone = ToneClear, brightness = Light }
 
 
-outlineDark : String -> Badge
-outlineDark content =
-    Options True Nothing
-        |> Badge { content = content, tone = ToneClear, brightness = Dark }
+outlineLightWithIcon : String -> Icon -> Badge
+outlineLightWithIcon content icon =
+    Options (Just icon)
+        |> Badge { content = content, tone = ToneClear, brightness = Light }
 
 
 {-| A light grayish variation of the badge.
@@ -117,7 +116,13 @@ outlineDark content =
 -}
 grayLight : String -> Badge
 grayLight content =
-    Options False Nothing
+    Options Nothing
+        |> Badge { content = content, tone = ToneGray, brightness = Light }
+
+
+grayLightWithIcon : String -> Icon -> Badge
+grayLightWithIcon content icon =
+    Options (Just icon)
         |> Badge { content = content, tone = ToneGray, brightness = Light }
 
 
@@ -128,7 +133,13 @@ grayLight content =
 -}
 primaryLight : String -> Badge
 primaryLight content =
-    Options False Nothing
+    Options Nothing
+        |> Badge { content = content, tone = TonePrimary, brightness = Light }
+
+
+primaryLightWithIcon : String -> Icon -> Badge
+primaryLightWithIcon content icon =
+    Options (Just icon)
         |> Badge { content = content, tone = TonePrimary, brightness = Light }
 
 
@@ -139,7 +150,13 @@ primaryLight content =
 -}
 warningLight : String -> Badge
 warningLight content =
-    Options False Nothing
+    Options Nothing
+        |> Badge { content = content, tone = ToneWarning, brightness = Light }
+
+
+warningLightWithIcon : String -> Icon -> Badge
+warningLightWithIcon content icon =
+    Options (Just icon)
         |> Badge { content = content, tone = ToneWarning, brightness = Light }
 
 
@@ -150,7 +167,13 @@ warningLight content =
 -}
 dangerLight : String -> Badge
 dangerLight content =
-    Options False Nothing
+    Options Nothing
+        |> Badge { content = content, tone = ToneDanger, brightness = Light }
+
+
+dangerLightWithIcon : String -> Icon -> Badge
+dangerLightWithIcon content icon =
+    Options (Just icon)
         |> Badge { content = content, tone = ToneDanger, brightness = Light }
 
 
@@ -161,7 +184,12 @@ dangerLight content =
 -}
 successLight : String -> Badge
 successLight content =
-    Options False Nothing
+    Options Nothing
+        |> Badge { content = content, tone = ToneSuccess, brightness = Light }
+
+
+successLightWithIcon content icon =
+    Options (Just icon)
         |> Badge { content = content, tone = ToneSuccess, brightness = Light }
 
 
@@ -172,7 +200,12 @@ successLight content =
 -}
 grayDark : String -> Badge
 grayDark content =
-    Options False Nothing
+    Options Nothing
+        |> Badge { content = content, tone = ToneGray, brightness = Dark }
+
+
+grayDarkWithIcon content icon =
+    Options (Just icon)
         |> Badge { content = content, tone = ToneGray, brightness = Dark }
 
 
@@ -183,7 +216,12 @@ grayDark content =
 -}
 primaryDark : String -> Badge
 primaryDark content =
-    Options False Nothing
+    Options Nothing
+        |> Badge { content = content, tone = TonePrimary, brightness = Dark }
+
+
+primaryDarkWithIcon content icon =
+    Options (Just icon)
         |> Badge { content = content, tone = TonePrimary, brightness = Dark }
 
 
@@ -194,7 +232,12 @@ primaryDark content =
 -}
 warningDark : String -> Badge
 warningDark content =
-    Options False Nothing
+    Options Nothing
+        |> Badge { content = content, tone = ToneWarning, brightness = Dark }
+
+
+warningDarkWithIcon content icon =
+    Options (Just icon)
         |> Badge { content = content, tone = ToneWarning, brightness = Dark }
 
 
@@ -205,7 +248,12 @@ warningDark content =
 -}
 dangerDark : String -> Badge
 dangerDark content =
-    Options False Nothing
+    Options Nothing
+        |> Badge { content = content, tone = ToneDanger, brightness = Dark }
+
+
+dangerDarkWithIcon content icon =
+    Options (Just icon)
         |> Badge { content = content, tone = ToneDanger, brightness = Dark }
 
 
@@ -216,8 +264,30 @@ dangerDark content =
 -}
 successDark : String -> Badge
 successDark content =
-    Options False Nothing
+    Options Nothing
         |> Badge { content = content, tone = ToneSuccess, brightness = Dark }
+
+
+successDarkWithIcon content icon =
+    Options (Just icon)
+        |> Badge { content = content, tone = ToneSuccess, brightness = Dark }
+
+
+{-| A variation of the badge with outline for dark backgrounds.
+
+    Badge.outlineDark "SENT"
+
+-}
+outlineDark : String -> Badge
+outlineDark content =
+    Options Nothing
+        |> Badge { content = content, tone = ToneClear, brightness = Dark }
+
+
+outlineDarkWithIcon : String -> Icon -> Badge
+outlineDarkWithIcon content icon =
+    Options (Just icon)
+        |> Badge { content = content, tone = ToneClear, brightness = Light }
 
 
 {-| Replaces the tone of a badge with a new one.
@@ -237,14 +307,18 @@ withTone builder (Badge { content } _) =
     builder content
 
 
-companionIcon : RenderConfig -> Icon -> Element msg
-companionIcon cfg icon =
+companionIcon : RenderConfig -> Icon -> Color -> Element msg
+companionIcon cfg icon iconColor =
     icon
-        |> Icon.withCustomSize 8
+        |> Icon.withCustomSize 16
+        |> Icon.withColor iconColor
         |> Icon.renderElement cfg
 
 
 
+-- Icon.seeMore "see more"
+--     |> Icon.withCustomSize 16
+--     |> Icon.renderElement cfg
 -- Render
 
 
@@ -252,33 +326,38 @@ companionIcon cfg icon =
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
 renderElement : RenderConfig -> Badge -> Element msg
-renderElement cfg (Badge { content, tone, brightness } { withIcon, withOutline }) =
+renderElement cfg (Badge { content, tone, brightness } { withIcon }) =
     case withIcon of
         Just icon ->
             let
                 ( background, textColor, outlineColor ) =
                     colors tone brightness
             in
-            Element.column []
-                [ companionIcon cfg icon
-                , Text.subtitle2 content
-                    |> Text.withColor textColor
-                    |> Text.withOverflow Text.ellipsize
-                    |> Text.renderElement cfg
-                    |> Element.el
-                        [ Element.width shrink
-                        , Font.center
-                        , background
-                            |> Palette.toElementColor
-                            |> Background.color
-                        , outlineColor
-                            |> Palette.toElementColor
-                            |> Border.color
-                        , Element.paddingEach { top = 4, bottom = 6, left = 8, right = 8 }
-                        , Element.height (px 24)
-                        , Border.rounded 12
-                        , Border.width 2
-                        ]
+            Element.row
+                [ Element.width shrink
+                , Font.center
+                , background
+                    |> Palette.toElementColor
+                    |> Background.color
+                , outlineColor
+                    |> Palette.toElementColor
+                    |> Border.color
+                , Element.height (px 24)
+                , Border.rounded 12
+                , Border.width 2
+                ]
+                [ Element.column
+                    [ Element.paddingEach { top = 2, bottom = 2, left = 2, right = 0 }
+                    ]
+                    [ companionIcon cfg icon textColor ]
+                , Element.column
+                    [ Element.paddingEach { top = 4, bottom = 0, left = 0, right = 6 }
+                    ]
+                    [ Text.subtitle2 content
+                        |> Text.withColor textColor
+                        |> Text.withOverflow Text.ellipsize
+                        |> Text.renderElement cfg
+                    ]
                 ]
 
         Nothing ->
@@ -299,7 +378,7 @@ renderElement cfg (Badge { content, tone, brightness } { withIcon, withOutline }
                     , outlineColor
                         |> Palette.toElementColor
                         |> Border.color
-                    , Element.paddingEach { top = 4, bottom = 6, left = 8, right = 8 }
+                    , Element.paddingEach { top = 4, bottom = 0, left = 6, right = 6 }
                     , Element.height (px 24)
                     , Border.rounded 12
                     , Border.width 2

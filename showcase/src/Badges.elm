@@ -6,7 +6,8 @@ import UI.Badge as Badge exposing (Badge)
 import UI.RenderConfig exposing (RenderConfig)
 import UIExplorer exposing (storiesOf)
 import Utils exposing (ExplorerStory, ExplorerUI, goToDocsCallToAction, prettifyElmCode, story, storyList)
-
+import UI.Icon as Icon
+import Utils exposing (iconsSvgSprite)
 
 stories : RenderConfig -> ExplorerUI
 stories cfg =
@@ -32,9 +33,14 @@ oneBadge cfg constructorLight constructorDark variation =
     storyList
         ( "Badge " ++ variation
         , List.map (Badge.renderElement cfg)
-            [ constructorLight "123"
+            [ 
+             constructorLight "123"
+            , Badge.grayLightWithIcon "123" (Icon.search "search")
             , constructorDark "456"
+            , Badge.outlineDarkWithIcon "123" (Icon.search "search")
             ]
+
+            |> (::) iconsSvgSprite
         , { defaultWithMenu
             | code = code variation
             , note = goToDocsCallToAction "Badge"
