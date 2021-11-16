@@ -94,6 +94,7 @@ icons =
     , ( Icon.eye, "eye" )
     , ( Icon.filter, "filter" )
     , ( Icon.fix, "fix" )
+    , ( Icon.fixing, "fixing" )
     , ( Icon.folder, "folder" )
     , ( Icon.food, "food" )
     , ( Icon.frozen, "frozen" )
