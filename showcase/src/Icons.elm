@@ -37,11 +37,7 @@ Icon.seeMore label
 
 note : String
 note =
-    """
-We name icons by their functionality and not their shapes.
-
-"""
-        ++ goToDocsCallToAction "Icon"
+    goToDocsCallToAction "Icon"
 
 
 icons : List ( String -> Icon, String )
