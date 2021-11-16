@@ -1,16 +1,9 @@
 module UI.Icon exposing
     ( svgSpriteImport
     , Icon
-    , add, arrowUp, assignPerson, bicycle, bike, boxes, check, success, car, close
-    , collapse, clockIssue, configure, clockLocked, coins, delete, done, download
-    , eBike, eCar, edit, eVan, eventLog, expand, filter, fix
-    , fixIssues, fixing, groups, insert, legacyApis, legacyHistorical, legacyLabelPrinter
-    , legacyReport, legacyRetailerDashboard, legacySignOut, loader, location, lock
-    , logout, messageLock, messageOTP, microphoneMute, moreActions, move, nextContent
-    , notifications, otp, paackSpaces, packages, person, persons, phone, pause
-    , previousContent, print, reload, remove, sandwichMenu, search, searchSpace
-    , seeMore, sort, sortDecreasing, sortIncreasing, toggle, toggleDown, toggleUp
-    , truck, unassignPerson, van, wait, warning, webhook
+    , addCircle, add, arrowCurveLeft, arrowDown, arrowLeft, arrowRight, arrowUp, bell, bicycle, bike, bluetooth, boltDisabled, bolt, boxFilled, boxOutlined, boxesFilled, boxesOutlined, camera, car, cellular, checkmarkCircle, checkmarkRoundedRectangle, checkmark, chevronDown, chevronLeft, chevronRight, chevronUp, clockIssue, clockLocked, clock, closeCircle, closeRoundedRectangle, close, coins, collapse, crosshair, directions, download, eBike, eCar, eVan, edit, ellipsis, empty, expand, eyeHide, eye, filter, fix, folder, food, frozen, gVan, grocery, groups, hamburger, hand, home, hourglass, info, legacyApis, legacyHistorical, legacyLabelPrinter, legacyReport, legacyRetailerDashboard, legacySignOut, list, loader, location, lock, logout, map, mapPinRadius, mapPin, messageLock, messageOTP, message, microphoneMute, microphone, minus, move, notepad, notification, otp, personAssign, personAssigned, personError, personUnassign, person, personsAdd, persons, phoneEndCall, phoneStartCall, placeholder, printerError, printer, redo, reload, remove, reporting, return, scanBarcode, scanGroup, scanPackage, scanSpace, scan, search, settings, shelves, sort, spaceError, spaceSearch, space, speakerMute, speaker, store, tag, trash, truck, undo, van, warning, waves, webhook
+    , fixing
+    , assignPerson, boxes, check, configure, delete, done, eventLog, fixIssues, insert, moreActions, nextContent, notifications, paackSpaces, packages, phone, pause, previousContent, print, sandwichMenu, searchSpace, seeMore, sortDecreasing, sortIncreasing, success, toggle, toggleDown, toggleUp, unassignPerson, wait
     , getHint
     , withColor
     , withSize, withCustomSize
@@ -19,13 +12,12 @@ module UI.Icon exposing
 
 {-| `UI.Icon` is an implementation of icons using an SVG-spritesheet.
 
-Icons' names are after their proposed action/symbolism instead of describing its shape.
-Consequently, we don't use the same icon for different operations as these would confuse the end-users.
-
 To use these icons, first, you must insert the spritesheet once (and only once) in the layout.
 The sprite sheet injection uses a custom `Html` component that later populates using a parcel's import.
 See [`Icon.svgSpriteImport`](UI-Icon#svgSpriteImport) to know what to do on the Elm's side.
 Parcel's instructions are in [README](https://github.com/PaackEng/paack-ui/blob/master/README.md).
+
+**NOTE**: The spritesheet is automatically injected when using [`UI.Document.toBrowserDocument`](UI-Document#toBrowserDocument)
 
 An icon can be created and rendered as in the following pipeline:
 
@@ -41,16 +33,21 @@ An icon can be created and rendered as in the following pipeline:
 # Building
 
 @docs Icon
-@docs add, arrowUp, assignPerson, bicycle, bike, boxes, check, success, car, close
-@docs collapse, clockIssue, configure, clockLocked, coins, delete, done, download
-@docs eBike, eCar, edit, eVan, eventLog, expand, filter, fix
-@docs fixIssues, fixing, groups, insert, legacyApis, legacyHistorical, legacyLabelPrinter
-@docs legacyReport, legacyRetailerDashboard, legacySignOut, loader, location, lock
-@docs logout, messageLock, messageOTP, microphoneMute, moreActions, move, nextContent
-@docs notifications, otp, paackSpaces, packages, person, persons, phone, pause
-@docs previousContent, print, reload, remove, sandwichMenu, search, searchSpace
-@docs seeMore, sort, sortDecreasing, sortIncreasing, toggle, toggleDown, toggleUp
-@docs truck, unassignPerson, van, wait, warning, webhook
+
+
+## Current names
+
+@docs addCircle, add, arrowCurveLeft, arrowDown, arrowLeft, arrowRight, arrowUp, bell, bicycle, bike, bluetooth, boltDisabled, bolt, boxFilled, boxOutlined, boxesFilled, boxesOutlined, camera, car, cellular, checkmarkCircle, checkmarkRoundedRectangle, checkmark, chevronDown, chevronLeft, chevronRight, chevronUp, clockIssue, clockLocked, clock, closeCircle, closeRoundedRectangle, close, coins, collapse, crosshair, directions, download, eBike, eCar, eVan, edit, ellipsis, empty, expand, eyeHide, eye, filter, fix, folder, food, frozen, gVan, grocery, groups, hamburger, hand, home, hourglass, info, legacyApis, legacyHistorical, legacyLabelPrinter, legacyReport, legacyRetailerDashboard, legacySignOut, list, loader, location, lock, logout, map, mapPinRadius, mapPin, messageLock, messageOTP, message, microphoneMute, microphone, minus, move, notepad, notification, otp, personAssign, personAssigned, personError, personUnassign, person, personsAdd, persons, phoneEndCall, phoneStartCall, placeholder, printerError, printer, redo, reload, remove, reporting, return, scanBarcode, scanGroup, scanPackage, scanSpace, scan, search, settings, shelves, sort, spaceError, spaceSearch, space, speakerMute, speaker, store, tag, trash, truck, undo, van, warning, waves, webhook
+
+
+## Special
+
+@docs fixing
+
+
+## Old (depreacted) names
+
+@docs assignPerson, boxes, check, configure, delete, done, eventLog, fixIssues, insert, moreActions, nextContent, notifications, paackSpaces, packages, phone, pause, previousContent, print, sandwichMenu, searchSpace, seeMore, sortDecreasing, sortIncreasing, success, toggle, toggleDown, toggleUp, unassignPerson, wait
 
 
 # Disassemble
@@ -162,61 +159,28 @@ withCustomSize size (Icon prop opt) =
 -- Icons
 
 
-{-| An arrow pointing to the left used in chevrons and paginators.
-
-    Icon.previousContent "Previous page"
-
--}
-previousContent : String -> Icon
-previousContent =
-    defaultInit "Chevron-Left"
+defaultInit : String -> String -> Icon
+defaultInit glyph hint =
+    Icon (Properties hint glyph) defaultOptions
 
 
-{-| An arrow pointing to the right used in chevrons and paginators.
 
-    Icon.nextContent "Next page"
-
--}
-nextContent : String -> Icon
-nextContent =
-    defaultInit "Chevron-Right"
+-- Current names
 
 
-{-| A foldable paper, toggle some content between showing/hiding, or full/collapsed.
+{-| Icon constructor.
 
-    Icon.toggle "Expand technical details"
+    Icon.addCircle "Accessibility hint"
 
 -}
-toggle : String -> Icon
-toggle =
-    defaultInit "Map"
+addCircle : String -> Icon
+addCircle =
+    defaultInit "Add-Circle"
 
 
-{-| An arrow pointing up.
-May indicate the collapsing of the content below.
+{-| Icon constructor.
 
-    Icon.toggleUp "Collapse details"
-
--}
-toggleUp : String -> Icon
-toggleUp =
-    defaultInit "Chevron-Up"
-
-
-{-| An arrow pointing down.
-May indicate the expansion of a hidden content below.
-
-    Icon.toggleDown "Expand details"
-
--}
-toggleDown : String -> Icon
-toggleDown =
-    defaultInit "Chevron-Down"
-
-
-{-| A plus sign. E.g., used to indicate the creation of new items in tables/lists.
-
-    Icon.add "Create new user"
+    Icon.add "Accessibility hint"
 
 -}
 add : String -> Icon
@@ -224,39 +188,309 @@ add =
     defaultInit "Add"
 
 
-{-| Piled up boxes.
+{-| Icon constructor.
 
-    Icon.packages "Stacked boxed"
+    Icon.arrowCurveLeft "Accessibility hint"
 
 -}
-boxes : String -> Icon
-boxes =
+arrowCurveLeft : String -> Icon
+arrowCurveLeft =
+    defaultInit "Arrow-CurveLeft"
+
+
+{-| Icon constructor.
+
+    Icon.arrowDown "Accessibility hint"
+
+-}
+arrowDown : String -> Icon
+arrowDown =
+    defaultInit "Arrow-Down"
+
+
+{-| Icon constructor.
+
+    Icon.arrowLeft "Accessibility hint"
+
+-}
+arrowLeft : String -> Icon
+arrowLeft =
+    defaultInit "Arrow-Left"
+
+
+{-| Icon constructor.
+
+    Icon.arrowRight "Accessibility hint"
+
+-}
+arrowRight : String -> Icon
+arrowRight =
+    defaultInit "Arrow-Right"
+
+
+{-| Icon constructor.
+
+    Icon.arrowUp "Accessibility hint"
+
+-}
+arrowUp : String -> Icon
+arrowUp =
+    defaultInit "Arrow-Up"
+
+
+{-| Icon constructor.
+
+    Icon.bell "Accessibility hint"
+
+-}
+bell : String -> Icon
+bell =
+    defaultInit "Bell"
+
+
+{-| Icon constructor.
+
+    Icon.bicycle "Accessibility hint"
+
+-}
+bicycle : String -> Icon
+bicycle =
+    defaultInit "Bicycle"
+
+
+{-| Icon constructor.
+
+    Icon.bike "Accessibility hint"
+
+-}
+bike : String -> Icon
+bike =
+    defaultInit "Bike"
+
+
+{-| Icon constructor.
+
+    Icon.bluetooth "Accessibility hint"
+
+-}
+bluetooth : String -> Icon
+bluetooth =
+    defaultInit "Bluetooth"
+
+
+{-| Icon constructor.
+
+    Icon.boltDisabled "Accessibility hint"
+
+-}
+boltDisabled : String -> Icon
+boltDisabled =
+    defaultInit "Bolt-Disabled"
+
+
+{-| Icon constructor.
+
+    Icon.bolt "Accessibility hint"
+
+-}
+bolt : String -> Icon
+bolt =
+    defaultInit "Bolt"
+
+
+{-| Icon constructor.
+
+    Icon.boxFilled "Accessibility hint"
+
+-}
+boxFilled : String -> Icon
+boxFilled =
+    defaultInit "Box-Filled"
+
+
+{-| Icon constructor.
+
+    Icon.boxOutlined "Accessibility hint"
+
+-}
+boxOutlined : String -> Icon
+boxOutlined =
+    defaultInit "Box-Outlined"
+
+
+{-| Icon constructor.
+
+    Icon.boxesFilled "Accessibility hint"
+
+-}
+boxesFilled : String -> Icon
+boxesFilled =
     defaultInit "Boxes-Filled"
 
 
-{-| A check mark, commonly used inside checkboxes and radio buttons.
+{-| Icon constructor.
 
-    Icon.check "Notepad"
-
--}
-check : String -> Icon
-check =
-    defaultInit "Checkmark"
-
-
-{-| A check mark in circle, commonly used to indicate a success state.
-
-    Icon.success "Success"
+    Icon.boxesOutlined "Accessibility hint"
 
 -}
-success : String -> Icon
-success =
+boxesOutlined : String -> Icon
+boxesOutlined =
+    defaultInit "Boxes-Outlined"
+
+
+{-| Icon constructor.
+
+    Icon.camera "Accessibility hint"
+
+-}
+camera : String -> Icon
+camera =
+    defaultInit "Camera"
+
+
+{-| Icon constructor.
+
+    Icon.car "Accessibility hint"
+
+-}
+car : String -> Icon
+car =
+    defaultInit "Car"
+
+
+{-| Icon constructor.
+
+    Icon.cellular "Accessibility hint"
+
+-}
+cellular : String -> Icon
+cellular =
+    defaultInit "Cellular"
+
+
+{-| Icon constructor.
+
+    Icon.checkmarkCircle "Accessibility hint"
+
+-}
+checkmarkCircle : String -> Icon
+checkmarkCircle =
     defaultInit "Checkmark-Circle"
 
 
-{-| A times sign. Usually used for closing dialogs.
+{-| Icon constructor.
 
-    Icon.close "Close this notification"
+    Icon.checkmarkRoundedRectangle "Accessibility hint"
+
+-}
+checkmarkRoundedRectangle : String -> Icon
+checkmarkRoundedRectangle =
+    defaultInit "Checkmark-RoundedRectangle"
+
+
+{-| Icon constructor.
+
+    Icon.checkmark "Accessibility hint"
+
+-}
+checkmark : String -> Icon
+checkmark =
+    defaultInit "Checkmark"
+
+
+{-| Icon constructor.
+
+    Icon.chevronDown "Accessibility hint"
+
+-}
+chevronDown : String -> Icon
+chevronDown =
+    defaultInit "Chevron-Down"
+
+
+{-| Icon constructor.
+
+    Icon.chevronLeft "Accessibility hint"
+
+-}
+chevronLeft : String -> Icon
+chevronLeft =
+    defaultInit "Chevron-Left"
+
+
+{-| Icon constructor.
+
+    Icon.chevronRight "Accessibility hint"
+
+-}
+chevronRight : String -> Icon
+chevronRight =
+    defaultInit "Chevron-Right"
+
+
+{-| Icon constructor.
+
+    Icon.chevronUp "Accessibility hint"
+
+-}
+chevronUp : String -> Icon
+chevronUp =
+    defaultInit "Chevron-Up"
+
+
+{-| Icon constructor.
+
+    Icon.clockIssue "Accessibility hint"
+
+-}
+clockIssue : String -> Icon
+clockIssue =
+    defaultInit "Clock-Issue"
+
+
+{-| Icon constructor.
+
+    Icon.clockLocked "Accessibility hint"
+
+-}
+clockLocked : String -> Icon
+clockLocked =
+    defaultInit "Clock-Locked"
+
+
+{-| Icon constructor.
+
+    Icon.clock "Accessibility hint"
+
+-}
+clock : String -> Icon
+clock =
+    defaultInit "Clock"
+
+
+{-| Icon constructor.
+
+    Icon.closeCircle "Accessibility hint"
+
+-}
+closeCircle : String -> Icon
+closeCircle =
+    defaultInit "Close-Circle"
+
+
+{-| Icon constructor.
+
+    Icon.closeRoundedRectangle "Accessibility hint"
+
+-}
+closeRoundedRectangle : String -> Icon
+closeRoundedRectangle =
+    defaultInit "Close-RoundedRectangle"
+
+
+{-| Icon constructor.
+
+    Icon.close "Accessibility hint"
 
 -}
 close : String -> Icon
@@ -264,224 +498,19 @@ close =
     defaultInit "Close"
 
 
-{-| A gear. Usually used for opening settings managers.
+{-| Icon constructor.
 
-    Icon.configure "Open display settings"
-
--}
-configure : String -> Icon
-configure =
-    defaultInit "Settings"
-
-
-{-| Tree-bar stacked vertically.
-It's usually used in mobile to toggle left bar menus.
-
-    Icon.sandwichMenu "Open pages menu"
+    Icon.coins "Accessibility hint"
 
 -}
-sandwichMenu : String -> Icon
-sandwichMenu =
-    defaultInit "Hamburger"
+coins : String -> Icon
+coins =
+    defaultInit "Coins"
 
 
-{-| Three-dot in series horizontally.
-It's usually used in the web to access less commonly used actions.
+{-| Icon constructor.
 
-    Icon.moreActions "More actions"
-
--}
-moreActions : String -> Icon
-moreActions =
-    defaultInit "Ellipsis"
-
-
-{-| A bell for indicating notifications.
-
-    Icon.notifications "See notifications"
-
--}
-notifications : String -> Icon
-notifications =
-    defaultInit "Bell"
-
-
-{-| Internal jargon in Paack.
-
-    Icon.paackSpaces "Spaces"
-
--}
-paackSpaces : String -> Icon
-paackSpaces =
-    defaultInit "Space"
-
-
-{-| "Box-Outlined".
-
-    Icon.packages "Order's packages"
-
--}
-packages : String -> Icon
-packages =
-    defaultInit "Box-Outlined"
-
-
-{-| A single person.
-
-    Icon.person "Account"
-
--}
-person : String -> Icon
-person =
-    defaultInit "Person"
-
-
-{-| Three persons.
-
-    Icon.persons "Contacts"
-
--}
-persons : String -> Icon
-persons =
-    defaultInit "Persons"
-
-
-{-| A phone.
-
-    Icon.phone "Call"
-
--}
-phone : String -> Icon
-phone =
-    defaultInit "Phone-StartCall"
-
-
-{-| A chat-like baloon.
-In Paack's apps this symbolizes the log of actions.
-
-    Icon.eventLog "Events"
-
--}
-eventLog : String -> Icon
-eventLog =
-    defaultInit "Message"
-
-
-{-| An user/person profile's silhouette.
-
-    Icon.logout "Leave/change account"
-
--}
-logout : String -> Icon
-logout =
-    defaultInit "Logout"
-
-
-{-| A magnifying glass. For use in search-related queries.
-
-    Icon.search "Search package with barcode"
-
--}
-search : String -> Icon
-search =
-    defaultInit "Search"
-
-
-{-| An A4 ink printer.
-Indicates the availability to print something related to the surrounding content.
-
-    Icon.print "Printer pacakage's barcode"
-
--}
-print : String -> Icon
-print =
-    defaultInit "Printer"
-
-
-{-| A refresh sign (loop arrow).
-
-    Icon.reload "Reload"
-
--}
-reload : String -> Icon
-reload =
-    defaultInit "Reload"
-
-
-{-| A pen. For editing fields/properties.
-
-    Icon.edit "Edit contact informations"
-
--}
-edit : String -> Icon
-edit =
-    defaultInit "Edit"
-
-
-{-| Ellipsis (three-dots horizontally aligned).
-For showing hidden details.
-
-    Icon.seeMore "Read more about this article"
-
--}
-seeMore : String -> Icon
-seeMore =
-    defaultInit "Ellipsis"
-
-
-{-| A warning sign (a triangle with an exclamation mark).
-
-    Icon.warning "Warning"
-
--}
-warning : String -> Icon
-warning =
-    defaultInit "Warning"
-
-
-{-| A funnel symbol represented by 3 lines horizontally aligned.
-
-    Icon.filter "Filter title column"
-
--}
-filter : String -> Icon
-filter =
-    defaultInit "Filter"
-
-
-{-| A set of dots aligned as a six-sided polygon
-
-    Icon.groups "Groups"
-
--}
-groups : String -> Icon
-groups =
-    defaultInit "Groups"
-
-
-{-| A group of squares acting as files with an arrow pointing to the bottom
-
-    Icon.download "Download CSV"
-
--}
-download : String -> Icon
-download =
-    defaultInit "Download"
-
-
-{-| Two arrows from the center to the border
-
-    Icon.expand "Expand view"
-
--}
-expand : String -> Icon
-expand =
-    defaultInit "Expand"
-
-
-{-| 2 Arrows from the border to the center
-
-    Icon.collapse "Collapse view"
+    Icon.collapse "Accessibility hint"
 
 -}
 collapse : String -> Icon
@@ -489,39 +518,459 @@ collapse =
     defaultInit "Collapse"
 
 
-{-| The space icon with a search icon in the right-bottom.
+{-| Icon constructor.
 
-    Icon.searchSpace "Search Space"
-
--}
-searchSpace : String -> Icon
-searchSpace =
-    defaultInit "Space-Search"
-
-
-{-| A circe with a line on center similar to a "No Way" road sign.
-
-    Icon.remove "Remove item"
+    Icon.crosshair "Accessibility hint"
 
 -}
-remove : String -> Icon
-remove =
-    defaultInit "Remove"
+crosshair : String -> Icon
+crosshair =
+    defaultInit "Crosshair"
 
 
-{-| A trash can with an "x" on it.
+{-| Icon constructor.
 
-    Icon.delete "Trash item"
+    Icon.directions "Accessibility hint"
 
 -}
-delete : String -> Icon
-delete =
-    defaultInit "Trash"
+directions : String -> Icon
+directions =
+    defaultInit "Directions"
 
 
-{-| Two vertical parallel arrows pointing to opposite directions.
+{-| Icon constructor.
 
-    Icon.move "Move item"
+    Icon.download "Accessibility hint"
+
+-}
+download : String -> Icon
+download =
+    defaultInit "Download"
+
+
+{-| Icon constructor.
+
+    Icon.eBike "Accessibility hint"
+
+-}
+eBike : String -> Icon
+eBike =
+    defaultInit "E-Bike"
+
+
+{-| Icon constructor.
+
+    Icon.eCar "Accessibility hint"
+
+-}
+eCar : String -> Icon
+eCar =
+    defaultInit "E-Car"
+
+
+{-| Icon constructor.
+
+    Icon.eVan "Accessibility hint"
+
+-}
+eVan : String -> Icon
+eVan =
+    defaultInit "E-Van"
+
+
+{-| Icon constructor.
+
+    Icon.edit "Accessibility hint"
+
+-}
+edit : String -> Icon
+edit =
+    defaultInit "Edit"
+
+
+{-| Icon constructor.
+
+    Icon.ellipsis "Accessibility hint"
+
+-}
+ellipsis : String -> Icon
+ellipsis =
+    defaultInit "Ellipsis"
+
+
+{-| Icon constructor.
+
+    Icon.empty "Accessibility hint"
+
+-}
+empty : String -> Icon
+empty =
+    defaultInit "Empty"
+
+
+{-| Icon constructor.
+
+    Icon.expand "Accessibility hint"
+
+-}
+expand : String -> Icon
+expand =
+    defaultInit "Expand"
+
+
+{-| Icon constructor.
+
+    Icon.eyeHide "Accessibility hint"
+
+-}
+eyeHide : String -> Icon
+eyeHide =
+    defaultInit "Eye-Hide"
+
+
+{-| Icon constructor.
+
+    Icon.eye "Accessibility hint"
+
+-}
+eye : String -> Icon
+eye =
+    defaultInit "Eye"
+
+
+{-| Icon constructor.
+
+    Icon.filter "Accessibility hint"
+
+-}
+filter : String -> Icon
+filter =
+    defaultInit "Filter"
+
+
+{-| Icon constructor.
+
+    Icon.fix "Accessibility hint"
+
+-}
+fix : String -> Icon
+fix =
+    defaultInit "Fix"
+
+
+{-| Icon constructor.
+
+    Icon.folder "Accessibility hint"
+
+-}
+folder : String -> Icon
+folder =
+    defaultInit "Folder"
+
+
+{-| Icon constructor.
+
+    Icon.food "Accessibility hint"
+
+-}
+food : String -> Icon
+food =
+    defaultInit "Food"
+
+
+{-| Icon constructor.
+
+    Icon.frozen "Accessibility hint"
+
+-}
+frozen : String -> Icon
+frozen =
+    defaultInit "Frozen"
+
+
+{-| Icon constructor.
+
+    Icon.gVan "Accessibility hint"
+
+-}
+gVan : String -> Icon
+gVan =
+    defaultInit "G-Van"
+
+
+{-| Icon constructor.
+
+    Icon.grocery "Accessibility hint"
+
+-}
+grocery : String -> Icon
+grocery =
+    defaultInit "Grocery"
+
+
+{-| Icon constructor.
+
+    Icon.groups "Accessibility hint"
+
+-}
+groups : String -> Icon
+groups =
+    defaultInit "Groups"
+
+
+{-| Icon constructor.
+
+    Icon.hamburger "Accessibility hint"
+
+-}
+hamburger : String -> Icon
+hamburger =
+    defaultInit "Hamburger"
+
+
+{-| Icon constructor.
+
+    Icon.hand "Accessibility hint"
+
+-}
+hand : String -> Icon
+hand =
+    defaultInit "Hand"
+
+
+{-| Icon constructor.
+
+    Icon.home "Accessibility hint"
+
+-}
+home : String -> Icon
+home =
+    defaultInit "Home"
+
+
+{-| Icon constructor.
+
+    Icon.hourglass "Accessibility hint"
+
+-}
+hourglass : String -> Icon
+hourglass =
+    defaultInit "Hourglass"
+
+
+{-| Icon constructor.
+
+    Icon.info "Accessibility hint"
+
+-}
+info : String -> Icon
+info =
+    defaultInit "Info"
+
+
+{-| Icon constructor.
+
+    Icon.legacyApis "Accessibility hint"
+
+-}
+legacyApis : String -> Icon
+legacyApis =
+    defaultInit "Legacy-Apis"
+
+
+{-| Icon constructor.
+
+    Icon.legacyHistorical "Accessibility hint"
+
+-}
+legacyHistorical : String -> Icon
+legacyHistorical =
+    defaultInit "Legacy-Historical"
+
+
+{-| Icon constructor.
+
+    Icon.legacyLabelPrinter "Accessibility hint"
+
+-}
+legacyLabelPrinter : String -> Icon
+legacyLabelPrinter =
+    defaultInit "Legacy-LabelPrinter"
+
+
+{-| Icon constructor.
+
+    Icon.legacyReport "Accessibility hint"
+
+-}
+legacyReport : String -> Icon
+legacyReport =
+    defaultInit "Legacy-Report"
+
+
+{-| Icon constructor.
+
+    Icon.legacyRetailerDashboard "Accessibility hint"
+
+-}
+legacyRetailerDashboard : String -> Icon
+legacyRetailerDashboard =
+    defaultInit "Legacy-RetailerDashboard"
+
+
+{-| Icon constructor.
+
+    Icon.legacySignOut "Accessibility hint"
+
+-}
+legacySignOut : String -> Icon
+legacySignOut =
+    defaultInit "Legacy-SignOut"
+
+
+{-| Icon constructor.
+
+    Icon.list "Accessibility hint"
+
+-}
+list : String -> Icon
+list =
+    defaultInit "List"
+
+
+{-| Icon constructor.
+
+    Icon.loader "Accessibility hint"
+
+-}
+loader : String -> Icon
+loader =
+    defaultInit "Loader"
+
+
+{-| Icon constructor.
+
+    Icon.location "Accessibility hint"
+
+-}
+location : String -> Icon
+location =
+    defaultInit "Location"
+
+
+{-| Icon constructor.
+
+    Icon.lock "Accessibility hint"
+
+-}
+lock : String -> Icon
+lock =
+    defaultInit "Lock"
+
+
+{-| Icon constructor.
+
+    Icon.logout "Accessibility hint"
+
+-}
+logout : String -> Icon
+logout =
+    defaultInit "Logout"
+
+
+{-| Icon constructor.
+
+    Icon.map "Accessibility hint"
+
+-}
+map : String -> Icon
+map =
+    defaultInit "Map"
+
+
+{-| Icon constructor.
+
+    Icon.mapPinRadius "Accessibility hint"
+
+-}
+mapPinRadius : String -> Icon
+mapPinRadius =
+    defaultInit "MapPin-Radius"
+
+
+{-| Icon constructor.
+
+    Icon.mapPin "Accessibility hint"
+
+-}
+mapPin : String -> Icon
+mapPin =
+    defaultInit "MapPin"
+
+
+{-| Icon constructor.
+
+    Icon.messageLock "Accessibility hint"
+
+-}
+messageLock : String -> Icon
+messageLock =
+    defaultInit "Message-Lock"
+
+
+{-| Icon constructor.
+
+    Icon.messageOTP "Accessibility hint"
+
+-}
+messageOTP : String -> Icon
+messageOTP =
+    defaultInit "Message-OTP"
+
+
+{-| Icon constructor.
+
+    Icon.message "Accessibility hint"
+
+-}
+message : String -> Icon
+message =
+    defaultInit "Message"
+
+
+{-| Icon constructor.
+
+    Icon.microphoneMute "Accessibility hint"
+
+-}
+microphoneMute : String -> Icon
+microphoneMute =
+    defaultInit "Microphone-Mute"
+
+
+{-| Icon constructor.
+
+    Icon.microphone "Accessibility hint"
+
+-}
+microphone : String -> Icon
+microphone =
+    defaultInit "Microphone"
+
+
+{-| Icon constructor.
+
+    Icon.minus "Accessibility hint"
+
+-}
+minus : String -> Icon
+minus =
+    defaultInit "Minus"
+
+
+{-| Icon constructor.
+
+    Icon.move "Accessibility hint"
 
 -}
 move : String -> Icon
@@ -529,34 +978,438 @@ move =
     defaultInit "Move"
 
 
-{-| An arrow pointing down.
+{-| Icon constructor.
 
-    Icon.sortIncreasing "Sort from A to Z"
-
--}
-sortIncreasing : String -> Icon
-sortIncreasing =
-    defaultInit "Arrow-Down"
-
-
-{-| An arrow pointing up.
-
-    Icon.sortDecreasing "Sort from Z to A"
+    Icon.notepad "Accessibility hint"
 
 -}
-sortDecreasing : String -> Icon
-sortDecreasing =
-    defaultInit "Arrow-Up"
+notepad : String -> Icon
+notepad =
+    defaultInit "Notepad"
 
 
-{-| A monkey wrench.
+{-| Icon constructor.
 
-    Icon.fix "Fix all invalid values"
+    Icon.notification "Accessibility hint"
 
 -}
-fix : String -> Icon
-fix =
-    defaultInit "Fix"
+notification : String -> Icon
+notification =
+    defaultInit "Notification"
+
+
+{-| Icon constructor.
+
+    Icon.otp "Accessibility hint"
+
+-}
+otp : String -> Icon
+otp =
+    defaultInit "OTP"
+
+
+{-| Icon constructor.
+
+    Icon.personAssign "Accessibility hint"
+
+-}
+personAssign : String -> Icon
+personAssign =
+    defaultInit "Person-Assign"
+
+
+{-| Icon constructor.
+
+    Icon.personAssigned "Accessibility hint"
+
+-}
+personAssigned : String -> Icon
+personAssigned =
+    defaultInit "Person-Assigned"
+
+
+{-| Icon constructor.
+
+    Icon.personError "Accessibility hint"
+
+-}
+personError : String -> Icon
+personError =
+    defaultInit "Person-Error"
+
+
+{-| Icon constructor.
+
+    Icon.personUnassign "Accessibility hint"
+
+-}
+personUnassign : String -> Icon
+personUnassign =
+    defaultInit "Person-Unassign"
+
+
+{-| Icon constructor.
+
+    Icon.person "Accessibility hint"
+
+-}
+person : String -> Icon
+person =
+    defaultInit "Person"
+
+
+{-| Icon constructor.
+
+    Icon.personsAdd "Accessibility hint"
+
+-}
+personsAdd : String -> Icon
+personsAdd =
+    defaultInit "Persons-Add"
+
+
+{-| Icon constructor.
+
+    Icon.persons "Accessibility hint"
+
+-}
+persons : String -> Icon
+persons =
+    defaultInit "Persons"
+
+
+{-| Icon constructor.
+
+    Icon.phoneEndCall "Accessibility hint"
+
+-}
+phoneEndCall : String -> Icon
+phoneEndCall =
+    defaultInit "Phone-EndCall"
+
+
+{-| Icon constructor.
+
+    Icon.phoneStartCall "Accessibility hint"
+
+-}
+phoneStartCall : String -> Icon
+phoneStartCall =
+    defaultInit "Phone-StartCall"
+
+
+{-| Icon constructor.
+
+    Icon.placeholder "Accessibility hint"
+
+-}
+placeholder : String -> Icon
+placeholder =
+    defaultInit "Placeholder"
+
+
+{-| Icon constructor.
+
+    Icon.printerError "Accessibility hint"
+
+-}
+printerError : String -> Icon
+printerError =
+    defaultInit "Printer-Error"
+
+
+{-| Icon constructor.
+
+    Icon.printer "Accessibility hint"
+
+-}
+printer : String -> Icon
+printer =
+    defaultInit "Printer"
+
+
+{-| Icon constructor.
+
+    Icon.redo "Accessibility hint"
+
+-}
+redo : String -> Icon
+redo =
+    defaultInit "Redo"
+
+
+{-| Icon constructor.
+
+    Icon.reload "Accessibility hint"
+
+-}
+reload : String -> Icon
+reload =
+    defaultInit "Reload"
+
+
+{-| Icon constructor.
+
+    Icon.remove "Accessibility hint"
+
+-}
+remove : String -> Icon
+remove =
+    defaultInit "Remove"
+
+
+{-| Icon constructor.
+
+    Icon.reporting "Accessibility hint"
+
+-}
+reporting : String -> Icon
+reporting =
+    defaultInit "Reporting"
+
+
+{-| Icon constructor.
+
+    Icon.return "Accessibility hint"
+
+-}
+return : String -> Icon
+return =
+    defaultInit "Return"
+
+
+{-| Icon constructor.
+
+    Icon.scanBarcode "Accessibility hint"
+
+-}
+scanBarcode : String -> Icon
+scanBarcode =
+    defaultInit "Scan-Barcode"
+
+
+{-| Icon constructor.
+
+    Icon.scanGroup "Accessibility hint"
+
+-}
+scanGroup : String -> Icon
+scanGroup =
+    defaultInit "Scan-Group"
+
+
+{-| Icon constructor.
+
+    Icon.scanPackage "Accessibility hint"
+
+-}
+scanPackage : String -> Icon
+scanPackage =
+    defaultInit "Scan-Package"
+
+
+{-| Icon constructor.
+
+    Icon.scanSpace "Accessibility hint"
+
+-}
+scanSpace : String -> Icon
+scanSpace =
+    defaultInit "Scan-Space"
+
+
+{-| Icon constructor.
+
+    Icon.scan "Accessibility hint"
+
+-}
+scan : String -> Icon
+scan =
+    defaultInit "Scan"
+
+
+{-| Icon constructor.
+
+    Icon.search "Accessibility hint"
+
+-}
+search : String -> Icon
+search =
+    defaultInit "Search"
+
+
+{-| Icon constructor.
+
+    Icon.settings "Accessibility hint"
+
+-}
+settings : String -> Icon
+settings =
+    defaultInit "Settings"
+
+
+{-| Icon constructor.
+
+    Icon.shelves "Accessibility hint"
+
+-}
+shelves : String -> Icon
+shelves =
+    defaultInit "Shelves"
+
+
+{-| Icon constructor.
+
+    Icon.sort "Accessibility hint"
+
+-}
+sort : String -> Icon
+sort =
+    defaultInit "Sort"
+
+
+{-| Icon constructor.
+
+    Icon.spaceError "Accessibility hint"
+
+-}
+spaceError : String -> Icon
+spaceError =
+    defaultInit "Space-Error"
+
+
+{-| Icon constructor.
+
+    Icon.spaceSearch "Accessibility hint"
+
+-}
+spaceSearch : String -> Icon
+spaceSearch =
+    defaultInit "Space-Search"
+
+
+{-| Icon constructor.
+
+    Icon.space "Accessibility hint"
+
+-}
+space : String -> Icon
+space =
+    defaultInit "Space"
+
+
+{-| Icon constructor.
+
+    Icon.speakerMute "Accessibility hint"
+
+-}
+speakerMute : String -> Icon
+speakerMute =
+    defaultInit "Speaker-Mute"
+
+
+{-| Icon constructor.
+
+    Icon.speaker "Accessibility hint"
+
+-}
+speaker : String -> Icon
+speaker =
+    defaultInit "Speaker"
+
+
+{-| Icon constructor.
+
+    Icon.store "Accessibility hint"
+
+-}
+store : String -> Icon
+store =
+    defaultInit "Store"
+
+
+{-| Icon constructor.
+
+    Icon.tag "Accessibility hint"
+
+-}
+tag : String -> Icon
+tag =
+    defaultInit "Tag"
+
+
+{-| Icon constructor.
+
+    Icon.trash "Accessibility hint"
+
+-}
+trash : String -> Icon
+trash =
+    defaultInit "Trash"
+
+
+{-| Icon constructor.
+
+    Icon.truck "Accessibility hint"
+
+-}
+truck : String -> Icon
+truck =
+    defaultInit "Truck"
+
+
+{-| Icon constructor.
+
+    Icon.undo "Accessibility hint"
+
+-}
+undo : String -> Icon
+undo =
+    defaultInit "Undo"
+
+
+{-| Icon constructor.
+
+    Icon.van "Accessibility hint"
+
+-}
+van : String -> Icon
+van =
+    defaultInit "Van"
+
+
+{-| Icon constructor.
+
+    Icon.warning "Accessibility hint"
+
+-}
+warning : String -> Icon
+warning =
+    defaultInit "Warning"
+
+
+{-| Icon constructor.
+
+    Icon.waves "Accessibility hint"
+
+-}
+waves : String -> Icon
+waves =
+    defaultInit "Waves"
+
+
+{-| Icon constructor.
+
+    Icon.webhook "Accessibility hint"
+
+-}
+webhook : String -> Icon
+webhook =
+    defaultInit "Webhook"
+
+
+
+-- Special ones
 
 
 {-| A monkey wrench with a red ball.
@@ -571,14 +1424,8 @@ fixing hint =
         { defaultOptions | notification = True }
 
 
-{-| A thunder bolt.
 
-    Icon.fixIssues "Fix issues from selected groups"
-
--}
-fixIssues : String -> Icon
-fixIssues =
-    defaultInit "Bolt"
+-- Deprecated names
 
 
 {-| A person with a plus sign on the bottom-right.
@@ -588,334 +1435,350 @@ fixIssues =
 -}
 assignPerson : String -> Icon
 assignPerson =
-    defaultInit "Person-Assign"
+    personAssign
+
+
+{-| Piled up boxes.
+
+    Icon.boxes "Stacked boxed"
+
+**NOTE**: Deprecated name.
+
+-}
+boxes : String -> Icon
+boxes =
+    boxesFilled
+
+
+{-| A check mark, commonly used inside checkboxes and radio buttons.
+
+    Icon.check "Notepad"
+
+**NOTE**: Deprecated name.
+
+-}
+check : String -> Icon
+check =
+    checkmark
+
+
+{-| A gear. Usually used for opening settings managers.
+
+    Icon.configure "Open display settings"
+
+**NOTE**: Deprecated name.
+
+-}
+configure : String -> Icon
+configure =
+    settings
+
+
+{-| A trash can with an "x" on it.
+
+    Icon.delete "Trash item"
+
+**NOTE**: Deprecated name.
+
+-}
+delete : String -> Icon
+delete =
+    trash
 
 
 {-| A notepad with a checkmark.
 
     Icon.done "Mark all as done."
 
+**NOTE**: Deprecated name.
+
 -}
 done : String -> Icon
 done =
-    defaultInit "Notepad"
+    notepad
 
 
-{-| A GPS-like arrow.
+{-| A chat-like baloon.
+In Paack's apps this symbolizes the log of actions.
 
-    Icon.location "Track order."
+    Icon.eventLog "Events"
 
--}
-location : String -> Icon
-location =
-    defaultInit "Location"
-
-
-{-| The hand from the stop sign.
-
-    Icon.pause "Paused orders"
+**NOTE**: Deprecated name.
 
 -}
-pause : String -> Icon
-pause =
-    defaultInit "Hand"
+eventLog : String -> Icon
+eventLog =
+    message
 
 
-{-| An hourglass.
+{-| A thunder bolt.
 
-    Icon.wait "On hold"
+    Icon.fixIssues "Fix issues from selected groups"
 
--}
-wait : String -> Icon
-wait =
-    defaultInit "Hourglass"
-
-
-{-| A loading spinner.
-
-    Icon.spin "You spin me right 'round"
+**NOTE**: Deprecated name.
 
 -}
-loader : String -> Icon
-loader hint =
-    Icon
-        (Properties hint "Loader")
-        { defaultOptions | spin = True }
+fixIssues : String -> Icon
+fixIssues =
+    bolt
 
 
 {-| A plus sign within a circle.
 
     Icon.insert "Insert row"
 
+**NOTE**: Deprecated name.
+
 -}
 insert : String -> Icon
 insert =
-    defaultInit "Add-Circle"
+    addCircle
+
+
+{-| Three-dot in series horizontally.
+It's usually used in the web to access less commonly used actions.
+
+    Icon.moreActions "More actions"
+
+**NOTE**: Deprecated name.
+
+-}
+moreActions : String -> Icon
+moreActions =
+    ellipsis
+
+
+{-| An arrow pointing to the right used in chevrons and paginators.
+
+    Icon.nextContent "Next page"
+
+**NOTE**: Deprecated name.
+
+-}
+nextContent : String -> Icon
+nextContent =
+    chevronRight
+
+
+{-| A bell for indicating notifications.
+
+    Icon.notifications "See notifications"
+
+**NOTE**: Deprecated name.
+
+-}
+notifications : String -> Icon
+notifications =
+    bell
+
+
+{-| Internal jargon in Paack.
+
+    Icon.paackSpaces "Spaces"
+
+**NOTE**: Deprecated name.
+
+-}
+paackSpaces : String -> Icon
+paackSpaces =
+    space
+
+
+{-| "Box-Outlined".
+
+    Icon.packages "Order's packages"
+
+**NOTE**: Deprecated name.
+
+-}
+packages : String -> Icon
+packages =
+    boxOutlined
+
+
+{-| A phone.
+
+    Icon.phone "Call"
+
+**NOTE**: Deprecated name.
+
+-}
+phone : String -> Icon
+phone =
+    phoneStartCall
+
+
+{-| The hand from the stop sign.
+
+    Icon.pause "Paused orders"
+
+**NOTE**: Deprecated name.
+
+-}
+pause : String -> Icon
+pause =
+    hand
+
+
+{-| An arrow pointing to the left used in chevrons and paginators.
+
+    Icon.previousContent "Previous page"
+
+**NOTE**: Deprecated name.
+
+-}
+previousContent : String -> Icon
+previousContent =
+    chevronLeft
+
+
+{-| An A4 ink printer.
+Indicates the availability to print something related to the surrounding content.
+
+    Icon.print "Printer pacakage's barcode"
+
+**NOTE**: Deprecated name.
+
+-}
+print : String -> Icon
+print =
+    printer
+
+
+{-| Tree-bar stacked vertically.
+It's usually used in mobile to toggle left bar menus.
+
+    Icon.sandwichMenu "Open pages menu"
+
+**NOTE**: Deprecated name.
+
+-}
+sandwichMenu : String -> Icon
+sandwichMenu =
+    hamburger
+
+
+{-| The space icon with a search icon in the right-bottom.
+
+    Icon.searchSpace "Search Space"
+
+**NOTE**: Deprecated name.
+
+-}
+searchSpace : String -> Icon
+searchSpace =
+    spaceSearch
+
+
+{-| Ellipsis (three-dots horizontally aligned).
+For showing hidden details.
+
+    Icon.seeMore "Read more about this article"
+
+**NOTE**: Deprecated name.
+
+-}
+seeMore : String -> Icon
+seeMore =
+    ellipsis
 
 
 {-| An arrow pointing up.
 
-    Icon.arrowUp "Arrow Up"
+    Icon.sortDecreasing "Sort from Z to A"
+
+**NOTE**: Deprecated name.
 
 -}
-arrowUp : String -> Icon
-arrowUp =
-    defaultInit "Arrow-Up"
+sortDecreasing : String -> Icon
+sortDecreasing =
+    arrowUp
 
 
-{-| A bicycle.
+{-| An arrow pointing down.
 
-    Icon.bicycle "Bicycle"
+    Icon.sortIncreasing "Sort from A to Z"
 
--}
-bicycle : String -> Icon
-bicycle =
-    defaultInit "Bicycle"
-
-
-{-| A bike.
-
-    Icon.bike "Bike"
+**NOTE**: Deprecated name.
 
 -}
-bike : String -> Icon
-bike =
-    defaultInit "Bike"
+sortIncreasing : String -> Icon
+sortIncreasing =
+    arrowDown
 
 
-{-| A car.
+{-| A check mark in circle, commonly used to indicate a success state.
 
-    Icon.car "Car"
+    Icon.success "Success"
 
--}
-car : String -> Icon
-car =
-    defaultInit "Car"
-
-
-{-| A clock with danger signal.
-
-    Icon.clockIssue "Clock issue"
+**NOTE**: Deprecated name.
 
 -}
-clockIssue : String -> Icon
-clockIssue =
-    defaultInit "Clock-Issue"
+success : String -> Icon
+success =
+    checkmarkCircle
 
 
-{-| A clock with a lock.
+{-| A foldable paper, toggle some content between showing/hiding, or full/collapsed.
 
-    Icon.clockLocked "Clock Locked"
+    Icon.toggle "Expand technical details"
 
--}
-clockLocked : String -> Icon
-clockLocked =
-    defaultInit "Clock-Locked"
-
-
-{-| A stack of coins.
-
-    Icon.coins "Coins"
+**NOTE**: Deprecated name.
 
 -}
-coins : String -> Icon
-coins =
-    defaultInit "Coins"
+toggle : String -> Icon
+toggle =
+    map
 
 
-{-| An electric bike.
+{-| An arrow pointing down.
+May indicate the expansion of a hidden content below.
 
-    Icon.eBike "Electric bike"
+    Icon.toggleDown "Expand details"
 
--}
-eBike : String -> Icon
-eBike =
-    defaultInit "E-Bike"
-
-
-{-| An electric car.
-
-    Icon.eCar "Electric car"
+**NOTE**: Deprecated name.
 
 -}
-eCar : String -> Icon
-eCar =
-    defaultInit "E-Car"
+toggleDown : String -> Icon
+toggleDown =
+    chevronDown
 
 
-{-| An electric van.
+{-| An arrow pointing up.
+May indicate the collapsing of the content below.
 
-    Icon.eVan "Electric van"
+    Icon.toggleUp "Collapse details"
 
--}
-eVan : String -> Icon
-eVan =
-    defaultInit "E-Van"
-
-
-{-| A lock.
-
-    Icon.lock "Lock"
+**NOTE**: Deprecated name.
 
 -}
-lock : String -> Icon
-lock =
-    defaultInit "Lock"
-
-
-{-| A lock in a bubble message.
-
-    Icon.messageLock "Message lock"
-
--}
-messageLock : String -> Icon
-messageLock =
-    defaultInit "Message-Lock"
-
-
-{-| A secret in a bubble message.
-
-    Icon.messageOTP "Message Otp"
-
--}
-messageOTP : String -> Icon
-messageOTP =
-    defaultInit "Message-OTP"
-
-
-{-| A microphone muted.
-
-    Icon.microphoneMute "Microphone Muted"
-
--}
-microphoneMute : String -> Icon
-microphoneMute =
-    defaultInit "Microphone-Mute"
-
-
-{-| A One time password.
-
-    Icon.otp "One time password"
-
--}
-otp : String -> Icon
-otp =
-    defaultInit "OTP"
-
-
-{-| A sort icon.
-
-    Icon.sort "Sort"
-
--}
-sort : String -> Icon
-sort =
-    defaultInit "Sort"
-
-
-{-| A truck.
-
-    Icon.truck "Truck"
-
--}
-truck : String -> Icon
-truck =
-    defaultInit "Truck"
-
-
-{-| A van.
-
-    Icon.van "Van"
-
--}
-van : String -> Icon
-van =
-    defaultInit "Van"
-
-
-{-| A webhook.
-
-    Icon.webhook "Webhook"
-
--}
-webhook : String -> Icon
-webhook =
-    defaultInit "Webhook"
-
-
-{-| A legacy apis.
-
-    Icon.legacyApis "Legacy apis"
-
--}
-legacyApis : String -> Icon
-legacyApis =
-    defaultInit "Legacy-Apis"
-
-
-{-| A legacy historical.
-
-    Icon.legacyHistorical "Legacy historical"
-
--}
-legacyHistorical : String -> Icon
-legacyHistorical =
-    defaultInit "Legacy-Historical"
-
-
-{-| A legacy label printer.
-
-    Icon.legacyLabelPrinter "Legacy label printer"
-
--}
-legacyLabelPrinter : String -> Icon
-legacyLabelPrinter =
-    defaultInit "Legacy-LabelPrinter"
-
-
-{-| A legacy label report.
-
-    Icon.legacyReport "Legacy report"
-
--}
-legacyReport : String -> Icon
-legacyReport =
-    defaultInit "Legacy-Report"
-
-
-{-| A legacy retailer dashboard.
-
-    Icon.legacyRetailerDashboard "Legacy retailer dashboard"
-
--}
-legacyRetailerDashboard : String -> Icon
-legacyRetailerDashboard =
-    defaultInit "Legacy-RetailerDashboard"
-
-
-{-| A legacy sign-out.
-
-    Icon.legacySignOut "Legacy sign-out"
-
--}
-legacySignOut : String -> Icon
-legacySignOut =
-    defaultInit "Legacy-SignOut"
+toggleUp : String -> Icon
+toggleUp =
+    chevronUp
 
 
 {-| A person with a plus sign on the bottom-right.
 
     Icon.assingPerson "Select Manager"
 
+**NOTE**: Deprecated name.
+
 -}
 unassignPerson : String -> Icon
 unassignPerson =
-    defaultInit "Person-Unassign"
+    personUnassign
 
 
-defaultInit : String -> String -> Icon
-defaultInit glyph hint =
-    Icon (Properties hint glyph) defaultOptions
+{-| An hourglass.
+
+    Icon.wait "On hold"
+
+**NOTE**: Deprecated name.
+
+-}
+wait : String -> Icon
+wait =
+    hourglass
 
 
 
@@ -985,10 +1848,10 @@ getHint (Icon { hint } _) =
 
 {-| Imports the SVG-spritesheet with all icons into the rendered HTML.
 
-There is no need for using this function when you're using [`UI.NavigationContainer`][nav], and you should be using it.
+There is no need for using this function when you're using [`UI.Document`][nav], and you should be using it.
 But, in case you aren't, you need to insert this function on the most top component, which probably is the [`Element.layout`][layout], like this:
 
-[nav]: UI-NavigationContainer
+[nav]: UI-Document
 [layout]: /packages/mdgriffith/elm-ui/latest/Element#layout
 
     main : Program Flags Model Msg
@@ -1003,7 +1866,7 @@ But, in case you aren't, you need to insert this function on the most top compon
                 }
         }
 
-**NOTE**: Use [`UI.NavigationContainer`][nav]!
+**NOTE**: Use [`UI.Document`][nav]!
 
 -}
 svgSpriteImport : Html.Html msg
