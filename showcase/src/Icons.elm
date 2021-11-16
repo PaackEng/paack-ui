@@ -1,12 +1,13 @@
 module Icons exposing (stories)
 
-import Element exposing (Element)
+import Element exposing (Element, fill, px)
 import Element.Font as Font
 import Html exposing (Html)
 import PluginOptions exposing (defaultWithoutMenu)
 import UI.Icon as Icon exposing (Icon)
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
+import UI.Text as Text exposing (ellipsize)
 import UIExplorer exposing (storiesOf)
 import Utils exposing (ExplorerUI, goToDocsCallToAction, iconsSvgSprite, prettifyElmCode)
 
@@ -185,7 +186,10 @@ iconView cfg color ( iconFn, label ) =
             |> Icon.withColor color
             |> Icon.renderElement cfg
             |> Element.el [ Element.centerX ]
-        , Element.el [ Font.size 14, Element.centerX ] <| Element.text label
+        , Text.caption label
+            |> Text.withOverflow ellipsize
+            |> Text.renderElement cfg
+            |> Element.el [ Font.center, Element.centerX, Element.width fill, Element.clipX, Element.height (px 14) ]
         ]
 
 
