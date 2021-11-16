@@ -838,14 +838,16 @@ list =
     defaultInit "List"
 
 
-{-| Icon constructor.
+{-| A loading spinner.
 
-    Icon.loader "Accessibility hint"
+    Icon.loader "You spin me right 'round"
 
 -}
 loader : String -> Icon
-loader =
-    defaultInit "Loader"
+loader hint =
+    Icon
+        (Properties hint "Loader")
+        { defaultOptions | spin = True }
 
 
 {-| Icon constructor.
