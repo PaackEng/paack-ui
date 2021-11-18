@@ -19,6 +19,7 @@ stories cfg =
         , oneBadge cfg Badge.dangerLight Badge.dangerDark "danger"
         , oneBadge cfg Badge.successLight Badge.successDark "success"
         , oneBadge cfg Badge.outlineLight Badge.outlineDark "outline"
+        , allBadgesWithIcon cfg
         , allBadge cfg
         ]
 
@@ -35,11 +36,8 @@ oneBadge cfg constructorLight constructorDark variation =
         , List.map (Badge.renderElement cfg)
             [ 
              constructorLight "123"
-            , Badge.grayLightWithIcon "123" (Icon.search "search")
             , constructorDark "456"
-            , Badge.outlineDarkWithIcon "123" (Icon.search "search")
             ]
-
             |> (::) iconsSvgSprite
         , { defaultWithMenu
             | code = code variation
@@ -62,13 +60,64 @@ allBadge cfg =
         , defaultWithMenu
         )
 
+allBadgesWithIcon : RenderConfig -> ExplorerStory
+allBadgesWithIcon cfg =
+    story
+        ( "United, With Icon"
+        ,  
+            Element.column 
+            [Element.spacing 12][
+                iconsSvgSprite
+                ,Element.row [Element.spacing 8][
+                    Badge.primaryLightWithIcon "Car" (Icon.car "car") |> Badge.renderElement cfg
+                ,   Badge.primaryDarkWithIcon "Car" (Icon.car "car") |> Badge.renderElement cfg
+                ] 
+                ,Element.row [Element.spacing 8][
+                    Badge.warningLightWithIcon "Car" (Icon.car "car") |> Badge.renderElement cfg
+                ,   Badge.warningDarkWithIcon "Car" (Icon.car "car") |> Badge.renderElement cfg
+                ] 
+                ,Element.row [Element.spacing 8][
+                    Badge.dangerLightWithIcon "Car" (Icon.car "car") |> Badge.renderElement cfg
+                ,   Badge.dangerDarkWithIcon "Car" (Icon.car "car") |> Badge.renderElement cfg
+                ] 
+                ,Element.row [Element.spacing 8][
+                    Badge.successLightWithIcon "Car" (Icon.car "car") |> Badge.renderElement cfg 
+                ,   Badge.successDarkWithIcon "Car" (Icon.car "car") |> Badge.renderElement cfg
+                ] 
+                ,Element.row [Element.spacing 8][
+                    Badge.grayLightWithIcon "Car" (Icon.car "car") |> Badge.renderElement cfg
+                ,   Badge.grayDarkWithIcon "Car" (Icon.car "car") |> Badge.renderElement cfg
+                ] 
+                ,Element.row [Element.spacing 8][
+                    Badge.outlineLightWithIcon "Car" (Icon.car "car") |> Badge.renderElement cfg
+                ,   Badge.outlineDarkWithIcon "Car" (Icon.car "car") |> Badge.renderElement cfg
+                ]
+            ]
+             
+        , { defaultWithMenu
+            | code = 
+            prettifyElmCode <|
+                """lightOneWithIcon renderConfig =
+    Badge.grayLightWithIcon "Car" (Icon.car "car")
+    |> Badge.renderElement renderConfig"""
+    ++"""
+    """
+    ++"""
+darkOneWithIcon renderConfig =
+    Badge.grayDarkWithIcon "Car" (Icon.car "car")
+    |> Badge.renderElement renderConfig
+
+"""
+            , note = goToDocsCallToAction "Badge"
+          }
+        )
+
 
 uniteVariation : RenderConfig -> List (String -> Badge) -> Element msg
 uniteVariation cfg constructors =
     constructors
         |> List.map (\constructor -> Badge.renderElement cfg (constructor "987"))
         |> Element.row [ Element.spacing 8 ]
-
 
 code : String -> String
 code variation =

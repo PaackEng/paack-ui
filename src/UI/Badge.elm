@@ -188,6 +188,7 @@ successLight content =
         |> Badge { content = content, tone = ToneSuccess, brightness = Light }
 
 
+successLightWithIcon : String -> Icon -> Badge
 successLightWithIcon content icon =
     Options (Just icon)
         |> Badge { content = content, tone = ToneSuccess, brightness = Light }
@@ -204,6 +205,7 @@ grayDark content =
         |> Badge { content = content, tone = ToneGray, brightness = Dark }
 
 
+grayDarkWithIcon : String -> Icon -> Badge
 grayDarkWithIcon content icon =
     Options (Just icon)
         |> Badge { content = content, tone = ToneGray, brightness = Dark }
@@ -220,6 +222,7 @@ primaryDark content =
         |> Badge { content = content, tone = TonePrimary, brightness = Dark }
 
 
+primaryDarkWithIcon : String -> Icon -> Badge
 primaryDarkWithIcon content icon =
     Options (Just icon)
         |> Badge { content = content, tone = TonePrimary, brightness = Dark }
@@ -236,6 +239,7 @@ warningDark content =
         |> Badge { content = content, tone = ToneWarning, brightness = Dark }
 
 
+warningDarkWithIcon : String -> Icon -> Badge
 warningDarkWithIcon content icon =
     Options (Just icon)
         |> Badge { content = content, tone = ToneWarning, brightness = Dark }
@@ -252,6 +256,7 @@ dangerDark content =
         |> Badge { content = content, tone = ToneDanger, brightness = Dark }
 
 
+dangerDarkWithIcon : String -> Icon -> Badge
 dangerDarkWithIcon content icon =
     Options (Just icon)
         |> Badge { content = content, tone = ToneDanger, brightness = Dark }
@@ -268,6 +273,7 @@ successDark content =
         |> Badge { content = content, tone = ToneSuccess, brightness = Dark }
 
 
+successDarkWithIcon : String -> Icon -> Badge
 successDarkWithIcon content icon =
     Options (Just icon)
         |> Badge { content = content, tone = ToneSuccess, brightness = Dark }
@@ -287,7 +293,7 @@ outlineDark content =
 outlineDarkWithIcon : String -> Icon -> Badge
 outlineDarkWithIcon content icon =
     Options (Just icon)
-        |> Badge { content = content, tone = ToneClear, brightness = Light }
+        |> Badge { content = content, tone = ToneClear, brightness = Dark }
 
 
 {-| Replaces the tone of a badge with a new one.
@@ -347,7 +353,7 @@ renderElement cfg (Badge { content, tone, brightness } { withIcon }) =
                 , Border.width 2
                 ]
                 [ Element.column
-                    [ Element.paddingEach { top = 2, bottom = 2, left = 2, right = 0 }
+                    [ Element.paddingEach { top = 2, bottom = 2, left = 3, right = 2 }
                     ]
                     [ companionIcon cfg icon textColor ]
                 , Element.column
