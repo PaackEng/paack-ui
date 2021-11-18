@@ -1,8 +1,9 @@
 module UI.Internal.Dialog exposing (dialogView)
 
-import Element exposing (Element, fill, shrink)
+import Element exposing (Element, fill, htmlAttribute, px, shrink)
 import Element.Border as Border
 import Element.Events as Events
+import Html.Attributes
 import UI.Button as Button exposing (Button)
 import UI.Dialog as Dialog
 import UI.Icon as Icon exposing (Icon)
@@ -47,8 +48,6 @@ desktopDialogView : RenderConfig -> Dialog.Dialog msg -> Element msg
 desktopDialogView cfg (Dialog.Dialog { title, icon } { body, buttons }) =
     Element.column
         [ Element.width shrink
-        , Element.centerY
-        , Element.centerX
         , mainBackground
         , Element.paddingEach
             { top = 0
@@ -68,6 +67,12 @@ desktopDialogView cfg (Dialog.Dialog { title, icon } { body, buttons }) =
         [ body
         , buttonsRow cfg buttons
         ]
+        |> Element.el
+            [ Element.centerX
+            , htmlAttribute (Html.Attributes.style "position" "fixed")
+            , htmlAttribute (Html.Attributes.style "top" "50%")
+            , htmlAttribute (Html.Attributes.style "bottom" "50%")
+            ]
 
 
 buttonsColumn : RenderConfig -> List (Button msg) -> Element msg
