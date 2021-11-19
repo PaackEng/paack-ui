@@ -107,7 +107,7 @@ code variation =
 lightOneWithIcon renderConfig =
     Badge."""
             ++ variation
-            ++ """Light "123"
+            ++ """Light "Car"
       |> Badge.withIcon (Icon.car "Car")
       |> Badge.renderElement renderConfig
 
@@ -120,7 +120,7 @@ darkOne renderConfig =
 darkOneWithIcon renderConfig =
     Badge."""
             ++ variation
-            ++ """Dark "456"
+            ++ """Dark "Bicycle"
       |> Badge.withIcon (Icon.bicycle "Bicycle")
       |> Badge.renderElement renderConfig
 """
