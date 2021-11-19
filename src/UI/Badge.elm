@@ -97,13 +97,8 @@ type BadgeBrightness
 {-| A variation of the badge with an icon
 -}
 withIcon : Icon -> Badge -> Badge
-withIcon icon (Badge { content, tone, brightness } _) =
-    let
-        properties =
-            Properties content tone brightness
-    in
-    Options (Just icon)
-        |> Badge properties
+withIcon icon (Badge properties options) =
+    Badge properties{ options | icon = Just icon }
 
 
 {-| A variation of the badge with outline for light backgrounds.
