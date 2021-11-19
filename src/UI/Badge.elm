@@ -4,11 +4,7 @@ module UI.Badge exposing
     , grayDark, primaryDark, successDark, warningDark, dangerDark
     , withTone
     , renderElement
-    ,  outlineDark
-      , outlineLight
-      , withIcon
-        -- , dangerDarkWithIcon, dangerLightWithIcon, grayDarkWithIcon, grayLightWithIcon, outlineDark, outlineDarkWithIcon, outlineLight, outlineLightWithIcon, primaryDarkWithIcon, primaryLightWithIcon, successDarkWithIcon, successLightWithIcon, warningDarkWithIcon, warningLightWithIcon
-
+    , outlineDark, outlineLight, withIcon
     )
 
 {-| Badges are small elements displayed, usually on the right of texts or top-right corner of the view, serving as counters, tags, or labels.
@@ -94,11 +90,16 @@ type BadgeBrightness
     | Dark
 
 
+defaultOptions : Options
+defaultOptions =
+    Options Nothing
+
+
 {-| A variation of the badge with an icon
 -}
 withIcon : Icon -> Badge -> Badge
 withIcon icon (Badge properties options) =
-    Badge properties{ options | icon = Just icon }
+    Badge properties { options | icon = Just icon }
 
 
 {-| A variation of the badge with outline for light backgrounds.
@@ -108,8 +109,7 @@ withIcon icon (Badge properties options) =
 -}
 outlineLight : String -> Badge
 outlineLight content =
-    Options Nothing
-        |> Badge { content = content, tone = ToneClear, brightness = Light }
+    Badge { content = content, tone = ToneClear, brightness = Light } defaultOptions
 
 
 {-| A light grayish variation of the badge.
@@ -119,8 +119,7 @@ outlineLight content =
 -}
 grayLight : String -> Badge
 grayLight content =
-    Options Nothing
-        |> Badge { content = content, tone = ToneGray, brightness = Light }
+    Badge { content = content, tone = ToneGray, brightness = Light } defaultOptions
 
 
 {-| A light primary-color variation of the badge.
@@ -130,8 +129,7 @@ grayLight content =
 -}
 primaryLight : String -> Badge
 primaryLight content =
-    Options Nothing
-        |> Badge { content = content, tone = TonePrimary, brightness = Light }
+    Badge { content = content, tone = TonePrimary, brightness = Light } defaultOptions
 
 
 {-| A light variation of the badge with warning-tone.
@@ -141,8 +139,7 @@ primaryLight content =
 -}
 warningLight : String -> Badge
 warningLight content =
-    Options Nothing
-        |> Badge { content = content, tone = ToneWarning, brightness = Light }
+    Badge { content = content, tone = ToneWarning, brightness = Light } defaultOptions
 
 
 {-| A light variation of the badge with danger-tone.
@@ -152,8 +149,7 @@ warningLight content =
 -}
 dangerLight : String -> Badge
 dangerLight content =
-    Options Nothing
-        |> Badge { content = content, tone = ToneDanger, brightness = Light }
+    Badge { content = content, tone = ToneDanger, brightness = Light } defaultOptions
 
 
 {-| A light variation of the badge with success-tone.
@@ -163,8 +159,7 @@ dangerLight content =
 -}
 successLight : String -> Badge
 successLight content =
-    Options Nothing
-        |> Badge { content = content, tone = ToneSuccess, brightness = Light }
+    Badge { content = content, tone = ToneSuccess, brightness = Light } defaultOptions
 
 
 {-| A dark grayish variation of the badge.
@@ -174,8 +169,7 @@ successLight content =
 -}
 grayDark : String -> Badge
 grayDark content =
-    Options Nothing
-        |> Badge { content = content, tone = ToneGray, brightness = Dark }
+    Badge { content = content, tone = ToneGray, brightness = Dark } defaultOptions
 
 
 {-| A primary-color variation of the badge.
@@ -185,8 +179,7 @@ grayDark content =
 -}
 primaryDark : String -> Badge
 primaryDark content =
-    Options Nothing
-        |> Badge { content = content, tone = TonePrimary, brightness = Dark }
+    Badge { content = content, tone = TonePrimary, brightness = Dark } defaultOptions
 
 
 {-| A variation of the badge with warning-tone.
@@ -196,8 +189,7 @@ primaryDark content =
 -}
 warningDark : String -> Badge
 warningDark content =
-    Options Nothing
-        |> Badge { content = content, tone = ToneWarning, brightness = Dark }
+    Badge { content = content, tone = ToneWarning, brightness = Dark } defaultOptions
 
 
 {-| A variation of the badge with danger-tone.
@@ -207,8 +199,7 @@ warningDark content =
 -}
 dangerDark : String -> Badge
 dangerDark content =
-    Options Nothing
-        |> Badge { content = content, tone = ToneDanger, brightness = Dark }
+    Badge { content = content, tone = ToneDanger, brightness = Dark } defaultOptions
 
 
 {-| A variation of the badge with success-tone.
@@ -218,8 +209,7 @@ dangerDark content =
 -}
 successDark : String -> Badge
 successDark content =
-    Options Nothing
-        |> Badge { content = content, tone = ToneSuccess, brightness = Dark }
+    Badge { content = content, tone = ToneSuccess, brightness = Dark } defaultOptions
 
 
 {-| A variation of the badge with outline for dark backgrounds.
@@ -229,8 +219,7 @@ successDark content =
 -}
 outlineDark : String -> Badge
 outlineDark content =
-    Options Nothing
-        |> Badge { content = content, tone = ToneClear, brightness = Dark }
+    Badge { content = content, tone = ToneClear, brightness = Dark } defaultOptions
 
 
 {-| Replaces the tone of a badge with a new one.
