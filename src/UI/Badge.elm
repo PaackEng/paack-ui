@@ -52,13 +52,11 @@ A badge can be created and rendered as in the following pipeline:
 
 -}
 
-import Dropdown
 import Element exposing (Element, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import UI.Icon as Icon exposing (Icon)
-import UI.Internal.Button exposing (EmbossedTone(..))
 import UI.Palette as Palette exposing (Color)
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
