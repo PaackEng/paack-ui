@@ -128,8 +128,6 @@ mobileView : RenderConfig -> Dialog.Dialog msg -> Element msg
 mobileView cfg (Dialog.Dialog { title, icon } { body, buttons }) =
     Element.column
         [ mainBackground
-        , Element.centerX
-        , Element.centerY
         , Element.padding 32
         , Element.spacing 8
         , Border.rounded 6
@@ -138,6 +136,12 @@ mobileView cfg (Dialog.Dialog { title, icon } { body, buttons }) =
         , body
         , buttonsColumn cfg buttons
         ]
+        |> Element.el
+            [ Element.centerX
+            , htmlAttribute (Html.Attributes.style "position" "fixed")
+            , htmlAttribute (Html.Attributes.style "top" "50%")
+            , htmlAttribute (Html.Attributes.style "bottom" "50%")
+            ]
 
 
 mobileHeader : RenderConfig -> String -> Icon -> Element msg
