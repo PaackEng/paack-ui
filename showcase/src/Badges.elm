@@ -19,7 +19,6 @@ stories cfg =
         , oneBadge cfg Badge.dangerLight Badge.dangerDark "danger"
         , oneBadge cfg Badge.successLight Badge.successDark "success"
         , oneBadge cfg Badge.outlineLight Badge.outlineDark "outline"
-        , allBadgesWithIcon cfg
         , allBadge cfg
         ]
 
@@ -35,7 +34,9 @@ oneBadge cfg constructorLight constructorDark variation =
         ( "Badge " ++ variation
         , List.map (Badge.renderElement cfg)
             [ constructorLight "123"
+            , constructorLight "Car" |> Badge.withIcon  (Icon.car "Car")
             , constructorDark "456"
+            , constructorDark "Bicycle" |> Badge.withIcon  (Icon.bicycle "Bicycle")
             ]
             |> (::) iconsSvgSprite
         , { defaultWithMenu
@@ -47,75 +48,42 @@ oneBadge cfg constructorLight constructorDark variation =
 
 allBadge : RenderConfig -> ExplorerStory
 allBadge cfg =
-    story
-        ( "United"
-        , [ [ Badge.primaryLight, Badge.primaryDark ]
+    let variants = [[ Badge.primaryLight, Badge.primaryDark ]
           , [ Badge.warningLight, Badge.warningDark ]
           , [ Badge.dangerLight, Badge.dangerDark ]
           , [ Badge.successLight, Badge.successDark ]
           , [ Badge.outlineLight, Badge.outlineDark ]
-          ]
+          ] in
+    story
+        ( "United"
+        , Element.row[ Element.spacing 24 ][
+            iconsSvgSprite
+        , variants
             |> List.map (uniteVariation cfg)
-            |> Element.column [ Element.spacing 8 ]
+            |> Element.column [ Element.spacing 12 ]
+        , variants
+            |> List.map (uniteVariationWithIcon cfg)
+            |> Element.column [ Element.spacing 12 ]
+        ]
         , defaultWithMenu
         )
-
-
-allBadgesWithIcon : RenderConfig -> ExplorerStory
-allBadgesWithIcon cfg =
-    story
-        ( "United, With Icon"
-        , Element.column
-            [ Element.spacing 12 ]
-            [ iconsSvgSprite
-            , Element.row [ Element.spacing 8 ]
-                [ Badge.primaryLightWithIcon "Car" (Icon.car "car") |> Badge.renderElement cfg
-                , Badge.primaryDarkWithIcon "Car" (Icon.car "car") |> Badge.renderElement cfg
-                ]
-            , Element.row [ Element.spacing 8 ]
-                [ Badge.warningLightWithIcon "Car" (Icon.car "car") |> Badge.renderElement cfg
-                , Badge.warningDarkWithIcon "Car" (Icon.car "car") |> Badge.renderElement cfg
-                ]
-            , Element.row [ Element.spacing 8 ]
-                [ Badge.dangerLightWithIcon "Car" (Icon.car "car") |> Badge.renderElement cfg
-                , Badge.dangerDarkWithIcon "Car" (Icon.car "car") |> Badge.renderElement cfg
-                ]
-            , Element.row [ Element.spacing 8 ]
-                [ Badge.successLightWithIcon "Car" (Icon.car "car") |> Badge.renderElement cfg
-                , Badge.successDarkWithIcon "Car" (Icon.car "car") |> Badge.renderElement cfg
-                ]
-            , Element.row [ Element.spacing 8 ]
-                [ Badge.grayLightWithIcon "Car" (Icon.car "car") |> Badge.renderElement cfg
-                , Badge.grayDarkWithIcon "Car" (Icon.car "car") |> Badge.renderElement cfg
-                ]
-            , Element.row [ Element.spacing 8 ]
-                [ Badge.outlineLightWithIcon "Car" (Icon.car "car") |> Badge.renderElement cfg
-                , Badge.outlineDarkWithIcon "Car" (Icon.car "car") |> Badge.renderElement cfg
-                ]
-            ]
-        , { defaultWithMenu
-            | code =
-                prettifyElmCode <|
-                    """lightOneWithIcon renderConfig =
-    Badge.grayLightWithIcon "Car" (Icon.car "car")
-    |> Badge.renderElement renderConfig"""
-                        ++ """
-    """
-                        ++ """
-darkOneWithIcon renderConfig =
-    Badge.grayDarkWithIcon "Car" (Icon.car "car")
-    |> Badge.renderElement renderConfig
-
-"""
-            , note = goToDocsCallToAction "Badge"
-          }
-        )
-
 
 uniteVariation : RenderConfig -> List (String -> Badge) -> Element msg
 uniteVariation cfg constructors =
     constructors
-        |> List.map (\constructor -> Badge.renderElement cfg (constructor "987"))
+        |> List.map (\constructor -> 
+            Badge.renderElement cfg (constructor "987")
+        )
+        |> Element.row [ Element.spacing 8 ]
+
+uniteVariationWithIcon : RenderConfig -> List (String -> Badge) -> Element msg
+uniteVariationWithIcon cfg constructors =
+    constructors
+        |> List.map (\constructor -> 
+            ((constructor "12") 
+            |> Badge.withIcon (Icon.packages "Packages"))
+            |> Badge.renderElement cfg
+        )
         |> Element.row [ Element.spacing 8 ]
 
 
@@ -128,9 +96,23 @@ code variation =
             ++ """Light "123"
       |> Badge.renderElement renderConfig
 
+lightOneWithIcon renderConfig =
+    Badge."""
+            ++ variation
+            ++ """Light "123"
+      |> Badge.withIcon (Icon.car "Car")
+      |> Badge.renderElement renderConfig
+
 darkOne renderConfig =
     Badge."""
             ++ variation
             ++ """Dark "456"
+      |> Badge.renderElement renderConfig
+
+darkOneWithIcon renderConfig =
+    Badge."""
+            ++ variation
+            ++ """Dark "456"
+      |> Badge.withIcon (Icon.bicycle "Bicycle")
       |> Badge.renderElement renderConfig
 """

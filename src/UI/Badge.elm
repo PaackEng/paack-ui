@@ -4,7 +4,11 @@ module UI.Badge exposing
     , grayDark, primaryDark, successDark, warningDark, dangerDark
     , withTone
     , renderElement
-    , dangerDarkWithIcon, dangerLightWithIcon, grayDarkWithIcon, grayLightWithIcon, outlineDark, outlineDarkWithIcon, outlineLight, outlineLightWithIcon, primaryDarkWithIcon, primaryLightWithIcon, successDarkWithIcon, successLightWithIcon, warningDarkWithIcon, warningLightWithIcon
+    ,  outlineDark
+      , outlineLight
+      , withIcon
+        -- , dangerDarkWithIcon, dangerLightWithIcon, grayDarkWithIcon, grayLightWithIcon, outlineDark, outlineDarkWithIcon, outlineLight, outlineLightWithIcon, primaryDarkWithIcon, primaryLightWithIcon, successDarkWithIcon, successLightWithIcon, warningDarkWithIcon, warningLightWithIcon
+
     )
 
 {-| Badges are small elements displayed, usually on the right of texts or top-right corner of the view, serving as counters, tags, or labels.
@@ -48,8 +52,8 @@ A badge can be created and rendered as in the following pipeline:
 
 -}
 
-import Dropdown exposing (Msg)
-import Element exposing (Attr, Attribute, Element, px, shrink)
+import Dropdown
+import Element exposing (Element, px, shrink)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
@@ -74,7 +78,7 @@ type alias Properties =
 
 
 type alias Options =
-    { withIcon : Maybe Icon
+    { icon : Maybe Icon
     }
 
 
@@ -92,6 +96,18 @@ type BadgeBrightness
     | Dark
 
 
+{-| A variation of the badge with an icon
+-}
+withIcon : Icon -> Badge -> Badge
+withIcon icon (Badge { content, tone, brightness } _) =
+    let
+        properties =
+            Properties content tone brightness
+    in
+    Options (Just icon)
+        |> Badge properties
+
+
 {-| A variation of the badge with outline for light backgrounds.
 
     Badge.outlineLight "SENT"
@@ -100,12 +116,6 @@ type BadgeBrightness
 outlineLight : String -> Badge
 outlineLight content =
     Options Nothing
-        |> Badge { content = content, tone = ToneClear, brightness = Light }
-
-
-outlineLightWithIcon : String -> Icon -> Badge
-outlineLightWithIcon content icon =
-    Options (Just icon)
         |> Badge { content = content, tone = ToneClear, brightness = Light }
 
 
@@ -120,12 +130,6 @@ grayLight content =
         |> Badge { content = content, tone = ToneGray, brightness = Light }
 
 
-grayLightWithIcon : String -> Icon -> Badge
-grayLightWithIcon content icon =
-    Options (Just icon)
-        |> Badge { content = content, tone = ToneGray, brightness = Light }
-
-
 {-| A light primary-color variation of the badge.
 
     Badge.primaryLight "NEW"
@@ -134,12 +138,6 @@ grayLightWithIcon content icon =
 primaryLight : String -> Badge
 primaryLight content =
     Options Nothing
-        |> Badge { content = content, tone = TonePrimary, brightness = Light }
-
-
-primaryLightWithIcon : String -> Icon -> Badge
-primaryLightWithIcon content icon =
-    Options (Just icon)
         |> Badge { content = content, tone = TonePrimary, brightness = Light }
 
 
@@ -154,12 +152,6 @@ warningLight content =
         |> Badge { content = content, tone = ToneWarning, brightness = Light }
 
 
-warningLightWithIcon : String -> Icon -> Badge
-warningLightWithIcon content icon =
-    Options (Just icon)
-        |> Badge { content = content, tone = ToneWarning, brightness = Light }
-
-
 {-| A light variation of the badge with danger-tone.
 
     Badge.dangerLight "ERROR"
@@ -168,12 +160,6 @@ warningLightWithIcon content icon =
 dangerLight : String -> Badge
 dangerLight content =
     Options Nothing
-        |> Badge { content = content, tone = ToneDanger, brightness = Light }
-
-
-dangerLightWithIcon : String -> Icon -> Badge
-dangerLightWithIcon content icon =
-    Options (Just icon)
         |> Badge { content = content, tone = ToneDanger, brightness = Light }
 
 
@@ -188,12 +174,6 @@ successLight content =
         |> Badge { content = content, tone = ToneSuccess, brightness = Light }
 
 
-successLightWithIcon : String -> Icon -> Badge
-successLightWithIcon content icon =
-    Options (Just icon)
-        |> Badge { content = content, tone = ToneSuccess, brightness = Light }
-
-
 {-| A dark grayish variation of the badge.
 
     Badge.grayDark "EMPTY"
@@ -202,12 +182,6 @@ successLightWithIcon content icon =
 grayDark : String -> Badge
 grayDark content =
     Options Nothing
-        |> Badge { content = content, tone = ToneGray, brightness = Dark }
-
-
-grayDarkWithIcon : String -> Icon -> Badge
-grayDarkWithIcon content icon =
-    Options (Just icon)
         |> Badge { content = content, tone = ToneGray, brightness = Dark }
 
 
@@ -222,12 +196,6 @@ primaryDark content =
         |> Badge { content = content, tone = TonePrimary, brightness = Dark }
 
 
-primaryDarkWithIcon : String -> Icon -> Badge
-primaryDarkWithIcon content icon =
-    Options (Just icon)
-        |> Badge { content = content, tone = TonePrimary, brightness = Dark }
-
-
 {-| A variation of the badge with warning-tone.
 
     Badge.warningDark "0"
@@ -236,12 +204,6 @@ primaryDarkWithIcon content icon =
 warningDark : String -> Badge
 warningDark content =
     Options Nothing
-        |> Badge { content = content, tone = ToneWarning, brightness = Dark }
-
-
-warningDarkWithIcon : String -> Icon -> Badge
-warningDarkWithIcon content icon =
-    Options (Just icon)
         |> Badge { content = content, tone = ToneWarning, brightness = Dark }
 
 
@@ -256,12 +218,6 @@ dangerDark content =
         |> Badge { content = content, tone = ToneDanger, brightness = Dark }
 
 
-dangerDarkWithIcon : String -> Icon -> Badge
-dangerDarkWithIcon content icon =
-    Options (Just icon)
-        |> Badge { content = content, tone = ToneDanger, brightness = Dark }
-
-
 {-| A variation of the badge with success-tone.
 
     Badge.successDark "SENT"
@@ -273,12 +229,6 @@ successDark content =
         |> Badge { content = content, tone = ToneSuccess, brightness = Dark }
 
 
-successDarkWithIcon : String -> Icon -> Badge
-successDarkWithIcon content icon =
-    Options (Just icon)
-        |> Badge { content = content, tone = ToneSuccess, brightness = Dark }
-
-
 {-| A variation of the badge with outline for dark backgrounds.
 
     Badge.outlineDark "SENT"
@@ -287,12 +237,6 @@ successDarkWithIcon content icon =
 outlineDark : String -> Badge
 outlineDark content =
     Options Nothing
-        |> Badge { content = content, tone = ToneClear, brightness = Dark }
-
-
-outlineDarkWithIcon : String -> Icon -> Badge
-outlineDarkWithIcon content icon =
-    Options (Just icon)
         |> Badge { content = content, tone = ToneClear, brightness = Dark }
 
 
@@ -332,9 +276,9 @@ companionIcon cfg icon iconColor =
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
 renderElement : RenderConfig -> Badge -> Element msg
-renderElement cfg (Badge { content, tone, brightness } { withIcon }) =
-    case withIcon of
-        Just icon ->
+renderElement cfg (Badge { content, tone, brightness } { icon }) =
+    case icon of
+        Just i ->
             let
                 ( background, textColor, outlineColor ) =
                     colors tone brightness
@@ -355,7 +299,7 @@ renderElement cfg (Badge { content, tone, brightness } { withIcon }) =
                 [ Element.column
                     [ Element.paddingEach { top = 2, bottom = 2, left = 3, right = 2 }
                     ]
-                    [ companionIcon cfg icon textColor ]
+                    [ companionIcon cfg i textColor ]
                 , Element.column
                     [ Element.paddingEach { top = 4, bottom = 0, left = 0, right = 6 }
                     ]
