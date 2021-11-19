@@ -34,9 +34,9 @@ oneBadge cfg constructorLight constructorDark variation =
         ( "Badge " ++ variation
         , List.map (Badge.renderElement cfg)
             [ constructorLight "123"
-            , constructorLight "Car" |> Badge.withIcon  (Icon.car "Car")
+            , constructorLight "Car" |> Badge.withIcon (Icon.car "Car")
             , constructorDark "456"
-            , constructorDark "Bicycle" |> Badge.withIcon  (Icon.bicycle "Bicycle")
+            , constructorDark "Bicycle" |> Badge.withIcon (Icon.bicycle "Bicycle")
             ]
             |> (::) iconsSvgSprite
         , { defaultWithMenu
@@ -48,42 +48,50 @@ oneBadge cfg constructorLight constructorDark variation =
 
 allBadge : RenderConfig -> ExplorerStory
 allBadge cfg =
-    let variants = [[ Badge.primaryLight, Badge.primaryDark ]
-          , [ Badge.warningLight, Badge.warningDark ]
-          , [ Badge.dangerLight, Badge.dangerDark ]
-          , [ Badge.successLight, Badge.successDark ]
-          , [ Badge.outlineLight, Badge.outlineDark ]
-          ] in
+    let
+        variants =
+            [ [ Badge.primaryLight, Badge.primaryDark ]
+            , [ Badge.warningLight, Badge.warningDark ]
+            , [ Badge.dangerLight, Badge.dangerDark ]
+            , [ Badge.successLight, Badge.successDark ]
+            , [ Badge.outlineLight, Badge.outlineDark ]
+            ]
+    in
     story
         ( "United"
-        , Element.row[ Element.spacing 24 ][
-            iconsSvgSprite
-        , variants
-            |> List.map (uniteVariation cfg)
-            |> Element.column [ Element.spacing 12 ]
-        , variants
-            |> List.map (uniteVariationWithIcon cfg)
-            |> Element.column [ Element.spacing 12 ]
-        ]
+        , Element.row [ Element.spacing 24 ]
+            [ iconsSvgSprite
+            , variants
+                |> List.map (uniteVariation cfg)
+                |> Element.column [ Element.spacing 12 ]
+            , variants
+                |> List.map (uniteVariationWithIcon cfg)
+                |> Element.column [ Element.spacing 12 ]
+            ]
         , defaultWithMenu
         )
+
 
 uniteVariation : RenderConfig -> List (String -> Badge) -> Element msg
 uniteVariation cfg constructors =
     constructors
-        |> List.map (\constructor -> 
-            Badge.renderElement cfg (constructor "987")
-        )
+        |> List.map
+            (\constructor ->
+                Badge.renderElement cfg (constructor "987")
+            )
         |> Element.row [ Element.spacing 8 ]
+
 
 uniteVariationWithIcon : RenderConfig -> List (String -> Badge) -> Element msg
 uniteVariationWithIcon cfg constructors =
     constructors
-        |> List.map (\constructor -> 
-            ((constructor "12") 
-            |> Badge.withIcon (Icon.packages "Packages"))
-            |> Badge.renderElement cfg
-        )
+        |> List.map
+            (\constructor ->
+                (constructor "12"
+                    |> Badge.withIcon (Icon.packages "Packages")
+                )
+                    |> Badge.renderElement cfg
+            )
         |> Element.row [ Element.spacing 8 ]
 
 
