@@ -88,6 +88,7 @@ import UI.Internal.LegacySideBar as LegacySideBar
 import UI.Internal.Menu as Menu
 import UI.Internal.Page as Internal
 import UI.Internal.SideBar as SideBar
+import UI.Internal.Utils.Element exposing (style)
 import UI.Link exposing (Link)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Utils.Action as Action
@@ -600,13 +601,23 @@ toBrowserDocument cfg pageItem (Document model) =
                 Nothing ->
                     Element.none
 
+        bodywithDialogBaseAttrs =
+            [ Element.inFront dialogView
+            , Element.width fill
+            , Element.height fill
+            ]
+
+        bodyWithDialogAttrs =
+            if dialogView == Element.none then
+                bodywithDialogBaseAttrs
+
+            else
+                style "max-height" "100vh" :: Element.clipY :: bodywithDialogBaseAttrs
+
         bodyWithDialog =
             -- Always creating this element is required so we don't loose scrollbar state
             Element.el
-                [ Element.inFront dialogView
-                , Element.width fill
-                , Element.height fill
-                ]
+                bodyWithDialogAttrs
                 body
 
         defaultAttrs =
