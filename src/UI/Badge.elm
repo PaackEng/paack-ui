@@ -95,7 +95,11 @@ defaultOptions =
     Options Nothing
 
 
-{-| A variation of the badge with an icon
+{-| A variation of the badge with an icon.
+
+    Badge.primaryLight "NEW"
+        |> Badge.withIcon (Icon.car "Car")
+
 -}
 withIcon : Icon -> Badge -> Badge
 withIcon icon (Badge properties options) =
@@ -245,13 +249,6 @@ companionIcon cfg icon iconColor =
         |> Icon.withCustomSize 16
         |> Icon.withColor iconColor
         |> Icon.renderElement cfg
-
-
-
--- Icon.seeMore "see more"
---     |> Icon.withCustomSize 16
---     |> Icon.renderElement cfg
--- Render
 
 
 {-| End of the builder's life.
