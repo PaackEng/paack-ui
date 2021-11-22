@@ -235,7 +235,9 @@ outlineDark content =
 
 -}
 withTone : (String -> Badge) -> Badge -> Badge
-withTone builder (Badge { content } _) =
+withTone builder (Badge { content } originalOptions) =
+   let (Badge newProps _) = builder content
+   in (Badge newProps originalOptions)
     builder content
 
 
