@@ -601,7 +601,7 @@ toBrowserDocument cfg pageItem (Document model) =
                 Nothing ->
                     Element.none
 
-        bodywithDialogBaseAttrs =
+        bodyWithDialogBaseAttrs =
             [ Element.inFront dialogView
             , Element.width fill
             , Element.height fill
@@ -609,10 +609,10 @@ toBrowserDocument cfg pageItem (Document model) =
 
         bodyWithDialogAttrs =
             if dialogView == Element.none then
-                bodywithDialogBaseAttrs
+                bodyWithDialogBaseAttrs
 
             else
-                style "max-height" "100vh" :: Element.clipY :: bodywithDialogBaseAttrs
+                style "max-height" "100vh" :: Element.clipY :: bodyWithDialogBaseAttrs
 
         bodyWithDialog =
             -- Always creating this element is required so we don't loose scrollbar state
