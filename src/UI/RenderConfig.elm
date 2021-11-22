@@ -172,7 +172,7 @@ isPortrait (Internal.RenderConfig { deviceOrientation }) =
 
 {-| `RenderConfig.elLayoutAttributes` are the recommended attributes for [`Element.layout`](/packages/mdgriffith/elm-ui/latest/Element#layout).
 
-If the app is using [`UI.NavigationContainer.navigator`](UI-NavigationContainer#navigator) then there is nothing to worry about as it already uses these attributes.
+If the app is using [`UI.Document.toBrowserDocument`](UI-Document#toBrowserDocument) then there is nothing to worry about as it already uses these attributes.
 
     Element.layout (RenderConfig.elLayoutAttributes renderConfig) (appView model)
 
