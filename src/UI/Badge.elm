@@ -11,12 +11,23 @@ module UI.Badge exposing
 
 Six color schemes are available: Primary, Warning, Danger, Success, Light, and Dark.
 But, brightness can also variate using the palette's brightness values with [`Badge.withBrightness`](UI-Palette#withBrightness).
+Optionally, an icon can be added to a badge if required.
 
 A badge can be created and rendered as in the following pipeline:
 
     Element.row []
         [ -- Some cool content
         , Badge.grayDark (String.fromInt (List.length someList))
+            |> Badge.renderElement renderConfig
+            |> Element.el [ Element.alignTop ]
+        ]
+
+If you need a badge with an icon, this can be specified with just an additional step, as below:
+
+    Element.row []
+        [ -- Some cool content
+        , Badge.grayDark (String.fromInt (List.length someList))
+            |> Badge.withIcon (Icon.packages "Packages")
             |> Badge.renderElement renderConfig
             |> Element.el [ Element.alignTop ]
         ]
