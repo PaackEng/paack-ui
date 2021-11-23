@@ -9,8 +9,8 @@ module UI.Badge exposing
 
 {-| Badges are small elements displayed, usually on the right of texts or top-right corner of the view, serving as counters, tags, or labels.
 
-Six color schemes are available: Primary, Warning, Danger, Success, Light, and Dark.
-But, brightness can also variate using the palette's brightness values with [`Badge.withBrightness`](UI-Palette#withBrightness).
+Six color schemes are available: Primary, Warning, Danger, Success, Gray & Outline.
+Brightness can also variate using the palette's brightness values with [`Badge.withBrightness`](UI-Palette#withBrightness).
 Optionally, an icon can be added to a badge if required.
 
 A badge can be created and rendered as in the following pipeline:
@@ -117,13 +117,13 @@ withIcon icon (Badge properties options) =
     Badge properties { options | icon = Just icon }
 
 
-{-| A variation of the badge with outline for light backgrounds.
+{-| A variation of the badge with a dark gray outline, intended for usage with lighter backgrounds.
 
-    Badge.outlineLight "SENT"
+    Badge.outlineDark "SENT"
 
 -}
-outlineLight : String -> Badge
-outlineLight content =
+outlineDark : String -> Badge
+outlineDark content =
     Badge { content = content, tone = ToneClear, brightness = Light } defaultOptions
 
 
@@ -227,13 +227,13 @@ successDark content =
     Badge { content = content, tone = ToneSuccess, brightness = Dark } defaultOptions
 
 
-{-| A variation of the badge with outline for dark backgrounds.
+{-| A variation of the badge with a light gray outline, intended for usage with darker backgrounds.
 
-    Badge.outlineDark "SENT"
+    Badge.outlineLight "SENT"
 
 -}
-outlineDark : String -> Badge
-outlineDark content =
+outlineLight : String -> Badge
+outlineLight content =
     Badge { content = content, tone = ToneClear, brightness = Dark } defaultOptions
 
 
