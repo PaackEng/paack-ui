@@ -289,18 +289,18 @@ renderElement cfg (Badge { content, tone, brightness } { icon }) =
                 , Border.rounded 12
                 , Border.width 2
                 ]
-                [ Element.column
+                [ Element.el
                     [ Element.paddingEach { top = 2, bottom = 2, left = 3, right = 2 }
                     ]
-                    [ companionIcon cfg i textColor ]
-                , Element.column
+                    (companionIcon cfg i textColor)
+                , Element.el
                     [ Element.paddingEach { top = 4, bottom = 0, left = 0, right = 6 }
                     ]
-                    [ Text.subtitle2 content
+                    (Text.subtitle2 content
                         |> Text.withColor textColor
                         |> Text.withOverflow Text.ellipsize
                         |> Text.renderElement cfg
-                    ]
+                    )
                 ]
 
         Nothing ->
