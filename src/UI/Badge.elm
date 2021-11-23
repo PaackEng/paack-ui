@@ -1,10 +1,9 @@
 module UI.Badge exposing
     ( Badge
-    , grayLight, primaryLight, successLight, warningLight, dangerLight
-    , grayDark, primaryDark, successDark, warningDark, dangerDark
-    , withTone
+    , grayLight, primaryLight, successLight, warningLight, dangerLight, outlineLight
+    , grayDark, primaryDark, successDark, warningDark, dangerDark, outlineDark
+    , withTone, withIcon
     , renderElement
-    , outlineDark, outlineLight, withIcon
     )
 
 {-| Badges are small elements displayed, usually on the right of texts or top-right corner of the view, serving as counters, tags, or labels.
@@ -40,17 +39,17 @@ If you need a badge with an icon, this can be specified with just an additional 
 
 ## Light
 
-@docs grayLight, primaryLight, successLight, warningLight, dangerLight
+@docs grayLight, primaryLight, successLight, warningLight, dangerLight, outlineLight
 
 
 ## Dark
 
-@docs grayDark, primaryDark, successDark, warningDark, dangerDark
+@docs grayDark, primaryDark, successDark, warningDark, dangerDark, outlineDark
 
 
 # Options
 
-@docs withTone
+@docs withTone, withIcon
 
 
 # Rendering
