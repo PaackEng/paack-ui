@@ -2,11 +2,12 @@
 .DS_Store
 
 .cache/
+.vscode/
 node_modules/
 yarn-error.log
 docs/elm-stuff/
 elm-stuff/
-
+package-lock.json
 dist/
 
 cypress/screenshots
