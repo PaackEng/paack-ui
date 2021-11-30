@@ -2,13 +2,12 @@ module UI.Button exposing
     ( Button, toggle, disabled, cmd, redirect
     , ButtonBody, fromLabel, fromIcon
     , fromLabeledOnLeftIcon, fromLabeledOnRightIcon
-    , ButtonStyle, hyperlink, primary, danger, light, clear
+    , ButtonStyle, hyperlink, primary, danger, light, clear, switchedOn
     , ButtonWidth, withWidth, widthFull, widthRelative
     , withSize
     , withDisabledIf
     , renderElement
     , map
-    , switchedOn
     )
 
 {-| The `UI.Button` is a component that can render as a hyperlink, a togglable button, a stylized button, or a clear padded-icon.
@@ -38,7 +37,7 @@ A button can be created and rendered as in the following pipeline:
 
 # Style
 
-@docs ButtonStyle, hyperlink, primary, danger, light, clear
+@docs ButtonStyle, hyperlink, primary, danger, light, clear, switchedOn
 
 
 # Width
