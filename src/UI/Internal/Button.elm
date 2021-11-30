@@ -59,6 +59,7 @@ type EmbossedTone
     | ToneDanger
     | ToneLight
     | ToneClear
+    | ToneSwitchedOn
 
 
 type ButtonStyle

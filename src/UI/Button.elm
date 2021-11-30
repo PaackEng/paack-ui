@@ -2,7 +2,7 @@ module UI.Button exposing
     ( Button, toggle, disabled, cmd, redirect
     , ButtonBody, fromLabel, fromIcon
     , fromLabeledOnLeftIcon, fromLabeledOnRightIcon
-    , ButtonStyle, hyperlink, primary, danger, light, clear
+    , ButtonStyle, hyperlink, primary, danger, light, clear, switchedOn
     , ButtonWidth, withWidth, widthFull, widthRelative
     , withSize
     , withDisabledIf
@@ -37,7 +37,7 @@ A button can be created and rendered as in the following pipeline:
 
 # Style
 
-@docs ButtonStyle, hyperlink, primary, danger, light, clear
+@docs ButtonStyle, hyperlink, primary, danger, light, clear, switchedOn
 
 
 # Width
@@ -351,6 +351,13 @@ This button usually commits the main task.
 primary : ButtonStyle
 primary =
     StyleEmbossed TonePrimary
+
+
+{-| The switched on state for a button. Any active button can be in a a possible "On" state.
+-}
+switchedOn : ButtonStyle
+switchedOn =
+    StyleEmbossed ToneSwitchedOn
 
 
 {-| A hyperlink-styled button looks like classical web links: Blue with an underline.
@@ -798,6 +805,9 @@ workingTheme tone =
                         }
                 }
 
+            ToneSwitchedOn ->
+                switchedOnTheme
+
 
 disabledTheme : List (Attribute msg)
 disabledTheme =
@@ -809,6 +819,22 @@ disabledTheme =
             }
         , hover = Nothing
         }
+
+
+switchedOnTheme : ButtonTheme
+switchedOnTheme =
+    { normal =
+        { background = Palette.blue200
+        , border = Palette.blue200
+        , text = Text.ColorPalette Palette.blue700
+        }
+    , hover =
+        Just
+            { background = Palette.blue300
+            , border = Palette.blue300
+            , text = Text.ColorPalette Palette.blue800
+            }
+    }
 
 
 primaryTheme : ButtonTheme
