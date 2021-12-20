@@ -1,7 +1,7 @@
 module UI.Icon exposing
     ( svgSpriteImport
     , Icon
-    , addCircle, add, arrowCurveLeft, arrowDown, arrowLeft, arrowRight, arrowUp, bell, bicycle, bike, bluetooth, boltDisabled, bolt, boxFilled, boxOutlined, boxesFilled, boxesOutlined, camera, car, cellular, checkmarkCircle, checkmarkRoundedRectangle, checkmark, chevronDown, chevronLeft, chevronRight, chevronUp, clockIssue, clockLocked, clock, closeCircle, closeRoundedRectangle, close, coins, collapse, crosshair, directions, download, eBike, eCar, eVan, edit, ellipsis, empty, expand, eyeHide, eye, filter, fix, folder, food, frozen, gVan, grocery, groups, hamburger, hand, home, hourglass, info, legacyApis, legacyHistorical, legacyLabelPrinter, legacyReport, legacyRetailerDashboard, legacySignOut, list, location, lock, logout, map, mapPinRadius, mapPin, messageLock, messageOTP, message, microphoneMute, microphone, minus, move, notepad, notification, otp, personAssign, personAssigned, personError, personUnassign, person, personsAdd, persons, phoneEndCall, phoneStartCall, placeholder, printerError, printer, redo, reload, remove, reporting, return, scanBarcode, scanGroup, scanPackage, scanSpace, scan, search, settings, shelves, sort, spaceError, spaceSearch, space, speakerMute, speaker, store, tag, trash, truck, undo, van, warning, waves, webhook
+    , addCircle, add, arrowCurveLeft, arrowDown, arrowLeft, arrowRight, arrowUp, bell, bicycle, bike, bluetooth, boltDisabled, bolt, boxFilled, boxOutlined, boxesFilled, boxesOutlined, camera, car, cellular, checkmarkCircle, checkmarkRoundedRectangle, checkmark, chevronDown, chevronLeft, chevronRight, chevronUp, clockIssue, clockLocked, clock, closeCircle, closeRoundedRectangle, close, coins, collapse, crosshair, directions, download, eBike, eCar, eVan, edit, ellipsis, empty, expand, eyeHide, eye, filter, fix, folder, food, frozen, gVan, grocery, groups, hamburger, hand, home, hourglass, info, legacyApis, legacyHistorical, legacyLabelPrinter, legacyReport, legacyRetailerDashboard, legacySignOut, list, location, lock, logout, map, mapPinRadius, mapPin, messageLock, messageOTP, message, microphoneMute, microphone, minus, move, notepad, notes, notification, otp, personAssign, personAssigned, personError, personUnassign, person, personsAdd, persons, phoneEndCall, phoneStartCall, placeholder, printerError, printer, redo, reload, remove, reporting, return, scanBarcode, scanGroup, scanPackage, scanSpace, scan, search, settings, shelves, sort, spaceError, spaceSearch, space, speakerMute, speaker, store, tag, trash, truck, undo, van, warning, waves, webhook
     , fixing, loader
     , assignPerson, boxes, check, configure, delete, done, eventLog, fixIssues, insert, moreActions, nextContent, notifications, paackSpaces, packages, phone, pause, previousContent, print, sandwichMenu, searchSpace, seeMore, sortDecreasing, sortIncreasing, success, toggle, toggleDown, toggleUp, unassignPerson, wait
     , getHint
@@ -37,7 +37,7 @@ An icon can be created and rendered as in the following pipeline:
 
 ## Current names
 
-@docs addCircle, add, arrowCurveLeft, arrowDown, arrowLeft, arrowRight, arrowUp, bell, bicycle, bike, bluetooth, boltDisabled, bolt, boxFilled, boxOutlined, boxesFilled, boxesOutlined, camera, car, cellular, checkmarkCircle, checkmarkRoundedRectangle, checkmark, chevronDown, chevronLeft, chevronRight, chevronUp, clockIssue, clockLocked, clock, closeCircle, closeRoundedRectangle, close, coins, collapse, crosshair, directions, download, eBike, eCar, eVan, edit, ellipsis, empty, expand, eyeHide, eye, filter, fix, folder, food, frozen, gVan, grocery, groups, hamburger, hand, home, hourglass, info, legacyApis, legacyHistorical, legacyLabelPrinter, legacyReport, legacyRetailerDashboard, legacySignOut, list, location, lock, logout, map, mapPinRadius, mapPin, messageLock, messageOTP, message, microphoneMute, microphone, minus, move, notepad, notification, otp, personAssign, personAssigned, personError, personUnassign, person, personsAdd, persons, phoneEndCall, phoneStartCall, placeholder, printerError, printer, redo, reload, remove, reporting, return, scanBarcode, scanGroup, scanPackage, scanSpace, scan, search, settings, shelves, sort, spaceError, spaceSearch, space, speakerMute, speaker, store, tag, trash, truck, undo, van, warning, waves, webhook
+@docs addCircle, add, arrowCurveLeft, arrowDown, arrowLeft, arrowRight, arrowUp, bell, bicycle, bike, bluetooth, boltDisabled, bolt, boxFilled, boxOutlined, boxesFilled, boxesOutlined, camera, car, cellular, checkmarkCircle, checkmarkRoundedRectangle, checkmark, chevronDown, chevronLeft, chevronRight, chevronUp, clockIssue, clockLocked, clock, closeCircle, closeRoundedRectangle, close, coins, collapse, crosshair, directions, download, eBike, eCar, eVan, edit, ellipsis, empty, expand, eyeHide, eye, filter, fix, folder, food, frozen, gVan, grocery, groups, hamburger, hand, home, hourglass, info, legacyApis, legacyHistorical, legacyLabelPrinter, legacyReport, legacyRetailerDashboard, legacySignOut, list, location, lock, logout, map, mapPinRadius, mapPin, messageLock, messageOTP, message, microphoneMute, microphone, minus, move, notepad, notes, notification, otp, personAssign, personAssigned, personError, personUnassign, person, personsAdd, persons, phoneEndCall, phoneStartCall, placeholder, printerError, printer, redo, reload, remove, reporting, return, scanBarcode, scanGroup, scanPackage, scanSpace, scan, search, settings, shelves, sort, spaceError, spaceSearch, space, speakerMute, speaker, store, tag, trash, truck, undo, van, warning, waves, webhook
 
 
 ## Special
@@ -976,6 +976,16 @@ move =
 notepad : String -> Icon
 notepad =
     defaultInit "Notepad"
+
+
+{-| Icon constructor.
+
+    Icon.notes "Accessibility hint"
+
+-}
+notes : String -> Icon
+notes =
+    defaultInit "Notes"
 
 
 {-| Icon constructor.
