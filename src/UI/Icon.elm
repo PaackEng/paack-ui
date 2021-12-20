@@ -8,6 +8,7 @@ module UI.Icon exposing
     , withColor
     , withSize, withCustomSize
     , renderElement
+    , walk
     )
 
 {-| `UI.Icon` is an implementation of icons using an SVG-spritesheet.
@@ -1376,6 +1377,16 @@ undo =
 van : String -> Icon
 van =
     defaultInit "Van"
+
+
+{-| Icon constructor.
+
+    Icon.walk "Accessibility hint"
+
+-}
+walk : String -> Icon
+walk =
+    defaultInit "walk"
 
 
 {-| Icon constructor.
