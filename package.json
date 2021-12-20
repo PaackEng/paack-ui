@@ -1,6 +1,6 @@
 {
   "name": "paack-ui",
-  "version": "6.3.0",
+  "version": "7.9.1",
   "description": "Paack's Design System applied over Elm UI",
   "main": "index.js",
   "assetsPath": "showcase/public/assets/",
