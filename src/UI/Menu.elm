@@ -17,7 +17,6 @@ A menu can be created and rendered as in the following pipeline:
             [ Menu.item Download
                 { icon = Icon.download
                 , title = "Download"
-                , color = Nothing
                 }
             ]
         |> Menu.renderElement renderConfig
