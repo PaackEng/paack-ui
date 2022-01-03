@@ -130,11 +130,11 @@ itemWithColor color (MenuItem menuItem) =
         |> Menu.renderElement renderConfig
 
 -}
-menu : msg -> Button msg -> Menu msg
-menu onToggle button =
+menu : msg -> List (MenuItem msg) -> Button msg -> Menu msg
+menu onToggle items button =
     Menu
         { button = button
-        , items = []
+        , items = items
         , onToggle = onToggle
         , isVisible = False
         }
