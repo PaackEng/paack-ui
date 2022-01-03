@@ -19,6 +19,7 @@
         "UI.Icon",
         "UI.Link",
         "UI.LoadingView",
+        "UI.Menu",
         "UI.Paginator",
         "UI.Palette",
         "UI.Radio",

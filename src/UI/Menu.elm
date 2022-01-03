@@ -1,9 +1,9 @@
 module UI.Menu exposing
-    ( Menu, item, menu
+    ( Menu, menu
+    , MenuItem, item
     , itemWithColor
     , setVisible
     , renderElement
-    , MenuItem
     )
 
 {-| The `UI.Menu` is a component for rendering dropdown menus.
@@ -24,7 +24,8 @@ A menu can be created and rendered as in the following pipeline:
 
 # Building
 
-@docs Menu, item, menu
+@docs Menu, menu
+@docs MenuItem, item
 
 
 # Style
