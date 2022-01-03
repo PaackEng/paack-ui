@@ -1,4 +1,10 @@
-module UI.Menu exposing (Menu, MenuItem, item, menu, setVisible, renderElement)
+module UI.Menu exposing
+    ( Menu, item, menu
+    , itemWithColor
+    , setVisible
+    , renderElement
+    , MenuItem
+    )
 
 {-| The `UI.Menu` is a component for rendering dropdown menus.
 
@@ -16,9 +22,16 @@ A menu can be created and rendered as in the following pipeline:
             ]
         |> Menu.renderElement renderConfig
 
+
 # Building
 
 @docs Menu, item, menu
+
+
+# Style
+
+@docs itemWithColor
+
 
 # Interactive
 
@@ -30,6 +43,7 @@ A menu can be created and rendered as in the following pipeline:
 @docs renderElement
 
 -}
+
 import Element exposing (Element)
 import Element.Background as Background
 import Element.Border as Border
@@ -43,6 +57,7 @@ import UI.Size as Size
 import UI.Text as Text
 import UI.Utils.ARIA as ARIA
 
+
 type alias Properties msg =
     { button : Button msg
     , items : List (MenuItem msg)
@@ -50,10 +65,12 @@ type alias Properties msg =
     , isVisible : Bool
     }
 
+
 {-| The `Menu msg` type is used for describing the component for later rendering.
 -}
 type Menu msg
     = Menu (Properties msg)
+
 
 {-| The `MenuItem` is required when assembling the list of menu entries.
 -}
@@ -76,24 +93,32 @@ type alias InternalMenuItem msg =
             [ Menu.item Download
                 { icon = Icon.download
                 , title = "Download"
-                , color = Nothing
                 }
             ]
         |> Menu.renderElement renderConfig
 
 -}
-item :
-    msg
-    ->
-        { icon : Maybe (String -> Icon)
-        , title : String
-        , color : Maybe Color
-        }
-    -> MenuItem msg
-item onToggle { icon, title, color } =
-    MenuItem { onClick = onToggle, icon = icon, title = title, color = color }
+item : msg -> { icon : Maybe (String -> Icon), title : String } -> MenuItem msg
+item onToggle { icon, title } =
+    MenuItem { onClick = onToggle, icon = icon, title = title, color = Nothing }
 
 
+{-| Sets the color of a `MenuItem`.
+
+    Button.cmd ToggleMenu Button.primary
+        |> Menu.menu ToggleMenu
+            [ Menu.item Delete
+                { icon = Icon.delete
+                , title = "Delete"
+                }
+                |> Menu.itemWithColor Palette.red700
+            ]
+        |> Menu.renderElement renderConfig
+
+-}
+itemWithColor : Color -> MenuItem msg -> MenuItem msg
+itemWithColor color (MenuItem menuItem) =
+    MenuItem { menuItem | color = Just color }
 
 
 {-| Defines all the required properties for creating a dropdown menu.
@@ -103,13 +128,12 @@ item onToggle { icon, title, color } =
             [ Menu.item Download
                 { icon = Just Icon.download
                 , title = "Download"
-                , color = Nothing
                 }
             , Menu.item Delete
                 { icon = Just Icon.delete
                 , title = "Delete"
-                , color = Just Palette.red700
                 }
+                |> Menu.itemWithColor Palette.red700
             ]
         |> Menu.renderElement renderConfig
 
@@ -157,9 +181,8 @@ renderElement renderConfig (Menu { button, items, onToggle, isVisible }) =
             )
 
 
+
 -- Internals
-
-
 
 
 renderMenu : RenderConfig -> List (MenuItem msg) -> msg -> Element msg
