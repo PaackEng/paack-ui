@@ -15,9 +15,8 @@ A menu can be created and rendered as in the following pipeline:
     Button.cmd ToggleMenu Button.primary
         |> Menu.menu ToggleMenu
             [ Menu.item Download
-                { icon = Icon.download
-                , title = "Download"
-                }
+                Icon.download
+                "Download"
             ]
         |> Menu.renderElement renderConfig
 
@@ -80,7 +79,7 @@ type MenuItem msg
 
 type alias InternalMenuItem msg =
     { color : Maybe Color
-    , icon : Maybe (String -> Icon)
+    , icon : String -> Icon
     , title : String
     , onClick : msg
     }
@@ -91,15 +90,14 @@ type alias InternalMenuItem msg =
     Button.cmd ToggleMenu Button.primary
         |> Menu.menu ToggleMenu
             [ Menu.item Download
-                { icon = Icon.download
-                , title = "Download"
-                }
+                Icon.download
+                "Download"
             ]
         |> Menu.renderElement renderConfig
 
 -}
-item : msg -> { icon : Maybe (String -> Icon), title : String } -> MenuItem msg
-item onToggle { icon, title } =
+item : msg -> (String -> Icon) -> String -> MenuItem msg
+item onToggle icon title =
     MenuItem { onClick = onToggle, icon = icon, title = title, color = Nothing }
 
 
@@ -107,10 +105,8 @@ item onToggle { icon, title } =
 
     Button.cmd ToggleMenu Button.primary
         |> Menu.menu ToggleMenu
-            [ Menu.item Delete
-                { icon = Icon.delete
-                , title = "Delete"
-                }
+            [ "Delete"
+                |> Menu.item Delete Icon.delete
                 |> Menu.itemWithColor Palette.red700
             ]
         |> Menu.renderElement renderConfig
@@ -125,14 +121,10 @@ itemWithColor color (MenuItem menuItem) =
 
     Button.cmd ToggleMenu Button.primary
         |> Menu.menu ToggleMenu
-            [ Menu.item Download
-                { icon = Just Icon.download
-                , title = "Download"
-                }
-            , Menu.item Delete
-                { icon = Just Icon.delete
-                , title = "Delete"
-                }
+            [ "Download"
+                |> Menu.item Download Icon.download
+            , "Delete"
+                |> Menu.item Delete Icon.delete
                 |> Menu.itemWithColor Palette.red700
             ]
         |> Menu.renderElement renderConfig
@@ -227,30 +219,25 @@ renderMenu renderConfig items onToggle =
 
 
 renderEntry : RenderConfig -> MenuItem msg -> Element msg
-renderEntry renderConfig (MenuItem menuItem) =
+renderEntry renderConfig (MenuItem { onClick, icon, title, color }) =
     Element.row
         (Element.padding 8
             :: Element.alignTop
             :: Element.spacing 5
             :: Element.width Element.fill
-            :: Events.onClick menuItem.onClick
+            :: Events.onClick onClick
             :: Element.mouseOver
                 [ Palette.toBackgroundColor Palette.gray300 ]
             :: Border.rounded 3
             :: ARIA.toElementAttributes ARIA.roleButton
         )
-        [ case menuItem.icon of
-            Just icon ->
-                menuItem.title
-                    |> icon
-                    |> Icon.withSize Size.extraSmall
-                    |> Icon.withColor (Maybe.withDefault Palette.blue menuItem.color)
-                    |> Icon.renderElement renderConfig
-                    |> Element.el [ Element.alignTop ]
-
-            Nothing ->
-                Element.none
-        , Text.body2 menuItem.title
-            |> Text.withColor (Maybe.withDefault Palette.blue menuItem.color)
+        [ title
+            |> icon
+            |> Icon.withSize Size.extraSmall
+            |> Icon.withColor (Maybe.withDefault Palette.blue color)
+            |> Icon.renderElement renderConfig
+            |> Element.el [ Element.alignTop ]
+        , Text.body2 title
+            |> Text.withColor (Maybe.withDefault Palette.blue color)
             |> Text.renderElement renderConfig
         ]
