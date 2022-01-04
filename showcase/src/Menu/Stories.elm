@@ -1,6 +1,6 @@
 module Menu.Stories exposing (stories, update)
 
-import Element exposing (Element, fill, maximum)
+import Element exposing (Element, fill)
 import Menu.Model as Menu
 import Menu.Msg as Menu
 import Model exposing (Model)
@@ -10,7 +10,6 @@ import Return exposing (Return)
 import UI.Button as Button
 import UI.Icon as Icon
 import UI.Menu as Menu
-import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UIExplorer exposing (storiesOf)
 import Utils
@@ -67,12 +66,12 @@ view renderConfig { menuStories } =
             |> Button.cmd toggleMenuMsg Button.primary
             |> Menu.menu toggleMenuMsg
                 [ "Edit"
-                    |> Menu.item toggleMenuMsg Icon.edit
+                    |> Menu.item toggleMenuMsg Nothing
                 , "Download"
-                    |> Menu.item toggleMenuMsg Icon.download
+                    |> Menu.item toggleMenuMsg (Just Icon.download)
                 , "Delete"
-                    |> Menu.item toggleMenuMsg Icon.delete
-                    |> Menu.itemWithColor Palette.red700
+                    |> Menu.item toggleMenuMsg (Just Icon.delete)
+                    |> Menu.itemWithDangerTone
                 ]
             |> Menu.setVisible menuStories.isVisible
             |> Menu.renderElement renderConfig
@@ -88,12 +87,12 @@ menuCode =
         |> Button.cmd toggleMenuMsg Button.primary
         |> Menu.menu toggleMenuMsg
             [ "Edit"
-                |> Menu.item toggleMenuMsg Icon.edit
+                |> Menu.item toggleMenuMsg (Just Icon.edit)
             , "Download"
-                |> Menu.item toggleMenuMsg Icon.download
+                |> Menu.item toggleMenuMsg (Just Icon.download)
             ,  "Delete"
-                |> Menu.item toggleMenuMsg Icon.delete
-                |> Menu.itemWithColor Palette.red700
+                |> Menu.item toggleMenuMsg (Just Icon.delete)
+                |> Menu.itemWithDangerTone
             ]
         |> Menu.setVisible menuStories.isVisible
         |> Menu.renderElement renderConfig

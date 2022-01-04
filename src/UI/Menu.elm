@@ -1,7 +1,7 @@
 module UI.Menu exposing
     ( Menu, menu
     , MenuItem, item
-    , itemWithColor
+    , itemWithDangerTone
     , setVisible
     , renderElement
     )
@@ -15,7 +15,7 @@ A menu can be created and rendered as in the following pipeline:
     Button.cmd ToggleMenu Button.primary
         |> Menu.menu ToggleMenu
             [ Menu.item Download
-                Icon.download
+                (Just Icon.download)
                 "Download"
             ]
         |> Menu.renderElement renderConfig
@@ -29,7 +29,7 @@ A menu can be created and rendered as in the following pipeline:
 
 # Style
 
-@docs itemWithColor
+@docs itemWithDangerTone
 
 
 # Interactive
@@ -50,7 +50,7 @@ import Element.Events as Events
 import Html.Attributes as HtmlAttrs
 import UI.Button as Button exposing (Button)
 import UI.Icon as Icon exposing (Icon)
-import UI.Palette as Palette exposing (Color)
+import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
@@ -78,8 +78,8 @@ type MenuItem msg
 
 
 type alias InternalMenuItem msg =
-    { color : Maybe Color
-    , icon : String -> Icon
+    { danger : Bool
+    , icon : Maybe (String -> Icon)
     , title : String
     , onClick : msg
     }
@@ -90,15 +90,15 @@ type alias InternalMenuItem msg =
     Button.cmd ToggleMenu Button.primary
         |> Menu.menu ToggleMenu
             [ Menu.item Download
-                Icon.download
+                (Just Icon.download)
                 "Download"
             ]
         |> Menu.renderElement renderConfig
 
 -}
-item : msg -> (String -> Icon) -> String -> MenuItem msg
+item : msg -> Maybe (String -> Icon) -> String -> MenuItem msg
 item onToggle icon title =
-    MenuItem { onClick = onToggle, icon = icon, title = title, color = Nothing }
+    MenuItem { onClick = onToggle, icon = icon, title = title, danger = False }
 
 
 {-| Sets the color of a `MenuItem`.
@@ -106,15 +106,15 @@ item onToggle icon title =
     Button.cmd ToggleMenu Button.primary
         |> Menu.menu ToggleMenu
             [ "Delete"
-                |> Menu.item Delete Icon.delete
-                |> Menu.itemWithColor Palette.red700
+                |> Menu.item Delete (Just Icon.delete)
+                |> Menu.itemWithDangerTone
             ]
         |> Menu.renderElement renderConfig
 
 -}
-itemWithColor : Color -> MenuItem msg -> MenuItem msg
-itemWithColor color (MenuItem menuItem) =
-    MenuItem { menuItem | color = Just color }
+itemWithDangerTone : MenuItem msg -> MenuItem msg
+itemWithDangerTone (MenuItem menuItem) =
+    MenuItem { menuItem | danger = True }
 
 
 {-| Defines all the required properties for creating a dropdown menu.
@@ -125,7 +125,7 @@ itemWithColor color (MenuItem menuItem) =
                 |> Menu.item Download Icon.download
             , "Delete"
                 |> Menu.item Delete Icon.delete
-                |> Menu.itemWithColor Palette.red700
+                |> Menu.itemWithDangerTone
             ]
         |> Menu.renderElement renderConfig
 
@@ -219,7 +219,15 @@ renderMenu renderConfig items onToggle =
 
 
 renderEntry : RenderConfig -> MenuItem msg -> Element msg
-renderEntry renderConfig (MenuItem { onClick, icon, title, color }) =
+renderEntry renderConfig ((MenuItem { onClick, title, danger }) as menuItem) =
+    let
+        ( color, background ) =
+            if danger then
+                ( Palette.red, Palette.red200 )
+
+            else
+                ( Palette.blue, Palette.gray200 )
+    in
     Element.row
         (Element.padding 8
             :: Element.alignTop
@@ -227,17 +235,27 @@ renderEntry renderConfig (MenuItem { onClick, icon, title, color }) =
             :: Element.width Element.fill
             :: Events.onClick onClick
             :: Element.mouseOver
-                [ Palette.toBackgroundColor Palette.gray300 ]
+                [ Palette.toBackgroundColor background ]
             :: Border.rounded 3
             :: ARIA.toElementAttributes ARIA.roleButton
         )
-        [ title
-            |> icon
-            |> Icon.withSize Size.extraSmall
-            |> Icon.withColor (Maybe.withDefault Palette.blue color)
-            |> Icon.renderElement renderConfig
-            |> Element.el [ Element.alignTop ]
+        [ renderIcon renderConfig menuItem color
         , Text.body2 title
-            |> Text.withColor (Maybe.withDefault Palette.blue color)
+            |> Text.withColor color
             |> Text.renderElement renderConfig
         ]
+
+
+renderIcon : RenderConfig -> MenuItem msg -> Palette.Color -> Element msg
+renderIcon renderConfig (MenuItem ({ title } as menuItem)) color =
+    case menuItem.icon of
+        Just icon ->
+            title
+                |> icon
+                |> Icon.withSize Size.extraSmall
+                |> Icon.withColor color
+                |> Icon.renderElement renderConfig
+                |> Element.el [ Element.alignTop ]
+
+        Nothing ->
+            Element.text ""
