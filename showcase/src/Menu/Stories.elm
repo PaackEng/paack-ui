@@ -66,11 +66,13 @@ view renderConfig { menuStories } =
             |> Button.cmd toggleMenuMsg Button.primary
             |> Menu.menu toggleMenuMsg
                 [ "Edit"
-                    |> Menu.item toggleMenuMsg Nothing
+                    |> Menu.item toggleMenuMsg
                 , "Download"
-                    |> Menu.item toggleMenuMsg (Just Icon.download)
+                    |> Menu.item toggleMenuMsg
+                    |> Menu.itemWithIcon Icon.download
                 , "Delete"
-                    |> Menu.item toggleMenuMsg (Just Icon.delete)
+                    |> Menu.item toggleMenuMsg
+                    |> Menu.itemWithIcon Icon.delete
                     |> Menu.itemWithDangerTone
                 ]
             |> Menu.setVisible menuStories.isVisible
@@ -87,11 +89,13 @@ menuCode =
         |> Button.cmd toggleMenuMsg Button.primary
         |> Menu.menu toggleMenuMsg
             [ "Edit"
-                |> Menu.item toggleMenuMsg (Just Icon.edit)
+                |> Menu.item toggleMenuMsg
             , "Download"
-                |> Menu.item toggleMenuMsg (Just Icon.download)
+                |> Menu.item toggleMenuMsg
+                |> Menu.itemWithIcon Icon.download
             ,  "Delete"
-                |> Menu.item toggleMenuMsg (Just Icon.delete)
+                |> Menu.item toggleMenuMsg
+                |> Menu.itemWithIcon Icon.delete
                 |> Menu.itemWithDangerTone
             ]
         |> Menu.setVisible menuStories.isVisible

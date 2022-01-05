@@ -1,7 +1,7 @@
 module UI.Menu exposing
     ( Menu, menu
     , MenuItem, item
-    , itemWithDangerTone
+    , itemWithIcon, itemWithDangerTone
     , setVisible
     , renderElement
     )
@@ -14,9 +14,9 @@ A menu can be created and rendered as in the following pipeline:
 
     Button.cmd ToggleMenu Button.primary
         |> Menu.menu ToggleMenu
-            [ Menu.item Download
-                (Just Icon.download)
-                "Download"
+            [ "Download"
+                |> Menu.item Download
+                |> Menu.itemWithIcon Icon.download
             ]
         |> Menu.renderElement renderConfig
 
@@ -29,7 +29,7 @@ A menu can be created and rendered as in the following pipeline:
 
 # Style
 
-@docs itemWithDangerTone
+@docs itemWithIcon, itemWithDangerTone
 
 
 # Interactive
@@ -89,16 +89,29 @@ type alias InternalMenuItem msg =
 
     Button.cmd ToggleMenu Button.primary
         |> Menu.menu ToggleMenu
-            [ Menu.item Download
-                (Just Icon.download)
-                "Download"
+            [ Menu.item Download "Download" ]
+        |> Menu.renderElement renderConfig
+
+-}
+item : msg -> String -> MenuItem msg
+item onToggle title =
+    MenuItem { onClick = onToggle, icon = Nothing, title = title, danger = False }
+
+
+{-| Sets the icon of a `MenuItem`.
+
+    Button.cmd ToggleMenu Button.primary
+        |> Menu.menu ToggleMenu
+            [ "Delete"
+                |> Menu.item Delete
+                |> Menu.itemWithIcon Icon.delete
             ]
         |> Menu.renderElement renderConfig
 
 -}
-item : msg -> Maybe (String -> Icon) -> String -> MenuItem msg
-item onToggle icon title =
-    MenuItem { onClick = onToggle, icon = icon, title = title, danger = False }
+itemWithIcon : (String -> Icon) -> MenuItem msg -> MenuItem msg
+itemWithIcon icon (MenuItem menuItem) =
+    MenuItem { menuItem | icon = Just icon }
 
 
 {-| Sets the color of a `MenuItem`.
@@ -106,7 +119,7 @@ item onToggle icon title =
     Button.cmd ToggleMenu Button.primary
         |> Menu.menu ToggleMenu
             [ "Delete"
-                |> Menu.item Delete (Just Icon.delete)
+                |> Menu.item Delete
                 |> Menu.itemWithDangerTone
             ]
         |> Menu.renderElement renderConfig
@@ -121,10 +134,9 @@ itemWithDangerTone (MenuItem menuItem) =
 
     Button.cmd ToggleMenu Button.primary
         |> Menu.menu ToggleMenu
-            [ "Download"
-                |> Menu.item Download Icon.download
+            [ Menu.item Download "Download"
             , "Delete"
-                |> Menu.item Delete Icon.delete
+                |> Menu.item Delete
                 |> Menu.itemWithDangerTone
             ]
         |> Menu.renderElement renderConfig
