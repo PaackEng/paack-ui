@@ -12,6 +12,7 @@ import Html exposing (Html, div, img)
 import Html.Attributes exposing (src, style)
 import Icons
 import LoadingView
+import Menu.Stories as Menu
 import Model exposing (Model)
 import Msg exposing (Msg(..))
 import Paginators.Stories as Paginators
@@ -114,6 +115,7 @@ main =
             , Dialog.stories renderConfig
             , TextField.stories renderConfig
             , LoadingView.stories
+            , Menu.stories renderConfig
             , Checkboxes.stories renderConfig
             , Switches.stories renderConfig
             , Radio.stories renderConfig
@@ -201,6 +203,10 @@ updateStories msg ({ customModel } as model) =
         FiltersStoriesMsg subMsg ->
             Filters.update subMsg customModel.filtersStories
                 |> R.map (\t -> { model | customModel = { customModel | filtersStories = t } })
+
+        MenuStoriesMsg subMsg ->
+            Menu.update subMsg customModel.menuStories
+                |> R.map (\t -> { model | customModel = { customModel | menuStories = t } })
 
         NoOp ->
             ( model, Cmd.none )
