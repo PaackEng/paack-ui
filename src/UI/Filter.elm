@@ -10,7 +10,7 @@ module UI.Filter exposing
     , FilterAppliedSorting, withAppliedSorting, sortingAscending, sortingDescending, notSorting
     , customFilter
     , withBody, withButtons, withBodyHeight
-    , FilterAppliedHeader, withAppliedHeader, appliedHeader
+    , FilterAppliedHeader, withAppliedHeader, appliedHeader, withCalendarBody
     )
 
 {-| The `UI.Filter` is a reusable dialog, hidden in a button, used for filtering the results of a list.
@@ -118,12 +118,13 @@ There is also the possibility to create a custom filter, where you set the sorti
 import Element exposing (Element)
 import Time
 import UI.Button exposing (Button)
+import UI.DatePicker as DatePicker exposing (DatePicker)
 import UI.Effects as Effects exposing (Effects)
 import UI.Internal.Filter.Model as Internal
 import UI.Internal.Filter.Msg as Internal
 import UI.Internal.Filter.Sorter as Sorter
 import UI.Internal.Filter.Update as Internal
-import UI.Internal.Filter.View as Internal
+import UI.Internal.Filter.View as Internal exposing (FilterBody(..))
 import UI.RenderConfig exposing (RenderConfig)
 
 
@@ -183,7 +184,7 @@ customFilter label { openMsg, closeMsg, isOpen } =
         , width = Element.fill
         , size = Internal.Medium
         , sorting = Nothing
-        , rows = always <| always []
+        , body = RowsBody { rows = always <| always <| [] } --RowsBody (always <| always [])
         , rowsHeight = Nothing
         , buttons = always []
         , applied = Nothing
@@ -244,7 +245,7 @@ withAlignRight (Filter filter) =
 -}
 withBody : List (Element msg) -> Filter msg -> Filter msg
 withBody newBody (Filter filter) =
-    Filter { filter | rows = always <| always newBody }
+    Filter { filter | body = RowsBody { rows = always <| always <| newBody } }
 
 
 {-| Sets the buttons at the bottom of the filter's dialog when open.
@@ -267,6 +268,10 @@ withAppliedHeader : Maybe (FilterAppliedHeader msg) -> Filter msg -> Filter msg
 withAppliedHeader maybeAppliedHeader (Filter filter) =
     Filter { filter | applied = Maybe.map (\(FilterAppliedHeader header) -> header) maybeAppliedHeader }
 
+
+withCalendarBody : DatePicker msg -> Filter msg -> Filter msg
+withCalendarBody newBody (Filter filter) =
+    Filter { filter | body =  DatePickerBody newBody}
 
 {-| Sets a preview of how many items (or which ones) were selected for filtering, with a button to fastly clear the filtering.
 -}

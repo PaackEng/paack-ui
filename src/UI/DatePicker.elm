@@ -1,18 +1,17 @@
-module UI.DatePicker exposing (..)
+module UI.DatePicker exposing (DatePicker(..), init, update, datepicker, Msg(..), DateEvent(..))
 
 import Date exposing (Date, Interval(..), Month, Unit(..))
-import Element exposing (Element, alignLeft, alignRight, fill, fillPortion, maximum, minimum, padding, px, rgb, spacing, width)
+import Element exposing (Element, alignLeft, alignRight, fill, fillPortion, maximum, minimum, padding, paddingXY, px, rgb, spacing, width)
 import Element.Border as Border
 import Element.Events
 import Element.Font as Font
-import Element.Input as Input
-import Task
+import Json.Decode
 import Time exposing (Month(..))
 import UI.Button as Button
-import UI.Effects as Effects exposing (Effects)
 import UI.Icon as Icon
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
+import UI.Size as Size
 import UI.Text as Text
 
 
@@ -21,10 +20,11 @@ defaultToday =
     Date.fromCalendarDate 2022 Feb 11
 
 
-type alias Property =
+type alias Property msg =
     { today : Date
     , current : Date
     , selected : Maybe Date
+    , toExternal : Msg -> msg
     }
 
 
@@ -34,13 +34,20 @@ type alias DayItem =
     }
 
 
-type DatePicker
-    = DatePicker Property
+type DatePicker msg
+    = DatePicker (Property msg)
 
 
-init : Maybe Date -> ( DatePicker, Effects Msg )
-init selected =
-    ( DatePicker { today = defaultToday, selected = selected, current = defaultToday }, Effects.fromCmd <| Task.perform SetToday Date.today )
+init : Maybe Date -> (Msg -> msg) -> DatePicker msg
+init selected toExt =
+    DatePicker { today = defaultToday
+    , selected = selected
+    , current = case selected of
+                    Just selected_ ->
+                        selected_
+                    Nothing ->
+                        defaultToday
+    , toExternal = toExt }
 
 
 
@@ -48,10 +55,9 @@ init selected =
 
 
 type Msg
-    = Previous
-    | Next
+    = PreviousMonth
+    | NextMonth
     | Selected Date
-    | SetToday Date
 
 
 type DateEvent
@@ -60,17 +66,17 @@ type DateEvent
     | Current Date
 
 
-update : Msg -> DatePicker -> ( DatePicker, DateEvent )
+update : Msg -> DatePicker msg -> ( DatePicker msg, DateEvent )
 update msg (DatePicker ({ today, current, selected } as model)) =
     case msg of
-        Previous ->
+        PreviousMonth ->
             let
                 prev =
                     Date.add Months -1 current
             in
             ( DatePicker { model | current = prev }, Current prev )
 
-        Next ->
+        NextMonth ->
             let
                 next =
                     Date.add Months 1 current
@@ -80,16 +86,11 @@ update msg (DatePicker ({ today, current, selected } as model)) =
         Selected date ->
             ( DatePicker { model | today = today, selected = Just date, current = current }, Picked date )
 
-        SetToday date ->
-            ( DatePicker { model | today = date, selected = Nothing, current = date }, None )
-
-
-
 -- VIEW
 
 
-datepicker : RenderConfig -> DatePicker -> Element Msg
-datepicker renderConfig (DatePicker ({ today, current, selected } as model)) =
+datepicker : RenderConfig -> DatePicker msg -> Element msg
+datepicker renderConfig (DatePicker ({ today, current, selected, toExternal } as model)) =
     let
         numberOfDays =
             daysOfMonth (Date.month model.current) (Date.year model.current)
@@ -102,14 +103,14 @@ datepicker renderConfig (DatePicker ({ today, current, selected } as model)) =
                 ++ datesOfTheMonth model.current
                 ++ dateDaysFromNextMonth (List.length fromPreviousMonth + numberOfDays) model.current
     in
-    Element.column [ width fill ]
-        [ header renderConfig model
+    Element.column [ width fill]
+        [ header renderConfig toExternal model
         , drawDateMatrix dates model
         ]
 
 
-drawDateMatrix : List DayItem -> Property -> Element Msg
-drawDateMatrix matrix ({ today, selected, current } as model) =
+drawDateMatrix : List DayItem -> Property msg-> Element msg
+drawDateMatrix matrix ({ today, selected, current, toExternal } as model) =
     let
         ( first, rest ) =
             split 7 matrix
@@ -128,26 +129,23 @@ drawDateMatrix matrix ({ today, selected, current } as model) =
     in
     Element.column
         [ spacing 2
-        , Border.width 1
-        , Border.rounded 8
-        , Palette.gray300 |> Palette.toBorderColor
         , Element.width
             (fill
                 |> minimum 240
             )
         ]
         [ Element.row [ spacing 2, Element.centerX, Element.width fill ] (List.map drawCol weekHeader)
-        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate model) first
-        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate model) second
-        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate model) third
-        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate model) fourth
-        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate model) fifth
-        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate model) sixth
+        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate model toExternal) first
+        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate model toExternal) second
+        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate model toExternal) third
+        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate model toExternal) fourth
+        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate model toExternal) fifth
+        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate model toExternal) sixth
         ]
 
 
-drawDate : Property -> DayItem -> Element Msg
-drawDate { today, selected, current } day =
+drawDate : Property msg -> (Msg -> msg) -> DayItem -> Element msg
+drawDate { today, selected, current } externalToMsg day =
     let
         isSelected =
             case selected of
@@ -156,6 +154,7 @@ drawDate { today, selected, current } day =
 
                 Nothing ->
                     False
+
     in
     Element.el
         [ Element.width (fillPortion 7)
@@ -168,7 +167,7 @@ drawDate { today, selected, current } day =
         , Element.mouseOver
             [ Palette.gray200 |> Palette.toBackgroundColor
             ]
-        , Element.Events.onClick (Selected day.date)
+        , Element.Events.onClick <| externalToMsg <| (Selected day.date)
         , if day.date == today then
             Element.inFront (Element.el [ Element.centerX, Element.alignBottom ] (Element.text "."))
 
@@ -181,9 +180,10 @@ drawDate { today, selected, current } day =
             [ Element.height (px 32)
             , Element.centerX
             ,
-                if day.isCurrentMonth then
+                if day.isCurrentMonth && not isSelected then
                     Palette.blue800 |> Palette.toFontColor
-
+                else if day.isCurrentMonth && isSelected then
+                    Palette.genericWhite |> Palette.toFontColor
                 else
                     Palette.gray500 |> Palette.toFontColor
             , Font.size 16
@@ -197,32 +197,36 @@ drawDate { today, selected, current } day =
             ]
 
 
-drawCol : String -> Element Msg
+drawCol : String -> Element msg
 drawCol day =
     Element.el [ Element.width (fillPortion 7), Element.centerX, Element.centerY ] <|
         Element.el [ Element.centerX, Font.size 12, Palette.gray700 |> Palette.toFontColor ]
             (Element.text <| day)
 
 
-header : RenderConfig -> Property -> Element Msg
-header renderConfig model =
+header : RenderConfig -> (Msg -> msg) -> Property msg -> Element msg
+header renderConfig  externalMsg model =
     let
         label =
             Date.format "MMMM" model.current ++ " " ++ (String.fromInt <| Date.year model.current)
     in
     Element.row [ Element.width fill ]
         [ Button.fromIcon (Icon.chevronLeft "previous")
-                |> Button.cmd Previous Button.clear
+                |> Button.cmd (externalMsg PreviousMonth) Button.clear
+                |> Button.withSize Size.small
                 |> Button.renderElement renderConfig
-
+                |> Element.el [alignLeft]
         ,
         label
         |> Text.subtitle1
             |> Text.withColor Palette.gray800
             |> Text.renderElement renderConfig
-        , Button.fromIcon (Icon.chevronLeft "previous")
-                          |> Button.cmd Next Button.clear
+            |> Element.el [Element.centerX]
+        , Button.fromIcon (Icon.chevronRight "previous")
+                          |> Button.cmd (externalMsg NextMonth) Button.clear
+                          |> Button.withSize Size.small
                           |> Button.renderElement renderConfig
+                          |> Element.el [alignRight]
         ]
 
 

@@ -1,5 +1,5 @@
 module UI.Effects exposing
-    ( Effects, SideEffect(..), none, batch, fromCmd, msgToCmd, analytics, domFocus
+    ( Effects, SideEffect(..), none, batch, msgToCmd, analytics, domFocus
     , map, perform
     )
 
@@ -44,7 +44,6 @@ type SideEffect msg
     = MsgToCmd msg
     | DomFocus (Result Dom.Error () -> msg) String
     | Analytics Analytics
-    | Cmd (Cmd msg)
 
 
 {-| Tells the `perform` function that there are no side-effects. Parallels `Cmd.none`.
@@ -77,8 +76,6 @@ map =
                 DomFocus msg id ->
                     DomFocus (msg >> f) id
 
-                Cmd cmd ->
-                    Cmd (Cmd.map f cmd)
     in
     mapSideEffect >> List.map
 
@@ -103,10 +100,6 @@ domFocus : (Result Dom.Error () -> msg) -> String -> Effects msg
 domFocus msg id =
     [ DomFocus msg id ]
 
-fromCmd : Cmd msg -> Effects msg
-fromCmd msg =
-    [Cmd msg]
-
 {-| Perform a minimal interpretation of side-effects into commands.
 Use this if you don't care to change how to interpret them.
 -}
@@ -128,6 +121,3 @@ performSideEffect effect =
 
         DomFocus msg id ->
             Task.attempt msg (Dom.focus id)
-
-        Cmd cmd ->
-            Cmd.none
