@@ -38,15 +38,18 @@ type DatePicker msg
     = DatePicker (Property msg)
 
 
-init : Maybe Date -> (Msg -> msg) -> DatePicker msg
-init selected toExt =
-    DatePicker { today = defaultToday
+init : Time.Posix -> Maybe Date -> (Msg -> msg) -> DatePicker msg
+init today selected toExt =
+    let
+        todayDate = Date.fromPosix Time.utc today
+    in
+    DatePicker { today = todayDate
     , selected = selected
     , current = case selected of
                     Just selected_ ->
                         selected_
                     Nothing ->
-                        defaultToday
+                        todayDate
     , toExternal = toExt }
 
 
