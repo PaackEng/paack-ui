@@ -1,4 +1,4 @@
-module UI.DatePicker exposing (DateEvent(..), DatePicker(..), Msg(..), datepicker, init, update)
+module UI.DatePicker exposing (DateEvent(..), DatePicker, Msg, datepicker, init, update)
 
 import Date exposing (Date, Interval(..), Month, Unit(..))
 import Element exposing (Element, alignLeft, alignRight, fill, fillPortion, height, maximum, minimum, padding, paddingXY, px, rgb, shrink, spacing, width)
