@@ -1,7 +1,7 @@
-module UI.DatePicker exposing (DatePicker(..), init, update, datepicker, Msg(..), DateEvent(..))
+module UI.DatePicker exposing (DateEvent(..), DatePicker(..), Msg(..), datepicker, init, update)
 
 import Date exposing (Date, Interval(..), Month, Unit(..))
-import Element exposing (Element, alignLeft, alignRight, fill, fillPortion, maximum, minimum, padding, paddingXY, px, rgb, spacing, width)
+import Element exposing (Element, alignLeft, alignRight, fill, fillPortion, height, maximum, minimum, padding, paddingXY, px, rgb, shrink, spacing, width)
 import Element.Border as Border
 import Element.Events
 import Element.Font as Font
@@ -10,14 +10,9 @@ import Time exposing (Month(..))
 import UI.Button as Button
 import UI.Icon as Icon
 import UI.Palette as Palette
-import UI.RenderConfig exposing (RenderConfig)
+import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
-
-
-defaultToday : Date
-defaultToday =
-    Date.fromCalendarDate 2022 Feb 11
 
 
 type alias Property msg =
@@ -41,16 +36,21 @@ type DatePicker msg
 init : Time.Posix -> Maybe Date -> (Msg -> msg) -> DatePicker msg
 init today selected toExt =
     let
-        todayDate = Date.fromPosix Time.utc today
+        todayDate =
+            Date.fromPosix Time.utc today
     in
-    DatePicker { today = todayDate
-    , selected = selected
-    , current = case selected of
-                    Just selected_ ->
-                        selected_
-                    Nothing ->
-                        todayDate
-    , toExternal = toExt }
+    DatePicker
+        { today = todayDate
+        , selected = selected
+        , current =
+            case selected of
+                Just selected_ ->
+                    selected_
+
+                Nothing ->
+                    todayDate
+        , toExternal = toExt
+        }
 
 
 
@@ -89,6 +89,8 @@ update msg (DatePicker ({ today, current, selected } as model)) =
         Selected date ->
             ( DatePicker { model | today = today, selected = Just date, current = current }, Picked date )
 
+
+
 -- VIEW
 
 
@@ -106,14 +108,14 @@ datepicker renderConfig (DatePicker ({ today, current, selected, toExternal } as
                 ++ datesOfTheMonth model.current
                 ++ dateDaysFromNextMonth (List.length fromPreviousMonth + numberOfDays) model.current
     in
-    Element.column [ width fill]
+    Element.column [ width fill ]
         [ header renderConfig toExternal model
-        , drawDateMatrix dates model
+        , drawDateMatrix renderConfig dates model
         ]
 
 
-drawDateMatrix : List DayItem -> Property msg-> Element msg
-drawDateMatrix matrix ({ today, selected, current, toExternal } as model) =
+drawDateMatrix : RenderConfig -> List DayItem -> Property msg -> Element msg
+drawDateMatrix renderConfig matrix ({ today, selected, current, toExternal } as model) =
     let
         ( first, rest ) =
             split 7 matrix
@@ -129,26 +131,30 @@ drawDateMatrix matrix ({ today, selected, current, toExternal } as model) =
 
         ( fifth, sixth ) =
             split 7 fourthRest
+
+        calendarWidth =
+            if RenderConfig.isMobile renderConfig then
+                fill |> minimum 240
+
+            else
+                fill |> minimum 240
     in
     Element.column
         [ spacing 2
-        , Element.width
-            (fill
-                |> minimum 240
-            )
+        , Element.width calendarWidth
         ]
         [ Element.row [ spacing 2, Element.centerX, Element.width fill ] (List.map drawCol weekHeader)
-        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate model toExternal) first
-        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate model toExternal) second
-        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate model toExternal) third
-        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate model toExternal) fourth
-        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate model toExternal) fifth
-        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate model toExternal) sixth
+        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate renderConfig model toExternal) first
+        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate renderConfig model toExternal) second
+        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate renderConfig model toExternal) third
+        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate renderConfig model toExternal) fourth
+        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate renderConfig model toExternal) fifth
+        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate renderConfig model toExternal) sixth
         ]
 
 
-drawDate : Property msg -> (Msg -> msg) -> DayItem -> Element msg
-drawDate { today, selected, current } externalToMsg day =
+drawDate : RenderConfig -> Property msg -> (Msg -> msg) -> DayItem -> Element msg
+drawDate renderConfig { today, selected, current } externalToMsg day =
     let
         isSelected =
             case selected of
@@ -158,6 +164,10 @@ drawDate { today, selected, current } externalToMsg day =
                 Nothing ->
                     False
 
+        (cellHeight, fontSize) = if RenderConfig.isMobile renderConfig then
+                        ((px 44), 20)
+                    else
+                        ((px 32), 16)
     in
     Element.el
         [ Element.width (fillPortion 7)
@@ -170,7 +180,7 @@ drawDate { today, selected, current } externalToMsg day =
         , Element.mouseOver
             [ Palette.gray200 |> Palette.toBackgroundColor
             ]
-        , Element.Events.onClick <| externalToMsg <| (Selected day.date)
+        , Element.Events.onClick <| externalToMsg <| Selected day.date
         , if day.date == today then
             Element.inFront (Element.el [ Element.centerX, Element.alignBottom ] (Element.text "."))
 
@@ -180,16 +190,17 @@ drawDate { today, selected, current } externalToMsg day =
         ]
     <|
         Element.column
-            [ Element.height (px 32)
+            [ Element.height cellHeight
             , Element.centerX
-            ,
-                if day.isCurrentMonth && not isSelected then
-                    Palette.blue800 |> Palette.toFontColor
-                else if day.isCurrentMonth && isSelected then
-                    Palette.genericWhite |> Palette.toFontColor
-                else
-                    Palette.gray500 |> Palette.toFontColor
-            , Font.size 16
+            , if day.isCurrentMonth && not isSelected then
+                Palette.blue800 |> Palette.toFontColor
+
+              else if day.isCurrentMonth && isSelected then
+                Palette.genericWhite |> Palette.toFontColor
+
+              else
+                Palette.gray500 |> Palette.toFontColor
+            , Font.size fontSize
             ]
             [ Element.el
                 [ Element.centerY
@@ -208,28 +219,32 @@ drawCol day =
 
 
 header : RenderConfig -> (Msg -> msg) -> Property msg -> Element msg
-header renderConfig  externalMsg model =
+header renderConfig externalMsg model =
     let
         label =
             Date.format "MMMM" model.current ++ " " ++ (String.fromInt <| Date.year model.current)
+
+        iconSize = if RenderConfig.isMobile renderConfig then
+                                Size.medium
+                    else
+                        Size.small
     in
     Element.row [ Element.width fill ]
         [ Button.fromIcon (Icon.chevronLeft "previous")
-                |> Button.cmd (externalMsg PreviousMonth) Button.clear
-                |> Button.withSize Size.small
-                |> Button.renderElement renderConfig
-                |> Element.el [alignLeft]
-        ,
-        label
-        |> Text.subtitle1
+            |> Button.cmd (externalMsg PreviousMonth) Button.clear
+            |> Button.withSize iconSize
+            |> Button.renderElement renderConfig
+            |> Element.el [ alignLeft ]
+        , label
+            |> Text.subtitle1
             |> Text.withColor Palette.gray800
             |> Text.renderElement renderConfig
-            |> Element.el [Element.centerX]
+            |> Element.el [ Element.centerX ]
         , Button.fromIcon (Icon.chevronRight "previous")
-                          |> Button.cmd (externalMsg NextMonth) Button.clear
-                          |> Button.withSize Size.small
-                          |> Button.renderElement renderConfig
-                          |> Element.el [alignRight]
+            |> Button.cmd (externalMsg NextMonth) Button.clear
+            |> Button.withSize iconSize
+            |> Button.renderElement renderConfig
+            |> Element.el [ alignRight ]
         ]
 
 

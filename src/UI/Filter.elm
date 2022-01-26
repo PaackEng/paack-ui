@@ -10,7 +10,8 @@ module UI.Filter exposing
     , FilterAppliedSorting, withAppliedSorting, sortingAscending, sortingDescending, notSorting
     , customFilter
     , withBody, withButtons, withBodyHeight
-    , FilterAppliedHeader, withAppliedHeader, appliedHeader, withCalendarBody
+    , FilterAppliedHeader, withAppliedHeader, appliedHeader
+    , withCalendarBody
     )
 
 {-| The `UI.Filter` is a reusable dialog, hidden in a button, used for filtering the results of a list.
@@ -184,7 +185,7 @@ customFilter label { openMsg, closeMsg, isOpen } =
         , width = Element.fill
         , size = Internal.Medium
         , sorting = Nothing
-        , body = RowsBody { rows = always <| always <| [] } --RowsBody (always <| always [])
+        , body = RowsBody { rows = always <| always <| [] }
         , rowsHeight = Nothing
         , buttons = always []
         , applied = Nothing
@@ -271,7 +272,8 @@ withAppliedHeader maybeAppliedHeader (Filter filter) =
 
 withCalendarBody : DatePicker msg -> Filter msg -> Filter msg
 withCalendarBody newBody (Filter filter) =
-    Filter { filter | body =  DatePickerBody newBody}
+    Filter { filter | body = DatePickerBody newBody }
+
 
 {-| Sets a preview of how many items (or which ones) were selected for filtering, with a button to fastly clear the filtering.
 -}

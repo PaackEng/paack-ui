@@ -29,11 +29,13 @@ type FilterSize
     = ExtraSmall
     | Medium
 
+
 type FilterBody msg
-  = RowsBody
-    { rows : RenderConfig -> FilterSize -> List (Element msg)
-    }
-  | DatePickerBody (DatePicker msg)
+    = RowsBody
+        { rows : RenderConfig -> FilterSize -> List (Element msg)
+        }
+    | DatePickerBody (DatePicker msg)
+
 
 type alias FullFilter msg =
     { label : String
@@ -43,7 +45,7 @@ type alias FullFilter msg =
     , width : Element.Length
     , size : FilterSize
     , sorting : Maybe (FilterSorting msg)
-    , body: FilterBody msg
+    , body : FilterBody msg
     , rowsHeight : Maybe Int
     , buttons : RenderConfig -> List (Button msg)
     , applied : Maybe { preview : String, clearMsg : msg }
@@ -242,11 +244,11 @@ bodyToElement renderConfig { label, closeMsg, width, size, sorting, body, button
                 bodyAttrsWithHeight
                 (case body of
                     RowsBody fx ->
-                        (fx.rows  renderConfig size)
-                    DatePickerBody picker ->
-                        [DatePicker.datepicker renderConfig picker]
-                )
+                        fx.rows renderConfig size
 
+                    DatePickerBody picker ->
+                        [ DatePicker.datepicker renderConfig picker ]
+                )
             , bodyButtons renderConfig size buttons
             ]
     in
@@ -601,7 +603,7 @@ defaultFilter config filter sorting =
         Maybe.map
             (\i -> { preview = String.fromInt i, clearMsg = config.editMsg Msg.Clear })
             (Model.appliedLength filter)
-    , body =  RowsBody {rows = rows}
+    , body = RowsBody { rows = rows }
     , alignRight = config.alignRight
     }
 

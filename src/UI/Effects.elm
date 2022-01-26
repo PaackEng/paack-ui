@@ -75,7 +75,6 @@ map =
 
                 DomFocus msg id ->
                     DomFocus (msg >> f) id
-
     in
     mapSideEffect >> List.map
 
@@ -99,6 +98,7 @@ analytics analytics_ =
 domFocus : (Result Dom.Error () -> msg) -> String -> Effects msg
 domFocus msg id =
     [ DomFocus msg id ]
+
 
 {-| Perform a minimal interpretation of side-effects into commands.
 Use this if you don't care to change how to interpret them.
