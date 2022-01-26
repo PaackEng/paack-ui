@@ -33,11 +33,11 @@ type DatePicker msg
     = DatePicker (Property msg)
 
 
-init : Time.Posix -> Maybe Date -> (Msg -> msg) -> DatePicker msg
-init today selected toExt =
+init : Time.Zone -> Time.Posix -> Maybe Date -> (Msg -> msg) -> DatePicker msg
+init timeZone today selected toExt =
     let
         todayDate =
-            Date.fromPosix Time.utc today
+            Date.fromPosix timeZone today
     in
     DatePicker
         { today = todayDate
@@ -87,7 +87,7 @@ update msg (DatePicker ({ today, current, selected } as model)) =
             ( DatePicker { model | current = next }, Current next )
 
         Selected date ->
-            ( DatePicker { model | today = today, selected = Just date, current = current }, Picked date )
+            ( DatePicker { model | selected = Just date }, Picked date )
 
 
 
@@ -140,13 +140,13 @@ drawDateMatrix renderConfig matrix ({ today, selected, current, toExternal } as 
                 fill |> minimum 240
         row =
             Element.row [ spacing 2, Element.centerX, Element.width fill ]
-        
+
         head =
-            row <| List.map drawCol weekHeader
-        
-        tail =
-            [first, second, third, fourth, fifth, sixth ]
-                |> List.map (drawDate renderConfig model toExternal >> row)
+            row <| List.map drawCol  <| weekHeader renderConfig
+
+        tail = [first, second, third, fourth, fifth, sixth ] |>
+                List.map (\days ->  row <| (List.map (drawDate renderConfig model toExternal) days))
+
     in
     head :: tail
         |> Element.column
@@ -250,8 +250,8 @@ header renderConfig externalMsg model =
         ]
 
 
-weekHeader : List String
-weekHeader =
+weekHeader : RenderConfig -> List String
+weekHeader _ =
     [ "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" ]
 
 
