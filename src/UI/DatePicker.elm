@@ -138,19 +138,21 @@ drawDateMatrix renderConfig matrix ({ today, selected, current, toExternal } as 
 
             else
                 fill |> minimum 240
+        row =
+            Element.row [ spacing 2, Element.centerX, Element.width fill ]
+        
+        head =
+            row <| List.map drawCol weekHeader
+        
+        tail =
+            [first, second, third, fourth, fifth, sixth ]
+                |> List.map (drawDate renderConfig model toExternal >> row)
     in
-    Element.column
-        [ spacing 2
-        , Element.width calendarWidth
-        ]
-        [ Element.row [ spacing 2, Element.centerX, Element.width fill ] (List.map drawCol weekHeader)
-        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate renderConfig model toExternal) first
-        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate renderConfig model toExternal) second
-        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate renderConfig model toExternal) third
-        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate renderConfig model toExternal) fourth
-        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate renderConfig model toExternal) fifth
-        , Element.row [ spacing 2, Element.centerX, Element.width fill ] <| List.map (drawDate renderConfig model toExternal) sixth
-        ]
+    head :: tail
+        |> Element.column
+            [ spacing 2
+            , Element.width calendarWidth
+            ]
 
 
 drawDate : RenderConfig -> Property msg -> (Msg -> msg) -> DayItem -> Element msg
