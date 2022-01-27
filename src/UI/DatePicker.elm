@@ -13,9 +13,11 @@ import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
 
+
 {-| The `UI.Datepicker` is a component for displaying a calendar.
 
-User must specify da today date, the date selected  to construct it.
+User must specify da today date, the date selected to construct it.
+
 
 # Building
 
@@ -26,9 +28,7 @@ User must specify da today date, the date selected  to construct it.
 
 @docs init, update
 
-
 -}
-
 type alias Property msg =
     { today : Date
     , current : Date
@@ -39,7 +39,6 @@ type alias Property msg =
 
 {-| The properties of every single day.
 -}
-
 type alias DayItem =
     { date : Date
     , isCurrentMonth : Bool
@@ -49,7 +48,6 @@ type alias DayItem =
 {-| The `DatePicker msg` type is used for describing the component for later
 rendering.
 -}
-
 type DatePicker msg
     = DatePicker (Property msg)
 
@@ -57,7 +55,6 @@ type DatePicker msg
 {-| The initial configuration, receive a time zone, the today posix time, a possible date to select and an external function
 to map the Msg.
 -}
-
 init : Time.Zone -> Time.Posix -> Maybe Date -> (Msg -> msg) -> DatePicker msg
 init timeZone today selected toExt =
     let
@@ -81,9 +78,9 @@ init timeZone today selected toExt =
 
 -- UPDATE
 
+
 {-| Contains a pre-defined datapicker's change.
 -}
-
 type Msg
     = PreviousMonth
     | NextMonth
@@ -92,7 +89,6 @@ type Msg
 
 {-| Contains the data events generated from the picker.
 -}
-
 type DateEvent
     = None
     | Picked Date
@@ -101,7 +97,6 @@ type DateEvent
 
 {-| The update function.
 -}
-
 update : Msg -> DatePicker msg -> ( DatePicker msg, DateEvent )
 update msg (DatePicker ({ today, current, selected } as model)) =
     case msg of
@@ -126,9 +121,9 @@ update msg (DatePicker ({ today, current, selected } as model)) =
 
 -- VIEW
 
+
 {-| Show the datapicker.
 -}
-
 datepicker : RenderConfig -> DatePicker msg -> Element msg
 datepicker renderConfig (DatePicker ({ today, current, selected, toExternal } as model)) =
     let
@@ -148,11 +143,13 @@ datepicker renderConfig (DatePicker ({ today, current, selected, toExternal } as
         , drawDateMatrix renderConfig dates model
         ]
 
+
+
 -- Internals
+
 
 {-| Draw the matrix of the days.
 -}
-
 drawDateMatrix : RenderConfig -> List DayItem -> Property msg -> Element msg
 drawDateMatrix renderConfig matrix ({ today, selected, current, toExternal } as model) =
     let
@@ -177,17 +174,19 @@ drawDateMatrix renderConfig matrix ({ today, selected, current, toExternal } as 
 
             else
                 fill |> minimum 240
+
         row =
             Element.row [ spacing 2, Element.centerX, Element.width fill ]
 
         head =
-            row <| List.map drawDayName  <| weekHeader renderConfig
+            row <| List.map drawDayName <| weekHeader renderConfig
 
-        tail = [first, second, third, fourth, fifth, sixth ] |>
-                List.map (\days ->  row <| (List.map (drawDate renderConfig model toExternal) days))
-
+        tail =
+            [ first, second, third, fourth, fifth, sixth ]
+                |> List.map (\days -> row <| List.map (drawDate renderConfig model toExternal) days)
     in
-    head :: tail
+    head
+        :: tail
         |> Element.column
             [ spacing 2
             , Element.width calendarWidth
@@ -196,7 +195,6 @@ drawDateMatrix renderConfig matrix ({ today, selected, current, toExternal } as 
 
 {-| Draw a single day.
 -}
-
 drawDate : RenderConfig -> Property msg -> (Msg -> msg) -> DayItem -> Element msg
 drawDate renderConfig { today, selected, current } externalToMsg day =
     let
@@ -208,10 +206,12 @@ drawDate renderConfig { today, selected, current } externalToMsg day =
                 Nothing ->
                     False
 
-        (cellHeight, fontSize) = if RenderConfig.isMobile renderConfig then
-                        ((px 44), 20)
-                    else
-                        ((px 32), 16)
+        ( cellHeight, fontSize ) =
+            if RenderConfig.isMobile renderConfig then
+                ( px 44, 20 )
+
+            else
+                ( px 32, 16 )
     in
     Element.el
         [ Element.width (fillPortion 7)
@@ -254,9 +254,9 @@ drawDate renderConfig { today, selected, current } externalToMsg day =
                     String.fromInt (Date.day day.date)
             ]
 
+
 {-| Draw the name of the day.
 -}
-
 drawDayName : String -> Element msg
 drawDayName day =
     Element.el [ Element.width (fillPortion 7), Element.centerX, Element.centerY ] <|
@@ -266,17 +266,18 @@ drawDayName day =
 
 {-| Draw the header of the calendar.
 -}
-
 header : RenderConfig -> (Msg -> msg) -> Property msg -> Element msg
 header renderConfig externalMsg model =
     let
         label =
             Date.format "MMMM" model.current ++ " " ++ (String.fromInt <| Date.year model.current)
 
-        iconSize = if RenderConfig.isMobile renderConfig then
-                                Size.medium
-                    else
-                        Size.small
+        iconSize =
+            if RenderConfig.isMobile renderConfig then
+                Size.medium
+
+            else
+                Size.small
     in
     Element.row [ Element.width fill ]
         [ Button.fromIcon (Icon.chevronLeft "previous")
@@ -304,14 +305,13 @@ weekHeader _ =
 
 {-| Numbers of the days to show in the calendar
 -}
-
 daysInTheView : Int
 daysInTheView =
     42
 
+
 {-| Return the week-day number of the 1th of the month
 -}
-
 weekDayOfFirstDay : Date -> Int
 weekDayOfFirstDay date =
     let
@@ -320,9 +320,9 @@ weekDayOfFirstDay date =
     in
     Date.weekdayNumber firstDay
 
+
 {-| Return the days to show from the previous month
 -}
-
 dateDaysFromPreviousMonth : Date -> List DayItem
 dateDaysFromPreviousMonth date =
     let
@@ -360,9 +360,9 @@ dateDaysFromPreviousMonth date =
             )
             dates
 
+
 {-| Return the days to show from the next month
 -}
-
 dateDaysFromNextMonth : Int -> Date -> List DayItem
 dateDaysFromNextMonth currentSize dayInCurrentMonth =
     if currentSize == daysInTheView then
@@ -390,9 +390,9 @@ dateDaysFromNextMonth currentSize dayInCurrentMonth =
             )
             dates
 
+
 {-| The days of the date month
 -}
-
 datesOfTheMonth : Date -> List DayItem
 datesOfTheMonth day =
     let
