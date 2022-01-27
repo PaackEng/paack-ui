@@ -90,14 +90,14 @@ type Msg
 {-| Contains the data events generated from the picker.
 -}
 type DateEvent
-    =  Picked Date
+    = Picked Date
     | Current Date
 
 
 {-| The update function.
 -}
 update : Msg -> DatePicker msg -> ( DatePicker msg, DateEvent )
-update msg (DatePicker ({current } as model)) =
+update msg (DatePicker ({ current } as model)) =
     case msg of
         PreviousMonth ->
             let
