@@ -6,7 +6,7 @@ import Utils exposing (ExplorerUI)
 
 
 stories : RenderConfig -> ExplorerUI
-stories renderConfig =
+stories _ =
     storiesOf
         "Datepicker"
         []
