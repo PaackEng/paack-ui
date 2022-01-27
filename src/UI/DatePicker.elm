@@ -1,11 +1,10 @@
 module UI.DatePicker exposing (DateEvent(..), DatePicker, Msg, datepicker, init, update)
 
 import Date exposing (Date, Interval(..), Month, Unit(..))
-import Element exposing (Element, alignLeft, alignRight, fill, fillPortion, height, maximum, minimum, padding, paddingXY, px, rgb, shrink, spacing, width)
+import Element exposing (Element, alignLeft, alignRight, fill, fillPortion, minimum, px, spacing, width)
 import Element.Border as Border
 import Element.Events
 import Element.Font as Font
-import Json.Decode
 import Time exposing (Month(..))
 import UI.Button as Button
 import UI.Icon as Icon
@@ -14,6 +13,21 @@ import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
 
+{-| The `UI.Datepicker` is a component for displaying a calendar.
+
+User must specify da today date, the date selected  to construct it.
+
+# Building
+
+@docs DatePicker, datepicker
+
+
+# Content
+
+@docs init, update
+
+
+-}
 
 type alias Property msg =
     { today : Date
@@ -23,15 +37,26 @@ type alias Property msg =
     }
 
 
+{-| The properties of every single day.
+-}
+
 type alias DayItem =
     { date : Date
     , isCurrentMonth : Bool
     }
 
 
+{-| The `DatePicker msg` type is used for describing the component for later
+rendering.
+-}
+
 type DatePicker msg
     = DatePicker (Property msg)
 
+
+{-| The initial configuration, receive a time zone, the today posix time, a possible date to select and an external function
+to map the Msg.
+-}
 
 init : Time.Zone -> Time.Posix -> Maybe Date -> (Msg -> msg) -> DatePicker msg
 init timeZone today selected toExt =
@@ -56,6 +81,8 @@ init timeZone today selected toExt =
 
 -- UPDATE
 
+{-| Contains a pre-defined datapicker's change.
+-}
 
 type Msg
     = PreviousMonth
@@ -63,11 +90,17 @@ type Msg
     | Selected Date
 
 
+{-| Contains the data events generated from the picker.
+-}
+
 type DateEvent
     = None
     | Picked Date
     | Current Date
 
+
+{-| The update function.
+-}
 
 update : Msg -> DatePicker msg -> ( DatePicker msg, DateEvent )
 update msg (DatePicker ({ today, current, selected } as model)) =
@@ -93,6 +126,8 @@ update msg (DatePicker ({ today, current, selected } as model)) =
 
 -- VIEW
 
+{-| Show the datapicker.
+-}
 
 datepicker : RenderConfig -> DatePicker msg -> Element msg
 datepicker renderConfig (DatePicker ({ today, current, selected, toExternal } as model)) =
@@ -113,6 +148,10 @@ datepicker renderConfig (DatePicker ({ today, current, selected, toExternal } as
         , drawDateMatrix renderConfig dates model
         ]
 
+-- Internals
+
+{-| Draw the matrix of the days.
+-}
 
 drawDateMatrix : RenderConfig -> List DayItem -> Property msg -> Element msg
 drawDateMatrix renderConfig matrix ({ today, selected, current, toExternal } as model) =
@@ -142,7 +181,7 @@ drawDateMatrix renderConfig matrix ({ today, selected, current, toExternal } as 
             Element.row [ spacing 2, Element.centerX, Element.width fill ]
 
         head =
-            row <| List.map drawCol  <| weekHeader renderConfig
+            row <| List.map drawDayName  <| weekHeader renderConfig
 
         tail = [first, second, third, fourth, fifth, sixth ] |>
                 List.map (\days ->  row <| (List.map (drawDate renderConfig model toExternal) days))
@@ -154,6 +193,9 @@ drawDateMatrix renderConfig matrix ({ today, selected, current, toExternal } as 
             , Element.width calendarWidth
             ]
 
+
+{-| Draw a single day.
+-}
 
 drawDate : RenderConfig -> Property msg -> (Msg -> msg) -> DayItem -> Element msg
 drawDate renderConfig { today, selected, current } externalToMsg day =
@@ -212,13 +254,18 @@ drawDate renderConfig { today, selected, current } externalToMsg day =
                     String.fromInt (Date.day day.date)
             ]
 
+{-| Draw the name of the day.
+-}
 
-drawCol : String -> Element msg
-drawCol day =
+drawDayName : String -> Element msg
+drawDayName day =
     Element.el [ Element.width (fillPortion 7), Element.centerX, Element.centerY ] <|
         Element.el [ Element.centerX, Font.size 12, Palette.gray700 |> Palette.toFontColor ]
             (Element.text <| day)
 
+
+{-| Draw the header of the calendar.
+-}
 
 header : RenderConfig -> (Msg -> msg) -> Property msg -> Element msg
 header renderConfig externalMsg model =
@@ -255,10 +302,15 @@ weekHeader _ =
     [ "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" ]
 
 
+{-| Numbers of the days to show in the calendar
+-}
+
 daysInTheView : Int
 daysInTheView =
     42
 
+{-| Return the week-day number of the 1th of the month
+-}
 
 weekDayOfFirstDay : Date -> Int
 weekDayOfFirstDay date =
@@ -268,6 +320,8 @@ weekDayOfFirstDay date =
     in
     Date.weekdayNumber firstDay
 
+{-| Return the days to show from the previous month
+-}
 
 dateDaysFromPreviousMonth : Date -> List DayItem
 dateDaysFromPreviousMonth date =
@@ -306,6 +360,8 @@ dateDaysFromPreviousMonth date =
             )
             dates
 
+{-| Return the days to show from the next month
+-}
 
 dateDaysFromNextMonth : Int -> Date -> List DayItem
 dateDaysFromNextMonth currentSize dayInCurrentMonth =
@@ -334,6 +390,8 @@ dateDaysFromNextMonth currentSize dayInCurrentMonth =
             )
             dates
 
+{-| The days of the date month
+-}
 
 datesOfTheMonth : Date -> List DayItem
 datesOfTheMonth day =
