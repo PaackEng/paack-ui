@@ -5,6 +5,7 @@ import Badges
 import Buttons.Stories as Buttons
 import Checkboxes.Stories as Checkboxes
 import ContentPlaceholders
+import Datapicker.Stories as Datapicker
 import Dialog
 import Dropdown.Stories as Dropdowns
 import Filters.Stories as Filters
@@ -123,6 +124,7 @@ main =
             , Tile.stories renderConfig
             , ContentPlaceholders.stories renderConfig
             , Dropdowns.stories renderConfig
+            , Datapicker.stories renderConfig
             ]
         |> category
             "Complex components"
