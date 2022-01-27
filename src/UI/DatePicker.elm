@@ -1,11 +1,11 @@
 module UI.DatePicker exposing (DateEvent(..), DatePicker, Msg, datepicker, init, update)
 
-import Date exposing (Date, Interval(..), Month, Unit(..))
+import Date exposing (Date, Interval(..), Unit(..))
 import Element exposing (Element, alignLeft, alignRight, fill, fillPortion, minimum, px, spacing, width)
 import Element.Border as Border
 import Element.Events
 import Element.Font as Font
-import Time exposing (Month(..))
+import Time
 import UI.Button as Button
 import UI.Icon as Icon
 import UI.Palette as Palette
@@ -90,15 +90,14 @@ type Msg
 {-| Contains the data events generated from the picker.
 -}
 type DateEvent
-    = None
-    | Picked Date
+    =  Picked Date
     | Current Date
 
 
 {-| The update function.
 -}
 update : Msg -> DatePicker msg -> ( DatePicker msg, DateEvent )
-update msg (DatePicker ({ today, current, selected } as model)) =
+update msg (DatePicker ({current } as model)) =
     case msg of
         PreviousMonth ->
             let
@@ -125,7 +124,7 @@ update msg (DatePicker ({ today, current, selected } as model)) =
 {-| Show the datapicker.
 -}
 datepicker : RenderConfig -> DatePicker msg -> Element msg
-datepicker renderConfig (DatePicker ({ today, current, selected, toExternal } as model)) =
+datepicker renderConfig (DatePicker ({ toExternal } as model)) =
     let
         numberOfDays =
             daysOfMonth (Date.month model.current) (Date.year model.current)
@@ -151,7 +150,7 @@ datepicker renderConfig (DatePicker ({ today, current, selected, toExternal } as
 {-| Draw the matrix of the days.
 -}
 drawDateMatrix : RenderConfig -> List DayItem -> Property msg -> Element msg
-drawDateMatrix renderConfig matrix ({ today, selected, current, toExternal } as model) =
+drawDateMatrix renderConfig matrix ({ toExternal } as model) =
     let
         ( first, rest ) =
             split 7 matrix
@@ -196,7 +195,7 @@ drawDateMatrix renderConfig matrix ({ today, selected, current, toExternal } as 
 {-| Draw a single day.
 -}
 drawDate : RenderConfig -> Property msg -> (Msg -> msg) -> DayItem -> Element msg
-drawDate renderConfig { today, selected, current } externalToMsg day =
+drawDate renderConfig { today, selected } externalToMsg day =
     let
         isSelected =
             case selected of

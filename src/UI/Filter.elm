@@ -119,7 +119,7 @@ There is also the possibility to create a custom filter, where you set the sorti
 import Element exposing (Element)
 import Time
 import UI.Button exposing (Button)
-import UI.DatePicker as DatePicker exposing (DatePicker)
+import UI.DatePicker exposing (DatePicker)
 import UI.Effects as Effects exposing (Effects)
 import UI.Internal.Filter.Model as Internal
 import UI.Internal.Filter.Msg as Internal
