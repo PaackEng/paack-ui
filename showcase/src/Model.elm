@@ -16,7 +16,6 @@ import Switches.Model as Switches
 import Tables.Model as Tables
 import Tabs.Model as Tabs
 import Tile.Model as Tile
-import UI.DatePicker as Datepicker
 import UIExplorer.Plugins.Tabs as TabsPlugin
 
 

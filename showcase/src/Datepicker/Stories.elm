@@ -2,7 +2,7 @@ module Datepicker.Stories exposing (..)
 
 import Date
 import Datepicker.Model as Datepicker
-import Datepicker.Msg as Datepicker
+import Datepicker.Msg as DatepickerMsg
 import Element exposing (Element, spacing)
 import Model exposing (Model)
 import Msg as RootMsg exposing (Msg)
@@ -10,16 +10,15 @@ import PluginOptions exposing (defaultWithMenu)
 import Return exposing (Return)
 import UI.DatePicker as DatePicker exposing (DateEvent(..))
 import UI.Internal.RenderConfig exposing (RenderConfig)
-import UI.Internal.Text exposing (Text(..))
 import UI.Text as Text
 import UIExplorer exposing (storiesOf)
 import Utils exposing (ExplorerStory, ExplorerUI, goToDocsCallToAction, prettifyElmCode, storyWithModel)
 
 
-update : RenderConfig -> Datepicker.Msg -> Datepicker.Model -> Return RootMsg.Msg Datepicker.Model
+update : RenderConfig -> DatepickerMsg.Msg -> Datepicker.Model -> Return RootMsg.Msg Datepicker.Model
 update _ msg model =
     case msg of
-        Datepicker.ToDatePicker subMsg ->
+        DatepickerMsg.ToDatePicker subMsg ->
             let
                 ( picker, date ) =
                     DatePicker.update subMsg model.datepicker
