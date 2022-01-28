@@ -152,7 +152,7 @@ defaultOptions : Options
 defaultOptions =
     { width = WidthShrink
     , size = Size.default
-    , id = ""
+    , id = Nothing
     }
 
 
@@ -329,8 +329,11 @@ withSize size button =
 
 
 {-| With `Button.withId`, you can add an [HTML ID attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/id) to the button element.
+
+    Button.withId (Just "id") someButton
+
 -}
-withId : String -> Button msg -> Button msg
+withId : Maybe String -> Button msg -> Button msg
 withId id button =
     case button of
         Button prop opt ->
@@ -484,7 +487,7 @@ toggleView cfg hint toggleMsg current { size, id } =
         attrs =
             Primitives.roundedBorders size
                 :: (Element.onIndividualClick <| toggleMsg (not current))
-                :: ElementUtils.id id
+                :: (id |> Maybe.map ElementUtils.id |> Maybe.withDefault (Primitives.roundedBorders size))
                 :: (ARIA.toElementAttributes <| ARIA.roleToggleButton current)
                 ++ toggleTheme current
                 ++ iconLayout hint size
@@ -512,7 +515,7 @@ hyperlinkView cfg body action { width, id, size } =
                 :: Font.regular
                 :: Font.underline
                 :: Element.pointer
-                :: ElementUtils.id id
+                :: (id |> Maybe.map ElementUtils.id |> Maybe.withDefault Element.pointer)
                 :: (ARIA.toElementAttributes <| ARIA.roleButton)
     in
     case action of
@@ -541,7 +544,7 @@ workingView cfg tone body action { size, width, id } =
                 :: buttonWidth width
                 :: Font.semiBold
                 :: Element.pointer
-                :: ElementUtils.id id
+                :: (id |> Maybe.map ElementUtils.id |> Maybe.withDefault Element.pointer)
                 :: (ARIA.toElementAttributes <| ARIA.roleButton)
                 ++ workingTheme tone
                 ++ bodyAttrs body size
@@ -570,7 +573,7 @@ staticView cfg body theme { size, width, id } =
             Primitives.roundedBorders size
                 :: buttonWidth width
                 :: Font.semiBold
-                :: ElementUtils.id id
+                :: (id |> Maybe.map ElementUtils.id |> Maybe.withDefault Font.semiBold)
                 :: Element.disabled
                 ++ bodyAttrs body size
                 ++ theme
