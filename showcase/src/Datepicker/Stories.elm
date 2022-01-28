@@ -12,7 +12,7 @@ import UI.DatePicker as DatePicker exposing (DateEvent(..))
 import UI.Internal.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UIExplorer exposing (storiesOf)
-import Utils exposing (ExplorerStory, ExplorerUI, goToDocsCallToAction, prettifyElmCode, storyWithModel)
+import Utils exposing (ExplorerStory, ExplorerUI, goToDocsCallToAction, iconsSvgSprite, prettifyElmCode, storyWithModel)
 
 
 update : RenderConfig -> DatepickerMsg.Msg -> Datepicker.Model -> Return RootMsg.Msg Datepicker.Model
@@ -63,7 +63,8 @@ basicCalendarStory cfg =
 calendarView : RenderConfig -> Model -> Element Msg
 calendarView renderConfig calendarStories =
     Element.column [ spacing 15 ]
-        [ case calendarStories.datepickerStories.selected of
+        [ iconsSvgSprite
+        , case calendarStories.datepickerStories.selected of
             Just date ->
                 "Date selected "
                     ++ Date.toIsoString date
