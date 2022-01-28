@@ -487,7 +487,6 @@ toggleView cfg hint toggleMsg current { size, id } =
         attrs =
             Primitives.roundedBorders size
                 :: (Element.onIndividualClick <| toggleMsg (not current))
-                :: (id |> Maybe.map ElementUtils.id |> Maybe.withDefault (Primitives.roundedBorders size))
                 :: (ARIA.toElementAttributes <| ARIA.roleToggleButton current)
                 ++ toggleTheme current
                 ++ iconLayout hint size
@@ -495,7 +494,7 @@ toggleView cfg hint toggleMsg current { size, id } =
     Icon.toggle hint
         |> fromIcon
         |> bodyToElement cfg size
-        |> Element.el attrs
+        |> Element.el (prependMaybe (Maybe.map ElementUtils.id id) attrs)
 
 
 hyperlinkView :
@@ -515,19 +514,21 @@ hyperlinkView cfg body action { width, id, size } =
                 :: Font.regular
                 :: Font.underline
                 :: Element.pointer
-                :: (id |> Maybe.map ElementUtils.id |> Maybe.withDefault Element.pointer)
                 :: (ARIA.toElementAttributes <| ARIA.roleButton)
+
+        attrsWithId =
+            prependMaybe (Maybe.map ElementUtils.id id) attrs
     in
     case action of
         ActionRedirect link ->
             body
                 |> bodyToElement cfg size
-                |> Link.wrapElement cfg attrs link
+                |> Link.wrapElement cfg attrsWithId link
 
         ActionMsg msg ->
             body
                 |> bodyToElement cfg size
-                |> Element.el (Element.onIndividualClick msg :: attrs)
+                |> Element.el (Element.onIndividualClick msg :: attrsWithId)
 
 
 workingView :
@@ -544,21 +545,23 @@ workingView cfg tone body action { size, width, id } =
                 :: buttonWidth width
                 :: Font.semiBold
                 :: Element.pointer
-                :: (id |> Maybe.map ElementUtils.id |> Maybe.withDefault Element.pointer)
                 :: (ARIA.toElementAttributes <| ARIA.roleButton)
                 ++ workingTheme tone
                 ++ bodyAttrs body size
+
+        attrsWithId =
+            prependMaybe (Maybe.map ElementUtils.id id) attrs
     in
     case action of
         ActionRedirect link ->
             body
                 |> bodyToElement cfg size
-                |> Link.wrapElement cfg attrs link
+                |> Link.wrapElement cfg attrsWithId link
 
         ActionMsg msg ->
             body
                 |> bodyToElement cfg size
-                |> Element.el (Element.onIndividualClick msg :: attrs)
+                |> Element.el (Element.onIndividualClick msg :: attrsWithId)
 
 
 staticView :
@@ -573,14 +576,13 @@ staticView cfg body theme { size, width, id } =
             Primitives.roundedBorders size
                 :: buttonWidth width
                 :: Font.semiBold
-                :: (id |> Maybe.map ElementUtils.id |> Maybe.withDefault Font.semiBold)
                 :: Element.disabled
                 ++ bodyAttrs body size
                 ++ theme
     in
     body
         |> bodyToElement cfg size
-        |> Element.el attrs
+        |> Element.el (prependMaybe (Maybe.map ElementUtils.id id) attrs)
 
 
 
