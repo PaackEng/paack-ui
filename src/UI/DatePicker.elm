@@ -221,7 +221,11 @@ drawDate renderConfig { today, selected } externalToMsg day =
           else
             Palette.genericWhite |> Palette.toBackgroundColor
         , Element.mouseOver
-            [ Palette.gray200 |> Palette.toBackgroundColor
+            [ if isSelected then
+                Palette.blue700 |> Palette.toBackgroundColor
+
+              else
+                Palette.gray200 |> Palette.toBackgroundColor
             ]
         , Element.Events.onClick <| externalToMsg <| Selected day.date
         , if day.date == today then
@@ -279,7 +283,7 @@ header renderConfig externalMsg model =
                 Size.small
     in
     Element.row [ Element.width fill ]
-        [ Button.fromIcon (Icon.chevronLeft "previous")
+        [ Button.fromIcon (Icon.chevronLeft "Previous Month")
             |> Button.cmd (externalMsg PreviousMonth) Button.clear
             |> Button.withSize iconSize
             |> Button.renderElement renderConfig
@@ -289,7 +293,7 @@ header renderConfig externalMsg model =
             |> Text.withColor Palette.gray800
             |> Text.renderElement renderConfig
             |> Element.el [ Element.centerX ]
-        , Button.fromIcon (Icon.chevronRight "previous")
+        , Button.fromIcon (Icon.chevronRight "Next Month")
             |> Button.cmd (externalMsg NextMonth) Button.clear
             |> Button.withSize iconSize
             |> Button.renderElement renderConfig

@@ -5,6 +5,7 @@ module Model exposing
 
 import Buttons.Model as Buttons
 import Checkboxes.Model as Checkboxes
+import Datepicker.Model as Datepicker
 import Dropdown.Model as Dropdown
 import Filters.Model as Filters
 import Menu.Model as Menu
@@ -15,12 +16,14 @@ import Switches.Model as Switches
 import Tables.Model as Tables
 import Tabs.Model as Tabs
 import Tile.Model as Tile
+import UI.DatePicker as Datepicker
 import UIExplorer.Plugins.Tabs as TabsPlugin
 
 
 type alias Model =
     { buttonsStories : Buttons.Model
     , checkboxesStories : Checkboxes.Model
+    , datepickerStories : Datepicker.Model
     , dropdownStories : Dropdown.Model
     , filtersStories : Filters.Model
     , menuStories : Menu.Model
@@ -39,6 +42,7 @@ init : Model
 init =
     { buttonsStories = Buttons.initModel
     , checkboxesStories = Checkboxes.initModel
+    , datepickerStories = Datepicker.initModel
     , dropdownStories = Dropdown.initModel
     , filtersStories = Filters.initModel
     , menuStories = Menu.initModel
