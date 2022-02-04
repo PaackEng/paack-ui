@@ -23,6 +23,7 @@ import UI.RenderConfig exposing (RenderConfig)
 type alias Options =
     { width : ButtonWidth
     , size : Size
+    , id : Maybe String
     }
 
 

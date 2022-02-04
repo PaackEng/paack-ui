@@ -6,6 +6,7 @@ module UI.Button exposing
     , ButtonWidth, withWidth, widthFull, widthRelative
     , withSize
     , withDisabledIf
+    , withId
     , renderElement
     , map
     )
@@ -55,6 +56,11 @@ A button can be created and rendered as in the following pipeline:
 @docs withDisabledIf
 
 
+# Identification
+
+@docs withId
+
+
 # Rendering
 
 @docs renderElement
@@ -86,6 +92,7 @@ import UI.Internal.Button as Internal
 import UI.Internal.Primitives as Primitives
 import UI.Internal.Size as Size exposing (Size)
 import UI.Internal.Text as Text exposing (TextColor)
+import UI.Internal.Utils.Element as ElementUtils
 import UI.Link as Link exposing (Link)
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
@@ -145,6 +152,7 @@ defaultOptions : Options
 defaultOptions =
     { width = WidthShrink
     , size = Size.default
+    , id = Nothing
     }
 
 
@@ -320,6 +328,21 @@ withSize size button =
             Button prop { opt | size = size }
 
 
+{-| With `Button.withId`, you can add an [HTML ID attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/id) to the button element.
+
+    Button.withId (Just "id") someButton
+
+-}
+withId : Maybe String -> Button msg -> Button msg
+withId id button =
+    case button of
+        Button prop opt ->
+            Button prop { opt | id = id }
+
+        Toggle prop opt ->
+            Toggle prop { opt | id = id }
+
+
 
 -- Style
 
@@ -433,19 +456,19 @@ The result of this function is a ready-to-insert Elm UI's Element.
 renderElement : RenderConfig -> Button msg -> Element msg
 renderElement cfg button =
     case button of
-        Toggle { hint, current, toggleMsg } { size } ->
-            toggleView cfg size hint toggleMsg current
+        Toggle { hint, current, toggleMsg } options ->
+            toggleView cfg hint toggleMsg current options
 
-        Button { mode, body } { size, width } ->
+        Button { mode, body } options ->
             case mode of
                 ButtonActive action StyleHyperlink ->
-                    hyperlinkView cfg size width body action
+                    hyperlinkView cfg body action options
 
                 ButtonActive action (StyleEmbossed tone) ->
-                    workingView cfg size width tone body action
+                    workingView cfg tone body action options
 
                 ButtonDisabled ->
-                    staticView cfg size width body disabledTheme
+                    staticView cfg body disabledTheme options
 
 
 
@@ -454,12 +477,12 @@ renderElement cfg button =
 
 toggleView :
     RenderConfig
-    -> Size
     -> String
     -> (Bool -> msg)
     -> Bool
+    -> Options
     -> Element msg
-toggleView cfg size hint toggleMsg current =
+toggleView cfg hint toggleMsg current { size, id } =
     let
         attrs =
             Primitives.roundedBorders size
@@ -471,17 +494,16 @@ toggleView cfg size hint toggleMsg current =
     Icon.toggle hint
         |> fromIcon
         |> bodyToElement cfg size
-        |> Element.el attrs
+        |> Element.el (prependMaybe (Maybe.map ElementUtils.id id) attrs)
 
 
 hyperlinkView :
     RenderConfig
-    -> Size
-    -> ButtonWidth
     -> ButtonBody
     -> ButtonAction msg
+    -> Options
     -> Element msg
-hyperlinkView cfg size width body action =
+hyperlinkView cfg body action { width, id, size } =
     let
         attrs =
             buttonWidth width
@@ -493,28 +515,30 @@ hyperlinkView cfg size width body action =
                 :: Font.underline
                 :: Element.pointer
                 :: (ARIA.toElementAttributes <| ARIA.roleButton)
+
+        attrsWithId =
+            prependMaybe (Maybe.map ElementUtils.id id) attrs
     in
     case action of
         ActionRedirect link ->
             body
                 |> bodyToElement cfg size
-                |> Link.wrapElement cfg attrs link
+                |> Link.wrapElement cfg attrsWithId link
 
         ActionMsg msg ->
             body
                 |> bodyToElement cfg size
-                |> Element.el (Element.onIndividualClick msg :: attrs)
+                |> Element.el (Element.onIndividualClick msg :: attrsWithId)
 
 
 workingView :
     RenderConfig
-    -> Size
-    -> ButtonWidth
     -> EmbossedTone
     -> ButtonBody
     -> ButtonAction msg
+    -> Options
     -> Element msg
-workingView cfg size width tone body action =
+workingView cfg tone body action { size, width, id } =
     let
         attrs =
             Primitives.roundedBorders size
@@ -524,27 +548,29 @@ workingView cfg size width tone body action =
                 :: (ARIA.toElementAttributes <| ARIA.roleButton)
                 ++ workingTheme tone
                 ++ bodyAttrs body size
+
+        attrsWithId =
+            prependMaybe (Maybe.map ElementUtils.id id) attrs
     in
     case action of
         ActionRedirect link ->
             body
                 |> bodyToElement cfg size
-                |> Link.wrapElement cfg attrs link
+                |> Link.wrapElement cfg attrsWithId link
 
         ActionMsg msg ->
             body
                 |> bodyToElement cfg size
-                |> Element.el (Element.onIndividualClick msg :: attrs)
+                |> Element.el (Element.onIndividualClick msg :: attrsWithId)
 
 
 staticView :
     RenderConfig
-    -> Size
-    -> ButtonWidth
     -> ButtonBody
     -> List (Attribute msg)
+    -> Options
     -> Element msg
-staticView cfg size width body theme =
+staticView cfg body theme { size, width, id } =
     let
         attrs =
             Primitives.roundedBorders size
@@ -556,7 +582,7 @@ staticView cfg size width body theme =
     in
     body
         |> bodyToElement cfg size
-        |> Element.el attrs
+        |> Element.el (prependMaybe (Maybe.map ElementUtils.id id) attrs)
 
 
 
