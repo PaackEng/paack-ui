@@ -7,6 +7,7 @@ import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
 import UI.Button as Button exposing (Button)
+import UI.DatePicker as DatePicker exposing (DatePicker)
 import UI.Icon as Icon
 import UI.Internal.Basics exposing (maybeNotThen, prependIf)
 import UI.Internal.Colors as Colors
@@ -29,6 +30,13 @@ type FilterSize
     | Medium
 
 
+type FilterBody msg
+    = RowsBody
+        { rows : RenderConfig -> FilterSize -> List (Element msg)
+        }
+    | DatePickerBody (DatePicker msg)
+
+
 type alias FullFilter msg =
     { label : String
     , openMsg : msg
@@ -37,7 +45,7 @@ type alias FullFilter msg =
     , width : Element.Length
     , size : FilterSize
     , sorting : Maybe (FilterSorting msg)
-    , rows : RenderConfig -> FilterSize -> List (Element msg)
+    , body : FilterBody msg
     , rowsHeight : Maybe Int
     , buttons : RenderConfig -> List (Button msg)
     , applied : Maybe { preview : String, clearMsg : msg }
@@ -178,13 +186,13 @@ bodyToElement :
             , width : Element.Length
             , size : FilterSize
             , sorting : Maybe (FilterSorting msg)
-            , rows : RenderConfig -> FilterSize -> List (Element msg)
+            , body : FilterBody msg
             , rowsHeight : Maybe Int
             , buttons : RenderConfig -> List (Button msg)
             , alignRight : Bool
         }
     -> Element msg
-bodyToElement renderConfig { label, closeMsg, width, size, sorting, rows, buttons, rowsHeight, alignRight } =
+bodyToElement renderConfig { label, closeMsg, width, size, sorting, body, buttons, rowsHeight, alignRight } =
     let
         attrs =
             if width == fill then
@@ -234,7 +242,13 @@ bodyToElement renderConfig { label, closeMsg, width, size, sorting, rows, button
             , bodySorting renderConfig size sorting
             , Element.column
                 bodyAttrsWithHeight
-                (rows renderConfig size)
+                (case body of
+                    RowsBody fx ->
+                        fx.rows renderConfig size
+
+                    DatePickerBody picker ->
+                        [ DatePicker.datepicker renderConfig picker ]
+                )
             , bodyButtons renderConfig size buttons
             ]
     in
@@ -589,7 +603,7 @@ defaultFilter config filter sorting =
         Maybe.map
             (\i -> { preview = String.fromInt i, clearMsg = config.editMsg Msg.Clear })
             (Model.appliedLength filter)
-    , rows = rows
+    , body = RowsBody { rows = rows }
     , alignRight = config.alignRight
     }
 

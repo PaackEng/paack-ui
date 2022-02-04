@@ -5,6 +5,7 @@ import Badges
 import Buttons.Stories as Buttons
 import Checkboxes.Stories as Checkboxes
 import ContentPlaceholders
+import Datepicker.Stories as Datepicker
 import Dialog
 import Dropdown.Stories as Dropdowns
 import Filters.Stories as Filters
@@ -123,6 +124,7 @@ main =
             , Tile.stories renderConfig
             , ContentPlaceholders.stories renderConfig
             , Dropdowns.stories renderConfig
+            , Datepicker.stories renderConfig
             ]
         |> category
             "Complex components"
@@ -210,6 +212,10 @@ updateStories msg ({ customModel } as model) =
 
         NoOp ->
             ( model, Cmd.none )
+
+        DatepickerStoriesMsg submsg ->
+            Datepicker.update renderConfig submsg customModel.datepickerStories
+                |> R.map (\t -> { model | customModel = { customModel | datepickerStories = t } })
 
 
 finishCustomUpdate : ExplorerModel -> ( Model, Cmd msg ) -> ( ExplorerModel, Cmd Msg )

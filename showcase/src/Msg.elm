@@ -2,6 +2,7 @@ module Msg exposing (Msg(..))
 
 import Buttons.Msg as Buttons
 import Checkboxes.Msg as Checkboxes
+import Datepicker.Msg as Datepicker
 import Dropdown.Msg as Dropdown
 import Filters.Msg as Filters
 import Menu.Msg as Menu
@@ -18,6 +19,7 @@ import UIExplorer.Plugins.Tabs as TabsPlugin
 type Msg
     = ButtonsStoriesMsg Buttons.Msg
     | CheckboxesStoriesMsg Checkboxes.Msg
+    | DatepickerStoriesMsg Datepicker.Msg
     | DropdownStoriesMsg Dropdown.Msg
     | FiltersStoriesMsg Filters.Msg
     | MenuStoriesMsg Menu.Msg
