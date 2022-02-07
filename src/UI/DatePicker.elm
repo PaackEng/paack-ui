@@ -1,12 +1,51 @@
-module UI.DatePicker exposing (DateEvent(..), DatePicker, Msg, datepicker, init, update)
+module UI.DatePicker exposing
+    ( DatePicker, singleDatePicker
+    , withTodaysMark
+    , renderElement
+    , Model, init, Msg, update
+    )
 
-import Date exposing (Date, Interval(..), Unit(..))
+{-| The `UI.DatePicker` is a component that displays a calendar for the user to pick a date.
+
+        DatePicker.singleDatePicker
+            { toExternalMsg = Msg.ToDatePicker
+            , onSelectMsg = Msg.SelectDate
+            }
+            model.datePickerModel
+            model.maybeSelectedDate
+            |> DatePicker.withTodaysMark appConfig.timeNow
+            |> DatePicker.renderElement appConfig.renderConfig
+
+
+# Building
+
+@docs DatePicker, singleDatePicker
+
+
+# Options
+
+@docs withTodaysMark
+
+
+# Rendering
+
+@docs renderElement
+
+
+# Model management
+
+@docs Model, init, Msg, update
+
+-}
+
+import Calendar exposing (Date)
 import Element exposing (Element, alignLeft, alignRight, fill, fillPortion, minimum, px, spacing, width)
 import Element.Border as Border
 import Element.Events
 import Element.Font as Font
 import Time
 import UI.Button as Button
+import UI.Effects as Effects exposing (Effects)
 import UI.Icon as Icon
 import UI.Palette as Palette
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
@@ -14,26 +53,28 @@ import UI.Size as Size
 import UI.Text as Text
 
 
-{-| The `UI.Datepicker` is a component for displaying a calendar.
-
-User must specify da today date, the date selected to construct it.
-
-
-# Building
-
-@docs DatePicker, datepicker
-
-
-# Content
-
-@docs init, update
-
+{-| The Model holding current viewing month and year.
 -}
+type Model
+    = Model { current : Date }
+
+
+{-| The `DatePicker msg` type is used for describing the component for later rendering.
+-}
+type DatePicker msg
+    = DatePicker (Property msg) Options
+
+
 type alias Property msg =
-    { today : Date
-    , current : Date
+    { toExternalMsg : Msg -> msg
+    , onSelectMsg : Date -> msg
+    , model : { current : Date }
+    }
+
+
+type alias Options =
+    { today : Maybe Date
     , selected : Maybe Date
-    , toExternal : Msg -> msg
     }
 
 
@@ -45,34 +86,14 @@ type alias DayItem =
     }
 
 
-{-| The `DatePicker msg` type is used for describing the component for later
-rendering.
+{-| Creates the starting Model. It receives an initial date for focusing its month and year.
+
+NOTE: This does not selects the said date, just start by displaying its month.
+
 -}
-type DatePicker msg
-    = DatePicker (Property msg)
-
-
-{-| The initial configuration, receive a time zone, the today posix time, a possible date to select and an external function
-to map the Msg.
--}
-init : Time.Zone -> Time.Posix -> Maybe Date -> (Msg -> msg) -> DatePicker msg
-init timeZone today selected toExt =
-    let
-        todayDate =
-            Date.fromPosix timeZone today
-    in
-    DatePicker
-        { today = todayDate
-        , selected = selected
-        , current =
-            case selected of
-                Just selected_ ->
-                    selected_
-
-                Nothing ->
-                    todayDate
-        , toExternal = toExt
-        }
+init : Date -> Model
+init startsWith =
+    Model { current = startsWith }
 
 
 
@@ -84,62 +105,78 @@ init timeZone today selected toExt =
 type Msg
     = PreviousMonth
     | NextMonth
-    | Selected Date
-
-
-{-| Contains the data events generated from the picker.
--}
-type DateEvent
-    = Picked Date
-    | Current Date
 
 
 {-| The update function.
 -}
-update : Msg -> DatePicker msg -> ( DatePicker msg, DateEvent )
-update msg (DatePicker ({ current } as model)) =
+update : Msg -> Model -> ( Model, Effects msg )
+update msg (Model ({ current } as model)) =
     case msg of
         PreviousMonth ->
-            let
-                prev =
-                    Date.add Months -1 current
-            in
-            ( DatePicker { model | current = prev }, Current prev )
+            ( Model { model | current = Calendar.decrementMonth current }
+            , Effects.none
+            )
 
         NextMonth ->
-            let
-                next =
-                    Date.add Months 1 current
-            in
-            ( DatePicker { model | current = next }, Current next )
-
-        Selected date ->
-            ( DatePicker { model | selected = Just date }, Picked date )
+            ( Model { model | current = Calendar.incrementMonth current }
+            , Effects.none
+            )
 
 
 
 -- VIEW
 
 
+{-| Allows picking a single date
+
+    singleDatePicker
+        { toExternalMsg = Msg.ToDatePicker
+        , onSelectMsg = Msg.SelectDate
+        }
+        model.datePickerModel
+        model.maybeSelectedDate
+
+-}
+singleDatePicker :
+    { toExternalMsg : Msg -> msg
+    , onSelectMsg : Date -> msg
+    }
+    -> Model
+    -> Maybe Date
+    -> DatePicker msg
+singleDatePicker { toExternalMsg, onSelectMsg } (Model model) selected =
+    DatePicker
+        { toExternalMsg = toExternalMsg
+        , onSelectMsg = onSelectMsg
+        , model = model
+        }
+        { today = Nothing
+        , selected = selected
+        }
+
+
+{-| Mark today's day with a single blue dot below it.
+-}
+withTodaysMark : Date -> DatePicker msg -> DatePicker msg
+withTodaysMark today (DatePicker prop opt) =
+    DatePicker prop { opt | today = Just today }
+
+
 {-| Show the datapicker.
 -}
-datepicker : RenderConfig -> DatePicker msg -> Element msg
-datepicker renderConfig (DatePicker ({ toExternal } as model)) =
+renderElement : RenderConfig -> DatePicker msg -> Element msg
+renderElement renderConfig (DatePicker { toExternalMsg, onSelectMsg, model } options) =
     let
-        numberOfDays =
-            daysOfMonth (Date.month model.current) (Date.year model.current)
-
-        fromPreviousMonth =
+        leftDates =
             dateDaysFromPreviousMonth model.current
+                ++ datesOfTheMonth model.current
 
         dates =
-            fromPreviousMonth
-                ++ datesOfTheMonth model.current
-                ++ dateDaysFromNextMonth (List.length fromPreviousMonth + numberOfDays) model.current
+            leftDates ++ dateDaysFromNextMonth model.current (List.length leftDates)
     in
     Element.column [ width fill ]
-        [ header renderConfig toExternal model
-        , drawDateMatrix renderConfig dates model
+        [ monthPicker renderConfig toExternalMsg model
+        , calendar renderConfig onSelectMsg options dates
         ]
 
 
@@ -147,42 +184,37 @@ datepicker renderConfig (DatePicker ({ toExternal } as model)) =
 -- Internals
 
 
-{-| Draw the matrix of the days.
--}
-drawDateMatrix : RenderConfig -> List DayItem -> Property msg -> Element msg
-drawDateMatrix renderConfig matrix ({ toExternal } as model) =
+calendar : RenderConfig -> (Date -> msg) -> Options -> List DayItem -> Element msg
+calendar renderConfig onSelectMsg options dates =
     let
-        ( first, rest ) =
-            split 7 matrix
+        ( first, firstRest ) =
+            take7 dates
 
         ( second, secondRest ) =
-            split 7 rest
+            take7 firstRest
 
         ( third, thirdRest ) =
-            split 7 secondRest
+            take7 secondRest
 
         ( fourth, fourthRest ) =
-            split 7 thirdRest
+            take7 thirdRest
 
         ( fifth, sixth ) =
-            split 7 fourthRest
+            take7 fourthRest
 
         calendarWidth =
-            if RenderConfig.isMobile renderConfig then
-                fill |> minimum 240
-
-            else
-                fill |> minimum 240
+            fill |> minimum 240
 
         row =
             Element.row [ spacing 2, Element.centerX, Element.width fill ]
 
         head =
-            row <| List.map drawDayName <| weekHeader renderConfig
+            row <| List.map dayOfTheWeek <| weekHeader renderConfig
 
         tail =
-            [ first, second, third, fourth, fifth, sixth ]
-                |> List.map (\days -> row <| List.map (drawDate renderConfig model toExternal) days)
+            List.map
+                (List.map (singleDay renderConfig options onSelectMsg) >> row)
+                [ first, second, third, fourth, fifth, sixth ]
     in
     head
         :: tail
@@ -192,10 +224,8 @@ drawDateMatrix renderConfig matrix ({ toExternal } as model) =
             ]
 
 
-{-| Draw a single day.
--}
-drawDate : RenderConfig -> Property msg -> (Msg -> msg) -> DayItem -> Element msg
-drawDate renderConfig { today, selected } externalToMsg day =
+singleDay : RenderConfig -> Options -> (Date -> msg) -> DayItem -> Element msg
+singleDay renderConfig { today, selected } onSelectMsg day =
     let
         isSelected =
             case selected of
@@ -211,69 +241,90 @@ drawDate renderConfig { today, selected } externalToMsg day =
 
             else
                 ( px 32, 16 )
+
+        textColor =
+            if day.isCurrentMonth then
+                if isSelected then
+                    Palette.genericWhite
+
+                else
+                    Palette.blue800
+
+            else
+                Palette.gray500
     in
-    Element.el
-        [ Element.width (fillPortion 7)
-        , Element.centerX
-        , if isSelected then
-            Palette.blue700 |> Palette.toBackgroundColor
-
-          else
-            Palette.genericWhite |> Palette.toBackgroundColor
-        , Element.mouseOver
-            [ if isSelected then
-                Palette.blue700 |> Palette.toBackgroundColor
-
-              else
-                Palette.gray200 |> Palette.toBackgroundColor
+    Calendar.getDay day.date
+        |> String.fromInt
+        |> Element.text
+        |> Element.el
+            [ Element.centerY
             ]
-        , Element.Events.onClick <| externalToMsg <| Selected day.date
-        , if day.date == today then
-            Element.inFront (Element.el [ Element.centerX, Element.alignBottom ] (Element.text "."))
-
-          else
-            Element.inFront Element.none
-        , Border.rounded 6
-        ]
-    <|
-        Element.column
+        |> Element.el
             [ Element.height cellHeight
             , Element.centerX
-            , if day.isCurrentMonth && not isSelected then
-                Palette.blue800 |> Palette.toFontColor
-
-              else if day.isCurrentMonth && isSelected then
-                Palette.genericWhite |> Palette.toFontColor
-
-              else
-                Palette.gray500 |> Palette.toFontColor
+            , Palette.toFontColor textColor
             , Font.size fontSize
             ]
-            [ Element.el
-                [ Element.centerY
+        |> Element.el
+            [ Element.width (fillPortion 1)
+            , Element.centerX
+            , Palette.toBackgroundColor <|
+                if isSelected then
+                    Palette.blue700
+
+                else
+                    Palette.genericWhite
+            , Element.mouseOver
+                [ Palette.toBackgroundColor <|
+                    if isSelected then
+                        Palette.blue700
+
+                    else
+                        Palette.gray200
                 ]
-              <|
-                Element.text <|
-                    String.fromInt (Date.day day.date)
+            , Element.Events.onClick <| onSelectMsg day.date
+            , Element.pointer
+            , if Just day.date == today then
+                Element.inFront (todaysMarkElement textColor)
+
+              else
+                Element.inFront Element.none
+            , Border.rounded 6
             ]
 
 
-{-| Draw the name of the day.
--}
-drawDayName : String -> Element msg
-drawDayName day =
-    Element.el [ Element.width (fillPortion 7), Element.centerX, Element.centerY ] <|
-        Element.el [ Element.centerX, Font.size 12, Palette.gray700 |> Palette.toFontColor ]
-            (Element.text <| day)
+todaysMarkElement : Palette.Color -> Element msg
+todaysMarkElement color =
+    Element.el
+        [ Element.centerX
+        , Element.alignBottom
+        , Palette.toFontColor color
+        ]
+        (Element.text ".")
+
+
+dayOfTheWeek : String -> Element msg
+dayOfTheWeek =
+    Element.el
+        [ Element.width (fillPortion 1)
+        , Element.centerY
+        , Font.center
+        , Font.size 12
+        , Palette.toFontColor Palette.gray700
+        ]
+        << Element.text
 
 
 {-| Draw the header of the calendar.
 -}
-header : RenderConfig -> (Msg -> msg) -> Property msg -> Element msg
-header renderConfig externalMsg model =
+monthPicker : RenderConfig -> (Msg -> msg) -> { current : Date } -> Element msg
+monthPicker renderConfig externalMsg model =
     let
         label =
-            Date.format "MMMM" model.current ++ " " ++ (String.fromInt <| Date.year model.current)
+            String.join " "
+                [ monthName renderConfig <| Calendar.getMonth model.current
+                , String.fromInt <| Calendar.getYear model.current
+                ]
 
         iconSize =
             if RenderConfig.isMobile renderConfig then
@@ -313,77 +364,37 @@ daysInTheView =
     42
 
 
-{-| Return the week-day number of the 1th of the month
--}
-weekDayOfFirstDay : Date -> Int
-weekDayOfFirstDay date =
-    let
-        firstDay =
-            Date.fromCalendarDate (Date.year date) (Date.month date) 1
-    in
-    Date.weekdayNumber firstDay
-
-
 {-| Return the days to show from the previous month
 -}
 dateDaysFromPreviousMonth : Date -> List DayItem
-dateDaysFromPreviousMonth date =
+dateDaysFromPreviousMonth currentDate =
     let
-        firstWeekDayMonth =
-            weekDayOfFirstDay date
+        firstDay =
+            untilIsFirstDay currentDate
     in
-    if firstWeekDayMonth == 1 then
-        []
+    if Calendar.getWeekday firstDay /= Time.Mon then
+        untilIsMonday (Calendar.decrementDay firstDay) []
 
     else
-        let
-            year =
-                Date.year date
-
-            month =
-                Date.month date
-
-            first =
-                Date.fromCalendarDate year month 1
-
-            start =
-                Date.add Days (-firstWeekDayMonth + 1) first
-
-            until =
-                Date.add Days -1 first
-
-            dates =
-                Date.range Day 1 start until ++ List.singleton until
-        in
-        List.map
-            (\day ->
-                { date = day
-                , isCurrentMonth = False
-                }
-            )
-            dates
+        []
 
 
 {-| Return the days to show from the next month
 -}
-dateDaysFromNextMonth : Int -> Date -> List DayItem
-dateDaysFromNextMonth currentSize dayInCurrentMonth =
-    if currentSize == daysInTheView then
-        []
-
-    else
+dateDaysFromNextMonth : Date -> Int -> List DayItem
+dateDaysFromNextMonth currentDate currentSize =
+    if currentSize /= daysInTheView then
         let
-            nextMonth =
-                Date.add Months 1 dayInCurrentMonth
-
             start =
-                Date.fromCalendarDate (Date.year nextMonth) (Date.month nextMonth) 1
+                currentDate
+                    |> untilIsFirstDay
+                    |> Calendar.incrementMonth
 
-            until =
-                Date.fromCalendarDate (Date.year nextMonth) (Date.month nextMonth) (daysInTheView - currentSize)
+            end =
+                incrementUntilIsDay (daysInTheView - currentSize) start
 
             dates =
-                Date.range Day 1 start until ++ List.singleton until
+                Calendar.getDateRange start end
         in
         List.map
             (\day ->
@@ -392,86 +403,97 @@ dateDaysFromNextMonth currentSize dayInCurrentMonth =
                 }
             )
             dates
+
+    else
+        []
 
 
 {-| The days of the date month
 -}
 datesOfTheMonth : Date -> List DayItem
-datesOfTheMonth day =
-    let
-        year =
-            Date.year day
-
-        month =
-            Date.month day
-
-        start =
-            Date.fromCalendarDate year month 1
-
-        until =
-            Date.fromCalendarDate year month <| daysOfMonth month year
-
-        dates =
-            Date.range Day 1 start until ++ [ Date.fromCalendarDate year month <| daysOfMonth month year ]
-    in
-    List.map
-        (\date ->
-            { date = date
-            , isCurrentMonth = True
-            }
-        )
-        dates
+datesOfTheMonth currentDate =
+    currentDate
+        |> Calendar.getDatesInMonth
+        |> List.map
+            (\date ->
+                { date = date
+                , isCurrentMonth = True
+                }
+            )
 
 
-isLeapYear : Int -> Bool
-isLeapYear y =
-    modBy 4 y == 0 && modBy 100 y /= 0 || modBy 400 y == 0
+take7 : List a -> ( List a, List a )
+take7 xs =
+    case xs of
+        a :: b :: c :: d :: e :: f :: g :: tail ->
+            ( [ a, b, c, d, e, f, g ], tail )
+
+        _ ->
+            ( xs, [] )
 
 
-daysOfMonth : Date.Month -> Int -> Int
-daysOfMonth month year =
+untilIsFirstDay : Date -> Date
+untilIsFirstDay date =
+    if Calendar.getDay date /= 1 then
+        untilIsFirstDay (Calendar.decrementDay date)
+
+    else
+        date
+
+
+incrementUntilIsDay : Int -> Date -> Date
+incrementUntilIsDay expectedDay date =
+    if Calendar.getDay date /= expectedDay then
+        incrementUntilIsDay expectedDay (Calendar.incrementDay date)
+
+    else
+        date
+
+
+untilIsMonday : Date -> List DayItem -> List DayItem
+untilIsMonday date accu =
+    if Calendar.getWeekday date /= Time.Mon then
+        untilIsMonday (Calendar.decrementDay date) ({ date = date, isCurrentMonth = False } :: accu)
+
+    else
+        { date = date, isCurrentMonth = False } :: accu
+
+
+monthName : RenderConfig -> Time.Month -> String
+monthName _ month =
     case month of
         Time.Jan ->
-            31
+            "January"
 
         Time.Feb ->
-            if isLeapYear year then
-                29
-
-            else
-                28
+            "February"
 
         Time.Mar ->
-            31
+            "March"
 
         Time.Apr ->
-            30
+            "April"
 
         Time.May ->
-            31
+            "May"
 
         Time.Jun ->
-            30
+            "June"
 
         Time.Jul ->
-            31
+            "July"
 
         Time.Aug ->
-            31
+            "August"
 
         Time.Sep ->
-            30
+            "September"
 
         Time.Oct ->
-            31
+            "October"
 
         Time.Nov ->
-            30
+            "Novemeber"
 
         Time.Dec ->
-            31
-
-
-split : Int -> List a -> ( List a, List a )
-split i xs =
-    ( List.take i xs, List.drop i xs )
+            "December"

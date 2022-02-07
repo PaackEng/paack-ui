@@ -9,9 +9,8 @@ module UI.Filter exposing
     , FilterSorting, withSorting, sorting, withSortingPreview
     , FilterAppliedSorting, withAppliedSorting, sortingAscending, sortingDescending, notSorting
     , customFilter
-    , withBody, withButtons, withBodyHeight
+    , withBody, withButtons, withBodyHeight, withCalendarBody
     , FilterAppliedHeader, withAppliedHeader, appliedHeader
-    , withCalendarBody
     )
 
 {-| The `UI.Filter` is a reusable dialog, hidden in a button, used for filtering the results of a list.
@@ -107,7 +106,7 @@ There is also the possibility to create a custom filter, where you set the sorti
 
 ## Customizer
 
-@docs withBody, withButtons, withBodyHeight
+@docs withBody, withButtons, withBodyHeight, withCalendarBody
 
 
 ## Header when filter applied
@@ -270,6 +269,8 @@ withAppliedHeader maybeAppliedHeader (Filter filter) =
     Filter { filter | applied = Maybe.map (\(FilterAppliedHeader header) -> header) maybeAppliedHeader }
 
 
+{-| Sets the content of the filter's dialog as a date-picker.
+-}
 withCalendarBody : DatePicker msg -> Filter msg -> Filter msg
 withCalendarBody newBody (Filter filter) =
     Filter { filter | body = DatePickerBody newBody }
