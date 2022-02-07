@@ -175,4 +175,11 @@ describe('Percy Snapshots', () => {
       cy.percySnapshot('Filters')
     })
   })
+
+  describe('DatePicker', () => {
+    it('Creates a snapshot for all arrangement of the DatePicker', () => {
+      cy.visit('/#Basics/DatePicker/Basic')
+      cy.percySnapshot('DatePicker')
+    })
+  })
 })
