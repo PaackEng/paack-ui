@@ -247,7 +247,7 @@ bodyToElement renderConfig { label, closeMsg, width, size, sorting, body, button
                         fx.rows renderConfig size
 
                     DatePickerBody picker ->
-                        [ DatePicker.datepicker renderConfig picker ]
+                        [ DatePicker.renderElement renderConfig picker ]
                 )
             , bodyButtons renderConfig size buttons
             ]
