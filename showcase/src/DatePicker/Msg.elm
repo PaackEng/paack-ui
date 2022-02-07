@@ -1,6 +1,6 @@
 module DatePicker.Msg exposing (..)
 
-import Date exposing (Date)
+import Calendar exposing (Date)
 import UI.DatePicker as DatePicker
 
 

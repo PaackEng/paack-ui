@@ -1,6 +1,6 @@
 module DatePicker.Model exposing (..)
 
-import Date exposing (Date)
+import Calendar exposing (Date)
 import DatePicker.Msg exposing (Msg(..))
 import Msg as RootMsg
 import Time
@@ -16,5 +16,5 @@ type alias Model =
 initModel : Model
 initModel =
     { selected = Nothing
-    , datePicker = DatePicker.init (Date.fromCalendarDate 2022 Time.Jan 1)
+    , datePicker = DatePicker.init <| Calendar.fromPosix <| Time.millisToPosix 1644248723983
     }

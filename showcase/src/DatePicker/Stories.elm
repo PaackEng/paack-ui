@@ -1,6 +1,6 @@
 module DatePicker.Stories exposing (..)
 
-import Date
+import Calendar
 import DatePicker.Model as StoryModel
 import DatePicker.Msg as DatePickerMsg
 import Element exposing (Element, spacing)
@@ -58,8 +58,18 @@ calendarView renderConfig { datePickerStories } =
         [ iconsSvgSprite
         , case datePickerStories.selected of
             Just date ->
-                "Date selected "
-                    ++ Date.toIsoString date
+                String.join " "
+                    [ "Selected date:"
+                    , Calendar.getYear date
+                        |> String.fromInt
+                    , Calendar.getMonth date
+                        |> Calendar.monthToInt
+                        |> String.fromInt
+                        |> String.padLeft 2 '0'
+                    , Calendar.getDay date
+                        |> String.fromInt
+                        |> String.padLeft 2 '0'
+                    ]
                     |> Text.body1
                     |> Text.renderElement renderConfig
                     |> Element.el [ Element.centerX ]
