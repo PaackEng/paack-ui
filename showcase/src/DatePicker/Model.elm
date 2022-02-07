@@ -16,5 +16,5 @@ type alias Model =
 initModel : Model
 initModel =
     { selected = Nothing
-    , datePicker = DatePicker.init <| Calendar.fromPosix <| Time.millisToPosix 1644248723983
+    , datePicker = DatePicker.init <| Calendar.fromPosix <| Time.millisToPosix 1641016800000
     }

@@ -356,7 +356,7 @@ dateDaysFromPreviousMonth currentDate =
             untilIsFirstDay currentDate
     in
     if Calendar.getWeekday firstDay /= Time.Mon then
-        untilIsMonday (Calendar.decrementDay firstDay)
+        untilIsMonday (Calendar.decrementDay firstDay) []
 
     else
         []
@@ -433,14 +433,13 @@ incrementUntilIsDay expectedDay date =
         date
 
 
-untilIsMonday : Date -> List DayItem
-untilIsMonday date =
+untilIsMonday : Date -> List DayItem -> List DayItem
+untilIsMonday date accu =
     if Calendar.getWeekday date /= Time.Mon then
-        { date = date, isCurrentMonth = False }
-            :: untilIsMonday (Calendar.decrementDay date)
+        untilIsMonday (Calendar.decrementDay date) ({ date = date, isCurrentMonth = False } :: accu)
 
     else
-        [ { date = date, isCurrentMonth = False } ]
+        { date = date, isCurrentMonth = False } :: accu
 
 
 monthName : RenderConfig -> Time.Month -> String
