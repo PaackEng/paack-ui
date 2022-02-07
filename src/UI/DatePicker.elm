@@ -2,8 +2,7 @@ module UI.DatePicker exposing
     ( DatePicker, singleDatePicker
     , withTodaysMark
     , renderElement
-    , Model, init, update
-    , Msg
+    , Model, init, Msg, update
     )
 
 {-| The `UI.DatePicker` is a component for displaying a calendar.
@@ -28,7 +27,7 @@ User must specify da today date, the date selected to construct it.
 
 # Model management
 
-@docs Model, init, update
+@docs Model, init, Msg, update
 
 -}
 
@@ -122,6 +121,16 @@ update msg (Model ({ current } as model)) =
 -- VIEW
 
 
+{-| Allows picking a single date
+
+    singleDatePicker
+        { toExternalMsg = Msg.ToDatePicker
+        , onSelectMsg = Msg.SelectDate
+        }
+        model.datePickerModel
+        model.maybeSelectedDate
+
+-}
 singleDatePicker :
     { toExternalMsg : Msg -> msg
     , onSelectMsg : Date -> msg
@@ -140,6 +149,8 @@ singleDatePicker { toExternalMsg, onSelectMsg } (Model model) selected =
         }
 
 
+{-| Mark today's day with a single blue dot below it.
+-}
 withTodaysMark : Date -> DatePicker msg -> DatePicker msg
 withTodaysMark today (DatePicker prop opt) =
     DatePicker prop { opt | today = Just today }
