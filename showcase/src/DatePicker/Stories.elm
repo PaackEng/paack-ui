@@ -90,10 +90,10 @@ basicDatePickerCode : String
 basicDatePickerCode =
     """
 DatePicker.singleDatePicker
-        { toExternalMsg = DatePickerMsg.ToDatePicker >> RootMsg.DatePickerStoriesMsg
-        , onSelectMsg = DatePickerMsg.Select >> RootMsg.DatePickerStoriesMsg
+        { toExternalMsg = Msg.ToDatePicker
+        , onSelectMsg = Msg.SelectDate
         }
-        datePickerStories.datePicker
-        datePickerStories.selected
+        model.datePickerModel
+        model.maybeSelectedDate
         |> DatePicker.renderElement renderConfig
 """

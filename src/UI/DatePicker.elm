@@ -5,9 +5,16 @@ module UI.DatePicker exposing
     , Model, init, Msg, update
     )
 
-{-| The `UI.DatePicker` is a component for displaying a calendar.
+{-| The `UI.DatePicker` is a component that displays a calendar for the user to pick a date.
 
-User must specify da today date, the date selected to construct it.
+        DatePicker.singleDatePicker
+            { toExternalMsg = Msg.ToDatePicker
+            , onSelectMsg = Msg.SelectDate
+            }
+            model.datePickerModel
+            model.maybeSelectedDate
+            |> DatePicker.withTodaysMark appConfig.timeNow
+            |> DatePicker.renderElement appConfig.renderConfig
 
 
 # Building
@@ -52,8 +59,7 @@ type Model
     = Model { current : Date }
 
 
-{-| The `DatePicker msg` type is used for describing the component for later
-rendering.
+{-| The `DatePicker msg` type is used for describing the component for later rendering.
 -}
 type DatePicker msg
     = DatePicker (Property msg) Options
@@ -80,7 +86,7 @@ type alias DayItem =
     }
 
 
-{-| The initial configuration, receives an initial date for focusing its month and year.
+{-| Creates the starting Model. It receives an initial date for focusing its month and year.
 
 NOTE: This does not selects the said date, just start by displaying its month.
 
