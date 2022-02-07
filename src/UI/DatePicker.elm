@@ -1,19 +1,19 @@
 module UI.DatePicker exposing
-    ( DatePicker, singleDatepicker
+    ( DatePicker, singleDatePicker
     , withTodaysMark
     , renderElement
     , Model, init, update
     , Msg
     )
 
-{-| The `UI.Datepicker` is a component for displaying a calendar.
+{-| The `UI.DatePicker` is a component for displaying a calendar.
 
 User must specify da today date, the date selected to construct it.
 
 
 # Building
 
-@docs DatePicker, singleDatepicker
+@docs DatePicker, singleDatePicker
 
 
 # Options
@@ -122,14 +122,14 @@ update msg (Model ({ current } as model)) =
 -- VIEW
 
 
-singleDatepicker :
+singleDatePicker :
     { toExternalMsg : Msg -> msg
     , onSelectMsg : Date -> msg
     }
     -> Model
     -> Maybe Date
     -> DatePicker msg
-singleDatepicker { toExternalMsg, onSelectMsg } (Model model) selected =
+singleDatePicker { toExternalMsg, onSelectMsg } (Model model) selected =
     DatePicker
         { toExternalMsg = toExternalMsg
         , onSelectMsg = onSelectMsg
