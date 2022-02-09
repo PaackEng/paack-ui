@@ -8,7 +8,8 @@ import Model exposing (Model)
 import Msg as RootMsg exposing (Msg)
 import PluginOptions exposing (defaultWithMenu)
 import Return exposing (Return)
-import UI.DatePicker as DatePicker
+import Time
+import UI.DatePicker as DatePicker exposing (DatePicker)
 import UI.Internal.RenderConfig exposing (RenderConfig)
 import UI.Text as Text
 import UIExplorer exposing (storiesOf)
@@ -37,23 +38,35 @@ stories : RenderConfig -> ExplorerUI
 stories renderConfig =
     storiesOf
         "DatePicker"
-        [ basicCalendarStory renderConfig ]
+        [ basicCalendarStory renderConfig False
+        , basicCalendarStory renderConfig True
+        ]
 
 
-basicCalendarStory : RenderConfig -> ExplorerStory
-basicCalendarStory cfg =
+basicCalendarStory : RenderConfig -> Bool -> ExplorerStory
+basicCalendarStory cfg isLimited =
     storyWithModel
-        ( "Basic"
-        , calendarView cfg
+        ( if isLimited then
+            "Limited"
+
+          else
+            "Basic"
+        , calendarView cfg isLimited
         , { defaultWithMenu
-            | code = prettifyElmCode basicDatePickerCode
+            | code =
+                prettifyElmCode <|
+                    if isLimited then
+                        limitedDatePickerCode
+
+                    else
+                        basicDatePickerCode
             , note = goToDocsCallToAction ""
           }
         )
 
 
-calendarView : RenderConfig -> Model -> Element Msg
-calendarView renderConfig { datePickerStories } =
+calendarView : RenderConfig -> Bool -> Model -> Element Msg
+calendarView renderConfig isLimited { datePickerStories } =
     Element.column [ spacing 15 ]
         [ iconsSvgSprite
         , case datePickerStories.selected of
@@ -75,15 +88,29 @@ calendarView renderConfig { datePickerStories } =
                     |> Element.el [ Element.centerX ]
 
             Nothing ->
-                Element.none
+                Text.body1 "No date selected."
+                    |> Text.renderElement renderConfig
+                    |> Element.el [ Element.centerX ]
         , DatePicker.singleDatePicker
             { toExternalMsg = DatePickerMsg.ToDatePicker >> RootMsg.DatePickerStoriesMsg
             , onSelectMsg = DatePickerMsg.Select >> RootMsg.DatePickerStoriesMsg
             }
             datePickerStories.datePicker
             datePickerStories.selected
+            |> limit isLimited
             |> DatePicker.renderElement renderConfig
         ]
+
+
+limit : Bool -> DatePicker msg -> DatePicker msg
+limit isLimited =
+    if isLimited then
+        DatePicker.withRangeLimits
+            (Just <| Calendar.fromPosix <| Time.millisToPosix 1638489600000)
+            (Just <| Calendar.fromPosix <| Time.millisToPosix 1646265600000)
+
+    else
+        identity
 
 
 basicDatePickerCode : String
@@ -95,5 +122,21 @@ DatePicker.singleDatePicker
         }
         model.datePickerModel
         model.maybeSelectedDate
+        |> DatePicker.renderElement renderConfig
+"""
+
+
+limitedDatePickerCode : String
+limitedDatePickerCode =
+    """
+DatePicker.singleDatePicker
+        { toExternalMsg = Msg.ToDatePicker
+        , onSelectMsg = Msg.SelectDate
+        }
+        model.datePickerModel
+        model.maybeSelectedDate
+        |> DatePicker.withRangeLimits
+            (Just <| Calendar.fromPosix <| Time.millisToPosix 1638489600000)
+            (Just <| Calendar.fromPosix <| Time.millisToPosix 1646265600000)
         |> DatePicker.renderElement renderConfig
 """
