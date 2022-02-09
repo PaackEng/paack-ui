@@ -1,6 +1,6 @@
 module UI.DatePicker exposing
     ( DatePicker, singleDatePicker
-    , withTodaysMark
+    , withTodaysMark, withRangeLimits
     , renderElement
     , Model, init, Msg, update
     )
@@ -24,7 +24,7 @@ module UI.DatePicker exposing
 
 # Options
 
-@docs withTodaysMark
+@docs withTodaysMark, withRangeLimits
 
 
 # Rendering
@@ -75,6 +75,8 @@ type alias Property msg =
 type alias Options =
     { today : Maybe Date
     , selected : Maybe Date
+    , lowerLimit : Maybe Date
+    , topperLimit : Maybe Date
     }
 
 
@@ -152,6 +154,8 @@ singleDatePicker { toExternalMsg, onSelectMsg } (Model model) selected =
         }
         { today = Nothing
         , selected = selected
+        , lowerLimit = Nothing
+        , topperLimit = Nothing
         }
 
 
@@ -162,20 +166,42 @@ withTodaysMark today (DatePicker prop opt) =
     DatePicker prop { opt | today = Just today }
 
 
+{-| Limits the days that can be selected to a specific range.
+
+NOTE: This function does not validate/change the current viewing month or selected date.
+
+-}
+withRangeLimits : Maybe Date -> Maybe Date -> DatePicker msg -> DatePicker msg
+withRangeLimits maybeFirst maybeSecond (DatePicker prop opt) =
+    case ( maybeFirst, maybeSecond ) of
+        ( Just first, Just second ) ->
+            if Calendar.compare first second == GT then
+                DatePicker prop { opt | lowerLimit = maybeSecond, topperLimit = maybeFirst }
+
+            else
+                DatePicker prop { opt | lowerLimit = maybeFirst, topperLimit = maybeSecond }
+
+        _ ->
+            DatePicker prop { opt | lowerLimit = maybeFirst, topperLimit = maybeSecond }
+
+
 {-| Show the datapicker.
 -}
 renderElement : RenderConfig -> DatePicker msg -> Element msg
 renderElement renderConfig (DatePicker { toExternalMsg, onSelectMsg, model } options) =
     let
+        firstDay =
+            untilIsFirstDay model.current
+
         leftDates =
-            dateDaysFromPreviousMonth model.current
+            dateDaysFromPreviousMonth firstDay
                 ++ datesOfTheMonth model.current
 
         dates =
-            leftDates ++ dateDaysFromNextMonth model.current (List.length leftDates)
+            leftDates ++ dateDaysFromNextMonth firstDay (List.length leftDates)
     in
     Element.column [ width fill ]
-        [ monthPicker renderConfig toExternalMsg model
+        [ monthPicker renderConfig toExternalMsg options model firstDay
         , calendar renderConfig onSelectMsg options dates
         ]
 
@@ -225,7 +251,7 @@ calendar renderConfig onSelectMsg options dates =
 
 
 singleDay : RenderConfig -> Options -> (Date -> msg) -> DayItem -> Element msg
-singleDay renderConfig { today, selected } onSelectMsg day =
+singleDay renderConfig { today, selected, lowerLimit, topperLimit } onSelectMsg day =
     let
         isSelected =
             case selected of
@@ -243,7 +269,7 @@ singleDay renderConfig { today, selected } onSelectMsg day =
                 ( px 32, 16 )
 
         textColor =
-            if day.isCurrentMonth then
+            if day.isCurrentMonth && enabled then
                 if isSelected then
                     Palette.genericWhite
 
@@ -252,6 +278,43 @@ singleDay renderConfig { today, selected } onSelectMsg day =
 
             else
                 Palette.gray500
+
+        attrs =
+            [ Element.width (fillPortion 1)
+            , Element.centerX
+            , Palette.toBackgroundColor <|
+                if isSelected then
+                    Palette.blue700
+
+                else
+                    Palette.genericWhite
+            , if Just day.date == today then
+                Element.inFront (todaysMarkElement textColor)
+
+              else
+                Element.inFront Element.none
+            , Border.rounded 6
+            ]
+
+        enabled =
+            inRange lowerLimit topperLimit day.date
+
+        clickableAttrs =
+            if enabled then
+                Element.mouseOver
+                    [ Palette.toBackgroundColor <|
+                        if isSelected then
+                            Palette.blue700
+
+                        else
+                            Palette.gray200
+                    ]
+                    :: (Element.Events.onClick <| onSelectMsg day.date)
+                    :: Element.pointer
+                    :: attrs
+
+            else
+                attrs
     in
     Calendar.getDay day.date
         |> String.fromInt
@@ -265,32 +328,7 @@ singleDay renderConfig { today, selected } onSelectMsg day =
             , Palette.toFontColor textColor
             , Font.size fontSize
             ]
-        |> Element.el
-            [ Element.width (fillPortion 1)
-            , Element.centerX
-            , Palette.toBackgroundColor <|
-                if isSelected then
-                    Palette.blue700
-
-                else
-                    Palette.genericWhite
-            , Element.mouseOver
-                [ Palette.toBackgroundColor <|
-                    if isSelected then
-                        Palette.blue700
-
-                    else
-                        Palette.gray200
-                ]
-            , Element.Events.onClick <| onSelectMsg day.date
-            , Element.pointer
-            , if Just day.date == today then
-                Element.inFront (todaysMarkElement textColor)
-
-              else
-                Element.inFront Element.none
-            , Border.rounded 6
-            ]
+        |> Element.el clickableAttrs
 
 
 todaysMarkElement : Palette.Color -> Element msg
@@ -317,8 +355,8 @@ dayOfTheWeek =
 
 {-| Draw the header of the calendar.
 -}
-monthPicker : RenderConfig -> (Msg -> msg) -> { current : Date } -> Element msg
-monthPicker renderConfig externalMsg model =
+monthPicker : RenderConfig -> (Msg -> msg) -> Options -> { current : Date } -> Date -> Element msg
+monthPicker renderConfig externalMsg options model firstDay =
     let
         label =
             String.join " "
@@ -332,11 +370,28 @@ monthPicker renderConfig externalMsg model =
 
             else
                 Size.small
+
+        disablePrev =
+            case options.lowerLimit of
+                Just value ->
+                    Calendar.compare (Calendar.decrementDay firstDay) value == LT
+
+                Nothing ->
+                    False
+
+        disableNext =
+            case options.topperLimit of
+                Just value ->
+                    Calendar.compare (Calendar.incrementMonth firstDay) value == GT
+
+                Nothing ->
+                    False
     in
     Element.row [ Element.width fill ]
         [ Button.fromIcon (Icon.chevronLeft "Previous Month")
             |> Button.cmd (externalMsg PreviousMonth) Button.clear
             |> Button.withSize iconSize
+            |> Button.withDisabledIf disablePrev
             |> Button.renderElement renderConfig
             |> Element.el [ alignLeft ]
         , label
@@ -347,6 +402,7 @@ monthPicker renderConfig externalMsg model =
         , Button.fromIcon (Icon.chevronRight "Next Month")
             |> Button.cmd (externalMsg NextMonth) Button.clear
             |> Button.withSize iconSize
+            |> Button.withDisabledIf disableNext
             |> Button.renderElement renderConfig
             |> Element.el [ alignRight ]
         ]
@@ -367,11 +423,7 @@ daysInTheView =
 {-| Return the days to show from the previous month
 -}
 dateDaysFromPreviousMonth : Date -> List DayItem
-dateDaysFromPreviousMonth currentDate =
-    let
-        firstDay =
-            untilIsFirstDay currentDate
-    in
+dateDaysFromPreviousMonth firstDay =
     if Calendar.getWeekday firstDay /= Time.Mon then
         untilIsMonday (Calendar.decrementDay firstDay) []
 
@@ -382,13 +434,11 @@ dateDaysFromPreviousMonth currentDate =
 {-| Return the days to show from the next month
 -}
 dateDaysFromNextMonth : Date -> Int -> List DayItem
-dateDaysFromNextMonth currentDate currentSize =
+dateDaysFromNextMonth firstDay currentSize =
     if currentSize /= daysInTheView then
         let
             start =
-                currentDate
-                    |> untilIsFirstDay
-                    |> Calendar.incrementMonth
+                Calendar.incrementMonth firstDay
 
             end =
                 incrementUntilIsDay (daysInTheView - currentSize) start
@@ -457,6 +507,28 @@ untilIsMonday date accu =
 
     else
         { date = date, isCurrentMonth = False } :: accu
+
+
+inRange : Maybe Date -> Maybe Date -> Date -> Bool
+inRange lowerLimit topperLimit day =
+    let
+        afterLower =
+            case lowerLimit of
+                Just value ->
+                    Calendar.compare day value /= LT
+
+                Nothing ->
+                    True
+
+        beforeTopper =
+            case topperLimit of
+                Just value ->
+                    Calendar.compare day value /= GT
+
+                Nothing ->
+                    True
+    in
+    afterLower && beforeTopper
 
 
 monthName : RenderConfig -> Time.Month -> String
