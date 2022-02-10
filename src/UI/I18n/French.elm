@@ -129,6 +129,32 @@ dropdown =
     }
 
 
+calendar : Calendar
+calendar =
+    { jan = EmptyFallback.calendar.jan
+    , feb = EmptyFallback.calendar.feb
+    , mar = EmptyFallback.calendar.mar
+    , apr = EmptyFallback.calendar.apr
+    , may = EmptyFallback.calendar.may
+    , jun = EmptyFallback.calendar.jun
+    , jul = EmptyFallback.calendar.jul
+    , aug = EmptyFallback.calendar.aug
+    , sep = EmptyFallback.calendar.sep
+    , oct = EmptyFallback.calendar.oct
+    , nov = EmptyFallback.calendar.nov
+    , dec = EmptyFallback.calendar.dec
+    , mon = EmptyFallback.calendar.mon
+    , tue = EmptyFallback.calendar.tue
+    , wed = EmptyFallback.calendar.wed
+    , thu = EmptyFallback.calendar.thu
+    , fri = EmptyFallback.calendar.fri
+    , sat = EmptyFallback.calendar.sat
+    , sun = EmptyFallback.calendar.sun
+    , prevMonth = EmptyFallback.calendar.prevMonth
+    , nextMonth = EmptyFallback.calendar.nextMonth
+    }
+
+
 root : Root
 root =
     { filters = filters
@@ -142,4 +168,5 @@ root =
     , sidebar = sidebar
     , contentPlaceholders = contentPlaceholders
     , dropdown = dropdown
+    , calendar = calendar
     }

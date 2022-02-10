@@ -109,6 +109,31 @@ type alias Dropdown =
     }
 
 
+type alias Calendar =
+    { jan : String
+    , feb : String
+    , mar : String
+    , apr : String
+    , may : String
+    , jun : String
+    , jul : String
+    , aug : String
+    , sep : String
+    , oct : String
+    , nov : String
+    , dec : String
+    , mon : String
+    , tue : String
+    , wed : String
+    , thu : String
+    , fri : String
+    , sat : String
+    , sun : String
+    , prevMonth : String
+    , nextMonth : String
+    }
+
+
 type alias Root =
     { filters : Filters
     , paginator : Paginator
@@ -121,4 +146,5 @@ type alias Root =
     , sidebar : Sidebar
     , contentPlaceholders : ContentPlaceholders
     , dropdown : Dropdown
+    , calendar : Calendar
     }

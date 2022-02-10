@@ -128,6 +128,32 @@ dropdown =
     }
 
 
+calendar : Calendar
+calendar =
+    { jan = "January"
+    , feb = "February"
+    , mar = "March"
+    , apr = "April"
+    , may = "May"
+    , jun = "June"
+    , jul = "July"
+    , aug = "August"
+    , sep = "September"
+    , oct = "October"
+    , nov = "November"
+    , dec = "December"
+    , mon = "Mon"
+    , tue = "Tue"
+    , wed = "Wed"
+    , thu = "Thu"
+    , fri = "Fri"
+    , sat = "Sat"
+    , sun = "Sun"
+    , prevMonth = "Previous Month"
+    , nextMonth = "Next Month"
+    }
+
+
 root : Root
 root =
     { filters = filters
@@ -141,4 +167,5 @@ root =
     , sidebar = sidebar
     , contentPlaceholders = contentPlaceholders
     , dropdown = dropdown
+    , calendar = calendar
     }

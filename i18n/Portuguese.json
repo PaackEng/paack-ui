@@ -1,0 +1,93 @@
+{
+    "filters": {
+        "dateFormat": "DD/MM/YYYY",
+        "close": "Fechar",
+        "clear": "Limpar",
+        "apply": "Aplique",
+        "period": {
+            "after": "Após",
+            "before": "Antes",
+            "on": "Em",
+            "description": "Seleccione o período de referência"
+        },
+        "range": {
+            "from": "",
+            "to": ""
+        },
+        "select": {
+            "description": ""
+        }
+    },
+    "paginator": {
+        "format": "",
+        "previous": "Anterior",
+        "next": "Próxima"
+    },
+    "checkbox": {
+        "toggle": ""
+    },
+    "listView": {
+        "search": "Procurar",
+        "selectAll": "Seleccionar todos"
+    },
+    "radio": {
+        "select": ""
+    },
+    "tables": {
+        "details": {
+            "show": "",
+            "collapse": ""
+        },
+        "sorting": {
+            "ascending": "",
+            "descending": ""
+        },
+        "selectRow": "",
+        "selectAll": ""
+    },
+    "dateInput": {
+        "invalid": ""
+    },
+    "dialog": {
+        "close": ""
+    },
+    "sidebar": {
+        "expand": "",
+        "collapse": "",
+        "previous": "",
+        "moreActions": ""
+    },
+    "contentPlaceholders": {
+        "nothingToSeeHere": {
+            "title": "",
+            "body": ""
+        }
+    },
+    "dropdown": {
+        "show": "",
+        "collapse": ""
+    },
+    "calendar": {
+        "jan": "Janeiro",
+        "feb": "Fevereiro",
+        "mar": "Março",
+        "apr": "Abril",
+        "may": "Maio",
+        "jun": "Junho",
+        "jul": "Julho",
+        "aug": "Agosto",
+        "sep": "Setembro",
+        "oct": "Outubro",
+        "nov": "Novembro",
+        "dec": "Dezembro",
+        "mon": "Seg",
+        "tue": "Ter",
+        "wed": "Qua",
+        "thu": "Qui",
+        "fri": "Sex",
+        "sat": "Sáb",
+        "sun": "Dom",
+        "prevMonth": "",
+        "nextMonth": ""
+    }
+}
