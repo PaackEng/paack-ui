@@ -47,6 +47,7 @@ import Time
 import UI.Button as Button
 import UI.Effects as Effects exposing (Effects)
 import UI.Icon as Icon
+import UI.Internal.RenderConfig as RenderConfig
 import UI.Palette as Palette
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Size as Size
@@ -386,9 +387,15 @@ monthPicker renderConfig externalMsg options model firstDay =
 
                 Nothing ->
                     False
+
+        terms =
+            RenderConfig.localeTerms renderConfig
+                |> .calendar
     in
     Element.row [ Element.width fill ]
-        [ Button.fromIcon (Icon.chevronLeft "Previous Month")
+        [ terms.prevMonth
+            |> Icon.chevronLeft
+            |> Button.fromIcon
             |> Button.cmd (externalMsg PreviousMonth) Button.clear
             |> Button.withSize iconSize
             |> Button.withDisabledIf disablePrev
@@ -399,7 +406,9 @@ monthPicker renderConfig externalMsg options model firstDay =
             |> Text.withColor Palette.gray800
             |> Text.renderElement renderConfig
             |> Element.el [ Element.centerX ]
-        , Button.fromIcon (Icon.chevronRight "Next Month")
+        , terms.nextMonth
+            |> Icon.chevronRight
+            |> Button.fromIcon
             |> Button.cmd (externalMsg NextMonth) Button.clear
             |> Button.withSize iconSize
             |> Button.withDisabledIf disableNext
@@ -409,8 +418,13 @@ monthPicker renderConfig externalMsg options model firstDay =
 
 
 weekHeader : RenderConfig -> List String
-weekHeader _ =
-    [ "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" ]
+weekHeader renderConfig =
+    let
+        { mon, tue, wed, thu, fri, sat, sun } =
+            RenderConfig.localeTerms renderConfig
+                |> .calendar
+    in
+    [ mon, tue, wed, thu, fri, sat, sun ]
 
 
 {-| Numbers of the days to show in the calendar
@@ -532,40 +546,45 @@ inRange lowerLimit topperLimit day =
 
 
 monthName : RenderConfig -> Time.Month -> String
-monthName _ month =
+monthName renderConfig month =
+    let
+        terms =
+            RenderConfig.localeTerms renderConfig
+                |> .calendar
+    in
     case month of
         Time.Jan ->
-            "January"
+            terms.jan
 
         Time.Feb ->
-            "February"
+            terms.feb
 
         Time.Mar ->
-            "March"
+            terms.mar
 
         Time.Apr ->
-            "April"
+            terms.apr
 
         Time.May ->
-            "May"
+            terms.may
 
         Time.Jun ->
-            "June"
+            terms.jun
 
         Time.Jul ->
-            "July"
+            terms.jul
 
         Time.Aug ->
-            "August"
+            terms.aug
 
         Time.Sep ->
-            "September"
+            terms.sep
 
         Time.Oct ->
-            "October"
+            terms.oct
 
         Time.Nov ->
-            "Novemeber"
+            terms.nov
 
         Time.Dec ->
-            "December"
+            terms.dec

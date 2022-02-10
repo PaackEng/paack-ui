@@ -1,4 +1,4 @@
-module UI.I18n.Spanish exposing (..)
+module UI.I18n.Portuguese exposing (..)
 
 import UI.I18n.English as EmptyFallback
 import UI.I18n.Types exposing (..)
@@ -6,32 +6,32 @@ import UI.I18n.Types exposing (..)
 
 filtersPeriod : FiltersPeriod
 filtersPeriod =
-    { after = "Después"
+    { after = "Após"
     , before = "Antes"
-    , on = "En"
-    , description = "Seleccionar período de referencia"
+    , on = "Em"
+    , description = "Seleccione o período de referência"
     }
 
 
 filtersRange : FiltersRange
 filtersRange =
-    { from = \{ date } -> "Desde: " ++ date ++ ""
-    , to = \{ date } -> "Hasta: " ++ date ++ ""
+    { from = EmptyFallback.filtersRange.from
+    , to = EmptyFallback.filtersRange.to
     }
 
 
 filtersSelect : FiltersSelect
 filtersSelect =
-    { description = "Seleccionar opción para filtrar"
+    { description = EmptyFallback.filtersSelect.description
     }
 
 
 filters : Filters
 filters =
     { dateFormat = "DD/MM/YYYY"
-    , close = "Cerrar"
-    , clear = "Limpiar"
-    , apply = "Aplicar"
+    , close = "Fechar"
+    , clear = "Limpar"
+    , apply = "Aplique"
     , period = filtersPeriod
     , range = filtersRange
     , select = filtersSelect
@@ -40,35 +40,35 @@ filters =
 
 paginator : Paginator
 paginator =
-    { format = \{ first, last, total } -> "" ++ first ++ " - " ++ last ++ " de " ++ total ++ ""
+    { format = EmptyFallback.paginator.format
     , previous = "Anterior"
-    , next = "Siguiente"
+    , next = "Próxima"
     }
 
 
 checkbox : Checkbox
 checkbox =
-    { toggle = "Agrupar"
+    { toggle = EmptyFallback.checkbox.toggle
     }
 
 
 listView : ListView
 listView =
-    { search = "Buscar"
-    , selectAll = EmptyFallback.listView.selectAll
+    { search = "Procurar"
+    , selectAll = "Seleccionar todos"
     }
 
 
 radio : Radio
 radio =
-    { select = "Seleccionar item"
+    { select = EmptyFallback.radio.select
     }
 
 
 tablesDetails : TablesDetails
 tablesDetails =
-    { show = "Expandir"
-    , collapse = "Colapsar"
+    { show = EmptyFallback.tablesDetails.show
+    , collapse = EmptyFallback.tablesDetails.collapse
     }
 
 
@@ -83,36 +83,36 @@ tables : Tables
 tables =
     { details = tablesDetails
     , sorting = tablesSorting
-    , selectRow = "Seleccionar esta fila."
-    , selectAll = "Seleccionar todas las filas"
+    , selectRow = EmptyFallback.tables.selectRow
+    , selectAll = EmptyFallback.tables.selectAll
     }
 
 
 dateInput : DateInput
 dateInput =
-    { invalid = "Formato de fecha inválido"
+    { invalid = EmptyFallback.dateInput.invalid
     }
 
 
 dialog : Dialog
 dialog =
-    { close = "Cerrar dialogo"
+    { close = EmptyFallback.dialog.close
     }
 
 
 sidebar : Sidebar
 sidebar =
-    { expand = "Expandir barra lateral"
-    , collapse = "Minimizar barra lateral"
-    , previous = "Atrás"
-    , moreActions = "Mas acciones"
+    { expand = EmptyFallback.sidebar.expand
+    , collapse = EmptyFallback.sidebar.collapse
+    , previous = EmptyFallback.sidebar.previous
+    , moreActions = EmptyFallback.sidebar.moreActions
     }
 
 
 contentPlaceholdersNothingToSeeHere : ContentPlaceholdersNothingToSeeHere
 contentPlaceholdersNothingToSeeHere =
-    { title = "Nada que ver aquí"
-    , body = "Mira, trataste de mirar aquí. Esta bien, la vida puede ser difícil a veces cuando no encontramos lo que estamos buscando..."
+    { title = EmptyFallback.contentPlaceholdersNothingToSeeHere.title
+    , body = EmptyFallback.contentPlaceholdersNothingToSeeHere.body
     }
 
 
@@ -131,23 +131,23 @@ dropdown =
 
 calendar : Calendar
 calendar =
-    { jan = "Enero"
-    , feb = "Febrero"
-    , mar = "Marzo"
+    { jan = "Janeiro"
+    , feb = "Fevereiro"
+    , mar = "Março"
     , apr = "Abril"
-    , may = "Mayo"
-    , jun = "Junio"
-    , jul = "Julio"
+    , may = "Maio"
+    , jun = "Junho"
+    , jul = "Julho"
     , aug = "Agosto"
-    , sep = "Septiembre"
-    , oct = "Octubre"
-    , nov = "Noviembre"
-    , dec = "Diciembre"
-    , mon = "Lun"
-    , tue = "Mar"
-    , wed = "Mié"
-    , thu = "Jue"
-    , fri = "Vie"
+    , sep = "Setembro"
+    , oct = "Outubro"
+    , nov = "Novembro"
+    , dec = "Dezembro"
+    , mon = "Seg"
+    , tue = "Ter"
+    , wed = "Qua"
+    , thu = "Qui"
+    , fri = "Sex"
     , sat = "Sáb"
     , sun = "Dom"
     , prevMonth = EmptyFallback.calendar.prevMonth

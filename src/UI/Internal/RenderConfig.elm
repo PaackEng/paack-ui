@@ -3,6 +3,7 @@ module UI.Internal.RenderConfig exposing (Locale(..), RenderConfig(..), RenderCo
 import Element
 import UI.I18n.English as LangEnglish
 import UI.I18n.French as LangFrench
+import UI.I18n.Portuguese as LangPortuguese
 import UI.I18n.Spanish as LangSpanish
 import UI.I18n.Types as I18n
 
@@ -20,8 +21,9 @@ type RenderConfig
 
 type Locale
     = English
-    | Spanish
     | French
+    | Portuguese
+    | Spanish
 
 
 localeTerms : RenderConfig -> I18n.Root
@@ -30,8 +32,11 @@ localeTerms (RenderConfig { locale }) =
         English ->
             LangEnglish.root
 
-        Spanish ->
-            LangSpanish.root
-
         French ->
             LangFrench.root
+
+        Portuguese ->
+            LangPortuguese.root
+
+        Spanish ->
+            LangSpanish.root

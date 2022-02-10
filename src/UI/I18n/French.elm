@@ -129,6 +129,32 @@ dropdown =
     }
 
 
+calendar : Calendar
+calendar =
+    { jan = "Janvier"
+    , feb = "Février"
+    , mar = "Mars"
+    , apr = "Avril"
+    , may = "Mai"
+    , jun = "Juin"
+    , jul = "Juillet"
+    , aug = "Août"
+    , sep = "Septembre"
+    , oct = "Octobre"
+    , nov = "Novembre"
+    , dec = "Décembre"
+    , mon = "Lun"
+    , tue = "Mar"
+    , wed = "Mer"
+    , thu = "Jeu"
+    , fri = "Ven"
+    , sat = "Sam"
+    , sun = "Dim"
+    , prevMonth = EmptyFallback.calendar.prevMonth
+    , nextMonth = EmptyFallback.calendar.nextMonth
+    }
+
+
 root : Root
 root =
     { filters = filters
@@ -142,4 +168,5 @@ root =
     , sidebar = sidebar
     , contentPlaceholders = contentPlaceholders
     , dropdown = dropdown
+    , calendar = calendar
     }

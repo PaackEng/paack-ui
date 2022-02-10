@@ -66,5 +66,28 @@
     "dropdown": {
         "show": "",
         "collapse": ""
+    },
+    "calendar": {
+        "jan": "Janvier",
+        "feb": "Février",
+        "mar": "Mars",
+        "apr": "Avril",
+        "may": "Mai",
+        "jun": "Juin",
+        "jul": "Juillet",
+        "aug": "Août",
+        "sep": "Septembre",
+        "oct": "Octobre",
+        "nov": "Novembre",
+        "dec": "Décembre",
+        "mon": "Lun",
+        "tue": "Mar",
+        "wed": "Mer",
+        "thu": "Jeu",
+        "fri": "Ven",
+        "sat": "Sam",
+        "sun": "Dim",
+        "prevMonth": "",
+        "nextMonth": ""
     }
 }
