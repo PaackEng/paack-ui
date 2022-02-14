@@ -1,7 +1,7 @@
 module UI.Tables.Stateful exposing
-    ( StatefulTable, StatefulConfig, table, withItems, withPaginator
+    ( StatefulTable, StatefulConfig, table, withItems
     , Responsive, Cover, Details, Detail, withResponsive, detailsEmpty, detailShown, detailHidden
-    , State, Msg, init, update, stateWithItems
+    , State, Msg, init, update, stateWithItems, stateWithPaginator
     , Filters, filtersEmpty, stateWithFilters
     , localSingleTextFilter, remoteSingleTextFilter
     , localMultiTextFilter, remoteMultiTextFilter
@@ -99,7 +99,7 @@ And on model:
 
 ## State
 
-@docs State, Msg, init, update, stateWithItems
+@docs State, Msg, init, update, stateWithItems, stateWithPaginator
 
 
 # Filters
@@ -226,7 +226,6 @@ type alias Options msg item columns =
     { overwriteItems : Maybe (List item)
     , width : Element.Length
     , responsive : Maybe (Responsive msg item columns)
-    , paginator : Bool
     }
 
 
@@ -251,7 +250,6 @@ defaultOptions =
     { overwriteItems = Nothing
     , width = shrink
     , responsive = Nothing
-    , paginator = True
     }
 
 
@@ -273,11 +271,6 @@ Each of these items will become a row in this table.
 withItems : List item -> StatefulTable msg item columns -> StatefulTable msg item columns
 withItems items (Table prop opt) =
     Table prop { opt | overwriteItems = Just items }
-
-
-withPaginator : StatefulTable msg item columns -> StatefulTable msg item columns
-withPaginator (Table prop opt) =
-    Table prop { opt | paginator = True }
 
 
 
@@ -313,9 +306,14 @@ type alias StateModel msg item columns =
     , items : List item
     , visibleItems : List item
     , sorters : Maybe (Sorters item columns)
-    , paginatorState : Paginator.State
-    , paginateFrom : Int
-    , paginateBy : Int
+    , paginator : Maybe PaginatorState
+    }
+
+
+type alias PaginatorState =
+    { state : Paginator.State
+    , from : Int
+    , by : Int
     }
 
 
@@ -349,9 +347,7 @@ init =
         , items = []
         , visibleItems = []
         , sorters = Nothing
-        , paginatorState = Paginator.init
-        , paginateFrom = 0
-        , paginateBy = 15
+        , paginator = Nothing
         }
 
 
@@ -379,6 +375,23 @@ stateWithItems items (State state) =
         }
 
 
+{-| Displays an paginator at the bottom of the table.
+
+    withPaginator someTable
+
+-}
+stateWithPaginator : State msg item columns -> State msg item columns
+stateWithPaginator (State state) =
+    { state
+        | paginator =
+            PaginatorState Paginator.init
+                0
+                25
+                |> Just
+    }
+        |> State
+
+
 {-| Given a message, apply an update to the [`Table.State`](#State).
 Do not ignore the returned `Cmd`, it may include remote filter's messages.
 
@@ -399,20 +412,31 @@ update msg (State state) =
             updateSorters state subMsg
 
         PaginatorToggleMenu ->
-            ( State { state | paginatorState = Paginator.toggleMenu state.paginatorState }
+            ( State
+                { state
+                    | paginator =
+                        Maybe.map (\paginator -> { paginator | state = Paginator.toggleMenu paginator.state })
+                            state.paginator
+                }
             , Effects.none
             )
 
         PaginateFrom item ->
-            ( State { state | paginateFrom = item }
+            ( State
+                { state
+                    | paginator =
+                        Maybe.map (\paginator -> { paginator | from = item })
+                            state.paginator
+                }
             , Effects.none
             )
 
         PaginateBy amount ->
             ( State
                 { state
-                    | paginateBy = amount
-                    , paginatorState = Paginator.toggleMenu state.paginatorState
+                    | paginator =
+                        Maybe.map (\paginator -> { paginator | by = amount })
+                            state.paginator
                 }
             , Effects.none
             )
@@ -1357,19 +1381,21 @@ desktopView renderConfig prop opt =
         items =
             viewGetItems state opt
 
-        items_ =
-            if opt.paginator then
-                items
-                    |> List.drop state.paginateFrom
-                    |> List.take state.paginateBy
+        ( items_, footer ) =
+            case state.paginator of
+                Just ({ from, by } as paginator) ->
+                    ( items
+                        |> List.drop from
+                        |> List.take by
+                    , paginator
+                        |> viewPaginator renderConfig (List.length items)
+                        |> Element.map prop.toExternalMsg
+                        |> Tuple.pair "paginator"
+                        |> List.singleton
+                    )
 
-            else
-                items
-
-        paginator =
-            state
-                |> viewPaginator renderConfig (List.length items)
-                |> Element.map prop.toExternalMsg
+                Nothing ->
+                    ( items, [] )
 
         rows =
             List.map (rowWithSelection renderConfig prop.toExternalMsg state prop.toRow columns) items_
@@ -1394,20 +1420,20 @@ desktopView renderConfig prop opt =
         , Element.width opt.width
         , Element.paddingEach padding
         ]
-        (headers :: rows ++ [ ( "paginator", paginator ) ])
+        (headers :: rows ++ footer)
 
 
-viewPaginator : RenderConfig -> Int -> StateModel msg item columns -> Element (Msg item)
-viewPaginator renderConfig length state =
-    { onChangeItem = PaginateFrom
-    , onChangePageAmount = PaginateBy
+viewPaginator : RenderConfig -> Int -> PaginatorState -> Element (Msg item)
+viewPaginator renderConfig length { state, from, by } =
+    { onChangeIndex = PaginateFrom
+    , onChangeAmountByPage = PaginateBy
     , onToggleMenu = PaginatorToggleMenu
     , totalAmount = length
-    , state = state.paginatorState
+    , state = state
     }
-        |> Paginator.paginator
-        |> Paginator.withPageAmount state.paginateBy
-        |> Paginator.withCurrentItem state.paginateFrom
+        |> Paginator.basic
+        |> Paginator.withAmountByPage by
+        |> Paginator.withIndex from
         |> Paginator.renderElement renderConfig
 
 
