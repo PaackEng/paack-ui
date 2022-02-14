@@ -350,8 +350,8 @@ init =
         , visibleItems = []
         , sorters = Nothing
         , paginatorState = Paginator.init
-        , paginateFrom = 1
-        , paginateBy = 25
+        , paginateFrom = 0
+        , paginateBy = 15
         }
 
 

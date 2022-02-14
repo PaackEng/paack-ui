@@ -115,8 +115,8 @@ paginator :
 paginator prop =
     Paginator prop
         { currentItem = 1
-        , pageAmount = 25
-        , amountOptions = [ 25, 50, 100 ]
+        , pageAmount = 15
+        , amountOptions = [ 15, 25, 50, 100 ]
         }
 
 
@@ -193,29 +193,35 @@ withPageAmountOptions amountOptions (Paginator prop opt) =
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
 renderElement : RenderConfig -> Paginator msg -> Element msg
-renderElement renderConfig ((Paginator prop opt) as paginator_) =
-    let
-        { totalAmount } =
-            prop
-
-        { currentItem, pageAmount } =
-            opt
-
-        maxItemRange =
-            currentItem + pageAmount
-    in
+renderElement renderConfig paginator_ =
     Keyed.row
         [ Element.width Element.fill ]
-        [ rangeInfo renderConfig
-            currentItem
-            maxItemRange
-            totalAmount
+        [ rangeInfo renderConfig paginator_
             |> Tuple.pair "current-range"
         , renderPaginator renderConfig paginator_
             |> Tuple.pair "indexer"
         , pageAmountSelector renderConfig paginator_
             |> Tuple.pair "page-amount-selector"
         ]
+
+
+rangeInfo : RenderConfig -> Paginator msg -> Element msg
+rangeInfo renderConfig (Paginator { totalAmount } { currentItem, pageAmount }) =
+    let
+        paginatorFormat =
+            renderConfig
+                |> localeTerms
+                |> .paginator
+                |> .tableFormat
+    in
+    paginatorFormat
+        { first = String.fromInt currentItem
+        , last = String.fromInt (min (currentItem + pageAmount) totalAmount)
+        , total = String.fromInt totalAmount
+        }
+        |> Text.body2
+        |> Text.renderElement renderConfig
+        |> Element.el [ Element.width <| Element.px 160 ]
 
 
 renderPaginator : RenderConfig -> Paginator msg -> Element msg
@@ -228,22 +234,13 @@ renderPaginator renderConfig ((Paginator prop opt) as paginator_) =
             opt
 
         currentPage =
-            floor <| toFloat currentItem / toFloat pageAmount
+            ceiling <| toFloat currentItem / toFloat pageAmount
 
         isFistPage =
             currentPage <= 1
 
         isLastPage =
-            nextPage >= pageAmount
-
-        previousPage =
-            (currentPage - 1) * pageAmount
-
-        nextPage =
-            (currentPage + 1) * pageAmount
-
-        totalPages =
-            ceiling <| toFloat totalAmount / toFloat pageAmount
+            currentPage >= ceiling (toFloat totalAmount / toFloat pageAmount)
     in
     Keyed.row
         [ Element.spacingXY 8 0
@@ -254,134 +251,34 @@ renderPaginator renderConfig ((Paginator prop opt) as paginator_) =
             isFistPage
             |> Tuple.pair "first-page"
         , previousButton renderConfig
-            (onChangeItem previousPage)
+            (onChangeItem <| (currentPage - 1) * pageAmount)
             isFistPage
             |> Tuple.pair "previous-page"
         , renderPages renderConfig paginator_
             |> Tuple.pair "indexer"
         , nextButton
             renderConfig
-            (onChangeItem nextPage)
+            (onChangeItem <| (currentPage + 1) * pageAmount)
             isLastPage
             |> Tuple.pair "next-page"
         , lastPageButton renderConfig
-            (onChangeItem totalPages)
+            (onChangeItem <| ceiling <| toFloat totalAmount / toFloat pageAmount)
             isLastPage
             |> Tuple.pair "last-page"
         ]
 
 
-renderPages : RenderConfig -> Paginator msg -> Element msg
-renderPages renderConfig (Paginator prop opt) =
-    let
-        { onChangeItem, totalAmount } =
-            prop
-
-        { currentItem, pageAmount } =
-            opt
-
-        currentPage =
-            currentItem // pageAmount
-
-        maxItemRange =
-            currentItem + pageAmount
-
-        totalPages =
-            ceiling <| toFloat totalAmount / toFloat pageAmount
-
-        ( leftPageRange, currentPage_, rightPageRange ) =
-            pageRanges totalPages maxItemRange currentPage
-    in
-    Keyed.row
-        [ Element.spacingXY 2 0
-        , Element.paddingXY 8 0
-        ]
-        [ leftPageRange
-            |> List.map
-                (changeIndexButton
-                    renderConfig
-                    currentItem
-                    onChangeItem
-                )
-            |> Element.row []
-            |> Tuple.pair "previous-range"
-        , changeIndexButton
-            renderConfig
-            currentItem
-            onChangeItem
-            currentPage_
-            |> Tuple.pair "current-page"
-        , rightPageRange
-            |> List.map
-                (changeIndexButton
-                    renderConfig
-                    currentItem
-                    onChangeItem
-                )
-            |> Element.row []
-            |> Tuple.pair "next-range"
-        ]
-
-
-pageRanges : Int -> Int -> Int -> ( List Int, Int, List Int )
-pageRanges total range page =
-    let
-        page_ =
-            max page 1
-
-        from =
-            page_
-                - range
-                - max 0 ((page_ + range) - total)
-                |> max 1
-
-        to =
-            page_
-                + range
-                + abs (min 0 (page_ - 1 - range))
-                |> min total
-
-        left =
-            if page_ > 1 then
-                List.range (max 1 from) (page_ - 1)
-
-            else
-                []
-
-        right =
-            if page_ < total then
-                List.range (page_ + 1) (min total to)
-
-            else
-                []
-    in
-    ( left, page_, right )
-
-
-rangeInfo : RenderConfig -> Int -> Int -> Int -> Element msg
-rangeInfo renderConfig currentItem maxItemRange totalAmount =
-    let
-        paginatorFormat =
-            renderConfig
-                |> localeTerms
-                |> .paginator
-                |> .tableFormat
-    in
-    paginatorFormat
-        { first = String.fromInt currentItem
-        , last =
-            String.fromInt
-                (if maxItemRange >= totalAmount then
-                    totalAmount
-
-                 else
-                    maxItemRange
-                )
-        , total = String.fromInt totalAmount
-        }
-        |> Text.body2
-        |> Text.renderElement renderConfig
-        |> Element.el [ Element.width <| Element.px 160 ]
+firstPageButton : RenderConfig -> msg -> Bool -> Element msg
+firstPageButton renderConfig msg isDisabled =
+    renderConfig
+        |> localeTerms
+        |> .paginator
+        |> .first
+        |> Button.fromLabel
+        |> Button.cmd msg Button.light
+        |> Button.withSize Size.small
+        |> Button.withDisabledIf isDisabled
+        |> Button.renderElement renderConfig
 
 
 previousButton : RenderConfig -> msg -> Bool -> Element msg
@@ -399,6 +296,63 @@ previousButton renderConfig msg isDisabled =
         |> Button.renderElement renderConfig
 
 
+renderPages : RenderConfig -> Paginator msg -> Element msg
+renderPages renderConfig ((Paginator { totalAmount } { currentItem, pageAmount }) as paginator_) =
+    let
+        currentPage =
+            currentItem // pageAmount
+
+        ( leftPageRange, rightPageRange ) =
+            pageRanges
+                (ceiling <| toFloat totalAmount / toFloat pageAmount)
+                pageAmount
+                currentPage
+    in
+    Keyed.row
+        [ Element.spacingXY 2 0
+        , Element.paddingXY 8 0
+        ]
+        [ leftPageRange
+            |> List.map (changeIndexButton renderConfig paginator_ False)
+            |> Element.row []
+            |> Tuple.pair "previous-range"
+        , changeIndexButton renderConfig paginator_ True currentPage
+            |> Tuple.pair "current-page"
+        , rightPageRange
+            |> List.map (changeIndexButton renderConfig paginator_ False)
+            |> Element.row []
+            |> Tuple.pair "next-range"
+        ]
+
+
+pageRanges : Int -> Int -> Int -> ( List Int, List Int )
+pageRanges total range page =
+    let
+        from =
+            page
+                - range
+                - max 0 ((page + range) - total)
+                |> max 0
+
+        to =
+            page
+                + range
+                + abs (min 0 (page - 1 - range))
+                |> min total
+    in
+    ( if page > 0 then
+            List.range (max 0 from) (page - 1)
+
+        else
+            []
+    , if page < total then
+            List.range (page + 1) (min total to)
+
+        else
+            []
+    )
+
+
 nextButton : RenderConfig -> msg -> Bool -> Element msg
 nextButton renderConfig msg isDisabled =
     Button.fromIcon
@@ -408,19 +362,6 @@ nextButton renderConfig msg isDisabled =
             |> .next
             |> Icon.nextContent
         )
-        |> Button.cmd msg Button.light
-        |> Button.withSize Size.small
-        |> Button.withDisabledIf isDisabled
-        |> Button.renderElement renderConfig
-
-
-firstPageButton : RenderConfig -> msg -> Bool -> Element msg
-firstPageButton renderConfig msg isDisabled =
-    renderConfig
-        |> localeTerms
-        |> .paginator
-        |> .first
-        |> Button.fromLabel
         |> Button.cmd msg Button.light
         |> Button.withSize Size.small
         |> Button.withDisabledIf isDisabled
@@ -440,11 +381,11 @@ lastPageButton renderConfig msg isDisabled =
         |> Button.renderElement renderConfig
 
 
-changeIndexButton : RenderConfig -> Int -> (Int -> msg) -> Int -> Element msg
-changeIndexButton renderConfig currentItem onChangeItem item =
-    Button.fromLabel (String.fromInt item)
-        |> Button.cmd (onChangeItem item)
-            (if item == currentItem then
+changeIndexButton : RenderConfig -> Paginator msg -> Bool -> Int -> Element msg
+changeIndexButton renderConfig (Paginator { onChangeItem } { pageAmount }) currentPage item =
+    Button.fromLabel (String.fromInt <| item + 1)
+        |> Button.cmd (onChangeItem <| item * pageAmount)
+            (if currentPage then
                 Button.primary
 
              else
