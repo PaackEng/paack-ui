@@ -1,7 +1,7 @@
 module UI.Internal.Tables.Paginator exposing
     ( Paginator, paginator
-    , State, Msg, init, update
-    , withCurrentItem, withPageAmountOptions
+    , State, init, toggleMenu
+    , withCurrentItem, withPageAmount, withPageAmountOptions
     , renderElement
     )
 
@@ -42,12 +42,12 @@ The following code applies the paginator to some simple list, and also applies p
 
 # State
 
-@docs State, Msg, init, update
+@docs State, init, toggleMenu
 
 
 # Options
 
-@docs withCurrentItem, withPageAmountOptions
+@docs withCurrentItem, withPageAmount, withPageAmountOptions
 
 
 # Rendering
@@ -79,7 +79,8 @@ type Paginator msg
 
 type alias Properties msg =
     { onChangeItem : Int -> msg
-    , onPaginatorMsg : Msg -> msg
+    , onChangePageAmount : Int -> msg
+    , onToggleMenu : msg
     , totalAmount : Int
     , state : State
     }
@@ -87,6 +88,7 @@ type alias Properties msg =
 
 type alias Options =
     { currentItem : Int
+    , pageAmount : Int
     , amountOptions : List Int
     }
 
@@ -104,7 +106,8 @@ type alias Options =
 -}
 paginator :
     { onChangeItem : Int -> msg
-    , onPaginatorMsg : Msg -> msg
+    , onChangePageAmount : Int -> msg
+    , onToggleMenu : msg
     , totalAmount : Int
     , state : State
     }
@@ -112,17 +115,13 @@ paginator :
 paginator prop =
     Paginator prop
         { currentItem = 1
+        , pageAmount = 25
         , amountOptions = [ 25, 50, 100 ]
         }
 
 
 
 -- State
-
-
-type Msg
-    = ChangeAmount Int
-    | ToggleMenu
 
 
 {-| Keep this one in your Model, it holds the paginator's state.
@@ -132,9 +131,7 @@ type State
 
 
 type alias StateModel =
-    { pageAmount : Int
-    , menu : Bool
-    }
+    { menu : Bool }
 
 
 {-| The correct way of instantiating a [`Paginator.State`](#State).
@@ -148,9 +145,7 @@ type alias StateModel =
 init : State
 init =
     State
-        { pageAmount = 25
-        , menu = False
-        }
+        { menu = False }
 
 
 {-| Given a message, apply an update to the [`Paginator.State`](#State).
@@ -159,14 +154,9 @@ init =
         Paginator.update subMsg oldModel.paginatorState
 
 -}
-update : Msg -> State -> State
-update msg (State state) =
-    case msg of
-        ChangeAmount amount ->
-            State { state | pageAmount = amount }
-
-        ToggleMenu ->
-            State { state | menu = not state.menu }
+toggleMenu : State -> State
+toggleMenu (State state) =
+    State { state | menu = not state.menu }
 
 
 
@@ -179,6 +169,13 @@ Paginator.withCurrentItem 11 somePaginator
 withCurrentItem : Int -> Paginator msg -> Paginator msg
 withCurrentItem item (Paginator prop opt) =
     Paginator prop { opt | currentItem = item }
+
+
+{-| TODO: DOC
+-}
+withPageAmount : Int -> Paginator msg -> Paginator msg
+withPageAmount pageAmount (Paginator prop opt) =
+    Paginator prop { opt | pageAmount = pageAmount }
 
 
 {-| TODO: DOC
@@ -196,13 +193,48 @@ withPageAmountOptions amountOptions (Paginator prop opt) =
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
 renderElement : RenderConfig -> Paginator msg -> Element msg
-renderElement renderConfig (Paginator { onChangeItem, onPaginatorMsg, totalAmount, state } { currentItem, amountOptions }) =
+renderElement renderConfig ((Paginator prop opt) as paginator_) =
     let
-        (State { pageAmount }) =
-            state
+        { totalAmount } =
+            prop
+
+        { currentItem, pageAmount } =
+            opt
+
+        maxItemRange =
+            currentItem + pageAmount
+    in
+    Keyed.row
+        [ Element.width Element.fill ]
+        [ rangeInfo renderConfig
+            currentItem
+            maxItemRange
+            totalAmount
+            |> Tuple.pair "current-range"
+        , renderPaginator renderConfig paginator_
+            |> Tuple.pair "indexer"
+        , pageAmountSelector renderConfig paginator_
+            |> Tuple.pair "page-amount-selector"
+        ]
+
+
+renderPaginator : RenderConfig -> Paginator msg -> Element msg
+renderPaginator renderConfig ((Paginator prop opt) as paginator_) =
+    let
+        { onChangeItem, totalAmount } =
+            prop
+
+        { currentItem, pageAmount } =
+            opt
 
         currentPage =
-            currentItem // pageAmount
+            floor <| toFloat currentItem / toFloat pageAmount
+
+        isFistPage =
+            currentPage <= 1
+
+        isLastPage =
+            nextPage >= pageAmount
 
         previousPage =
             (currentPage - 1) * pageAmount
@@ -210,77 +242,120 @@ renderElement renderConfig (Paginator { onChangeItem, onPaginatorMsg, totalAmoun
         nextPage =
             (currentPage + 1) * pageAmount
 
+        totalPages =
+            ceiling <| toFloat totalAmount / toFloat pageAmount
+    in
+    Keyed.row
+        [ Element.spacingXY 8 0
+        , Element.centerX
+        ]
+        [ firstPageButton renderConfig
+            (onChangeItem 1)
+            isFistPage
+            |> Tuple.pair "first-page"
+        , previousButton renderConfig
+            (onChangeItem previousPage)
+            isFistPage
+            |> Tuple.pair "previous-page"
+        , renderPages renderConfig paginator_
+            |> Tuple.pair "indexer"
+        , nextButton
+            renderConfig
+            (onChangeItem nextPage)
+            isLastPage
+            |> Tuple.pair "next-page"
+        , lastPageButton renderConfig
+            (onChangeItem totalPages)
+            isLastPage
+            |> Tuple.pair "last-page"
+        ]
+
+
+renderPages : RenderConfig -> Paginator msg -> Element msg
+renderPages renderConfig (Paginator prop opt) =
+    let
+        { onChangeItem, totalAmount } =
+            prop
+
+        { currentItem, pageAmount } =
+            opt
+
+        currentPage =
+            currentItem // pageAmount
+
         maxItemRange =
             currentItem + pageAmount
 
         totalPages =
             ceiling <| toFloat totalAmount / toFloat pageAmount
 
-        ( leftPageRange, rightPageRange ) =
+        ( leftPageRange, currentPage_, rightPageRange ) =
             pageRanges totalPages maxItemRange currentPage
     in
-    Keyed.row []
-        [ ( "current-range"
-          , rangeInfo renderConfig
-                currentItem
-                maxItemRange
-                totalAmount
-          )
-        , ( "first-page"
-          , firstPageButton renderConfig
-                (onChangeItem 1)
-          )
-        , ( "previous-page"
-          , previousButton renderConfig
-                (onChangeItem previousPage)
-                (previousPage < 1)
-          )
-        , ( "previous-range"
-          , leftPageRange
-                |> List.map
-                    (changeIndexButton
-                        renderConfig
-                        currentItem
-                        onChangeItem
-                    )
-                |> Element.row []
-          )
-        , ( "current-page"
-          , changeIndexButton
-                renderConfig
-                currentItem
-                onChangeItem
-                currentPage
-          )
-        , ( "next-range"
-          , rightPageRange
-                |> List.map
-                    (changeIndexButton
-                        renderConfig
-                        currentItem
-                        onChangeItem
-                    )
-                |> Element.row []
-          )
-        , ( "next-page"
-          , nextButton
-                renderConfig
-                (onChangeItem nextPage)
-                (nextPage > pageAmount)
-          )
-        , ( "last-page"
-          , lastPageButton renderConfig
-                (onChangeItem totalPages)
-          )
-        , ( "page-amount-selector"
-          , case amountOptions of
-                [] ->
-                    Element.none
-
-                _ ->
-                    pageAmountSelector renderConfig onPaginatorMsg amountOptions pageAmount
-          )
+    Keyed.row
+        [ Element.spacingXY 2 0
+        , Element.paddingXY 8 0
         ]
+        [ leftPageRange
+            |> List.map
+                (changeIndexButton
+                    renderConfig
+                    currentItem
+                    onChangeItem
+                )
+            |> Element.row []
+            |> Tuple.pair "previous-range"
+        , changeIndexButton
+            renderConfig
+            currentItem
+            onChangeItem
+            currentPage_
+            |> Tuple.pair "current-page"
+        , rightPageRange
+            |> List.map
+                (changeIndexButton
+                    renderConfig
+                    currentItem
+                    onChangeItem
+                )
+            |> Element.row []
+            |> Tuple.pair "next-range"
+        ]
+
+
+pageRanges : Int -> Int -> Int -> ( List Int, Int, List Int )
+pageRanges total range page =
+    let
+        page_ =
+            max page 1
+
+        from =
+            page_
+                - range
+                - max 0 ((page_ + range) - total)
+                |> max 1
+
+        to =
+            page_
+                + range
+                + abs (min 0 (page_ - 1 - range))
+                |> min total
+
+        left =
+            if page_ > 1 then
+                List.range (max 1 from) (page_ - 1)
+
+            else
+                []
+
+        right =
+            if page_ < total then
+                List.range (page_ + 1) (min total to)
+
+            else
+                []
+    in
+    ( left, page_, right )
 
 
 rangeInfo : RenderConfig -> Int -> Int -> Int -> Element msg
@@ -306,6 +381,7 @@ rangeInfo renderConfig currentItem maxItemRange totalAmount =
         }
         |> Text.body2
         |> Text.renderElement renderConfig
+        |> Element.el [ Element.width <| Element.px 160 ]
 
 
 previousButton : RenderConfig -> msg -> Bool -> Element msg
@@ -338,30 +414,29 @@ nextButton renderConfig msg isDisabled =
         |> Button.renderElement renderConfig
 
 
-firstPageButton : RenderConfig -> msg -> Element msg
-firstPageButton renderConfig msg =
+firstPageButton : RenderConfig -> msg -> Bool -> Element msg
+firstPageButton renderConfig msg isDisabled =
     renderConfig
         |> localeTerms
         |> .paginator
         |> .first
         |> Button.fromLabel
-        -- TODO
-        |> Button.cmd msg
-            Button.light
+        |> Button.cmd msg Button.light
         |> Button.withSize Size.small
+        |> Button.withDisabledIf isDisabled
         |> Button.renderElement renderConfig
 
 
-lastPageButton : RenderConfig -> msg -> Element msg
-lastPageButton renderConfig msg =
+lastPageButton : RenderConfig -> msg -> Bool -> Element msg
+lastPageButton renderConfig msg isDisabled =
     renderConfig
         |> localeTerms
         |> .paginator
         |> .last
         |> Button.fromLabel
-        |> Button.cmd msg
-            Button.light
+        |> Button.cmd msg Button.light
         |> Button.withSize Size.small
+        |> Button.withDisabledIf isDisabled
         |> Button.renderElement renderConfig
 
 
@@ -379,60 +454,49 @@ changeIndexButton renderConfig currentItem onChangeItem item =
         |> Button.renderElement renderConfig
 
 
-pageRanges : Int -> Int -> Int -> ( List Int, List Int )
-pageRanges total range page =
-    let
-        from =
-            page
-                - range
-                - max 0 ((page + range) - total)
-                |> max 1
-
-        to =
-            page
-                + range
-                + abs (min 0 (page - 1 - range))
-                |> min total
-
-        left =
-            if page > 1 then
-                List.range (max 1 from) (page - 1)
-
-            else
-                []
-
-        right =
-            if page < total then
-                List.range (page + 1) (min total to)
-
-            else
-                []
-    in
-    ( left, right )
-
-
-pageAmountSelector : RenderConfig -> (Msg -> msg) -> List Int -> Int -> Element msg
-pageAmountSelector renderConfig onPaginatorMsg amountOptions pageAmount =
-    Keyed.row []
-        [ ( "rows-page"
-          , Text.body2 "Rows/Page"
+pageAmountSelector : RenderConfig -> Paginator msg -> Element msg
+pageAmountSelector renderConfig ((Paginator _ { amountOptions }) as paginator_) =
+    if not <| List.isEmpty amountOptions then
+        Keyed.row
+            [ Element.width <| Element.px 160
+            , Element.spacingXY 8 0
+            ]
+            [ Text.body2 "Rows/Page"
                 |> Text.renderElement renderConfig
-          )
-        , ( "amount-menu"
-          , amountMenu renderConfig onPaginatorMsg amountOptions pageAmount
-          )
+                |> Tuple.pair "rows-page"
+            , paginator_
+                |> amountMenu renderConfig
+                |> Tuple.pair "amount-menu"
+            ]
+
+    else
+        emptyAmountMenu
+
+
+emptyAmountMenu : Element msg
+emptyAmountMenu =
+    Element.el
+        [ Element.alignRight
+        , Element.width <| Element.px 160
         ]
+        Element.none
 
 
-amountMenu : RenderConfig -> (Msg -> msg) -> List Int -> Int -> Element msg
-amountMenu renderConfig onPaginatorMsg amountOptions pageAmount =
-    Button.fromLabel (String.fromInt pageAmount)
-        |> Button.cmd (onPaginatorMsg ToggleMenu) Button.light
+amountMenu : RenderConfig -> Paginator msg -> Element msg
+amountMenu renderConfig (Paginator prop opt) =
+    let
+        { onToggleMenu, onChangePageAmount, state } =
+            prop
+
+        { amountOptions, pageAmount } =
+            opt
+    in
+    Button.fromLabeledOnLeftIcon (Icon.chevronDown <| String.fromInt pageAmount)
+        |> Button.cmd onToggleMenu Button.light
         |> Button.withSize Size.small
-        |> Menu.menu (onPaginatorMsg ToggleMenu)
-            (List.map (amountMenuItem (ChangeAmount >> onPaginatorMsg))
-                amountOptions
-            )
+        |> Menu.menu onToggleMenu
+            (List.map (amountMenuItem onChangePageAmount) amountOptions)
+        |> Menu.setVisible (menuIsVisible state)
         |> Menu.renderElement renderConfig
 
 
@@ -441,3 +505,8 @@ amountMenuItem onChangePageAmount amountOption =
     amountOption
         |> String.fromInt
         |> Menu.item (onChangePageAmount amountOption) Nothing
+
+
+menuIsVisible : State -> Bool
+menuIsVisible (State { menu }) =
+    menu

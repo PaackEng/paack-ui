@@ -64,8 +64,12 @@ sorters =
         |> Stateful.sortByInt (.read >> posixToMillis)
 
 
-books : List Book
 books =
+    books_ ++ books_ ++ books_ ++ books_ ++ books_ ++ books_ ++ books_ ++ books_ ++ books_ ++ books_ ++ books_ ++ books_ ++ books_ ++ books_ ++ books_ ++ books_ ++ books_ ++ books_ ++ books_
+
+
+books_ : List Book
+books_ =
     [ { author = "Dan Brown"
       , title = "Angels & Demons"
       , year = 2000

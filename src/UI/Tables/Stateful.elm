@@ -1,5 +1,5 @@
 module UI.Tables.Stateful exposing
-    ( StatefulTable, StatefulConfig, table, withItems
+    ( StatefulTable, StatefulConfig, table, withItems, withPaginator
     , Responsive, Cover, Details, Detail, withResponsive, detailsEmpty, detailShown, detailHidden
     , State, Msg, init, update, stateWithItems
     , Filters, filtersEmpty, stateWithFilters
@@ -89,7 +89,7 @@ And on model:
 
 # Stateful
 
-@docs StatefulTable, StatefulConfig, table, withItems
+@docs StatefulTable, StatefulConfig, table, withItems, withPaginator
 
 
 ## Mobile
@@ -184,6 +184,7 @@ import UI.Internal.Tables.Common exposing (..)
 import UI.Internal.Tables.Filters as Filters
 import UI.Internal.Tables.FiltersView as FiltersView
 import UI.Internal.Tables.ListView as ListView
+import UI.Internal.Tables.Paginator as Paginator
 import UI.Internal.Tables.Sorters as Sorters exposing (Sorters)
 import UI.Internal.Tables.View exposing (..)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
@@ -225,6 +226,7 @@ type alias Options msg item columns =
     { overwriteItems : Maybe (List item)
     , width : Element.Length
     , responsive : Maybe (Responsive msg item columns)
+    , paginator : Bool
     }
 
 
@@ -249,6 +251,7 @@ defaultOptions =
     { overwriteItems = Nothing
     , width = shrink
     , responsive = Nothing
+    , paginator = True
     }
 
 
@@ -272,6 +275,11 @@ withItems items (Table prop opt) =
     Table prop { opt | overwriteItems = Just items }
 
 
+withPaginator : StatefulTable msg item columns -> StatefulTable msg item columns
+withPaginator (Table prop opt) =
+    Table prop { opt | paginator = True }
+
+
 
 -- State
 
@@ -282,6 +290,9 @@ type Msg item
     = MobileToggle Int
     | ForFilters Filters.Msg
     | ForSorters Sorters.Msg
+    | PaginatorToggleMenu
+    | PaginateFrom Int
+    | PaginateBy Int
     | FilterDialogOpen Int
     | FilterDialogClose
     | SelectionToggleAll
@@ -302,6 +313,9 @@ type alias StateModel msg item columns =
     , items : List item
     , visibleItems : List item
     , sorters : Maybe (Sorters item columns)
+    , paginatorState : Paginator.State
+    , paginateFrom : Int
+    , paginateBy : Int
     }
 
 
@@ -335,6 +349,9 @@ init =
         , items = []
         , visibleItems = []
         , sorters = Nothing
+        , paginatorState = Paginator.init
+        , paginateFrom = 1
+        , paginateBy = 25
         }
 
 
@@ -380,6 +397,25 @@ update msg (State state) =
 
         ForSorters subMsg ->
             updateSorters state subMsg
+
+        PaginatorToggleMenu ->
+            ( State { state | paginatorState = Paginator.toggleMenu state.paginatorState }
+            , Effects.none
+            )
+
+        PaginateFrom item ->
+            ( State { state | paginateFrom = item }
+            , Effects.none
+            )
+
+        PaginateBy amount ->
+            ( State
+                { state
+                    | paginateBy = amount
+                    , paginatorState = Paginator.toggleMenu state.paginatorState
+                }
+            , Effects.none
+            )
 
         FilterDialogOpen index ->
             ( State { state | filterDialog = Just index }, Effects.none )
@@ -1321,8 +1357,22 @@ desktopView renderConfig prop opt =
         items =
             viewGetItems state opt
 
+        items_ =
+            if opt.paginator then
+                items
+                    |> List.drop state.paginateFrom
+                    |> List.take state.paginateBy
+
+            else
+                items
+
+        paginator =
+            state
+                |> viewPaginator renderConfig (List.length items)
+                |> Element.map prop.toExternalMsg
+
         rows =
-            List.map (rowWithSelection renderConfig prop.toExternalMsg state prop.toRow columns) items
+            List.map (rowWithSelection renderConfig prop.toExternalMsg state prop.toRow columns) items_
 
         padding =
             { top = 20, left = 20, right = 20, bottom = 0 }
@@ -1344,7 +1394,21 @@ desktopView renderConfig prop opt =
         , Element.width opt.width
         , Element.paddingEach padding
         ]
-        (headers :: rows)
+        (headers :: rows ++ [ ( "paginator", paginator ) ])
+
+
+viewPaginator : RenderConfig -> Int -> StateModel msg item columns -> Element (Msg item)
+viewPaginator renderConfig length state =
+    { onChangeItem = PaginateFrom
+    , onChangePageAmount = PaginateBy
+    , onToggleMenu = PaginatorToggleMenu
+    , totalAmount = length
+    , state = state.paginatorState
+    }
+        |> Paginator.paginator
+        |> Paginator.withPageAmount state.paginateBy
+        |> Paginator.withCurrentItem state.paginateFrom
+        |> Paginator.renderElement renderConfig
 
 
 viewSelectionHeader : RenderConfig -> StateModel msg item columns -> (Msg item -> msg) -> Maybe (Element msg)

@@ -20,8 +20,12 @@
     },
     "paginator": {
         "format": "{{first}} - {{last}} of {{total}}",
+        "tableFormat": "{{first}}-{{last}} of {{total}}",
         "previous": "Previous",
-        "next": "Next"
+        "next": "Next",
+        "first": "First",
+        "last": "Last",
+        "rowsPerPage": "Rows/Page"
     },
     "checkbox": {
         "toggle": "Toggle"

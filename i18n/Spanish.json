@@ -20,8 +20,12 @@
     },
     "paginator": {
         "format": "{{first}} - {{last}} de {{total}}",
+        "tableFormat": "{{first}}-{{last}} de {{total}}",
         "previous": "Anterior",
-        "next": "Siguiente"
+        "next": "Siguiente",
+        "first": "",
+        "last": "",
+        "rowsPerPage": ""
     },
     "checkbox": {
         "toggle": "Agrupar"
