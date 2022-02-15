@@ -209,17 +209,17 @@ renderPages onChangeIndex currentPage totalPages amountByPage =
             pageRanges totalPages 4 currentPage
     in
     Keyed.row
-        [ Element.spacingXY 2 0
-        , Element.paddingXY 8 0
+        [ Element.paddingXY 8 0
+        , Element.spacingXY 2 0
         ]
         [ leftPageRange
             |> List.map (indexButton onChangeIndex amountByPage False)
-            |> Keyed.row []
+            |> Keyed.row [ Element.spacingXY 2 0 ]
             |> Tuple.pair "behind"
         , indexButton onChangeIndex amountByPage True currentPage
         , rightPageRange
             |> List.map (indexButton onChangeIndex amountByPage False)
-            |> Keyed.row []
+            |> Keyed.row [ Element.spacingXY 2 0 ]
             |> Tuple.pair "after"
         ]
         |> Tuple.pair "indexer"
