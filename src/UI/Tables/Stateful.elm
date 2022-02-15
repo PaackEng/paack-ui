@@ -89,7 +89,7 @@ And on model:
 
 # Stateful
 
-@docs StatefulTable, StatefulConfig, table, withItems, withPaginator
+@docs StatefulTable, StatefulConfig, table, withItems
 
 
 ## Mobile
