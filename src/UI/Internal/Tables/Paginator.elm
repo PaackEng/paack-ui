@@ -237,7 +237,7 @@ pageRanges total range page =
         to =
             page
                 + range
-                + abs (min 0 (page - 1 - range))
+                + abs (min 0 (page - range))
                 |> min total
     in
     ( if page > 0 then
