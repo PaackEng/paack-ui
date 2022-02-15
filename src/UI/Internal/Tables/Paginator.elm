@@ -333,7 +333,7 @@ indexButton onChangeIndex amountByPage isCurentPage index =
 pageAmountSelector : RenderConfig -> Paginator msg -> ( String, Element msg )
 pageAmountSelector renderConfig paginator =
     Keyed.row
-        [ Element.width <| Element.px 150
+        [ Element.width <| Element.minimum 132 Element.shrink
         , Element.spacingXY 8 0
         ]
         [ renderConfig
