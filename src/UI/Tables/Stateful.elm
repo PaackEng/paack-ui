@@ -1,7 +1,7 @@
 module UI.Tables.Stateful exposing
     ( StatefulTable, StatefulConfig, table, withItems
     , Responsive, Cover, Details, Detail, withResponsive, detailsEmpty, detailShown, detailHidden
-    , State, Msg, init, update, stateWithItems
+    , State, Msg, init, update, stateWithItems, stateWithPaginator
     , Filters, filtersEmpty, stateWithFilters
     , localSingleTextFilter, remoteSingleTextFilter
     , localMultiTextFilter, remoteMultiTextFilter
@@ -99,7 +99,7 @@ And on model:
 
 ## State
 
-@docs State, Msg, init, update, stateWithItems
+@docs State, Msg, init, update, stateWithItems, stateWithPaginator
 
 
 # Filters
@@ -184,6 +184,7 @@ import UI.Internal.Tables.Common exposing (..)
 import UI.Internal.Tables.Filters as Filters
 import UI.Internal.Tables.FiltersView as FiltersView
 import UI.Internal.Tables.ListView as ListView
+import UI.Internal.Tables.Paginator as Paginator
 import UI.Internal.Tables.Sorters as Sorters exposing (Sorters)
 import UI.Internal.Tables.View exposing (..)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
@@ -282,6 +283,9 @@ type Msg item
     = MobileToggle Int
     | ForFilters Filters.Msg
     | ForSorters Sorters.Msg
+    | PaginatorToggleMenu
+    | PaginateFrom Int
+    | PaginateBy Int
     | FilterDialogOpen Int
     | FilterDialogClose
     | SelectionToggleAll
@@ -302,6 +306,14 @@ type alias StateModel msg item columns =
     , items : List item
     , visibleItems : List item
     , sorters : Maybe (Sorters item columns)
+    , paginator : Maybe PaginatorState
+    }
+
+
+type alias PaginatorState =
+    { state : Paginator.State
+    , from : Int
+    , by : Int
     }
 
 
@@ -335,6 +347,7 @@ init =
         , items = []
         , visibleItems = []
         , sorters = Nothing
+        , paginator = Nothing
         }
 
 
@@ -362,6 +375,23 @@ stateWithItems items (State state) =
         }
 
 
+{-| Displays an paginator at the bottom of the table.
+
+    withPaginator someTable
+
+-}
+stateWithPaginator : State msg item columns -> State msg item columns
+stateWithPaginator (State state) =
+    { state
+        | paginator =
+            PaginatorState Paginator.init
+                0
+                25
+                |> Just
+    }
+        |> State
+
+
 {-| Given a message, apply an update to the [`Table.State`](#State).
 Do not ignore the returned `Cmd`, it may include remote filter's messages.
 
@@ -380,6 +410,42 @@ update msg (State state) =
 
         ForSorters subMsg ->
             updateSorters state subMsg
+
+        PaginatorToggleMenu ->
+            ( State
+                { state
+                    | paginator =
+                        Maybe.map (\paginator -> { paginator | state = Paginator.toggleMenu paginator.state })
+                            state.paginator
+                }
+            , Effects.none
+            )
+
+        PaginateFrom item ->
+            ( State
+                { state
+                    | paginator =
+                        Maybe.map (\paginator -> { paginator | from = item })
+                            state.paginator
+                }
+            , Effects.none
+            )
+
+        PaginateBy amount ->
+            ( State
+                { state
+                    | paginator =
+                        Maybe.map
+                            (\paginator ->
+                                { paginator
+                                    | by = amount
+                                    , state = Paginator.toggleMenu paginator.state
+                                }
+                            )
+                            state.paginator
+                }
+            , Effects.none
+            )
 
         FilterDialogOpen index ->
             ( State { state | filterDialog = Just index }, Effects.none )
@@ -1321,8 +1387,24 @@ desktopView renderConfig prop opt =
         items =
             viewGetItems state opt
 
+        ( items_, footer ) =
+            case state.paginator of
+                Just ({ from, by } as paginator) ->
+                    ( items
+                        |> List.drop from
+                        |> List.take by
+                    , paginator
+                        |> viewPaginator renderConfig (List.length items)
+                        |> Element.map prop.toExternalMsg
+                        |> Tuple.pair "paginator"
+                        |> List.singleton
+                    )
+
+                Nothing ->
+                    ( items, [] )
+
         rows =
-            List.map (rowWithSelection renderConfig prop.toExternalMsg state prop.toRow columns) items
+            List.map (rowWithSelection renderConfig prop.toExternalMsg state prop.toRow columns) items_
 
         padding =
             { top = 20, left = 20, right = 20, bottom = 0 }
@@ -1344,7 +1426,21 @@ desktopView renderConfig prop opt =
         , Element.width opt.width
         , Element.paddingEach padding
         ]
-        (headers :: rows)
+        (headers :: rows ++ footer)
+
+
+viewPaginator : RenderConfig -> Int -> PaginatorState -> Element (Msg item)
+viewPaginator renderConfig length { state, from, by } =
+    { onChangeIndex = PaginateFrom
+    , onChangeAmountByPage = PaginateBy
+    , onToggleMenu = PaginatorToggleMenu
+    , totalAmount = length
+    , state = state
+    }
+        |> Paginator.basic
+        |> Paginator.withAmountByPage by
+        |> Paginator.withIndex from
+        |> Paginator.renderElement renderConfig
 
 
 viewSelectionHeader : RenderConfig -> StateModel msg item columns -> (Msg item -> msg) -> Maybe (Element msg)

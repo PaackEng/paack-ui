@@ -41,8 +41,12 @@ filters =
 paginator : Paginator
 paginator =
     { format = \{ first, last, total } -> "" ++ first ++ " - " ++ last ++ " de " ++ total ++ ""
+    , tableFormat = \{ first, last, total } -> "" ++ first ++ "-" ++ last ++ " de " ++ total ++ ""
     , previous = "Anterior"
     , next = "Siguiente"
+    , first = EmptyFallback.paginator.first
+    , last = EmptyFallback.paginator.last
+    , rowsPerPage = EmptyFallback.paginator.rowsPerPage
     }
 
 
