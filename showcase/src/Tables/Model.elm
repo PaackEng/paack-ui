@@ -18,7 +18,12 @@ initModel =
         Table.init
             |> Table.stateWithFilters Book.filters
             |> Table.stateWithSorters Book.sorters
-            |> Table.stateWithItems Book.books
+            |> Table.stateWithItems
+                (List.concatMap
+                    (always Book.books)
+                    (List.range 1 30)
+                )
+            |> Table.stateWithPaginator
     , selecTableState =
         Table.init
             |> Table.stateWithSelection .isbn False
