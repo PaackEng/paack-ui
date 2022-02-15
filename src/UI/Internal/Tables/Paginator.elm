@@ -12,15 +12,19 @@ module UI.Internal.Tables.Paginator exposing
 
 import Element exposing (Element)
 import Element.Border as Border
+import Element.Events as Events
+import Element.Font as Font
 import Element.Keyed as Keyed
 import UI.Button as Button
 import UI.Icon as Icon
+import UI.Internal.Primitives as Primitives
 import UI.Internal.RenderConfig exposing (localeTerms)
 import UI.Menu as Menu exposing (MenuItem)
 import UI.Palette as Palette
 import UI.RenderConfig exposing (RenderConfig)
 import UI.Size as Size
 import UI.Text as Text
+import UI.Utils.ARIA as ARIA
 import UI.Utils.Element exposing (zeroPadding)
 
 
@@ -156,7 +160,7 @@ renderPaginator renderConfig (Paginator { onChangeIndex, totalAmount } { index, 
         , previousButton renderConfig
             (onChangeIndex <| (currentPage - 1) * amountByPage)
             isFistPage
-        , renderPages renderConfig onChangeIndex currentPage totalPages amountByPage
+        , renderPages onChangeIndex currentPage totalPages amountByPage
         , nextButton
             renderConfig
             (onChangeIndex <| (currentPage + 1) * amountByPage)
@@ -176,7 +180,7 @@ firstPageButton renderConfig msg isDisabled =
         |> .first
         |> Button.fromLabel
         |> Button.cmd msg Button.light
-        |> Button.withSize Size.small
+        |> Button.withSize Size.extraSmall
         |> Button.withDisabledIf isDisabled
         |> Button.renderElement renderConfig
         |> Tuple.pair "first"
@@ -192,14 +196,14 @@ previousButton renderConfig msg isDisabled =
             |> Icon.previousContent
         )
         |> Button.cmd msg Button.light
-        |> Button.withSize Size.small
+        |> Button.withSize Size.extraSmall
         |> Button.withDisabledIf isDisabled
         |> Button.renderElement renderConfig
         |> Tuple.pair "previous"
 
 
-renderPages : RenderConfig -> (Int -> msg) -> Int -> Int -> Int -> ( String, Element msg )
-renderPages renderConfig onChangeIndex currentPage totalPages amountByPage =
+renderPages : (Int -> msg) -> Int -> Int -> Int -> ( String, Element msg )
+renderPages onChangeIndex currentPage totalPages amountByPage =
     let
         ( leftPageRange, rightPageRange ) =
             pageRanges totalPages 4 currentPage
@@ -209,12 +213,12 @@ renderPages renderConfig onChangeIndex currentPage totalPages amountByPage =
         , Element.paddingXY 8 0
         ]
         [ leftPageRange
-            |> List.map (indexButton renderConfig onChangeIndex amountByPage False)
+            |> List.map (indexButton onChangeIndex amountByPage False)
             |> Keyed.row []
             |> Tuple.pair "behind"
-        , indexButton renderConfig onChangeIndex amountByPage True currentPage
+        , indexButton onChangeIndex amountByPage True currentPage
         , rightPageRange
-            |> List.map (indexButton renderConfig onChangeIndex amountByPage False)
+            |> List.map (indexButton onChangeIndex amountByPage False)
             |> Keyed.row []
             |> Tuple.pair "after"
         ]
@@ -259,7 +263,7 @@ nextButton renderConfig msg isDisabled =
             |> Icon.nextContent
         )
         |> Button.cmd msg Button.light
-        |> Button.withSize Size.small
+        |> Button.withSize Size.extraSmall
         |> Button.withDisabledIf isDisabled
         |> Button.renderElement renderConfig
         |> Tuple.pair "next"
@@ -273,33 +277,57 @@ lastPageButton renderConfig msg isDisabled =
         |> .last
         |> Button.fromLabel
         |> Button.cmd msg Button.light
-        |> Button.withSize Size.small
+        |> Button.withSize Size.extraSmall
         |> Button.withDisabledIf isDisabled
         |> Button.renderElement renderConfig
         |> Tuple.pair "last-page"
 
 
-indexButton : RenderConfig -> (Int -> msg) -> Int -> Bool -> Int -> ( String, Element msg )
-indexButton renderConfig onChangeIndex amountByPage isCurentPage item =
+indexButton : (Int -> msg) -> Int -> Bool -> Int -> ( String, Element msg )
+indexButton onChangeIndex amountByPage isCurentPage index =
     let
         label =
-            String.fromInt <| item + 1
+            String.fromInt <| index + 1
     in
-    Button.fromLabel label
-        |> Button.cmd (onChangeIndex <| item * amountByPage)
-            (indexButtonStyle isCurentPage)
-        |> Button.withSize Size.small
-        |> Button.renderElement renderConfig
+    label
+        |> Element.text
+        |> Element.el
+            [ Font.size 12
+            , Element.centerX
+            , Element.centerY
+            , Font.semiBold
+            , Font.color <|
+                if isCurentPage then
+                    Palette.toElementColor Palette.genericWhite
+
+                else
+                    Palette.toElementColor Palette.blue700
+            ]
+        |> Element.el
+            ((Element.width <| Element.minimum 24 Element.shrink)
+                :: (Element.height <| Element.minimum 24 Element.shrink)
+                :: (Palette.toBackgroundColor <|
+                        if isCurentPage then
+                            Palette.blue700
+
+                        else
+                            Palette.gray200
+                   )
+                :: Element.mouseOver
+                    [ Palette.toBackgroundColor <|
+                        if isCurentPage then
+                            Palette.blue800
+
+                        else
+                            Palette.gray300
+                    ]
+                :: Events.onClick (onChangeIndex <| index * amountByPage)
+                :: Element.pointer
+                :: Element.paddingXY 6 2
+                :: Primitives.roundedBorders Size.extraSmall
+                :: ARIA.toElementAttributes ARIA.roleButton
+            )
         |> Tuple.pair label
-
-
-indexButtonStyle : Bool -> Button.ButtonStyle
-indexButtonStyle isCurrentPage =
-    if isCurrentPage then
-        Button.primary
-
-    else
-        Button.light
 
 
 pageAmountSelector : RenderConfig -> Paginator msg -> ( String, Element msg )
@@ -326,7 +354,7 @@ amountMenu : RenderConfig -> Paginator msg -> Element msg
 amountMenu renderConfig (Paginator prop opt) =
     Button.fromLabeledOnLeftIcon (Icon.chevronDown <| String.fromInt opt.amountByPage)
         |> Button.cmd prop.onToggleMenu Button.light
-        |> Button.withSize Size.small
+        |> Button.withSize Size.extraSmall
         |> Menu.menu prop.onToggleMenu
             (List.map (amountMenuItem prop.onChangeAmountByPage) opt.pageAmountOptions)
         |> Menu.setVisible (menuIsVisible prop.state)
