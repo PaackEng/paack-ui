@@ -435,7 +435,13 @@ update msg (State state) =
             ( State
                 { state
                     | paginator =
-                        Maybe.map (\paginator -> { paginator | by = amount })
+                        Maybe.map
+                            (\paginator ->
+                                { paginator
+                                    | by = amount
+                                    , state = Paginator.toggleMenu paginator.state
+                                }
+                            )
                             state.paginator
                 }
             , Effects.none
