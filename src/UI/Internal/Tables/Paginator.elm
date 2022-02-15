@@ -308,7 +308,11 @@ pageAmountSelector renderConfig paginator =
         [ Element.width <| Element.px 150
         , Element.spacingXY 8 0
         ]
-        [ Text.body2 "Rows/Page"
+        [ renderConfig
+            |> localeTerms
+            |> .paginator
+            |> .rowsPerPage
+            |> Text.body2
             |> Text.renderElement renderConfig
             |> Tuple.pair "rows-page"
         , paginator
