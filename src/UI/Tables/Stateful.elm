@@ -187,7 +187,6 @@ import UI.Internal.Tables.ListView as ListView
 import UI.Internal.Tables.Paginator as Paginator
 import UI.Internal.Tables.Sorters as Sorters exposing (Sorters)
 import UI.Internal.Tables.View exposing (..)
-import UI.Palette as Palette
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UI.Tables.Common as Common exposing (..)
 import UI.Utils.TypeNumbers as T
