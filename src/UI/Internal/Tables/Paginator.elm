@@ -131,7 +131,8 @@ rangeInfo renderConfig (Paginator { totalAmount } { index, amountByPage }) =
         |> Text.body2
         |> Text.withOverflow Text.wrap
         |> Text.renderElement renderConfig
-        |> Element.el [ Element.width <| Element.minimum 96 Element.shrink ]
+        |> Element.el
+            [ Element.width <| Element.minimum 132 Element.shrink ]
         |> Tuple.pair "range-info"
 
 
