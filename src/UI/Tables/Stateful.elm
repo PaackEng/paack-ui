@@ -1387,21 +1387,15 @@ desktopView renderConfig prop opt =
         items =
             viewGetItems state opt
 
-        ( items_, footer ) =
+        items_ =
             case state.paginator of
-                Just ({ from, by } as paginator) ->
-                    ( items
+                Just { from, by } ->
+                    items
                         |> List.drop from
                         |> List.take by
-                    , paginator
-                        |> viewPaginator renderConfig (List.length items)
-                        |> Element.map prop.toExternalMsg
-                        |> Tuple.pair "paginator"
-                        |> List.singleton
-                    )
 
                 Nothing ->
-                    ( items, [] )
+                    items
 
         rows =
             List.map (rowWithSelection renderConfig prop.toExternalMsg state prop.toRow columns) items_
@@ -1421,12 +1415,38 @@ desktopView renderConfig prop opt =
                 columns
                 selectionHeader
     in
-    Keyed.column
-        [ Element.spacing 2
-        , Element.width opt.width
-        , Element.paddingEach padding
-        ]
-        (headers :: rows ++ footer)
+    case state.paginator of
+        Just paginator ->
+            Keyed.column
+                [ Element.width opt.width
+                , Element.height Element.fill
+                , Element.paddingEach padding
+                ]
+                [ (headers :: rows)
+                    |> Keyed.column
+                        [ Element.spacing 2
+                        , Element.width Element.fill
+                        , Element.height Element.fill
+                        , Element.scrollbars
+                        ]
+                    |> Element.el
+                        [ Element.width Element.fill
+                        , Element.height Element.fill
+                        ]
+                    |> Tuple.pair "table"
+                , paginator
+                    |> viewPaginator renderConfig (List.length items)
+                    |> Element.map prop.toExternalMsg
+                    |> Tuple.pair "paginator"
+                ]
+
+        Nothing ->
+            Keyed.column
+                [ Element.spacing 2
+                , Element.width opt.width
+                , Element.paddingEach padding
+                ]
+                (headers :: rows)
 
 
 viewPaginator : RenderConfig -> Int -> PaginatorState -> Element (Msg item)
