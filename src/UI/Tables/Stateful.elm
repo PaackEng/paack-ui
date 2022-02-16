@@ -1450,7 +1450,9 @@ desktopView renderConfig prop opt =
                     |> viewPaginator renderConfig (List.length items)
                     |> Element.map prop.toExternalMsg
                     |> Element.el
-                        [ Element.alignBottom ]
+                        [ Element.alignBottom
+                        , Element.width Element.fill
+                        ]
                     |> Tuple.pair "paginator"
                 ]
 
