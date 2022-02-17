@@ -12,7 +12,7 @@ module UI.Tables.Stateful exposing
     , Sorters, stateWithSorters
     , sortersEmpty, sortBy, sortByFloat, sortByInt, sortByChar, sortWith, unsortable
     , sortDecreasing, sortIncreasing
-    , withWidth
+    , withWidth, withHeight
     , stateWithSelection, stateIsSelected
     , renderElement
     )
@@ -144,9 +144,9 @@ And on model:
 @docs sortDecreasing, sortIncreasing
 
 
-# Width
+# Size
 
-@docs withWidth
+@docs withWidth, withHeight
 
 
 # Selection
@@ -225,6 +225,7 @@ type alias StatefulConfig msg item columns =
 type alias Options msg item columns =
     { overwriteItems : Maybe (List item)
     , width : Element.Length
+    , height : Element.Length
     , responsive : Maybe (Responsive msg item columns)
     }
 
@@ -249,6 +250,7 @@ defaultOptions : Options msg item columns
 defaultOptions =
     { overwriteItems = Nothing
     , width = shrink
+    , height = fill
     , responsive = Nothing
     }
 
@@ -1128,6 +1130,18 @@ withWidth width (Table prop opt_) =
     Table prop { opt_ | width = width }
 
 
+{-| Applies [`Element.height`](/packages/mdgriffith/elm-ui/latest/Element#height) to the component.
+
+    Table.withHeight
+        (Element.fill |> Element.minimum 220)
+        someTable
+
+-}
+withHeight : Element.Length -> StatefulTable msg item columns -> StatefulTable msg item columns
+withHeight height (Table prop opt_) =
+    Table prop { opt_ | height = height }
+
+
 
 -- Sorting
 
@@ -1387,21 +1401,15 @@ desktopView renderConfig prop opt =
         items =
             viewGetItems state opt
 
-        ( items_, footer ) =
+        items_ =
             case state.paginator of
-                Just ({ from, by } as paginator) ->
-                    ( items
+                Just { from, by } ->
+                    items
                         |> List.drop from
                         |> List.take by
-                    , paginator
-                        |> viewPaginator renderConfig (List.length items)
-                        |> Element.map prop.toExternalMsg
-                        |> Tuple.pair "paginator"
-                        |> List.singleton
-                    )
 
                 Nothing ->
-                    ( items, [] )
+                    items
 
         rows =
             List.map (rowWithSelection renderConfig prop.toExternalMsg state prop.toRow columns) items_
@@ -1421,12 +1429,40 @@ desktopView renderConfig prop opt =
                 columns
                 selectionHeader
     in
-    Keyed.column
-        [ Element.spacing 2
-        , Element.width opt.width
-        , Element.paddingEach padding
-        ]
-        (headers :: rows ++ footer)
+    case state.paginator of
+        Just paginator ->
+            Keyed.column
+                [ Element.width opt.width
+                , Element.height opt.height
+                , Element.paddingEach padding
+                ]
+                [ Keyed.column
+                    [ Element.spacing 2
+                    , Element.height Element.fill
+                    , Element.width Element.fill
+                    , Element.alignTop
+                    , Element.scrollbars
+                    ]
+                    (headers :: rows)
+                    |> Tuple.pair "table"
+                , paginator
+                    |> viewPaginator renderConfig (List.length items)
+                    |> Element.map prop.toExternalMsg
+                    |> Element.el
+                        [ Element.alignBottom
+                        , Element.width Element.fill
+                        ]
+                    |> Tuple.pair "paginator"
+                ]
+
+        Nothing ->
+            Keyed.column
+                [ Element.spacing 2
+                , Element.width opt.width
+                , Element.height opt.height
+                , Element.paddingEach padding
+                ]
+                (headers :: rows)
 
 
 viewPaginator : RenderConfig -> Int -> PaginatorState -> Element (Msg item)
