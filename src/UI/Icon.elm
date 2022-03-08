@@ -1,7 +1,7 @@
 module UI.Icon exposing
     ( svgSpriteImport
     , Icon
-    , addCircle, add, arrowCurveLeft, arrowDown, arrowLeft, arrowRight, arrowUp, bell, bicycle, bike, bluetooth, boltDisabled, bolt, boxFilled, boxOutlined, boxesFilled, boxesOutlined, camera, car, cellular, checkmarkCircle, checkmarkRoundedRectangle, checkmark, chevronDown, chevronLeft, chevronRight, chevronUp, clockIssue, clockLocked, clock, closeCircle, closeRoundedRectangle, close, coins, collapse, crosshair, directions, download, eBike, eCar, eVan, edit, ellipsis, empty, expand, eyeHide, eye, filter, fix, folder, food, frozen, gVan, grocery, groups, hamburger, hand, home, hourglass, info, legacyApis, legacyHistorical, legacyLabelPrinter, legacyReport, legacyRetailerDashboard, legacySignOut, list, location, lock, logout, map, mapPinRadius, mapPin, messageLock, messageOTP, message, microphoneMute, microphone, minus, move, notepad, notes, notification, otp, personAssign, personAssigned, personError, personUnassign, person, personsAdd, persons, phoneEndCall, phoneStartCall, placeholder, printerError, printer, redo, reload, remove, reporting, return, scanBarcode, scanGroup, scanPackage, scanSpace, scan, search, settings, shelves, sort, spaceError, spaceSearch, space, speakerMute, speaker, store, tag, trash, truck, undo, van, walk, warning, waves, webhook
+    , addCircle, add, arrowCurveLeft, arrowDown, arrowLeft, arrowRight, arrowUp, bell, bicycle, bike, bluetooth, boltDisabled, bolt, boxFilled, boxOutlined, boxesFilled, boxesOutlined, calendar, camera, car, cellular, checkmarkCircle, checkmarkRoundedRectangle, checkmark, chevronDown, chevronLeft, chevronRight, chevronUp, clockIssue, clockLocked, clock, closeCircle, closeRoundedRectangle, close, coins, collapse, crosshair, currencyNote, directions, download, eBike, eCar, eVan, edit, ellipsis, emailFill, emailOutline, empty, expand, eyeHide, eye, filter, firstPage, fix, folder, food, frozen, gVan, grocery, groups, hamburger, hand, home, hourglass, info, keys, lastPage, legacyApis, legacyHistorical, legacyLabelPrinter, legacyReport, legacyRetailerDashboard, legacySignOut, list, location, lock, logout, map, mapPinRadius, mapPin, messageLock, messageOTP, message, microphoneMute, microphone, minus, move, notepad, notes, notification, otp, personAssign, personAssigned, personError, personRemove, personUnassign, person, personsAdd, personsNotApplicable, persons, phoneEndCall, phoneStartCall, placeholder, printerError, printer, redo, reload, remove, report, reporting, reset, return, scanBarcode, scanGroup, scanPackage, scanSpace, scan, search, settings, shelves, sort, spaceError, spaceSearch, space, speakerMute, speaker, store, tag, trash, truck, undo, van, walk, warning, waves, webhook
     , fixing, loader
     , assignPerson, boxes, check, configure, delete, done, eventLog, fixIssues, insert, moreActions, nextContent, notifications, paackSpaces, packages, phone, pause, previousContent, print, sandwichMenu, searchSpace, seeMore, sortDecreasing, sortIncreasing, success, toggle, toggleDown, toggleUp, unassignPerson, wait
     , getHint
@@ -37,7 +37,7 @@ An icon can be created and rendered as in the following pipeline:
 
 ## Current names
 
-@docs addCircle, add, arrowCurveLeft, arrowDown, arrowLeft, arrowRight, arrowUp, bell, bicycle, bike, bluetooth, boltDisabled, bolt, boxFilled, boxOutlined, boxesFilled, boxesOutlined, camera, car, cellular, checkmarkCircle, checkmarkRoundedRectangle, checkmark, chevronDown, chevronLeft, chevronRight, chevronUp, clockIssue, clockLocked, clock, closeCircle, closeRoundedRectangle, close, coins, collapse, crosshair, directions, download, eBike, eCar, eVan, edit, ellipsis, empty, expand, eyeHide, eye, filter, fix, folder, food, frozen, gVan, grocery, groups, hamburger, hand, home, hourglass, info, legacyApis, legacyHistorical, legacyLabelPrinter, legacyReport, legacyRetailerDashboard, legacySignOut, list, location, lock, logout, map, mapPinRadius, mapPin, messageLock, messageOTP, message, microphoneMute, microphone, minus, move, notepad, notes, notification, otp, personAssign, personAssigned, personError, personUnassign, person, personsAdd, persons, phoneEndCall, phoneStartCall, placeholder, printerError, printer, redo, reload, remove, reporting, return, scanBarcode, scanGroup, scanPackage, scanSpace, scan, search, settings, shelves, sort, spaceError, spaceSearch, space, speakerMute, speaker, store, tag, trash, truck, undo, van, walk, warning, waves, webhook
+@docs addCircle, add, arrowCurveLeft, arrowDown, arrowLeft, arrowRight, arrowUp, bell, bicycle, bike, bluetooth, boltDisabled, bolt, boxFilled, boxOutlined, boxesFilled, boxesOutlined, calendar, camera, car, cellular, checkmarkCircle, checkmarkRoundedRectangle, checkmark, chevronDown, chevronLeft, chevronRight, chevronUp, clockIssue, clockLocked, clock, closeCircle, closeRoundedRectangle, close, coins, collapse, crosshair, currencyNote, directions, download, eBike, eCar, eVan, edit, ellipsis, emailFill, emailOutline, empty, expand, eyeHide, eye, filter, firstPage, fix, folder, food, frozen, gVan, grocery, groups, hamburger, hand, home, hourglass, info, keys, lastPage, legacyApis, legacyHistorical, legacyLabelPrinter, legacyReport, legacyRetailerDashboard, legacySignOut, list, location, lock, logout, map, mapPinRadius, mapPin, messageLock, messageOTP, message, microphoneMute, microphone, minus, move, notepad, notes, notification, otp, personAssign, personAssigned, personError, personRemove, personUnassign, person, personsAdd, personsNotApplicable, persons, phoneEndCall, phoneStartCall, placeholder, printerError, printer, redo, reload, remove, report, reporting, reset, return, scanBarcode, scanGroup, scanPackage, scanSpace, scan, search, settings, shelves, sort, spaceError, spaceSearch, space, speakerMute, speaker, store, tag, trash, truck, undo, van, walk, warning, waves, webhook
 
 
 ## Special
@@ -340,6 +340,16 @@ boxesOutlined =
 
 {-| Icon constructor.
 
+    Icon.calendar "Accessibility hint"
+
+-}
+calendar : String -> Icon
+calendar =
+    defaultInit "Calendar"
+
+
+{-| Icon constructor.
+
     Icon.camera "Accessibility hint"
 
 -}
@@ -530,6 +540,16 @@ crosshair =
 
 {-| Icon constructor.
 
+    Icon.currencyNote "Accessibility hint"
+
+-}
+currencyNote : String -> Icon
+currencyNote =
+    defaultInit "Currency-Note"
+
+
+{-| Icon constructor.
+
     Icon.directions "Accessibility hint"
 
 -}
@@ -600,6 +620,26 @@ ellipsis =
 
 {-| Icon constructor.
 
+    Icon.emailFill "Accessibility hint"
+
+-}
+emailFill : String -> Icon
+emailFill =
+    defaultInit "Email-Fill"
+
+
+{-| Icon constructor.
+
+    Icon.emailOutline "Accessibility hint"
+
+-}
+emailOutline : String -> Icon
+emailOutline =
+    defaultInit "Email-Outline"
+
+
+{-| Icon constructor.
+
     Icon.empty "Accessibility hint"
 
 -}
@@ -646,6 +686,16 @@ eye =
 filter : String -> Icon
 filter =
     defaultInit "Filter"
+
+
+{-| Icon constructor.
+
+    Icon.firstPage "Accessibility hint"
+
+-}
+firstPage : String -> Icon
+firstPage =
+    defaultInit "First-Page"
 
 
 {-| Icon constructor.
@@ -766,6 +816,26 @@ hourglass =
 info : String -> Icon
 info =
     defaultInit "Info"
+
+
+{-| Icon constructor.
+
+    Icon.keys "Accessibility hint"
+
+-}
+keys : String -> Icon
+keys =
+    defaultInit "Keys"
+
+
+{-| Icon constructor.
+
+    Icon.lastPage "Accessibility hint"
+
+-}
+lastPage : String -> Icon
+lastPage =
+    defaultInit "Last-Page"
 
 
 {-| Icon constructor.
@@ -1040,6 +1110,16 @@ personError =
 
 {-| Icon constructor.
 
+    Icon.personRemove "Accessibility hint"
+
+-}
+personRemove : String -> Icon
+personRemove =
+    defaultInit "Person-Remove"
+
+
+{-| Icon constructor.
+
     Icon.personUnassign "Accessibility hint"
 
 -}
@@ -1066,6 +1146,16 @@ person =
 personsAdd : String -> Icon
 personsAdd =
     defaultInit "Persons-Add"
+
+
+{-| Icon constructor.
+
+    Icon.personsNotApplicable "Accessibility hint"
+
+-}
+personsNotApplicable : String -> Icon
+personsNotApplicable =
+    defaultInit "Persons-NotApplicable"
 
 
 {-| Icon constructor.
@@ -1160,12 +1250,32 @@ remove =
 
 {-| Icon constructor.
 
+    Icon.report "Accessibility hint"
+
+-}
+report : String -> Icon
+report =
+    defaultInit "Report"
+
+
+{-| Icon constructor.
+
     Icon.reporting "Accessibility hint"
 
 -}
 reporting : String -> Icon
 reporting =
     defaultInit "Reporting"
+
+
+{-| Icon constructor.
+
+    Icon.reset "Accessibility hint"
+
+-}
+reset : String -> Icon
+reset =
+    defaultInit "Reset"
 
 
 {-| Icon constructor.
