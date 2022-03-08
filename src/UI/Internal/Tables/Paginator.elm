@@ -353,11 +353,12 @@ pageAmountSelector renderConfig paginator =
 
 amountMenu : RenderConfig -> Paginator msg -> Element msg
 amountMenu renderConfig (Paginator prop opt) =
-    Button.fromLabeledOnLeftIcon (Icon.chevronDown <| String.fromInt opt.amountByPage)
+    Button.fromLabeledOnLeftIcon (Icon.chevronUp <| String.fromInt opt.amountByPage)
         |> Button.cmd prop.onToggleMenu Button.light
         |> Button.withSize Size.extraSmall
         |> Menu.menu prop.onToggleMenu
             (List.map (amountMenuItem prop.onChangeAmountByPage) opt.pageAmountOptions)
+        |> Menu.withOpenDirection Menu.openAbove
         |> Menu.setVisible (menuIsVisible prop.state)
         |> Menu.renderElement renderConfig
 
