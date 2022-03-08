@@ -1,7 +1,8 @@
 module UI.Menu exposing
     ( Menu, menu
     , MenuItem, item
-    , itemWithDangerTone
+    , OpenDirection, openAbove, openBelow
+    , itemWithDangerTone, withOpenDirection
     , setVisible
     , renderElement
     )
@@ -29,7 +30,8 @@ A menu can be created and rendered as in the following pipeline:
 
 # Style
 
-@docs itemWithDangerTone
+@docs OpenDirection, openAbove, openBelow
+@docs itemWithDangerTone, withOpenDirection
 
 
 # Interactive
@@ -62,6 +64,7 @@ type alias Properties msg =
     , items : List (MenuItem msg)
     , onToggle : msg
     , isVisible : Bool
+    , direction : OpenDirection
     }
 
 
@@ -69,6 +72,13 @@ type alias Properties msg =
 -}
 type Menu msg
     = Menu (Properties msg)
+
+
+{-| The `OpenDirection` is used to determine the direction that the menu will open.
+-}
+type OpenDirection
+    = Above
+    | Below
 
 
 {-| The `MenuItem` is required when assembling the list of menu entries.
@@ -99,6 +109,20 @@ type alias InternalMenuItem msg =
 item : msg -> Maybe (String -> Icon) -> String -> MenuItem msg
 item onToggle icon title =
     MenuItem { onClick = onToggle, icon = icon, title = title, danger = False }
+
+
+{-| Renders the menu above the button, mostly used on menus that appear on the bottom of the screen.
+-}
+openAbove : OpenDirection
+openAbove =
+    Above
+
+
+{-| Renders the menu bellow the button, this is the default menu direction.
+-}
+openBelow : OpenDirection
+openBelow =
+    Below
 
 
 {-| Sets the color of a `MenuItem`.
@@ -137,6 +161,7 @@ menu onToggle items button =
         , items = items
         , onToggle = onToggle
         , isVisible = False
+        , direction = Below
         }
 
 
@@ -150,11 +175,30 @@ setVisible isVisible (Menu state) =
     Menu { state | isVisible = isVisible }
 
 
+{-| Sets menu direction.
+
+    Menu.withOpenDirection Menu.above someMenu
+
+-}
+withOpenDirection : OpenDirection -> Menu msg -> Menu msg
+withOpenDirection direction (Menu state) =
+    Menu { state | direction = direction }
+
+
 {-| End of the builder's life.
 The result of this function is a ready-to-insert Elm UI's Element.
 -}
 renderElement : RenderConfig -> Menu msg -> Element msg
-renderElement renderConfig (Menu { button, items, onToggle, isVisible }) =
+renderElement renderConfig (Menu { button, items, onToggle, isVisible, direction }) =
+    let
+        renderOnDirection =
+            case direction of
+                Above ->
+                    Element.above
+
+                Below ->
+                    Element.below
+    in
     button
         |> Button.renderElement renderConfig
         |> Element.el
@@ -164,7 +208,7 @@ renderElement renderConfig (Menu { button, items, onToggle, isVisible }) =
                 :: (if isVisible then
                         [ onToggle
                             |> renderMenu renderConfig items
-                            |> Element.below
+                            |> renderOnDirection
                         ]
 
                     else
