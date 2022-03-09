@@ -1432,7 +1432,7 @@ desktopView renderConfig prop opt =
     case state.paginator of
         Just paginator ->
             Keyed.column
-                [ Element.width opt.width
+                [ Element.width Element.fill
                 , Element.height opt.height
                 , Element.paddingEach padding
                 ]
@@ -1444,6 +1444,10 @@ desktopView renderConfig prop opt =
                     , Element.scrollbars
                     ]
                     (headers :: rows)
+                    |> Element.el
+                        [ Element.width opt.width
+                        , Element.height Element.fill
+                        ]
                     |> Tuple.pair "table"
                 , paginator
                     |> viewPaginator renderConfig (List.length items)
