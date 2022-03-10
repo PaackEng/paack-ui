@@ -139,11 +139,11 @@ rangeInfo renderConfig (Paginator { totalAmount } { index, amountByPage }) =
 renderPaginator : RenderConfig -> Paginator msg -> ( String, Element msg )
 renderPaginator renderConfig (Paginator { onChangeIndex, totalAmount } { index, amountByPage }) =
     let
-        currentPage =
-            ceiling <| toFloat index / toFloat amountByPage
-
         totalPages =
             floor <| toFloat totalAmount / toFloat amountByPage
+
+        currentPage =
+            min totalPages (floor <| toFloat index / toFloat amountByPage)
 
         isFistPage =
             currentPage <= 0
@@ -239,7 +239,7 @@ pageRanges total range page =
             page
                 + range
                 + abs (min 0 (page - range))
-                |> min total
+                |> min (total - 1)
     in
     ( if page > 0 then
         List.range (max 0 from) (page - 1)
