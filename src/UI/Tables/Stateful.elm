@@ -12,7 +12,7 @@ module UI.Tables.Stateful exposing
     , Sorters, stateWithSorters
     , sortersEmpty, sortBy, sortByFloat, sortByInt, sortByChar, sortWith, unsortable
     , sortDecreasing, sortIncreasing
-    , withWidth, withHeight
+    , withWidth, withContentWidth, withHeight
     , stateWithSelection, stateIsSelected
     , renderElement
     )
@@ -146,7 +146,7 @@ And on model:
 
 # Size
 
-@docs withWidth, withHeight
+@docs withWidth, withContentWidth, withHeight
 
 
 # Selection
@@ -225,6 +225,7 @@ type alias StatefulConfig msg item columns =
 type alias Options msg item columns =
     { overwriteItems : Maybe (List item)
     , width : Element.Length
+    , contentWidth : Element.Length
     , height : Element.Length
     , responsive : Maybe (Responsive msg item columns)
     }
@@ -250,6 +251,7 @@ defaultOptions : Options msg item columns
 defaultOptions =
     { overwriteItems = Nothing
     , width = shrink
+    , contentWidth = fill
     , height = fill
     , responsive = Nothing
     }
@@ -1130,6 +1132,18 @@ withWidth width (Table prop opt_) =
     Table prop { opt_ | width = width }
 
 
+{-| Allows expanding the content width when using a scrollbar.
+
+    Table.withContentWidth
+        (Element.fill |> Element.minimum 220)
+        someTable
+
+-}
+withContentWidth : Element.Length -> StatefulTable msg item columns -> StatefulTable msg item columns
+withContentWidth width (Table prop opt_) =
+    Table prop { opt_ | contentWidth = width }
+
+
 {-| Applies [`Element.height`](/packages/mdgriffith/elm-ui/latest/Element#height) to the component.
 
     Table.withHeight
@@ -1428,6 +1442,9 @@ desktopView renderConfig prop opt =
                 state.sorters
                 columns
                 selectionHeader
+
+        extendWidth =
+            Tuple.mapSecond <| Element.el [ Element.width opt.contentWidth ]
     in
     case state.paginator of
         Just paginator ->
@@ -1436,14 +1453,15 @@ desktopView renderConfig prop opt =
                 , Element.height opt.height
                 , Element.paddingEach padding
                 ]
-                [ Keyed.column
-                    [ Element.spacing 2
-                    , Element.height Element.fill
-                    , Element.width Element.fill
-                    , Element.alignTop
-                    , Element.scrollbars
-                    ]
-                    (headers :: rows)
+                [ (headers :: rows)
+                    |> List.map extendWidth
+                    |> Keyed.column
+                        [ Element.spacing 2
+                        , Element.height Element.fill
+                        , Element.width Element.fill
+                        , Element.alignTop
+                        , Element.scrollbars
+                        ]
                     |> Tuple.pair "table"
                 , paginator
                     |> viewPaginator renderConfig (List.length items)

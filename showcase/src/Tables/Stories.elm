@@ -101,7 +101,8 @@ demoTable renderConfig columns state msg =
             { toDetails = Book.toTableDetails
             , toCover = Book.toTableCover
             }
-        |> Stateful.withWidth (Element.px 800)
+        |> Stateful.withWidth (Element.px 900)
+        |> Stateful.withContentWidth (Element.px 900)
         |> Stateful.withHeight (Element.px 480)
         |> Stateful.renderElement renderConfig
 
