@@ -140,7 +140,7 @@ renderPaginator : RenderConfig -> Paginator msg -> ( String, Element msg )
 renderPaginator renderConfig (Paginator { onChangeIndex, totalAmount } { index, amountByPage }) =
     let
         totalPages =
-            floor <| toFloat totalAmount / toFloat amountByPage
+            ceiling <| toFloat (totalAmount - amountByPage) / toFloat amountByPage
 
         currentPage =
             min totalPages (floor <| toFloat index / toFloat amountByPage)
@@ -239,7 +239,7 @@ pageRanges total range page =
             page
                 + range
                 + abs (min 0 (page - range))
-                |> min (total - 1)
+                |> min total
     in
     ( if page > 0 then
         List.range (max 0 from) (page - 1)
