@@ -3051,10 +3051,10 @@ elm-hot@^1.1.6:
   resolved "https://registry.yarnpkg.com/elm-hot/-/elm-hot-1.1.6.tgz#93e3962b40670e65f0a3640951b3add2702bfd0e"
   integrity sha512-zYZJlfs7Gt4BdjA+D+857K+XAWzwwySJmXCgFpHW1dIEfaHSZCIPYPf7/jinZBLfKRkOAlKzI32AA84DY50g7Q==
 
-elm-review@^2.6.1:
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/elm-review/-/elm-review-2.7.0.tgz#2bf779d4abb5da90c41bb5880354a96156828b09"
-  integrity sha512-PvZj6M6rHYpyAGp2MKF/TzeDawioQacBTkVxzlBBGuMoO4LXw2PMIm/NmhkxcD38l5SvDIwpWmyDKvEsMaWNhQ==
+elm-review@^2.7.1:
+  version "2.7.1"
+  resolved "https://registry.yarnpkg.com/elm-review/-/elm-review-2.7.1.tgz#53c7b997841c48348deaf43ab4a3f07ee8486b50"
+  integrity sha512-leDgjvE6ldYSOG/jMLmMw2g1vRnrd9nH9mnQcJt57SY2F4FnZT2hfIbuIUBXPaBwhWwC0a6BRt+Jv/2sGOG03A==
   dependencies:
     chalk "^4.0.0"
     chokidar "^3.5.2"
