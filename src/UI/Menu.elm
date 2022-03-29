@@ -45,7 +45,7 @@ A menu can be created and rendered as in the following pipeline:
 
 -}
 
-import Element exposing (Element)
+import Element exposing (Element, rgb255)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
