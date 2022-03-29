@@ -20,12 +20,12 @@ jobs:
         with:
           cache: 'yarn'
 
-      - uses: PaackEng/elm-validate-action@v1.1.1
+      - uses: PaackEng/elm-validate-action@v1.2.0
         with:
           elm-make-options:
           elm-review-extra-options: --ignore-dirs 'src/I18n'
 
-      - uses: PaackEng/elm-validate-action@v1.1.1
+      - uses: PaackEng/elm-validate-action@v1.2.0
         with:
           elm-working-directory: 'showcase'
           elm-review-extra-options: --ignore-dirs '../src'

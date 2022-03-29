@@ -10,7 +10,6 @@ module UI.Internal.Text exposing
     , attributes
     , combinedAttrs
     , defaultText
-    , ellipsizedText
     , fontColor
     , getSpans
     , mapOptions

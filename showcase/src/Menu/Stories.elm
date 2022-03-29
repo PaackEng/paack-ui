@@ -24,10 +24,8 @@ import Utils
 
 
 update : Menu.Msg -> Menu.Model -> Return Msg.Msg Menu.Model
-update msg model =
-    case msg of
-        Menu.ToggleMenu ->
-            ( { model | isVisible = not model.isVisible }, Cmd.none )
+update _ model =
+    ( { model | isVisible = not model.isVisible }, Cmd.none )
 
 
 stories : RenderConfig -> ExplorerUI

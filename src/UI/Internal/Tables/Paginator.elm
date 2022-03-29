@@ -7,7 +7,6 @@ module UI.Internal.Tables.Paginator exposing
     , toggleMenu
     , withAmountByPage
     , withIndex
-    , withPageAmountOptions
     )
 
 import Element exposing (Element)
@@ -91,11 +90,6 @@ withIndex item (Paginator prop opt) =
 withAmountByPage : Int -> Paginator msg -> Paginator msg
 withAmountByPage pageAmount (Paginator prop opt) =
     Paginator prop { opt | amountByPage = pageAmount }
-
-
-withPageAmountOptions : List Int -> Paginator msg -> Paginator msg
-withPageAmountOptions pageAmountOptions (Paginator prop opt) =
-    Paginator prop { opt | pageAmountOptions = pageAmountOptions }
 
 
 renderElement : RenderConfig -> Paginator msg -> Element msg
@@ -228,25 +222,26 @@ renderPages onChangeIndex currentPage totalPages amountByPage =
 
 pageRanges : Int -> Int -> Int -> ( List Int, List Int )
 pageRanges total range page =
-    let
-        from =
-            page
-                - range
-                - max 0 ((page + range) - total)
-                |> max 0
-
-        to =
-            page
-                + range
-                + abs (min 0 (page - range))
-                |> min total
-    in
     ( if page > 0 then
+        let
+            from =
+                page
+                    - range
+                    - max 0 ((page + range) - total)
+                    |> max 0
+        in
         List.range (max 0 from) (page - 1)
 
       else
         []
     , if page < total then
+        let
+            to =
+                page
+                    + range
+                    + abs (min 0 (page - range))
+                    |> min total
+        in
         List.range (page + 1) (min total to)
 
       else

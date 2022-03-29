@@ -153,16 +153,17 @@ renderElement renderConfig (Checkbox { message, label, state } options) =
                     boxAttrs
                     Element.none
 
-        text =
-            case size of
-                SizeSM ->
-                    Text.body2
-
-                SizeMD ->
-                    Text.body1
-
         labelElement =
             if options.labelVisible then
+                let
+                    text =
+                        case size of
+                            SizeSM ->
+                                Text.body2
+
+                            SizeMD ->
+                                Text.body1
+                in
                 Input.labelRight
                     [ Element.width Element.fill
                     , Element.paddingEach

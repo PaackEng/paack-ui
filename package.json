@@ -5,8 +5,8 @@
   "main": "index.js",
   "assetsPath": "showcase/public/assets/",
   "scripts": {
-    "cleanup:showcase": "cd showcase && elm-review --template PaackEng/elm-review-config#1.1.1 --ignore-dirs ../src --fix-all",
-    "cleanup:ui": "elm-review --template PaackEng/elm-review-config#1.1.1 --fix-all",
+    "cleanup:showcase": "cd showcase && elm-review --template PaackEng/elm-review-config#1.2.0 --ignore-dirs ../src --fix-all",
+    "cleanup:ui": "elm-review --template PaackEng/elm-review-config#1.2.0 --fix-all",
     "cleanup": "yarn run review:ui && yarn run review:showcase --fix-all",
     "docs": "elm make --docs=dist/docs.json",
     "docs-preview": "yarn exec edp",
@@ -15,8 +15,8 @@
     "test": "elm-test",
     "i18n": "i18n-json-to-elm",
     "percy": "percy exec -- cypress run",
-    "review:showcase": "cd showcase && elm-review --template PaackEng/elm-review-config#1.1.1 --ignore-dirs ../src",
-    "review:ui": "elm-review --template PaackEng/elm-review-config#1.1.1",
+    "review:showcase": "cd showcase && elm-review --template PaackEng/elm-review-config#1.2.0 --ignore-dirs ../src",
+    "review:ui": "elm-review --template PaackEng/elm-review-config#1.2.0",
     "review": "yarn run review:ui && yarn run review:showcase"
   },
   "prettier": {
@@ -36,7 +36,7 @@
   "dependencies": {
     "@percy/cli": "^1.0.0-beta.76",
     "@percy/cypress": "^3.1.1",
-    "cypress": "^9.5.1",
+    "cypress": "^9.5.2",
     "elm": "^0.19.1-5",
     "elm-format": "^0.8.5",
     "elm-hot": "^1.1.6",
@@ -49,6 +49,6 @@
   },
   "devDependencies": {
     "elm-doc-preview": "^5.0.5",
-    "elm-review": "^2.6.1"
+    "elm-review": "^2.7.1"
   }
 }

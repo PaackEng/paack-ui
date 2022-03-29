@@ -190,15 +190,6 @@ The result of this function is a ready-to-insert Elm UI's Element.
 -}
 renderElement : RenderConfig -> Menu msg -> Element msg
 renderElement renderConfig (Menu { button, items, onToggle, isVisible, direction }) =
-    let
-        renderOnDirection =
-            case direction of
-                Above ->
-                    Element.above
-
-                Below ->
-                    Element.below
-    in
     button
         |> Button.renderElement renderConfig
         |> Element.el
@@ -206,6 +197,15 @@ renderElement renderConfig (Menu { button, items, onToggle, isVisible, direction
                 :: Element.pointer
                 :: Element.alignTop
                 :: (if isVisible then
+                        let
+                            renderOnDirection =
+                                case direction of
+                                    Above ->
+                                        Element.above
+
+                                    Below ->
+                                        Element.below
+                        in
                         [ onToggle
                             |> renderMenu renderConfig items
                             |> renderOnDirection
@@ -239,7 +239,7 @@ renderMenu renderConfig items onToggle =
             , Element.height Element.fill
             , Element.padding 4
             , Element.alignRight
-            , Background.color <| Element.rgb 255 255 255
+            , Background.color <| Element.rgb255 255 255 255
             , Palette.toBorderColor <| Palette.gray200
             , Border.width 1
             , Border.rounded 4

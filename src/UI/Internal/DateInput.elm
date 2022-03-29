@@ -277,17 +277,17 @@ monthToInt month =
 
 dateAfter : PrimitiveDate -> PrimitiveDate -> Bool
 dateAfter min value =
-    let
-        minMonth =
-            monthToInt min.month
-
-        valueMonth =
-            monthToInt value.month
-    in
     if value.year > min.year then
         True
 
     else if value.year == min.year then
+        let
+            valueMonth =
+                monthToInt value.month
+
+            minMonth =
+                monthToInt min.month
+        in
         if valueMonth > minMonth then
             True
 
@@ -303,17 +303,17 @@ dateAfter min value =
 
 dateBefore : PrimitiveDate -> PrimitiveDate -> Bool
 dateBefore max value =
-    let
-        maxMonth =
-            monthToInt max.month
-
-        valueMonth =
-            monthToInt value.month
-    in
     if value.year < max.year then
         True
 
     else if value.year == max.year then
+        let
+            valueMonth =
+                monthToInt value.month
+
+            maxMonth =
+                monthToInt max.month
+        in
         if valueMonth < maxMonth then
             True
 

@@ -1,4 +1,4 @@
-module UI.Internal.Page exposing (PageBody(..), Stack, toShowcaseElement)
+module UI.Internal.Page exposing (PageBody(..), Stack)
 
 import Element exposing (Element)
 import UI.Utils.Action as Action
@@ -14,13 +14,3 @@ type alias Stack msg =
     , action : Maybe (Action.WithIcon msg)
     , goBackMsg : msg
     }
-
-
-toShowcaseElement : PageBody msg -> Element msg
-toShowcaseElement content =
-    case content of
-        PageBodySingle body ->
-            body
-
-        PageBodyStack _ body ->
-            body
