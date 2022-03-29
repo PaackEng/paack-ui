@@ -1,4 +1,4 @@
-module Main exposing (CompileDocument, main)
+module Main exposing (main)
 
 import Alerts
 import Badges
@@ -29,7 +29,6 @@ import Tabs.Stories as Tabs
 import TextField
 import Texts
 import Tile.Stories as Tile
-import UI.Document exposing (Document)
 import UI.RenderConfig as RenderConfig exposing (RenderConfig)
 import UIExplorer
     exposing
@@ -46,12 +45,6 @@ import UIExplorer.Plugins.Note as NotePlugin
 import UIExplorer.Plugins.Tabs as TabsPlugin
 import UIExplorer.Plugins.Tabs.Icons as TabsIconsPlugin
 import Utils exposing (ExplorerModel)
-
-
-{-| importing UI.Document mostly so they compile too
--}
-type alias CompileDocument =
-    Document Never Never
 
 
 config : Config Model Msg PluginOptions

@@ -515,11 +515,6 @@ defaultButtons editMsg filter renderConfig =
                 |> Button.fromLabel
                 |> Button.cmd (editMsg Msg.Apply) Button.primary
 
-        disabledApplyButton =
-            terms.filters.apply
-                |> Button.fromLabel
-                |> Button.disabled
-
         clearButton =
             terms.filters.clear
                 |> Button.fromLabel
@@ -527,6 +522,12 @@ defaultButtons editMsg filter renderConfig =
     in
     case ( Model.isApplied filter, Model.isEdited filter ) of
         ( False, False ) ->
+            let
+                disabledApplyButton =
+                    terms.filters.apply
+                        |> Button.fromLabel
+                        |> Button.disabled
+            in
             [ disabledApplyButton ]
 
         ( False, True ) ->

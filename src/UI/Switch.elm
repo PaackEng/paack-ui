@@ -119,19 +119,20 @@ renderElement _ (Switch { message, label, state } { color }) =
             ARIA.roleSwitch state
                 |> ARIA.withLabel label
                 |> ARIA.toElementAttributes
-
-        colorAttr =
-            case color of
-                ColorHalfOpaque ->
-                    Colors.overlayBackground
-
-                ColorSuccess ->
-                    Background.color Colors.green500
-
-                ColorDanger ->
-                    Background.color Colors.red600
     in
     if state then
+        let
+            colorAttr =
+                case color of
+                    ColorHalfOpaque ->
+                        Colors.overlayBackground
+
+                    ColorSuccess ->
+                        Background.color Colors.green500
+
+                    ColorDanger ->
+                        Background.color Colors.red600
+        in
         Element.none
             |> Element.el (Element.padding 10 :: knobAttrs)
             |> Element.el (paddingRight :: thinBorder)

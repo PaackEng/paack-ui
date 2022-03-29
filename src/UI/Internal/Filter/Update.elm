@@ -1,4 +1,4 @@
-module UI.Internal.Filter.Update exposing (Analytics(..), OutMsg, apply, emptyOutMsg, update)
+module UI.Internal.Filter.Update exposing (Analytics(..), OutMsg, apply, update)
 
 import UI.Effects as Effects exposing (Effects)
 import UI.Internal.Filter.Model exposing (..)

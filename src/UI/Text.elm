@@ -253,8 +253,7 @@ multiline style lines =
     let
         newSpans =
             lines
-                |> List.map (style >> Internal.getSpans)
-                |> List.concat
+                |> List.concatMap (style >> Internal.getSpans)
     in
     Internal.Text newSpans Internal.textDefaultOptions
 
@@ -274,7 +273,6 @@ combination parts =
     let
         newSpans =
             parts
-                |> List.map Internal.getSpans
-                |> List.concat
+                |> List.concatMap Internal.getSpans
     in
     Internal.Text newSpans Internal.textDefaultOptions

@@ -1442,12 +1442,13 @@ desktopView renderConfig prop opt =
                 state.sorters
                 columns
                 selectionHeader
-
-        extendWidth =
-            Tuple.mapSecond <| Element.el [ Element.width opt.contentWidth ]
     in
     case state.paginator of
         Just paginator ->
+            let
+                extendWidth =
+                    Tuple.mapSecond <| Element.el [ Element.width opt.contentWidth ]
+            in
             Keyed.column
                 [ Element.width opt.width
                 , Element.height opt.height

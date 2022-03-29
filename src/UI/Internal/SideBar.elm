@@ -128,30 +128,31 @@ mobile cfg page menu title maybeStack =
                 [ viewHead cfg menu title maybeStack
                 , Element.el [ width fill, height fill, Element.scrollbarY ] page
                 ]
-
-        menuView =
-            Element.row [ width fill, height fill ]
-                [ viewSide cfg { proportional = True, persistent = True } menu
-                , Element.el
-                    [ Colors.gray800
-                        |> Element.colorSetOpacity 0.85
-                        |> Background.color
-                    , width (fillPortion 25)
-                    , height fill
-                    , Events.onClick (toggleMsg (not isExpanded))
-                    ]
-                    Element.none
-                ]
-
-        containerWithBar =
-            Element.column
-                [ width fill
-                , height fill
-                , Element.inFront menuView
-                ]
-                [ content100vh ]
     in
     if isExpanded then
+        let
+            menuView =
+                Element.row [ width fill, height fill ]
+                    [ viewSide cfg { proportional = True, persistent = True } menu
+                    , Element.el
+                        [ Colors.gray800
+                            |> Element.colorSetOpacity 0.85
+                            |> Background.color
+                        , width (fillPortion 25)
+                        , height fill
+                        , Events.onClick (toggleMsg (not isExpanded))
+                        ]
+                        Element.none
+                    ]
+
+            containerWithBar =
+                Element.column
+                    [ width fill
+                    , height fill
+                    , Element.inFront menuView
+                    ]
+                    [ content100vh ]
+        in
         containerWithBar
 
     else
@@ -350,11 +351,12 @@ selectedItemOutline isSelected =
             , padding 8
             ]
 
-        selectedColor =
-            Palette.blue200 |> Palette.toElementColor
-
         attrs =
             if isSelected then
+                let
+                    selectedColor =
+                        Palette.blue200 |> Palette.toElementColor
+                in
                 Background.color selectedColor
                     :: baseAttrs
 

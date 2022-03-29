@@ -4,9 +4,7 @@ module UI.Internal.Utils.Element exposing
     , id
     , overflowAttrs
     , overflowVisible
-    , overlay
     , overlayZIndex
-    , shrinkButClip
     , style
     , tabIndex
     , title
@@ -17,7 +15,6 @@ module UI.Internal.Utils.Element exposing
 import Element exposing (Attribute, Element, fill, minimum, shrink)
 import Element.Events as Events
 import Html.Attributes as HtmlAttrs
-import UI.Internal.Colors as Colors
 
 
 style : String -> String -> Attribute msg
@@ -79,20 +76,6 @@ customOverlay onClickMsg backgroundStyleAttributes foregroundContent =
         , Element.inFront foregroundContent
         ]
         (Element.el backgroundAttributes Element.none)
-
-
-overlay : msg -> Element msg -> Element msg
-overlay closeMsg content =
-    customOverlay closeMsg [ Colors.overlayBackground ] content
-
-
-shrinkButClip : List (Attribute msg)
-shrinkButClip =
-    List.map tuplesToStyles
-        [ ( "width", "min-content" )
-        , ( "max-width", "100%" )
-        , ( "overflow", "clip" )
-        ]
 
 
 overlayZIndex : Int
