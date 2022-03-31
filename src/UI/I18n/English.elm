@@ -40,9 +40,9 @@ filters =
 paginator : Paginator
 paginator =
     { format = \{ first, last, total } -> "" ++ first ++ " - " ++ last ++ " of " ++ total ++ ""
-    , tableFormat = \{ first, last, total } -> "" ++ first ++ "-" ++ last ++ " of " ++ total ++ ""
     , previous = "Previous"
     , next = "Next"
+    , tableFormat = \{ first, last, total } -> "" ++ first ++ "-" ++ last ++ " of " ++ total ++ ""
     , first = "First"
     , last = "Last"
     , rowsPerPage = "Rows/Page"

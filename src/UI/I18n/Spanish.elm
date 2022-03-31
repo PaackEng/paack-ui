@@ -41,9 +41,9 @@ filters =
 paginator : Paginator
 paginator =
     { format = \{ first, last, total } -> "" ++ first ++ " - " ++ last ++ " de " ++ total ++ ""
-    , tableFormat = \{ first, last, total } -> "" ++ first ++ "-" ++ last ++ " de " ++ total ++ ""
     , previous = "Anterior"
     , next = "Siguiente"
+    , tableFormat = \{ first, last, total } -> "" ++ first ++ "-" ++ last ++ " de " ++ total ++ ""
     , first = EmptyFallback.paginator.first
     , last = EmptyFallback.paginator.last
     , rowsPerPage = EmptyFallback.paginator.rowsPerPage
@@ -59,7 +59,7 @@ checkbox =
 listView : ListView
 listView =
     { search = "Buscar"
-    , selectAll = EmptyFallback.listView.selectAll
+    , selectAll = "Seleccionar Todos"
     }
 
 
@@ -78,8 +78,8 @@ tablesDetails =
 
 tablesSorting : TablesSorting
 tablesSorting =
-    { ascending = EmptyFallback.tablesSorting.ascending
-    , descending = EmptyFallback.tablesSorting.descending
+    { ascending = "Ordenar ascendente"
+    , descending = "Ordenar descendete"
     }
 
 
@@ -128,8 +128,8 @@ contentPlaceholders =
 
 dropdown : Dropdown
 dropdown =
-    { show = EmptyFallback.dropdown.show
-    , collapse = EmptyFallback.dropdown.collapse
+    { show = "Expandir"
+    , collapse = "Minimizar"
     }
 
 
@@ -154,8 +154,8 @@ calendar =
     , fri = "Vie"
     , sat = "Sáb"
     , sun = "Dom"
-    , prevMonth = EmptyFallback.calendar.prevMonth
-    , nextMonth = EmptyFallback.calendar.nextMonth
+    , prevMonth = "Mes anterior"
+    , nextMonth = "Mes siguiente"
     }
 
 
