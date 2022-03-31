@@ -20,9 +20,9 @@
     },
     "paginator": {
         "format": "{{first}} - {{last}} de {{total}}",
-        "tableFormat": "{{first}}-{{last}} de {{total}}",
         "previous": "Anterior",
         "next": "Siguiente",
+        "tableFormat": "{{first}}-{{last}} de {{total}}",
         "first": "",
         "last": "",
         "rowsPerPage": ""
@@ -32,7 +32,7 @@
     },
     "listView": {
         "search": "Buscar",
-        "selectAll": ""
+        "selectAll": "Seleccionar Todos"
     },
     "radio": {
         "select": "Seleccionar item"
@@ -43,8 +43,8 @@
             "collapse": "Colapsar"
         },
         "sorting": {
-            "ascending": "",
-            "descending": ""
+            "ascending": "Ordenar ascendente",
+            "descending": "Ordenar descendete"
         },
         "selectRow": "Seleccionar esta fila.",
         "selectAll": "Seleccionar todas las filas"
@@ -68,8 +68,8 @@
         }
     },
     "dropdown": {
-        "show": "",
-        "collapse": ""
+        "show": "Expandir",
+        "collapse": "Minimizar"
     },
     "calendar": {
         "jan": "Enero",
@@ -91,7 +91,7 @@
         "fri": "Vie",
         "sat": "Sáb",
         "sun": "Dom",
-        "prevMonth": "",
-        "nextMonth": ""
+        "prevMonth": "Mes anterior",
+        "nextMonth": "Mes siguiente"
     }
 }

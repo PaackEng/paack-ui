@@ -33,9 +33,9 @@ type alias Filters =
 
 type alias Paginator =
     { format : { first : String, last : String, total : String } -> String
-    , tableFormat : { first : String, last : String, total : String } -> String
     , previous : String
     , next : String
+    , tableFormat : { first : String, last : String, total : String } -> String
     , first : String
     , last : String
     , rowsPerPage : String

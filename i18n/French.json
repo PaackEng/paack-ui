@@ -20,9 +20,9 @@
     },
     "paginator": {
         "format": "{{first}} - {{last}} sur {{total}}\n",
-        "tableFormat": "{{first}}-{{last}} sur {{total}}",
         "previous": "Précédent",
         "next": "Suivant",
+        "tableFormat": "{{first}}-{{last}} sur {{total}}",
         "first": "",
         "last": "",
         "rowsPerPage": ""
