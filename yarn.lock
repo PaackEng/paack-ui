@@ -2042,9 +2042,9 @@ caniuse-api@^3.0.0:
     lodash.uniq "^4.5.0"
 
 caniuse-lite@^1.0.0, caniuse-lite@^1.0.30001317:
-  version "1.0.30001322"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001322.tgz#2e4c09d11e1e8f852767dab287069a8d0c29d623"
-  integrity sha512-neRmrmIrCGuMnxGSoh+x7zYtQFFgnSY2jaomjU56sCkTA6JINqQrxutF459JpWcWRajvoyn95sOXq4Pqrnyjew==
+  version "1.0.30001323"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001323.tgz#a451ff80dec7033016843f532efda18f02eec011"
+  integrity sha512-e4BF2RlCVELKx8+RmklSEIVub1TWrmdhvA5kEUueummz1XyySW0DVk+3x9HyhU9MuWTa2BhqLgEuEmUwASAdCA==
 
 caseless@~0.12.0:
   version "0.12.0"
@@ -2735,9 +2735,9 @@ dayjs@^1.10.4:
   integrity sha512-JLC809s6Y948/FuCZPm5IX8rRhQwOiyMb2TfVVQEixG7P8Lm/gt5S7yoQZmC8x1UehI9Pb7sksEt4xx14m+7Ug==
 
 deasync@^0.1.14:
-  version "0.1.24"
-  resolved "https://registry.yarnpkg.com/deasync/-/deasync-0.1.24.tgz#6ecc9c6ff9eba64a4f4572ae3c4db77fed09268a"
-  integrity sha512-i98vg42xNfRZCymummMAN0rIcQ1gZFinSe3btvPIvy6JFTaeHcumeKybRo2HTv86nasfmT0nEgAn2ggLZhOCVA==
+  version "0.1.25"
+  resolved "https://registry.yarnpkg.com/deasync/-/deasync-0.1.25.tgz#43f4674e01a2e687dcff72a77c7f003682875b48"
+  integrity sha512-tia42VeVpjTtsWSMPlzVv0GmNXhziqJWlUSIyzyZ2KU0+fNfeWvhNc1nd0enyl4nadAA6qb91a+gG1asu8lYAw==
   dependencies:
     bindings "^1.5.0"
     node-addon-api "^1.7.1"
@@ -3013,9 +3013,9 @@ ee-first@1.1.1:
   integrity sha1-WQxhFWsK4vTwJVcyoViyZrxWsh0=
 
 electron-to-chromium@^1.4.84:
-  version "1.4.99"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.99.tgz#da97e2c116dc6de2f91a81b4ff8d1b19bf54dc1f"
-  integrity sha512-YXMzbvlo6pW12KWw0bj6cIGCJi1Moy8PLCuuzgRzg6WYIcHILK3szU+HHnHFx2b373qRv+cfmHhbmRbatyAbPA==
+  version "1.4.103"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.103.tgz#abfe376a4d70fa1e1b4b353b95df5d6dfd05da3a"
+  integrity sha512-c/uKWR1Z/W30Wy/sx3dkZoj4BijbXX85QKWu9jJfjho3LBAXNEGAEW3oWiGb+dotA6C6BzCTxL2/aLes7jlUeg==
 
 elliptic@^6.5.3:
   version "6.5.4"
@@ -5496,10 +5496,10 @@ p-try@^2.0.0:
   resolved "https://registry.yarnpkg.com/p-try/-/p-try-2.2.0.tgz#cb2868540e313d61de58fafbe35ce9004d5540e6"
   integrity sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==
 
-paack-ui-assets@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/paack-ui-assets/-/paack-ui-assets-0.2.1.tgz#04a3a969f89e9775666ba94f8f59a7a2544d793f"
-  integrity sha512-xZjkoidjksiK/ieoxdnxTs17ilUXUQvvel8AS4jmEhlsLycME90ew3XGNsl0s1PQStDh+L0pX2mRGK57M7dMmw==
+paack-ui-assets@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/paack-ui-assets/-/paack-ui-assets-0.2.2.tgz#0da02168e975c49e4d1c6038b73de3a6e3b03654"
+  integrity sha512-v2r01cpayfsMZ/b6h91/sBpecNDQ5+GXdoOkeXlDEsM8VqF72c+sr5OgmxqYgNqID77j2zAk0S3S7Tp1KBF/7Q==
 
 package-json@^6.3.0:
   version "6.5.0"
@@ -6050,9 +6050,9 @@ postcss-selector-parser@^3.0.0:
     uniq "^1.0.1"
 
 postcss-selector-parser@^6.0.2:
-  version "6.0.9"
-  resolved "https://registry.yarnpkg.com/postcss-selector-parser/-/postcss-selector-parser-6.0.9.tgz#ee71c3b9ff63d9cd130838876c13a2ec1a992b2f"
-  integrity sha512-UO3SgnZOVTwu4kyLR22UQ1xZh086RyNZppb7lLAKBFK8a32ttG5i87Y/P3+2bRSjZNyJ1B7hfFNo273tKe9YxQ==
+  version "6.0.10"
+  resolved "https://registry.yarnpkg.com/postcss-selector-parser/-/postcss-selector-parser-6.0.10.tgz#79b61e2c0d1bfc2602d549e11d0876256f8df88d"
+  integrity sha512-IQ7TZdoaqbT+LCpShg46jnZVlhWD2w6iQYAcYXfHARZ7X1t/UGhhceQDs5X0cGqKvYlHNOuv7Oa1xmb0oQuA3w==
   dependencies:
     cssesc "^3.0.0"
     util-deprecate "^1.0.2"
