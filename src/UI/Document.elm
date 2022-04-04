@@ -3,7 +3,7 @@ module UI.Document exposing
     , Document, document
     , Page, page, pageWithDialog, pageWithDefaultMenu, pageMap
     , PageBody, bodySingle, Stack, bodyStack
-    , withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages
+    , withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages, withExtraHtml
     , MenuPage, menuPage, withSidebarStyle, sidebarPersistent
     , sidebarNonPersistent, withLegacyTransitionMenuStyle, showMenu, hideMenu
     , toBrowserDocument
@@ -67,7 +67,7 @@ Example of usage:
 
 # Menu
 
-@docs withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages
+@docs withMenuLogo, withMenuActions, MenuAction, menuAction, withMenuPages, withExtraHtml
 @docs MenuPage, menuPage, withSidebarStyle, sidebarPersistent
 @docs sidebarNonPersistent, withLegacyTransitionMenuStyle, showMenu, hideMenu
 
@@ -181,6 +181,7 @@ type alias DocumentRecord pageSet msg =
     , menu : Menu.Menu msg
     , sidebarStyle : SidebarStyle
     , hasLegacySidebar : Bool
+    , extraHtml : List (Html msg)
     }
 
 
@@ -288,6 +289,13 @@ appearance/behavior of the sidebar when it is enabled by the `hasMenu` flag.
 withSidebarStyle : SidebarStyle -> Document page msg -> Document page msg
 withSidebarStyle style (Document nav) =
     Document { nav | sidebarStyle = style }
+
+
+{-| `Document.withExtraHtml` allows injecting unrelated elements in the page.
+-}
+withExtraHtml : List (Html msg) -> Document page msg -> Document page msg
+withExtraHtml newExtraHtml (Document nav) =
+    Document { nav | extraHtml = nav.extraHtml ++ newExtraHtml }
 
 
 {-| `Document.withLegacyTransitionMenuStyle` takes a Legacy `SidebarStyle` setting the
@@ -529,6 +537,7 @@ document applier (Model state) pagesPages =
         , menu = menu applier state
         , sidebarStyle = SidebarPersistent
         , hasLegacySidebar = False
+        , extraHtml = []
         }
 
 
@@ -614,9 +623,9 @@ toBrowserDocument cfg pageItem (Document model) =
     in
     { title = title
     , body =
-        [ Icon.svgSpriteImport
-        , Element.layout defaultAttrs bodyWithDialog
-        ]
+        Icon.svgSpriteImport
+            :: Element.layout defaultAttrs bodyWithDialog
+            :: model.extraHtml
     }
 
 
