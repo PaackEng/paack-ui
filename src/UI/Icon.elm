@@ -1515,7 +1515,7 @@ van =
 -}
 walk : String -> Icon
 walk =
-    defaultInit "walk"
+    defaultInit "Walk"
 
 
 {-| Icon constructor.
