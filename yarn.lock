@@ -5496,10 +5496,10 @@ p-try@^2.0.0:
   resolved "https://registry.yarnpkg.com/p-try/-/p-try-2.2.0.tgz#cb2868540e313d61de58fafbe35ce9004d5540e6"
   integrity sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==
 
-paack-ui-assets@^0.2.2:
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/paack-ui-assets/-/paack-ui-assets-0.2.2.tgz#0da02168e975c49e4d1c6038b73de3a6e3b03654"
-  integrity sha512-v2r01cpayfsMZ/b6h91/sBpecNDQ5+GXdoOkeXlDEsM8VqF72c+sr5OgmxqYgNqID77j2zAk0S3S7Tp1KBF/7Q==
+paack-ui-assets@^0.3.0:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/paack-ui-assets/-/paack-ui-assets-0.3.1.tgz#20bfd4b5ad3651a4fc3b8a5bc70fc1412650decf"
+  integrity sha512-NIPLvG5zuqtgqLyzg26dmHi0Xjmak+QGvYJwzYPWnY50kyh/hN31DWu01elr7J9f0v/0qM9PzvWaVAdjqy/PEA==
 
 package-json@^6.3.0:
   version "6.5.0"
