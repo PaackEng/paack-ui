@@ -99,6 +99,7 @@ icons =
     , ( Icon.firstPage, "firstPage" )
     , ( Icon.fix, "fix" )
     , ( Icon.fixing, "fixing" )
+    , ( Icon.flag, "flag" )
     , ( Icon.folder, "folder" )
     , ( Icon.food, "food" )
     , ( Icon.frozen, "frozen" )
