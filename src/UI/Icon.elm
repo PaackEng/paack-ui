@@ -1,7 +1,7 @@
 module UI.Icon exposing
     ( svgSpriteImport
     , Icon
-    , addCircle, add, arrowCurveLeft, arrowDown, arrowLeft, arrowRight, arrowShapeUp, arrowUp, bell, bicycle, bike, bluetooth, boltDisabled, bolt, boxFilled, boxOutlined, boxesFilled, boxesOutlined, calendar, camera, car, cellular, checkmarkCircle, checkmarkRoundedRectangle, checkmark, chevronDown, chevronLeft, chevronRight, chevronUp, circle, clockIssue, clockLocked, clock, closeCircle, closeRoundedRectangle, close, coins, collapse, crosshair, currencyNote, directions, download, eBike, eCar, eVan, edit, ellipsis, emailFill, emailOutline, empty, expand, eyeHide, eye, filter, firstPage, fix, flag, folder, food, frozen, gVan, grocery, groups, hamburger, hand, home, hourglass, info, keys, lastPage, legacyApis, legacyHistorical, legacyLabelPrinter, legacyReport, legacyRetailerDashboard, legacySignOut, list, location, lock, logout, map, mapPinRadius, mapPin, messageLock, messageOTP, message, microphoneMute, microphone, minus, move, notepad, notes, notification, otp, personAssign, personAssigned, personError, personRemove, personUnassign, person, personsAdd, personsNotApplicable, persons, phoneEndCall, phoneStartCall, placeholder, printerError, printer, redo, reload, remove, report, reporting, reset, return, scanBarcode, scanGroup, scanPackage, scanSpace, scan, search, settings, shelves, sort, spaceError, spaceSearch, space, speakerMute, speaker, store, tag, trash, truck, undo, van, walk, warning, waves, webhook
+    , addCircle, add, arrowCurveLeft, arrowDown, arrowDownBold, arrowLeft, arrowRight, arrowShapeUp, arrowUp, arrowUpBoldNegative, bell, bicycle, bike, bluetooth, boltDisabled, bolt, boxFilled, boxOutlined, boxesFilled, boxesOutlined, calendar, camera, car, cellular, checkmarkCircle, checkmarkRoundedRectangle, checkmark, chevronDown, chevronLeft, chevronRight, chevronUp, circle, clockIssue, clockLocked, clock, closeCircle, closeRoundedRectangle, close, coins, collapse, crosshair, currencyNote, directions, download, eBike, eCar, eVan, edit, ellipsis, emailFill, emailOutline, empty, expand, eyeHide, eye, filter, firstPage, fix, flag, folder, food, frozen, gVan, grocery, groups, hamburger, hand, home, hourglass, info, keys, lastPage, legacyApis, legacyHistorical, legacyLabelPrinter, legacyReport, legacyRetailerDashboard, legacySignOut, list, location, lock, logout, map, mapPinRadius, mapPin, messageLock, messageOTP, message, microphoneMute, microphone, minus, move, notepad, notes, notification, otp, personAssign, personAssigned, personError, personRemove, personUnassign, person, personsAdd, personsNotApplicable, persons, phoneEndCall, phoneStartCall, placeholder, printerError, printer, redo, reload, remove, report, reporting, reset, return, scanBarcode, scanGroup, scanPackage, scanSpace, scan, search, settings, shelves, sort, spaceError, spaceSearch, space, speakerMute, speaker, store, tag, trash, truck, undo, van, walk, warning, waves, webhook
     , fixing, loader
     , assignPerson, boxes, check, configure, delete, done, eventLog, fixIssues, insert, moreActions, nextContent, notifications, paackSpaces, packages, phone, pause, previousContent, print, sandwichMenu, searchSpace, seeMore, sortDecreasing, sortIncreasing, success, toggle, toggleDown, toggleUp, unassignPerson, wait
     , getHint
@@ -37,7 +37,7 @@ An icon can be created and rendered as in the following pipeline:
 
 ## Current names
 
-@docs addCircle, add, arrowCurveLeft, arrowDown, arrowLeft, arrowRight, arrowShapeUp, arrowUp, bell, bicycle, bike, bluetooth, boltDisabled, bolt, boxFilled, boxOutlined, boxesFilled, boxesOutlined, calendar, camera, car, cellular, checkmarkCircle, checkmarkRoundedRectangle, checkmark, chevronDown, chevronLeft, chevronRight, chevronUp, circle, clockIssue, clockLocked, clock, closeCircle, closeRoundedRectangle, close, coins, collapse, crosshair, currencyNote, directions, download, eBike, eCar, eVan, edit, ellipsis, emailFill, emailOutline, empty, expand, eyeHide, eye, filter, firstPage, fix, flag, folder, food, frozen, gVan, grocery, groups, hamburger, hand, home, hourglass, info, keys, lastPage, legacyApis, legacyHistorical, legacyLabelPrinter, legacyReport, legacyRetailerDashboard, legacySignOut, list, location, lock, logout, map, mapPinRadius, mapPin, messageLock, messageOTP, message, microphoneMute, microphone, minus, move, notepad, notes, notification, otp, personAssign, personAssigned, personError, personRemove, personUnassign, person, personsAdd, personsNotApplicable, persons, phoneEndCall, phoneStartCall, placeholder, printerError, printer, redo, reload, remove, report, reporting, reset, return, scanBarcode, scanGroup, scanPackage, scanSpace, scan, search, settings, shelves, sort, spaceError, spaceSearch, space, speakerMute, speaker, store, tag, trash, truck, undo, van, walk, warning, waves, webhook
+@docs addCircle, add, arrowCurveLeft, arrowDown, arrowDownBold, arrowLeft, arrowRight, arrowShapeUp, arrowUp, arrowUpBoldNegative, bell, bicycle, bike, bluetooth, boltDisabled, bolt, boxFilled, boxOutlined, boxesFilled, boxesOutlined, calendar, camera, car, cellular, checkmarkCircle, checkmarkRoundedRectangle, checkmark, chevronDown, chevronLeft, chevronRight, chevronUp, circle, clockIssue, clockLocked, clock, closeCircle, closeRoundedRectangle, close, coins, collapse, crosshair, currencyNote, directions, download, eBike, eCar, eVan, edit, ellipsis, emailFill, emailOutline, empty, expand, eyeHide, eye, filter, firstPage, fix, flag, folder, food, frozen, gVan, grocery, groups, hamburger, hand, home, hourglass, info, keys, lastPage, legacyApis, legacyHistorical, legacyLabelPrinter, legacyReport, legacyRetailerDashboard, legacySignOut, list, location, lock, logout, map, mapPinRadius, mapPin, messageLock, messageOTP, message, microphoneMute, microphone, minus, move, notepad, notes, notification, otp, personAssign, personAssigned, personError, personRemove, personUnassign, person, personsAdd, personsNotApplicable, persons, phoneEndCall, phoneStartCall, placeholder, printerError, printer, redo, reload, remove, report, reporting, reset, return, scanBarcode, scanGroup, scanPackage, scanSpace, scan, search, settings, shelves, sort, spaceError, spaceSearch, space, speakerMute, speaker, store, tag, trash, truck, undo, van, walk, warning, waves, webhook
 
 
 ## Special
@@ -210,6 +210,16 @@ arrowDown =
 
 {-| Icon constructor.
 
+    Icon.arrowDownBold "Accessibility hint"
+
+-}
+arrowDownBold : String -> Icon
+arrowDownBold =
+    defaultInit "Arrow-Down-Bold"
+
+
+{-| Icon constructor.
+
     Icon.arrowLeft "Accessibility hint"
 
 -}
@@ -246,6 +256,16 @@ arrowShapeUp =
 arrowUp : String -> Icon
 arrowUp =
     defaultInit "Arrow-Up"
+
+
+{-| Icon constructor.
+
+    Icon.arrowUpBoldNegative "Accessibility hint"
+
+-}
+arrowUpBoldNegative : String -> Icon
+arrowUpBoldNegative =
+    defaultInit "Arrow-Up-Bold-Negative"
 
 
 {-| Icon constructor.
