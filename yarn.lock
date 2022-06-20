@@ -1806,6 +1806,13 @@ brace-expansion@^1.1.7:
     balanced-match "^1.0.0"
     concat-map "0.0.1"
 
+brace-expansion@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/brace-expansion/-/brace-expansion-2.0.1.tgz#1edc459e0f0c548486ecf9fc99f2221364b9a0ae"
+  integrity sha512-XnAIvQ8eM+kC6aULx6wuQiwVsnzsi9d3WxzV3FpWTGA19F621kwdbsAcFKXgKUHZWsy+mY6iL1sHTxWEFCytDA==
+  dependencies:
+    balanced-match "^1.0.0"
+
 braces@^2.3.1, braces@^2.3.2:
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/braces/-/braces-2.3.2.tgz#5979fd3f14cd531565e5fa2df1abfff1dfaee729"
@@ -2119,7 +2126,7 @@ chalk@^3.0.0:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
 
-chalk@^4.0.0, chalk@^4.1.0:
+chalk@^4.0.0, chalk@^4.1.0, chalk@^4.1.2:
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-4.1.2.tgz#aac4e2b7734a740867aeb16bf02aad556a1e7a01"
   integrity sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==
@@ -2151,7 +2158,7 @@ chokidar@^2.1.5:
   optionalDependencies:
     fsevents "^1.2.7"
 
-chokidar@^3.3.1, chokidar@^3.5.1, chokidar@^3.5.2:
+chokidar@^3.3.1, chokidar@^3.5.2, chokidar@^3.5.3:
   version "3.5.3"
   resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-3.5.3.tgz#1cf37c8707b932bd1af1ae22c0432e2acd1903bd"
   integrity sha512-Dr3sfKRP6oTcjf2JmUmFJfeVMvXBdegxB0iVQ5eb2V10uFJUCAS8OByZdVAyVb8xXNz3GjjTgj9kLWsZTqE6kw==
@@ -2341,10 +2348,10 @@ commander@^5.0.0, commander@^5.1.0:
   resolved "https://registry.yarnpkg.com/commander/-/commander-5.1.0.tgz#46abbd1652f8e059bddaef99bbdcb2ad9cf179ae"
   integrity sha512-P0CysNDQ7rtVw4QIQtm+MRxV66vKFSvlsQvGYXZWR3qFU0jlMKHZZZgw8e+8DSah4UDKMqnknRDQz+xuQXQ/Zg==
 
-commander@^7.1.0:
-  version "7.2.0"
-  resolved "https://registry.yarnpkg.com/commander/-/commander-7.2.0.tgz#a36cb57d0b501ce108e4d20559a150a391d97ab7"
-  integrity sha512-QrWXB+ZQSVPmIWIhtEO9H+gwHaMGYiF5ChvoJ+K9ZGHG/sVsa6yiesAD1GC/x46sET00Xlwo1u49RVVVzvcSkw==
+commander@^9.3.0:
+  version "9.3.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-9.3.0.tgz#f619114a5a2d2054e0d9ff1b31d5ccf89255e26b"
+  integrity sha512-hv95iU5uXPbK83mjrJKuZyFM/LBAoCV/XhVGkS5Je6tl7sxr6A0ITMw5WoRV46/UaJ46Nllm3Xt7IaJhXTIkzw==
 
 common-tags@^1.8.0:
   version "1.8.2"
@@ -3093,24 +3100,28 @@ elm-review@^2.7.2:
     which "^2.0.2"
     wrap-ansi "^6.2.0"
 
-elm-test@^0.19.1-revision7:
-  version "0.19.1-revision7"
-  resolved "https://registry.yarnpkg.com/elm-test/-/elm-test-0.19.1-revision7.tgz#1a0864b001f2cc55ba6479bd3afedfbd271ab549"
-  integrity sha512-sd3nCQMeYMaY84Sz41bVJ30ZvQN1/4ZcD8uYMOuUbM39FDh58NY9/AcImVJ7Z+gjCFdcSU6VscZzhUoPW8jp6Q==
+elm-solve-deps-wasm@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/elm-solve-deps-wasm/-/elm-solve-deps-wasm-1.0.1.tgz#0141f4f464e67e5d7a75bbcbf1fcdda9bf41d7fa"
+  integrity sha512-A05XKZKhzM8vWTo8KvNR4g1ICt9iMPOAMfo79OK25c+tQaLSfQ8iMYvW6XgSEd+SgRfM5VSKX4hKEiH6iTiWsg==
+
+elm-test@^0.19.1-revision8:
+  version "0.19.1-revision8"
+  resolved "https://registry.yarnpkg.com/elm-test/-/elm-test-0.19.1-revision8.tgz#77dae1227eb082d9e4ef0268f4ff8919bd5ce61c"
+  integrity sha512-n89sr4N1C/5KRPeVdbSd49UqOHkk1yDE+69Pxd98XGLt4OGkE/DlP1yrmUGEBSrsKzW/P2pvZcCFXrjtPhzoLw==
   dependencies:
-    chalk "^4.1.0"
-    chokidar "^3.5.1"
-    commander "^7.1.0"
+    chalk "^4.1.2"
+    chokidar "^3.5.3"
+    commander "^9.3.0"
     cross-spawn "^7.0.3"
-    elm-tooling "^1.2.0"
-    glob "^7.1.6"
-    graceful-fs "^4.2.4"
-    rimraf "^3.0.2"
+    elm-solve-deps-wasm "^1.0.1"
+    glob "^8.0.3"
+    graceful-fs "^4.2.10"
     split "^1.0.1"
     which "^2.0.2"
-    xmlbuilder "^15.1.0"
+    xmlbuilder "^15.1.1"
 
-elm-tooling@^1.2.0, elm-tooling@^1.6.0:
+elm-tooling@^1.6.0:
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/elm-tooling/-/elm-tooling-1.8.0.tgz#366870f95c1eb678f89ac8b7608869c7d3e1d86c"
   integrity sha512-IjMvW/VHqxLidlJSAocBGDBmqiZ1NS0lK/UCMRU4ULEEaTVjpSd/9Dv0mH2ok0H0egSTYx19GnrdL4Lq9h+z+A==
@@ -3771,6 +3782,17 @@ glob@^7.0.0, glob@^7.1.3, glob@^7.1.4, glob@^7.1.6:
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
+glob@^8.0.3:
+  version "8.0.3"
+  resolved "https://registry.yarnpkg.com/glob/-/glob-8.0.3.tgz#415c6eb2deed9e502c68fa44a272e6da6eeca42e"
+  integrity sha512-ull455NHSHI/Y1FqGaaYFaLGkNMMJbavMrEGFXG/PGrg6y7sutWHUHrz6gy6WEBH6akM1M414dWKCNs+IhKdiQ==
+  dependencies:
+    fs.realpath "^1.0.0"
+    inflight "^1.0.4"
+    inherits "2"
+    minimatch "^5.0.1"
+    once "^1.3.0"
+
 global-dirs@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/global-dirs/-/global-dirs-3.0.0.tgz#70a76fe84ea315ab37b1f5576cbde7d48ef72686"
@@ -3821,7 +3843,7 @@ got@^9.6.0:
     to-readable-stream "^1.0.0"
     url-parse-lax "^3.0.0"
 
-graceful-fs@^4.1.11, graceful-fs@^4.1.4, graceful-fs@^4.1.6, graceful-fs@^4.2.0, graceful-fs@^4.2.4, graceful-fs@~4.2.0:
+graceful-fs@^4.1.11, graceful-fs@^4.1.4, graceful-fs@^4.1.6, graceful-fs@^4.2.0, graceful-fs@^4.2.10, graceful-fs@~4.2.0:
   version "4.2.10"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.10.tgz#147d3a006da4ca3ce14728c7aefc287c367d7a6c"
   integrity sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==
@@ -5015,6 +5037,13 @@ minimatch@^3.0.0, minimatch@^3.1.1:
   integrity sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==
   dependencies:
     brace-expansion "^1.1.7"
+
+minimatch@^5.0.1:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-5.1.0.tgz#1717b464f4971b144f6aabe8f2d0b8e4511e09c7"
+  integrity sha512-9TPBGGak4nHfGZsPBohm9AWg6NoT7QTCehS3BIJABslyZbzxfV78QM2Y6+i741OPZIafFAaiiEMh5OyIrJPgtg==
+  dependencies:
+    brace-expansion "^2.0.1"
 
 minimatch@~3.0.4:
   version "3.0.8"
@@ -7737,7 +7766,7 @@ xml-name-validator@^3.0.0:
   resolved "https://registry.yarnpkg.com/xml-name-validator/-/xml-name-validator-3.0.0.tgz#6ae73e06de4d8c6e47f9fb181f78d648ad457c6a"
   integrity sha512-A5CUptxDsvxKJEU3yO6DuWBSJz/qizqzJKOMIfUJHETbBw/sFaDxgd6fxm1ewUaM0jZ444Fc5vC5ROYurg/4Pw==
 
-xmlbuilder@^15.1.0:
+xmlbuilder@^15.1.1:
   version "15.1.1"
   resolved "https://registry.yarnpkg.com/xmlbuilder/-/xmlbuilder-15.1.1.tgz#9dcdce49eea66d8d10b42cae94a79c3c8d0c2ec5"
   integrity sha512-yMqGBqtXyeN1e3TGYvgNgDVZ3j84W4cwkOXQswghol6APgZWaff9lnbvN7MHYJOiXsvGPXtjTYJEiC9J2wv9Eg==
