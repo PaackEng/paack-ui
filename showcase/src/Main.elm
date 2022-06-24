@@ -39,6 +39,7 @@ import UIExplorer
         , exploreWithCategories
         , logoFromHtml
         )
+import UIExplorer.ColorMode as ColorMode
 import UIExplorer.Plugins.Code as CodePlugin
 import UIExplorer.Plugins.MenuVisibility as MenuVisibility
 import UIExplorer.Plugins.Note as NotePlugin
@@ -47,15 +48,18 @@ import UIExplorer.Plugins.Tabs.Icons as TabsIconsPlugin
 import Utils exposing (ExplorerModel)
 
 
-config : Config Model Msg PluginOptions
+config : Config Model Msg PluginOptions {}
 config =
     { customModel = Model.init
+    , init = \_ model -> model
     , customHeader = customHeader
     , update = updateStories
     , onModeChanged = Nothing
     , viewEnhancer = viewEnhancer
     , menuViewEnhancer = MenuVisibility.menuViewEnhancer
     , subscriptions = always Sub.none
+    , documentTitle = Nothing
+    , enableDarkMode = False
     }
 
 
@@ -73,7 +77,7 @@ viewEnhancer : ExplorerModel -> Html (UIExplorer.Msg Msg) -> Html (UIExplorer.Ms
 viewEnhancer m stories =
     Html.div []
         [ stories
-        , TabsPlugin.view m.colorMode
+        , TabsPlugin.view (Maybe.withDefault ColorMode.Light m.colorMode)
             m.customModel.tabs
             [ ( "Code", CodePlugin.viewEnhancer m, TabsIconsPlugin.code )
             , ( "Notes", NotePlugin.viewEnhancer m, TabsIconsPlugin.note )
@@ -91,7 +95,7 @@ renderConfig =
         RenderConfig.localeEnglish
 
 
-main : UIExplorerProgram Model Msg PluginOptions
+main : UIExplorerProgram Model Msg PluginOptions {}
 main =
     createCategories
         |> category
