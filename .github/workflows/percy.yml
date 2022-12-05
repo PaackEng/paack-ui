@@ -20,7 +20,7 @@ jobs:
         # NOTE: percy has its own cache
 
       - name: Percy test
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v5
         with:
           install-command: yarn --frozen-lockfile --silent
           cache-key: percy-${{ hashFiles('yarn.lock') }}
