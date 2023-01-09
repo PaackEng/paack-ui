@@ -126,7 +126,7 @@ viewSide cfg _ (Menu.Menu prop opt) =
             if prop.isExpanded then
                 let
                     toggleMsg =
-                        prop.toggleMsg (not prop.isExpanded)
+                        prop.toggleMsg False
                 in
                 headerView cfg toggleMsg opt.logo
 
