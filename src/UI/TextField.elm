@@ -801,7 +801,7 @@ genericAttr label isPlaceholder isStatic hasError width size =
         if isPlaceholder then
             Colors.gray400
 
-        else if hasError && not isPlaceholder then
+        else if hasError then
             Colors.red700
 
         else

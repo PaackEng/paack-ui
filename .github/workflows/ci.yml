@@ -28,7 +28,7 @@ jobs:
       - uses: PaackEng/elm-validate-action@v1.2.0
         with:
           elm-working-directory: 'showcase'
-          elm-review-extra-options: --ignore-dirs '../src'
+          elm-review-extra-options: --ignore-dirs '../src' --ignore-dirs '../tests'
 
   tests:
     runs-on: ubuntu-latest

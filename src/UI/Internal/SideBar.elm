@@ -140,7 +140,7 @@ mobile cfg page menu title maybeStack =
                             |> Background.color
                         , width (fillPortion 25)
                         , height fill
-                        , Events.onClick (toggleMsg (not isExpanded))
+                        , Events.onClick (toggleMsg False)
                         ]
                         Element.none
                     ]
