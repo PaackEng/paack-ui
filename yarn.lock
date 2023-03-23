@@ -10,6 +10,31 @@
     "@jridgewell/gen-mapping" "^0.1.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
+"@avh4/elm-format-darwin-arm64@0.8.6-2":
+  version "0.8.6-2"
+  resolved "https://registry.yarnpkg.com/@avh4/elm-format-darwin-arm64/-/elm-format-darwin-arm64-0.8.6-2.tgz#557142c63a6679f695dfcb3ed5974f7e128652e2"
+  integrity sha512-DCK8/BHNnZq1DIn4zVm2oSA/kBt5O4lleMo8XOC6R7ZhxrS4xGw6qmwdinKjEcawI2yV9YHkuuwmkhT+jCyAGg==
+
+"@avh4/elm-format-darwin-x64@0.8.6-2":
+  version "0.8.6-2"
+  resolved "https://registry.yarnpkg.com/@avh4/elm-format-darwin-x64/-/elm-format-darwin-x64-0.8.6-2.tgz#65787139d9ed24d1ab545337773b160fb7d6e99f"
+  integrity sha512-t4sUuJf9d45brhEbPGyP0+O0wwn0rCXV4ojr4xHpni2uy+LxMIrJmhnWImpf7ozQzcr5Lh0GrPniOENOxDlMxw==
+
+"@avh4/elm-format-linux-arm64@0.8.6-2":
+  version "0.8.6-2"
+  resolved "https://registry.yarnpkg.com/@avh4/elm-format-linux-arm64/-/elm-format-linux-arm64-0.8.6-2.tgz#7620a8e08d889635f713d6682e1f1e8a1e174e5f"
+  integrity sha512-EgG5fDvW2DLN7GX6fj8kr+T4vkojHRy4IMYI/FV6z1W0220B0b+KKvJjBJyRBAz5BFaV1PJNMgaySu14AoTbow==
+
+"@avh4/elm-format-linux-x64@0.8.6-2":
+  version "0.8.6-2"
+  resolved "https://registry.yarnpkg.com/@avh4/elm-format-linux-x64/-/elm-format-linux-x64-0.8.6-2.tgz#3345da22bf960e2211051cb84f8d36803db4d98d"
+  integrity sha512-bgEXHumfXNbYwGbuBKTuYhSPIQ3bY/pQcUTzTHW/+4tZnaEObMZnLm8tfukIzWHrM/oK5MtYAvj5B7UmmZO5Pg==
+
+"@avh4/elm-format-win32-x64@0.8.6-2":
+  version "0.8.6-2"
+  resolved "https://registry.yarnpkg.com/@avh4/elm-format-win32-x64/-/elm-format-win32-x64-0.8.6-2.tgz#135ed6b05ee54070c06242ab481b6011035473bd"
+  integrity sha512-ERzWQ2rutVNeryaBqKQMKghw/HdxVww7ujPBW5mJ99PwWGHYZdJCpw6P4m/s3zOqLKviRM44WCrH0LgDSuwcXQ==
+
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.16.7":
   version "7.16.7"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.16.7.tgz#44416b6bd7624b998f5b1af5d470856c40138789"
@@ -3056,12 +3081,23 @@ elm-doc-preview@^5.0.5:
     tmp "0.1.0"
     ws "^7.2.3"
 
-elm-format@^0.8.3, elm-format@^0.8.5:
+elm-format@^0.8.3:
   version "0.8.5"
   resolved "https://registry.yarnpkg.com/elm-format/-/elm-format-0.8.5.tgz#bd87c344d371ccd7eb694c6f7bccf29487596454"
   integrity sha512-/Mjwz5RhJ8cdcMsHT98AEKprSIHyRde+URIPvnHez9WH7Xp+rFCOJx0FNMPIYrbHE9Ei7HDSVwhjDP0i+mlvpQ==
   dependencies:
     binwrap "^0.2.3"
+
+elm-format@^0.8.6:
+  version "0.8.6"
+  resolved "https://registry.yarnpkg.com/elm-format/-/elm-format-0.8.6.tgz#3d8e0cd3195f7003ef039c047e4f4c0b7961e18c"
+  integrity sha512-hUYo7PNH6iUR6km1r9teEYYyf/sSzBEuPtbCj4aTbHg1u9B2btGz4oxuIL12yXMxyzXiGoggLS9nnsaLQ1C2rg==
+  optionalDependencies:
+    "@avh4/elm-format-darwin-arm64" "0.8.6-2"
+    "@avh4/elm-format-darwin-x64" "0.8.6-2"
+    "@avh4/elm-format-linux-arm64" "0.8.6-2"
+    "@avh4/elm-format-linux-x64" "0.8.6-2"
+    "@avh4/elm-format-win32-x64" "0.8.6-2"
 
 elm-hot@^1.1.6:
   version "1.1.6"
